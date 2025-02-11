@@ -1,0 +1,150 @@
+Auto Transport Quote System – Developer Guide
+📌 Project Overview
+This document outlines the complete logic, pricing structure, UI/UX elements, API integrations, and functionalities for the Auto Transport Quote System. The system will be integrated into quote-form-two.vercel.app to provide fast, accurate, and user-friendly transport quotes.
+
+🖥️ Customer Page Requirements
+Quote Display Section
+Full Pricing Menu displaying all transport options:
+Open Transport Price (Car, SUV, Pickup Truck)
+Enclosed Transport Price (Car, SUV, Pickup Truck)
+Transit Time Display calculated as distance ÷ 400 miles per day
+Disclaimer:
+"Prices are based on mileage and do not account for inoperable or oversized vehicles, or very specific timing needs. If you have an urgent time-sensitive request, please call, text, or live chat with us."
+"Reserve Your Spot – No Payment Required" Button
+Additional Features
+Live Chat / Support
+Customer Testimonials
+FAQ Section
+Why Choose Us? (Competitive advantages)
+
+📝 Quote Form Fields
+1️⃣ Vehicle Type Selection (Dropdown Menu)
+Customers select the main vehicle category from a dropdown:
+Car
+SUV
+Pickup Truck
+Other (Manually Entered by Customer)
+2️⃣ Make & Model Dropdown (For Cars, SUVs, and Pickup Trucks)
+If a customer selects Car, SUV, or Pickup Truck, a second dropdown appears to select:
+Make (e.g., Toyota, Ford, Chevrolet)
+Model (e.g., Camry, F-150, Silverado)
+3️⃣ Manually Entered Vehicle Types
+For all other vehicle types, the customer must manually enter details:
+Boat
+Golf Cart
+Motorcycle
+RV
+5th Wheel
+Travel Trailer
+ATV/UTV
+Other (Free text entry)
+
+⚙️ Pricing Logic
+1️⃣ Distance-Based Pricing (For Sedans, SUVs, Pickup Trucks)
+0–499 miles: No price is displayed; instead, the user is redirected to a thank-you page:
+“Thank you! Your request has been received. Our team will contact you soon with a confirmed price.”
+500–800 miles: $0.614 per mile + 10% margin
+801+ miles: $0.614 per mile
+Minimum price for any route: $450
+
+2️⃣ Vehicle Type Adjustments
+SUVs:
+Under 1,600 miles: +25% over sedan price
+Over 1,600 miles: +7.5% over sedan price
+Pickup Trucks:
++28.9% over sedan price
+Enclosed pickup truck transport: 20% higher than enclosed SUV transport
+All manually entered vehicle types → Pricing requires a custom quote. The user is redirected to a thank-you page for follow-up.
+
+3️⃣ Open vs. Enclosed Transport
+Open transport: Base price
+Enclosed transport: +40% increase over open transport price
+
+4️⃣ Seasonal Pricing Adjustments (Applied Automatically, Not Shown to Customer)
+Southbound (October–March) → +35% increase
+Northbound (April–September) → +35% increase
+This adjustment is calculated automatically but will NOT be displayed or mentioned to the customer.
+
+🛣️ Distance Calculation – Google Maps API or Mapbox API
+The system will use Google Maps API or Mapbox API to calculate mileage between the pickup and drop-off locations.
+
+📍 Code for Fetching Distance Data
+Google Maps API
+javascript
+CopyEdit
+const getDistanceGoogle = async (pickup, dropoff) => {
+  const API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${pickup}&destinations=${dropoff}&key=${API_KEY}`;
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.rows[0].elements[0].status === "OK") {
+      return {
+        distance: Math.round(data.rows[0].elements[0].distance.value / 1609.34), // Convert meters to miles
+      };
+    } else {
+      throw new Error("Distance calculation failed");
+    }
+  } catch (error) {
+    console.error("Google Maps API Error:", error);
+    return null;
+  }
+};
+
+
+🚚 Transit Time Calculation
+Transit time is calculated as distance ÷ 400 miles per day.
+javascript
+CopyEdit
+const calculateTransitTime = (distance) => {
+  return Math.ceil(distance / 400); // Round up to the nearest whole day
+};
+
+
+💰 Full Pricing Calculation Function
+javascript
+CopyEdit
+const calculateQuote = async (pickup, dropoff, vehicleType, transportType, date) => {
+  const routeData = await getDistanceGoogle(pickup, dropoff);  
+  if (!routeData) return null;
+
+  let basePrice = routeData.distance * 0.614;
+
+  // Apply vehicle type adjustments
+  if (vehicleType === "suv") {
+    basePrice *= routeData.distance < 1600 ? 1.25 : 1.075;
+  } else if (vehicleType === "pickup") {
+    basePrice *= 1.289;
+  }
+
+  // Apply seasonal pricing adjustment (not shown to customer)
+  const month = new Date(date).getMonth() + 1; // Get the month (1-12)
+  if (month >= 10 || month <= 3) {
+    basePrice *= 1.35; // Southbound pricing increase
+  } else if (month >= 4 && month <= 9) {
+    basePrice *= 1.35; // Northbound pricing increase
+  }
+
+  // Adjust for enclosed transport
+  if (transportType === "enclosed") {
+    basePrice *= 1.4;
+    if (vehicleType === "pickup") basePrice *= 1.2;
+  }
+
+  return { 
+    price: basePrice.toFixed(2), 
+    transitTime: calculateTransitTime(routeData.distance) 
+  };
+};
+
+
+✅ Final Implementation Steps
+✅ Customer Quote Form: Dropdown for Car, SUV, Pickup Truck, manual entry for other vehicles
+✅ Google Maps API or Mapbox API for distance calculations
+✅ Transit time calculated as distance ÷ 400 miles per day
+✅ Seasonal pricing automatically applied but NOT displayed to the customer
+✅ Checkout page connection with pre-filled customer data
+✅ Automated SMS & email notifications for quotes & bookings
+
