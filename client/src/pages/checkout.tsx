@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-//import { apiRequest } from "@/lib/queryClient"; // Removed unnecessary import
 import { ArrowRight, Calendar, Mail, Phone, User, Car, Truck, Shield } from "lucide-react";
 
 type CheckoutData = {
@@ -24,7 +22,6 @@ type CheckoutData = {
 };
 
 export default function Checkout() {
-  const [selectedTransport, setSelectedTransport] = useState<"open" | "enclosed">();
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
@@ -35,7 +32,6 @@ export default function Checkout() {
   }
 
   const handleConfirm = () => {
-    if (!selectedTransport) return;
     navigate("/thank-you");
   };
 
@@ -53,10 +49,8 @@ export default function Checkout() {
             <h3 className="text-lg font-semibold">Select Transport Type</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card
-                className={`cursor-pointer transition-all ${
-                  selectedTransport === "open" ? "ring-2 ring-primary" : ""
-                }`}
-                onClick={() => setSelectedTransport("open")}
+                className={`cursor-pointer transition-all`}
+                onClick={() => {}}
               >
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-center gap-2">
@@ -68,10 +62,8 @@ export default function Checkout() {
               </Card>
 
               <Card
-                className={`cursor-pointer transition-all ${
-                  selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
-                }`}
-                onClick={() => setSelectedTransport("enclosed")}
+                className={`cursor-pointer transition-all`}
+                onClick={() => {}}
               >
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-center gap-2">
@@ -146,10 +138,20 @@ export default function Checkout() {
             </div>
           </div>
 
+          {/* Price Display */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Total Price</h3>
+                <p className="text-sm text-muted-foreground">Open Transport</p>
+              </div>
+              <p className="text-3xl font-bold">${data.openTransportPrice}</p>
+            </div>
+          </div>
+
           {/* CTA Button */}
           <Button
             onClick={handleConfirm}
-            disabled={!selectedTransport}
             className="w-full h-12 text-lg font-semibold"
             size="lg"
           >
