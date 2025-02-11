@@ -30,12 +30,12 @@ export default function Home() {
     try {
       const distance = await getDistance(data.pickupLocation, data.dropoffLocation);
       const pricing = calculatePricing(distance, data.vehicleType);
-      
-      if (data.vehicleType === "other") {
+
+      if (data.vehicleType !== "car/truck/suv") {
         navigate("/thank-you");
         return;
       }
-      
+
       setPrices(pricing);
     } catch (error) {
       toast({
@@ -53,21 +53,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="container mx-auto max-w-7xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Auto Transport Quote Calculator
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Get an instant quote for shipping your vehicle
-          </p>
-        </div>
-
-        <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
-
-        {prices && <PriceDisplay {...prices} onReserve={handleReserve} />}
-      </div>
+    <div className="bg-background">
+      <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+      {prices && <PriceDisplay {...prices} onReserve={handleReserve} />}
     </div>
   );
 }
