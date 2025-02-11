@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowRight, Calendar, Mail, Phone, User, Car } from "lucide-react";
+import { ArrowRight, Calendar, Mail, Phone, User, Car, Truck, Shield } from "lucide-react";
 
 type CheckoutData = {
   vehicleType: string;
@@ -16,24 +17,34 @@ type CheckoutData = {
   name?: string;
   phone?: string;
   email?: string;
-  transportType: "open" | "enclosed";
-  price: number;
+  openTransportPrice: number;
+  enclosedTransportPrice: number;
   transitTime: number;
+  distance: number;
 };
 
 export default function Checkout() {
+  const [selectedTransport, setSelectedTransport] = useState<"open" | "enclosed">();
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
 
-  if (!data.price) {
+  if (!data.openTransportPrice) {
     navigate("/");
     return null;
   }
 
   const handleConfirm = async () => {
+    if (!selectedTransport) return;
+
     try {
-      await apiRequest("POST", "/api/quotes", data);
+      const quoteData = {
+        ...data,
+        transportType: selectedTransport,
+        price: selectedTransport === "open" ? data.openTransportPrice : data.enclosedTransportPrice,
+      };
+
+      await apiRequest("POST", "/api/quotes", quoteData);
       navigate("/thank-you");
     } catch (error) {
       console.error("Failed to submit quote:", error);
@@ -49,6 +60,59 @@ export default function Checkout() {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Transport Options */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Select Transport Type</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card 
+                className={`cursor-pointer transition-all ${
+                  selectedTransport === "open" ? "ring-2 ring-primary" : ""
+                }`}
+                onClick={() => setSelectedTransport("open")}
+              >
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-5 w-5" />
+                    <h4 className="font-medium">Open Transport</h4>
+                  </div>
+                  <p className="text-2xl font-bold">${data.openTransportPrice}</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all ${
+                  selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
+                }`}
+                onClick={() => setSelectedTransport("enclosed")}
+              >
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    <h4 className="font-medium">Enclosed Transport</h4>
+                  </div>
+                  <p className="text-2xl font-bold">${data.enclosedTransportPrice}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Vehicle Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Car className="h-5 w-5" />
+              Vehicle Details
+            </h3>
+            <div className="grid gap-2">
+              <p><span className="font-medium">Year:</span> {data.year}</p>
+              <p><span className="font-medium">Make:</span> {data.make}</p>
+              <p><span className="font-medium">Model:</span> {data.model}</p>
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Contact Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -79,22 +143,6 @@ export default function Checkout() {
 
           <Separator />
 
-          {/* Vehicle Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Car className="h-5 w-5" />
-              Vehicle Details
-            </h3>
-            <div className="grid gap-2">
-              <p><span className="font-medium">Year:</span> {data.year}</p>
-              <p><span className="font-medium">Make:</span> {data.make}</p>
-              <p><span className="font-medium">Model:</span> {data.model}</p>
-              <p><span className="font-medium">Transport Type:</span> {data.transportType === "open" ? "Open Transport" : "Enclosed Transport"}</p>
-            </div>
-          </div>
-
-          <Separator />
-
           {/* Shipping Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -109,28 +157,19 @@ export default function Checkout() {
             </div>
           </div>
 
-          <Separator />
-
-          {/* Price */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-end">
-              <div>
-                <h3 className="text-lg font-semibold">Total Price</h3>
-                <p className="text-sm text-muted-foreground">No payment required to reserve</p>
-              </div>
-              <p className="text-3xl font-bold">${data.price}</p>
-            </div>
-          </div>
-
           {/* CTA Button */}
           <Button 
-            onClick={handleConfirm} 
+            onClick={handleConfirm}
+            disabled={!selectedTransport}
             className="w-full h-12 text-lg font-semibold"
             size="lg"
           >
             Book Your Free Reservation Now!
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
+          <p className="text-sm text-center text-muted-foreground">
+            No payment required to reserve your spot
+          </p>
         </CardContent>
       </Card>
     </div>
