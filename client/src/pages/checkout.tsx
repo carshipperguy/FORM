@@ -39,7 +39,7 @@ export default function Checkout() {
     return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
   };
 
-  const currentPrice = selectedTransport === "enclosed" 
+  const currentPrice = selectedTransport === "enclosed"
     ? calculatePrice(data.enclosedTransportPrice)
     : calculatePrice(data.openTransportPrice);
 
@@ -70,16 +70,20 @@ export default function Checkout() {
             Fill in your details to secure your vehicle transport
           </p>
           <div className="flex justify-center items-center gap-8 mt-4">
-            <img
-              src="/assets/google-rating.png"
-              alt="4.7 Star Google Rating"
-              className="h-12"
-            />
-            <img
-              src="/assets/bbb-accredited.png"
-              alt="BBB Accredited Business"
-              className="h-12"
-            />
+            <div className="h-12">
+              <img
+                src="/assets/google-rating.png"
+                alt="4.7 Star Google Rating"
+                className="h-full w-auto object-contain"
+              />
+            </div>
+            <div className="h-12">
+              <img
+                src="/assets/bbb-accredited.png"
+                alt="BBB Accredited Business"
+                className="h-full w-auto object-contain"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -162,9 +166,9 @@ export default function Checkout() {
 
           {/* Submit Button and Disclaimers */}
           <div className="space-y-6">
-            <Button 
+            <Button
               onClick={handleReserve}
-              className="w-full h-12 text-lg font-semibold" 
+              className="w-full h-12 text-lg font-semibold"
               size="lg"
               disabled={!selectedTransport}
             >
