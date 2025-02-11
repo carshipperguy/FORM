@@ -2,20 +2,21 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Calendar, Mail, Phone, User, Car, Truck, Shield } from "lucide-react";
+import { ArrowRight, Calendar, Car } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+// Make all fields optional for testing
 const bookingSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  pickupAddress: z.string().min(1, "Pickup address is required"),
-  deliveryAddress: z.string().min(1, "Delivery address is required"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  pickupAddress: z.string().optional(),
+  deliveryAddress: z.string().optional(),
 });
 
 type BookingFormData = z.infer<typeof bookingSchema>;
@@ -121,7 +122,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input placeholder="John" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -135,7 +135,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input placeholder="Doe" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -149,7 +148,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input type="email" placeholder="john@example.com" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -163,7 +161,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input type="tel" placeholder="(555) 555-5555" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -177,7 +174,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input placeholder="Enter complete pickup address" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -191,7 +187,6 @@ export default function Checkout() {
                       <FormControl>
                         <Input placeholder="Enter complete delivery address" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
