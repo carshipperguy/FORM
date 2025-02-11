@@ -15,7 +15,6 @@ export const quotes = pgTable("quotes", {
   name: text("name"),
   phone: text("phone"),
   email: text("email"),
-  address: text("address"),
   distance: real("distance").notNull(),
   openTransportPrice: real("open_transport_price").notNull(),
   enclosedTransportPrice: real("enclosed_transport_price").notNull(),
@@ -33,7 +32,6 @@ export const quoteFormSchema = z.object({
   name: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email().optional(),
-  address: z.string().optional(),
 });
 
 export const insertQuoteSchema = createInsertSchema(quotes);

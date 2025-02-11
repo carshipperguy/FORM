@@ -22,6 +22,7 @@ type QuoteFormProps = {
 
 export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const [selectedMake, setSelectedMake] = useState<string>("");
+  const [showContactFields, setShowContactFields] = useState(false);
 
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteFormSchema),
@@ -29,11 +30,17 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
       vehicleType: "car/truck/suv",
       pickupLocation: "",
       dropoffLocation: "",
-      shipmentDate: new Date(),
+      shipmentDate: undefined,
     },
   });
 
   const vehicleType = form.watch("vehicleType");
+  const shipmentDate = form.watch("shipmentDate");
+
+  // Show contact fields when date is selected
+  if (shipmentDate && !showContactFields) {
+    setShowContactFields(true);
+  }
 
   const onSubmit = (data: QuoteFormData) => {
     onCalculate(data);
@@ -222,57 +229,48 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {showContactFields && (
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input placeholder="Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Phone" type="tel" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input placeholder="Phone" type="tel" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Email" type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input placeholder="Email" type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
