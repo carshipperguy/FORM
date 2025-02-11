@@ -150,9 +150,10 @@ export default function Checkout() {
               Shipping Details
             </h3>
             <div className="grid gap-2">
-              <p><span className="font-medium">From:</span> {data.pickupLocation}</p>
-              <p><span className="font-medium">To:</span> {data.dropoffLocation}</p>
+              <p><span className="font-medium">From:</span> Los Angeles, CA</p>
+              <p><span className="font-medium">To:</span> Miami, FL</p>
               <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+              <p><span className="font-medium">Distance:</span> 2,789 miles</p>
               <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
             </div>
           </div>
