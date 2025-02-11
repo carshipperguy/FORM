@@ -27,15 +27,16 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
       vehicleType: "car/truck/suv",
-      year: undefined,
-      make: undefined,
-      model: undefined,
+      year: "",
+      make: "",
+      model: "",
       pickupLocation: "",
       dropoffLocation: "",
       shipmentDate: undefined,
     },
   });
 
+  const vehicleType = form.watch("vehicleType");
   const make = form.watch("make");
   const shipmentDate = form.watch("shipmentDate");
 
@@ -47,6 +48,8 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const onSubmit = (data: QuoteFormData) => {
     onCalculate(data);
   };
+
+  const isCarTruckSuv = vehicleType === "car/truck/suv";
 
   return (
     <Card className="w-full max-w-[500px] mx-auto">
@@ -120,20 +123,26 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="year"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange}>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {years.map((year) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Year" />
-                          </SelectTrigger>
+                          <Input placeholder="Enter Year" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          {years.map((year) => (
-                            <SelectItem key={year} value={year}>
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -144,20 +153,26 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="make"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange}>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Vehicle Make" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {makes.map((make) => (
+                              <SelectItem key={make} value={make}>
+                                {make}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Vehicle Make" />
-                          </SelectTrigger>
+                          <Input placeholder="Enter Make" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          {makes.map((make) => (
-                            <SelectItem key={make} value={make}>
-                              {make}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -168,20 +183,26 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="model"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} disabled={!make}>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange} disabled={!make}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Vehicle Model" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {make && modelsByMake[make]?.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {model}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Vehicle Model" />
-                          </SelectTrigger>
+                          <Input placeholder="Enter Model" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          {make && modelsByMake[make]?.map((model) => (
-                            <SelectItem key={model} value={model}>
-                              {model}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
