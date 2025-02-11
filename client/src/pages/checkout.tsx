@@ -17,8 +17,6 @@ const bookingSchema = z.object({
   lastName: z.string().optional(),
   email: z.string().optional(),
   phone: z.string().optional(),
-  pickupAddress: z.string().optional(),
-  deliveryAddress: z.string().optional(),
 });
 
 type BookingFormData = z.infer<typeof bookingSchema>;
@@ -54,8 +52,6 @@ export default function Checkout() {
       lastName: "",
       email: data.email || "",
       phone: data.phone || "",
-      pickupAddress: "",
-      deliveryAddress: "",
     },
   });
 
@@ -68,7 +64,7 @@ export default function Checkout() {
     return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
   };
 
-  const currentPrice = selectedTransport === "enclosed" 
+  const currentPrice = selectedTransport === "enclosed"
     ? calculatePrice(data.enclosedTransportPrice)
     : calculatePrice(data.openTransportPrice);
 
@@ -84,6 +80,13 @@ export default function Checkout() {
           <p className="text-muted-foreground">
             Fill in your details to secure your vehicle transport
           </p>
+          <div className="mx-auto w-fit">
+            <img
+              src="/assets/google-rating.png"
+              alt="4.7 Star Google Rating"
+              className="h-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Transport Options */}
@@ -125,8 +128,12 @@ export default function Checkout() {
           {/* Guaranteed Date Option */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h3 className="font-medium">Expedited shipping</h3>
-              <p className="text-sm text-muted-foreground">Expedited shipping that's faster than standard transit time, your vehicle is a priority for pickup and delivery.</p>
+              <h3 className="font-medium">Guaranteed Date Expedited Shipping</h3>
+              <p className="text-sm text-muted-foreground">
+                Expedited shipping ensures your vehicle is prioritized for pickup and delivery,
+                arriving faster than standard transit times. Your transport is scheduled with a
+                guaranteed pickup date for maximum convenience.
+              </p>
             </div>
             <Switch
               checked={guaranteedDate}
@@ -216,32 +223,6 @@ export default function Checkout() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="pickupAddress"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Pickup Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter complete pickup address" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="deliveryAddress"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Delivery Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter complete delivery address" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
               </div>
 
               {/* Submit Button */}
@@ -250,11 +231,14 @@ export default function Checkout() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
 
-              <div className="space-y-2 text-sm text-center text-muted-foreground">
-                <p>
-                  Quotes do not account for inoperable or oversized vehicles, existing transport arrangements with other companies, or off-route locations that may incur additional costs.
+              <div className="space-y-4 text-center">
+                <p className="text-xl font-bold">
+                  No credit card required to reserve your spot
                 </p>
-                <p>No credit card required to reserve your spot.</p>
+                <p className="text-sm text-muted-foreground">
+                  Quotes do not account for inoperable or oversized vehicles, existing transport
+                  arrangements with other companies, or off-route locations that may incur additional costs.
+                </p>
               </div>
             </form>
           </Form>
