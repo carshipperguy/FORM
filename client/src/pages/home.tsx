@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { QuoteForm } from "@/components/quote-form";
-import { PriceDisplay } from "@/components/price-display";
 import { calculatePricing } from "@/lib/pricing";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -16,12 +15,6 @@ async function getDistance(origin: string, destination: string): Promise<number>
 }
 
 export default function Home() {
-  const [prices, setPrices] = useState<{
-    openTransport: number;
-    enclosedTransport: number;
-    transitTime: number;
-  } | null>(null);
-  const [quoteData, setQuoteData] = useState<QuoteFormData | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -37,8 +30,19 @@ export default function Home() {
         return;
       }
 
-      setPrices(pricing);
-      setQuoteData(data);
+      const checkoutData = {
+        ...data,
+        openTransportPrice: pricing.openTransport,
+        enclosedTransportPrice: pricing.enclosedTransport,
+        transitTime: pricing.transitTime,
+        distance,
+      };
+
+      const params = new URLSearchParams({
+        data: encodeURIComponent(JSON.stringify(checkoutData)),
+      });
+
+      navigate(`/checkout?${params.toString()}`);
     } catch (error) {
       toast({
         title: "Error",
@@ -50,27 +54,9 @@ export default function Home() {
     }
   };
 
-  const handleReserve = async (type: "open" | "enclosed") => {
-    if (!quoteData || !prices) return;
-
-    const checkoutData = {
-      ...quoteData,
-      transportType: type,
-      price: type === "open" ? prices.openTransport : prices.enclosedTransport,
-      transitTime: prices.transitTime,
-    };
-
-    const params = new URLSearchParams({
-      data: encodeURIComponent(JSON.stringify(checkoutData)),
-    });
-
-    navigate(`/checkout?${params.toString()}`);
-  };
-
   return (
     <div className="bg-background">
       <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
-      {prices && <PriceDisplay {...prices} onReserve={handleReserve} />}
     </div>
   );
 }
