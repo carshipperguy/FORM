@@ -97,10 +97,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="vehicleType"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>What Would You Like To Ship?</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="What Would You Like To Ship?" />
+                            <SelectValue placeholder="Select vehicle type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -123,11 +124,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="year"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Year</FormLabel>
                       {isCarTruckSuv ? (
                         <Select onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Year" />
+                              <SelectValue placeholder="Select year" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -140,7 +142,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                         </Select>
                       ) : (
                         <FormControl>
-                          <Input placeholder="Enter Year" {...field} />
+                          <Input placeholder="Enter year" {...field} />
                         </FormControl>
                       )}
                       <FormMessage />
@@ -153,11 +155,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="make"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Make</FormLabel>
                       {isCarTruckSuv ? (
                         <Select onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Vehicle Make" />
+                              <SelectValue placeholder="Select make" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -170,7 +173,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                         </Select>
                       ) : (
                         <FormControl>
-                          <Input placeholder="Enter Make" {...field} />
+                          <Input placeholder="Enter make" {...field} />
                         </FormControl>
                       )}
                       <FormMessage />
@@ -183,11 +186,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="model"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Model</FormLabel>
                       {isCarTruckSuv ? (
                         <Select onValueChange={field.onChange} disabled={!make}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Vehicle Model" />
+                              <SelectValue placeholder="Select model" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -200,7 +204,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                         </Select>
                       ) : (
                         <FormControl>
-                          <Input placeholder="Enter Model" {...field} />
+                          <Input placeholder="Enter model" {...field} />
                         </FormControl>
                       )}
                       <FormMessage />
@@ -220,6 +224,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="shipmentDate"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Shipment Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -251,6 +256,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           />
                         </PopoverContent>
                       </Popover>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
