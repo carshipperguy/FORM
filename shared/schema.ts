@@ -1,31 +1,39 @@
-import { pgTable, text, serial, integer, boolean, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, real, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { vehicleTypes } from "../client/src/lib/vehicle-data";
 
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
   vehicleType: text("vehicle_type").notNull(),
   make: text("make"),
   model: text("model"),
+  customVehicleDetails: text("custom_vehicle_details"),
   pickupLocation: text("pickup_location").notNull(),
   dropoffLocation: text("dropoff_location").notNull(),
+  shipmentDate: timestamp("shipment_date").notNull(),
+  name: text("name"),
+  phone: text("phone"),
+  email: text("email"),
+  address: text("address"),
   distance: real("distance").notNull(),
   openTransportPrice: real("open_transport_price").notNull(),
   enclosedTransportPrice: real("enclosed_transport_price").notNull(),
   transitTime: integer("transit_time").notNull(),
-  email: text("email"),
-  phone: text("phone"),
 });
 
 export const quoteFormSchema = z.object({
-  vehicleType: z.enum(["car", "suv", "pickup", "other"]),
+  vehicleType: z.enum(vehicleTypes),
   make: z.string().optional(),
   model: z.string().optional(),
-  otherVehicle: z.string().optional(),
+  customVehicleDetails: z.string().optional(),
   pickupLocation: z.string().min(1, "Pickup location is required"),
   dropoffLocation: z.string().min(1, "Dropoff location is required"),
-  email: z.string().email().optional(),
+  shipmentDate: z.date(),
+  name: z.string().optional(),
   phone: z.string().optional(),
+  email: z.string().email().optional(),
+  address: z.string().optional(),
 });
 
 export const insertQuoteSchema = createInsertSchema(quotes);

@@ -19,7 +19,9 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
+      <div className="w-[500px] h-[800px] mx-auto overflow-y-auto bg-white">
+        <Router />
+      </div>
       <Toaster />
     </QueryClientProvider>
   );
