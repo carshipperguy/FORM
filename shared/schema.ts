@@ -7,8 +7,6 @@ export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
   vehicleType: text("vehicle_type").notNull(),
   year: text("year"),
-  make: text("make"),
-  model: text("model"),
   customVehicleDetails: text("custom_vehicle_details"),
   pickupLocation: text("pickup_location").notNull(),
   dropoffLocation: text("dropoff_location").notNull(),
@@ -25,8 +23,6 @@ export const quotes = pgTable("quotes", {
 export const quoteFormSchema = z.object({
   vehicleType: z.enum(vehicleTypes),
   year: z.string().optional(),
-  make: z.string().optional(),
-  model: z.string().optional(),
   customVehicleDetails: z.string().optional(),
   pickupLocation: z.string().min(1, "Pickup location is required"),
   dropoffLocation: z.string().min(1, "Dropoff location is required"),
