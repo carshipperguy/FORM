@@ -5,15 +5,6 @@ import { calculatePricing } from "@/lib/pricing";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
-async function getDistance(origin: string, destination: string): Promise<number> {
-  const response = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
-  if (!response.ok) {
-    throw new Error("Failed to calculate distance");
-  }
-  const data = await response.json();
-  return data.distance;
-}
-
 export default function Home() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [, navigate] = useLocation();
@@ -22,7 +13,8 @@ export default function Home() {
   const handleCalculate = async (data: QuoteFormData) => {
     setIsCalculating(true);
     try {
-      const distance = await getDistance(data.pickupLocation, data.dropoffLocation);
+      // Use mock distance for testing
+      const distance = 1000;
       const pricing = calculatePricing(distance, data.vehicleType);
 
       if (data.vehicleType !== "car/truck/suv") {
