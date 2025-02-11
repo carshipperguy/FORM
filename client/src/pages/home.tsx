@@ -21,6 +21,7 @@ export default function Home() {
     enclosedTransport: number;
     transitTime: number;
   } | null>(null);
+  const [quoteData, setQuoteData] = useState<QuoteFormData | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -37,6 +38,7 @@ export default function Home() {
       }
 
       setPrices(pricing);
+      setQuoteData(data);
     } catch (error) {
       toast({
         title: "Error",
@@ -49,7 +51,20 @@ export default function Home() {
   };
 
   const handleReserve = async (type: "open" | "enclosed") => {
-    navigate("/thank-you");
+    if (!quoteData || !prices) return;
+
+    const checkoutData = {
+      ...quoteData,
+      transportType: type,
+      price: type === "open" ? prices.openTransport : prices.enclosedTransport,
+      transitTime: prices.transitTime,
+    };
+
+    const params = new URLSearchParams({
+      data: encodeURIComponent(JSON.stringify(checkoutData)),
+    });
+
+    navigate(`/checkout?${params.toString()}`);
   };
 
   return (

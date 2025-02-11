@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertQuoteSchema } from "@shared/schema";
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -37,6 +38,16 @@ export function registerRoutes(app: Express): Server {
       res.json({ distance });
     } catch (error) {
       res.status(500).json({ error: "Failed to calculate distance" });
+    }
+  });
+
+  app.post("/api/quotes", async (req, res) => {
+    try {
+      const quoteData = insertQuoteSchema.parse(req.body);
+      const quote = await storage.createQuote(quoteData);
+      res.json(quote);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid quote data" });
     }
   });
 
