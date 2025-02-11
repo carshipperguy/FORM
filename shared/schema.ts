@@ -6,6 +6,7 @@ import { vehicleTypes } from "../client/src/lib/vehicle-data";
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
   vehicleType: text("vehicle_type").notNull(),
+  year: text("year"),
   make: text("make"),
   model: text("model"),
   customVehicleDetails: text("custom_vehicle_details"),
@@ -23,6 +24,7 @@ export const quotes = pgTable("quotes", {
 
 export const quoteFormSchema = z.object({
   vehicleType: z.enum(vehicleTypes),
+  year: z.string().optional(),
   make: z.string().optional(),
   model: z.string().optional(),
   customVehicleDetails: z.string().optional(),
