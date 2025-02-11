@@ -80,10 +80,15 @@ export default function Checkout() {
           <p className="text-muted-foreground">
             Fill in your details to secure your vehicle transport
           </p>
-          <div className="mx-auto w-fit">
+          <div className="flex justify-center items-center gap-8 mt-4">
             <img
               src="/assets/google-rating.png"
               alt="4.7 Star Google Rating"
+              className="h-12"
+            />
+            <img
+              src="/assets/bbb-accredited.png"
+              alt="BBB Accredited Business"
               className="h-12"
             />
           </div>
@@ -232,7 +237,7 @@ export default function Checkout() {
               </Button>
 
               <div className="space-y-4 text-center">
-                <p className="text-xl font-bold">
+                <p className="text-2xl font-bold">
                   No credit card required to reserve your spot
                 </p>
                 <p className="text-sm text-muted-foreground">
