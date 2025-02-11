@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Calendar, Car, Truck, Shield } from "lucide-react";
+import { ArrowRight, Calendar, Truck, Shield } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 type CheckoutData = {
@@ -44,7 +44,21 @@ export default function Checkout() {
     : calculatePrice(data.openTransportPrice);
 
   const handleReserve = () => {
-    navigate("/thank-you");
+    const params = new URLSearchParams({
+      data: encodeURIComponent(JSON.stringify({
+        ...data,
+        selectedTransport,
+        guaranteedDate,
+        finalPrice: currentPrice
+      }))
+    });
+    navigate(`/booking?${params.toString()}`);
+  };
+
+  // Extract city from location string
+  const extractCity = (location: string) => {
+    const parts = location.split(',');
+    return parts[0].trim();
   };
 
   return (
@@ -137,8 +151,8 @@ export default function Checkout() {
 
               <div className="grid gap-2">
                 <h4 className="font-medium">Route Information</h4>
-                <p><span className="font-medium">From:</span> {data.pickupLocation} (ZIP: {data.pickupLocation.match(/\d{5}/)?.[0] || 'N/A'})</p>
-                <p><span className="font-medium">To:</span> {data.dropoffLocation} (ZIP: {data.dropoffLocation.match(/\d{5}/)?.[0] || 'N/A'})</p>
+                <p><span className="font-medium">From:</span> {extractCity(data.pickupLocation)}</p>
+                <p><span className="font-medium">To:</span> {extractCity(data.dropoffLocation)}</p>
                 <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
                 <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
                 <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
@@ -152,6 +166,7 @@ export default function Checkout() {
               onClick={handleReserve}
               className="w-full h-12 text-lg font-semibold" 
               size="lg"
+              disabled={!selectedTransport}
             >
               Reserve Your Spot
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -159,7 +174,7 @@ export default function Checkout() {
 
             <div className="space-y-4 text-center">
               <p className="text-2xl font-bold">
-                No credit card required to reserve your spot
+                No payment required
               </p>
               <p className="text-sm text-muted-foreground">
                 Quotes do not account for inoperable or oversized vehicles, existing transport
