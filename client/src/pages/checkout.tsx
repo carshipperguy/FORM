@@ -64,8 +64,15 @@ export default function Checkout() {
     return null;
   }
 
+  const calculatePrice = (basePrice: number) => {
+    return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
+  };
+
+  const currentPrice = selectedTransport === "enclosed" 
+    ? calculatePrice(data.enclosedTransportPrice)
+    : calculatePrice(data.openTransportPrice);
+
   const onSubmit = async (formData: BookingFormData) => {
-    // Here we would typically submit the booking data to the server
     navigate("/thank-you");
   };
 
@@ -94,7 +101,7 @@ export default function Checkout() {
                     <Truck className="h-5 w-5" />
                     <h4 className="font-medium">Open Transport</h4>
                   </div>
-                  <p className="text-2xl font-bold">${data.openTransportPrice}</p>
+                  <p className="text-2xl font-bold">${calculatePrice(data.openTransportPrice)}</p>
                 </CardContent>
               </Card>
 
@@ -109,25 +116,22 @@ export default function Checkout() {
                     <Shield className="h-5 w-5" />
                     <h4 className="font-medium">Enclosed Transport</h4>
                   </div>
-                  <p className="text-2xl font-bold">${data.enclosedTransportPrice}</p>
+                  <p className="text-2xl font-bold">${calculatePrice(data.enclosedTransportPrice)}</p>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          <Separator />
-
-          {/* Vehicle Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Car className="h-5 w-5" />
-              Vehicle Details
-            </h3>
-            <div className="grid gap-2">
-              <p><span className="font-medium">Year:</span> {data.year}</p>
-              <p><span className="font-medium">Make:</span> {data.make}</p>
-              <p><span className="font-medium">Model:</span> {data.model}</p>
+          {/* Guaranteed Date Option */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="font-medium">Expedited shipping</h3>
+              <p className="text-sm text-muted-foreground">Expedited shipping that's faster than standard transit time, your vehicle is a priority for pickup and delivery.</p>
             </div>
+            <Switch
+              checked={guaranteedDate}
+              onCheckedChange={setGuaranteedDate}
+            />
           </div>
 
           <Separator />
@@ -138,27 +142,21 @@ export default function Checkout() {
               <Calendar className="h-5 w-5" />
               Shipping Details
             </h3>
-            <div className="grid gap-2">
-              <p><span className="font-medium">From:</span> {data.pickupLocation}</p>
-              <p><span className="font-medium">To:</span> {data.dropoffLocation}</p>
-              <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
-              <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
-              <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
-            </div>
-          </div>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <h4 className="font-medium">Vehicle Information</h4>
+                <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
+              </div>
 
-          <Separator />
-
-          {/* Guaranteed Date Option */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h3 className="font-medium">Guaranteed Pickup Date</h3>
-              <p className="text-sm text-muted-foreground">Add $75 for guaranteed pickup within 24 hours of your preferred date</p>
+              <div className="grid gap-2">
+                <h4 className="font-medium">Route Information</h4>
+                <p><span className="font-medium">From:</span> {data.pickupLocation} (ZIP: {data.pickupLocation.match(/\d{5}/)?.[0] || 'N/A'})</p>
+                <p><span className="font-medium">To:</span> {data.dropoffLocation} (ZIP: {data.dropoffLocation.match(/\d{5}/)?.[0] || 'N/A'})</p>
+                <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+                <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
+                <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
+              </div>
             </div>
-            <Switch
-              checked={guaranteedDate}
-              onCheckedChange={setGuaranteedDate}
-            />
           </div>
 
           <Separator />
@@ -252,10 +250,12 @@ export default function Checkout() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
 
-              <p className="text-sm text-center text-muted-foreground">
-                By reserving, you acknowledge that the final price may vary based on vehicle condition and specific requirements.
-                No payment required to reserve your spot.
-              </p>
+              <div className="space-y-2 text-sm text-center text-muted-foreground">
+                <p>
+                  Quotes do not account for inoperable or oversized vehicles, existing transport arrangements with other companies, or off-route locations that may incur additional costs.
+                </p>
+                <p>No credit card required to reserve your spot.</p>
+              </div>
             </form>
           </Form>
         </CardContent>
