@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { apiRequest } from "@/lib/queryClient";
+//import { apiRequest } from "@/lib/queryClient"; // Removed unnecessary import
 import { ArrowRight, Calendar, Mail, Phone, User, Car, Truck, Shield } from "lucide-react";
 
 type CheckoutData = {
@@ -34,21 +34,9 @@ export default function Checkout() {
     return null;
   }
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!selectedTransport) return;
-
-    try {
-      const quoteData = {
-        ...data,
-        transportType: selectedTransport,
-        price: selectedTransport === "open" ? data.openTransportPrice : data.enclosedTransportPrice,
-      };
-
-      await apiRequest("POST", "/api/quotes", quoteData);
-      navigate("/thank-you");
-    } catch (error) {
-      console.error("Failed to submit quote:", error);
-    }
+    navigate("/thank-you");
   };
 
   return (
@@ -64,7 +52,7 @@ export default function Checkout() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Select Transport Type</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card 
+              <Card
                 className={`cursor-pointer transition-all ${
                   selectedTransport === "open" ? "ring-2 ring-primary" : ""
                 }`}
@@ -79,7 +67,7 @@ export default function Checkout() {
                 </CardContent>
               </Card>
 
-              <Card 
+              <Card
                 className={`cursor-pointer transition-all ${
                   selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
                 }`}
@@ -159,7 +147,7 @@ export default function Checkout() {
           </div>
 
           {/* CTA Button */}
-          <Button 
+          <Button
             onClick={handleConfirm}
             disabled={!selectedTransport}
             className="w-full h-12 text-lg font-semibold"
