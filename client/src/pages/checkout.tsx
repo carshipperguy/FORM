@@ -4,22 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Calendar, Car, Truck, Shield } from "lucide-react";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Switch } from "@/components/ui/switch";
-
-// Make all fields optional for testing
-const bookingSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  email: z.string().optional(),
-  phone: z.string().optional(),
-});
-
-type BookingFormData = z.infer<typeof bookingSchema>;
 
 type CheckoutData = {
   vehicleType: string;
@@ -45,16 +30,6 @@ export default function Checkout() {
   const searchParams = new URLSearchParams(window.location.search);
   const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
 
-  const form = useForm<BookingFormData>({
-    resolver: zodResolver(bookingSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: data.email || "",
-      phone: data.phone || "",
-    },
-  });
-
   if (!data.openTransportPrice) {
     navigate("/");
     return null;
@@ -64,11 +39,11 @@ export default function Checkout() {
     return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
   };
 
-  const currentPrice = selectedTransport === "enclosed"
+  const currentPrice = selectedTransport === "enclosed" 
     ? calculatePrice(data.enclosedTransportPrice)
     : calculatePrice(data.openTransportPrice);
 
-  const onSubmit = async (formData: BookingFormData) => {
+  const handleReserve = () => {
     navigate("/thank-you");
   };
 
@@ -171,82 +146,27 @@ export default function Checkout() {
             </div>
           </div>
 
-          <Separator />
+          {/* Submit Button and Disclaimers */}
+          <div className="space-y-6">
+            <Button 
+              onClick={handleReserve}
+              className="w-full h-12 text-lg font-semibold" 
+              size="lg"
+            >
+              Reserve Your Spot
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
 
-          {/* Contact Form */}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Doe" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="john@example.com" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                        <Input type="tel" placeholder="(555) 555-5555" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full h-12 text-lg font-semibold" size="lg">
-                Reserve Your Spot
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-
-              <div className="space-y-4 text-center">
-                <p className="text-2xl font-bold">
-                  No credit card required to reserve your spot
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Quotes do not account for inoperable or oversized vehicles, existing transport
-                  arrangements with other companies, or off-route locations that may incur additional costs.
-                </p>
-              </div>
-            </form>
-          </Form>
+            <div className="space-y-4 text-center">
+              <p className="text-2xl font-bold">
+                No credit card required to reserve your spot
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Quotes do not account for inoperable or oversized vehicles, existing transport
+                arrangements with other companies, or off-route locations that may incur additional costs.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
