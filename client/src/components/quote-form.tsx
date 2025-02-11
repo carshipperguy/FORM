@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { quoteFormSchema, type QuoteFormData } from "@shared/schema";
-import { vehicleTypes, makes, models } from "@/lib/vehicle-data";
+import { vehicleTypes, makes, models, years } from "@/lib/vehicle-data";
 
 type QuoteFormProps = {
   onCalculate: (data: QuoteFormData) => void;
@@ -31,10 +31,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
       pickupLocation: "",
       dropoffLocation: "",
       shipmentDate: undefined,
+      year: undefined, // Added default value for year
     },
   });
 
   const vehicleType = form.watch("vehicleType");
+  const year = form.watch("year");
   const shipmentDate = form.watch("shipmentDate");
 
   // Show contact fields when date is selected
@@ -116,24 +118,19 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   <>
                     <FormField
                       control={form.control}
-                      name="make"
+                      name="year"
                       render={({ field }) => (
                         <FormItem>
-                          <Select
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              setSelectedMake(value);
-                            }}
-                          >
+                          <Select onValueChange={field.onChange}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Vehicle Make" />
+                                <SelectValue placeholder="Year" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {makes[vehicleType]?.map((make) => (
-                                <SelectItem key={make} value={make}>
-                                  {make}
+                              {years.map((year) => (
+                                <SelectItem key={year} value={year}>
+                                  {year}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -141,6 +138,36 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                         </FormItem>
                       )}
                     />
+
+                    {year && (
+                      <FormField
+                        control={form.control}
+                        name="make"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                setSelectedMake(value);
+                              }}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Vehicle Make" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {makes[vehicleType]?.map((make) => (
+                                  <SelectItem key={make} value={make}>
+                                    {make}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     {selectedMake && (
                       <FormField
