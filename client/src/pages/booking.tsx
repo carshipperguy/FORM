@@ -13,16 +13,16 @@ import { z } from "zod";
 
 const bookingSchema = z.object({
   pickupStreetAddress: z.string().min(1, "Street address is required"),
-  pickupCity: z.string().min(1, "City is required"),
-  pickupState: z.string().min(1, "State is required"),
-  pickupZip: z.string().min(1, "ZIP code is required"),
+  pickupCity: z.string(),
+  pickupState: z.string(),
+  pickupZip: z.string(),
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
   pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
 
   deliveryStreetAddress: z.string().min(1, "Street address is required"),
-  deliveryCity: z.string().min(1, "City is required"),
-  deliveryState: z.string().min(1, "State is required"),
-  deliveryZip: z.string().min(1, "ZIP code is required"),
+  deliveryCity: z.string(),
+  deliveryState: z.string(),
+  deliveryZip: z.string(),
   deliveryContactName: z.string().min(1, "Delivery contact name is required"),
   deliveryContactPhone: z.string().min(1, "Delivery contact phone is required"),
 
@@ -53,9 +53,9 @@ type QuoteData = {
 };
 
 export default function Booking() {
-  const [, navigate] = useLocation();
   const [isPickupContact, setIsPickupContact] = useState(false);
   const [isDeliveryContact, setIsDeliveryContact] = useState(false);
+  const [, navigate] = useLocation();
 
   const searchParams = new URLSearchParams(window.location.search);
   const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteData;
@@ -182,9 +182,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -195,9 +194,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -208,9 +206,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -284,9 +281,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -297,9 +293,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -310,9 +305,8 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly disabled className="bg-muted" />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
