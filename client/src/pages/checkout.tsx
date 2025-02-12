@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Calendar, Truck, Shield } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { TrustBadges } from "@/components/trust-badges";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 type CheckoutData = {
   vehicleType: string;
@@ -26,51 +28,29 @@ type CheckoutData = {
 
 export default function Checkout() {
   const [selectedTransport, setSelectedTransport] = useState<"open" | "enclosed">();
-  const [guaranteedDate, setGuaranteedDate] = useState(false);
   const [, navigate] = useLocation();
+  const form = useForm();
 
   const searchParams = new URLSearchParams(window.location.search);
   let data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
 
-  const calculateDistance = async (pickup: string, dropoff: string) => {
-    return new Promise<{success: boolean, distance: number}>((resolve) => {
-      setTimeout(() => {
-        resolve({success: true, distance: 100}); 
-      }, 500)
-    })
+  const calculatePrice = (basePrice: number) => {
+    return basePrice;
   };
-
-  if (!data.distance) {
-    calculateDistance(data.pickupLocation, data.dropoffLocation)
-      .then(result => {
-        if (result.success) {
-          data.distance = result.distance;
-          data.transitTime = Math.ceil(result.distance / 300) + 1; 
-        }
-      })
-      .catch(console.error);
-  }
 
   if (!data.openTransportPrice) {
     navigate("/");
     return null;
   }
 
-  const calculatePrice = (basePrice: number) => {
-    return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
-  };
-
-  const currentPrice = selectedTransport === "enclosed"
-    ? calculatePrice(data.enclosedTransportPrice)
-    : calculatePrice(data.openTransportPrice);
-
   const handleReserve = () => {
     const params = new URLSearchParams({
       data: encodeURIComponent(JSON.stringify({
         ...data,
         selectedTransport,
-        guaranteedDate,
-        finalPrice: currentPrice
+        finalPrice: selectedTransport === "enclosed" 
+          ? calculatePrice(data.enclosedTransportPrice)
+          : calculatePrice(data.openTransportPrice)
       }))
     });
     navigate(`/booking?${params.toString()}`);
@@ -84,8 +64,8 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <Card className="max-w-[800px] mx-auto">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl">Your Confirmed Price</CardTitle>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">Your Confirmed Price</CardTitle>
           <TrustBadges />
         </CardHeader>
         <CardContent className="space-y-6">
@@ -99,12 +79,12 @@ export default function Checkout() {
                 }`}
                 onClick={() => setSelectedTransport("open")}
               >
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
                     <Truck className="h-5 w-5" />
                     <h4 className="font-medium">Open Transport</h4>
                   </div>
-                  <p className="text-2xl font-bold">${calculatePrice(data.openTransportPrice)}</p>
+                  <p className="text-4xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</p>
                 </CardContent>
               </Card>
 
@@ -114,29 +94,35 @@ export default function Checkout() {
                 }`}
                 onClick={() => setSelectedTransport("enclosed")}
               >
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
                     <Shield className="h-5 w-5" />
                     <h4 className="font-medium">Enclosed Transport</h4>
                   </div>
-                  <p className="text-2xl font-bold">${calculatePrice(data.enclosedTransportPrice)}</p>
+                  <p className="text-4xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</p>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h3 className="font-medium">Guaranteed Date Expedited Shipping</h3>
-              <p className="text-sm text-muted-foreground">
-                Expedited shipping ensures your vehicle is prioritized for pickup and delivery,
-                arriving faster than standard transit times. Your transport is scheduled with a
-                guaranteed pickup date for maximum convenience.
-              </p>
-            </div>
-            <Switch
-              checked={guaranteedDate}
-              onCheckedChange={setGuaranteedDate}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Additional Notes</h3>
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>If you need to add any important details, leave them here</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter any additional information about your shipment"
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
 
