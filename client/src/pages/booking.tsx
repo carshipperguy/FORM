@@ -28,6 +28,7 @@ const bookingSchema = z.object({
   deliveryState: z.string(),
   deliveryZip: z.string(),
 
+  expeditedShipping: z.boolean().optional(),
   notes: z.string().optional(),
   acceptTerms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
@@ -95,6 +96,7 @@ export default function Booking() {
       deliveryState: dropoffLocation.state,
       deliveryZip: dropoffLocation.zip,
 
+      expeditedShipping: false,
       notes: "",
       acceptTerms: false
     },
@@ -200,7 +202,7 @@ export default function Booking() {
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Pickup Location */}
+                {/* Pickup Details */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Pickup Details</h3>
                   <div className="flex items-center space-x-2 mb-4">
@@ -301,7 +303,7 @@ export default function Booking() {
                   </div>
                 </div>
 
-                {/* Delivery Location */}
+                {/* Delivery Details */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Delivery Details</h3>
                   <div className="flex items-center space-x-2 mb-4">
@@ -400,6 +402,33 @@ export default function Booking() {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Expedited Shipping Option */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Shipping Options</h3>
+                  <FormField
+                    control={form.control}
+                    name="expeditedShipping"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Expedited Shipping
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Priority pickup and faster delivery times
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 {/* Notes Section */}
