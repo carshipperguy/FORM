@@ -84,7 +84,7 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <Card className="max-w-[800px] mx-auto">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl">Your Confirmed Price</CardTitle>
           <TrustBadges />
         </CardHeader>
