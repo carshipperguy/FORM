@@ -5,23 +5,19 @@ export function TrustBadges() {
     <div className="flex flex-col items-center mt-8">
       <h2 className="text-xl font-semibold mb-4">Our Trust & Ratings</h2>
       <div className="flex flex-wrap justify-center gap-5">
-        <img
-          src="google.png"
+        <Image
+          src="/google-badge.png"
           alt="Google 4.7 Star Rating"
-          style={{ 
-            width: 'auto',
-            maxWidth: '200px',
-            height: 'auto'
-          }}
+          width={200}
+          height={80}
+          className="object-contain"
         />
-        <img
-          src="bbb trust logo.webp"
+        <Image
+          src="/bbb-badge.png"
           alt="BBB Accredited Business"
-          style={{ 
-            width: 'auto',
-            maxWidth: '200px',
-            height: 'auto'
-          }}
+          width={200}
+          height={80}
+          className="object-contain"
         />
       </div>
     </div>
