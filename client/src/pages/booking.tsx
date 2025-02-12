@@ -76,19 +76,19 @@ export default function Booking() {
     navigate("/thank-you");
   };
 
-  // Extract proper location details
+  // Extract city from location string
   const extractCity = (location: string) => {
     const parts = location.split(',');
-    return parts[0].trim() || "Unknown City";
+    return parts[0]?.trim() || "";
   };
 
   // Extract full location details
   const extractLocation = (location: string) => {
-    const parts = location.split(',');
+    const parts = location.split(',').map(part => part.trim());
     return {
-      city: parts[0]?.trim() || "",
-      state: parts[1]?.trim() || "",
-      zip: parts[2]?.trim() || ""
+      city: parts[0] || "",
+      state: parts[1] || "",
+      zip: parts[2] || ""
     };
   };
 
@@ -128,22 +128,6 @@ export default function Booking() {
             {/* Shipping Details Summary */}
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <h3 className="font-semibold mb-2">Shipping Details</h3>
-              <div className="flex justify-center items-center gap-8 mt-4">
-                <div className="h-12 w-32">
-                  <img
-                    src="/assets/google-reviews.png"
-                    alt="4.7 stars on Google"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="h-12 w-32">
-                  <img
-                    src="/assets/bbb-rating.png"
-                    alt="BBB A+ Rating"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              </div>
               <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
@@ -177,16 +161,12 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md border border-border">
-                          <p className="text-sm text-muted-foreground">
-                            {pickupLocation.city && pickupLocation.state ? (
-                              <>
-                                {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
-                              </>
-                            ) : (
-                              "Location details will appear here"
-                            )}
-                          </p>
+                        <div className="mt-2 p-3 bg-muted rounded-md">
+                          {pickupLocation.city && (
+                            <p className="text-sm text-muted-foreground">
+                              {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
+                            </p>
+                          )}
                         </div>
                       </FormItem>
                     )}
@@ -244,16 +224,12 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md border border-border">
-                          <p className="text-sm text-muted-foreground">
-                            {dropoffLocation.city && dropoffLocation.state ? (
-                              <>
-                                {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
-                              </>
-                            ) : (
-                              "Location details will appear here"
-                            )}
-                          </p>
+                        <div className="mt-2 p-3 bg-muted rounded-md">
+                          {dropoffLocation.city && (
+                            <p className="text-sm text-muted-foreground">
+                              {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
+                            </p>
+                          )}
                         </div>
                       </FormItem>
                     )}
