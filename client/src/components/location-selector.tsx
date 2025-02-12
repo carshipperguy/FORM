@@ -33,23 +33,22 @@ export function LocationSelector({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [options, setOptions] = React.useState<LocationOption[]>([]);
 
-  // Debug logs
+  // Handle search query changes
   React.useEffect(() => {
-    console.log('Current value:', value);
-    console.log('Current options:', options);
-  }, [value, options]);
-
-  // Update options when search query changes
-  React.useEffect(() => {
-    if (searchQuery) {
-      console.log('Searching with query:', searchQuery);
+    if (searchQuery.length >= 2) {
       const results = searchLocations(searchQuery);
-      console.log('Search results:', results);
+      console.log('Search results for:', searchQuery, results);
       setOptions(results);
     } else {
       setOptions([]);
     }
   }, [searchQuery]);
+
+  const handleSelect = (currentValue: string) => {
+    onChange(currentValue);
+    setOpen(false);
+    setSearchQuery("");
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -74,15 +73,14 @@ export function LocationSelector({
       <PopoverContent className="w-[400px] p-0">
         <Command>
           <CommandInput
-            placeholder="Enter ZIP code or city name..."
+            placeholder="Search by city, state, or ZIP..."
             value={searchQuery}
-            onValueChange={(value) => {
-              console.log('Input value changed:', value);
-              setSearchQuery(value);
-            }}
+            onValueChange={setSearchQuery}
           />
           <CommandEmpty className="py-6 text-center text-sm">
-            {searchQuery ? "No locations found." : "Start typing to search..."}
+            {searchQuery.length < 2 
+              ? "Type at least 2 characters to search..."
+              : "No locations found."}
           </CommandEmpty>
           {options.length > 0 && (
             <CommandGroup heading={label}>
@@ -90,12 +88,7 @@ export function LocationSelector({
                 <CommandItem
                   key={option.value}
                   value={option.value}
-                  onSelect={() => {
-                    console.log('Selected option:', option);
-                    onChange(option.value);
-                    setOpen(false);
-                    setSearchQuery("");
-                  }}
+                  onSelect={() => handleSelect(option.value)}
                 >
                   <Check
                     className={cn(
