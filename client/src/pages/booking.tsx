@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
+import { validateAddress, calculateDistance, type Address } from "@/lib/mapquest";
+import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
   pickupStreetAddress: z.string().min(1, "Street address is required"),
@@ -99,8 +101,60 @@ export default function Booking() {
     },
   });
 
+  const { toast } = useToast();
+
   const onSubmit = async (formData: BookingFormData) => {
-    navigate("/thank-you");
+    const pickupAddress: Address = {
+      street: formData.pickupStreetAddress,
+      city: formData.pickupCity,
+      state: formData.pickupState,
+      postalCode: formData.pickupZip
+    };
+
+    const deliveryAddress: Address = {
+      street: formData.deliveryStreetAddress,
+      city: formData.deliveryCity,
+      state: formData.deliveryState,
+      postalCode: formData.deliveryZip
+    };
+
+    // Validate both addresses
+    const pickupValidation = await validateAddress(pickupAddress);
+    const deliveryValidation = await validateAddress(deliveryAddress);
+
+    if (!pickupValidation.isValid || !deliveryValidation.isValid) {
+      toast({
+        title: "Invalid Address",
+        description: "Please check both addresses and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Calculate accurate distance
+    const distanceResult = await calculateDistance(pickupAddress, deliveryAddress);
+
+    if (!distanceResult.success) {
+      toast({
+        title: "Error",
+        description: "Could not calculate shipping distance. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Update the data with validated addresses and accurate distance
+    const updatedData = {
+      ...data,
+      ...formData,
+      distance: distanceResult.distance,
+      validatedPickupAddress: pickupValidation.formattedAddress,
+      validatedDeliveryAddress: deliveryValidation.formattedAddress
+    };
+
+    navigate("/thank-you", {
+      search: `?data=${encodeURIComponent(JSON.stringify(updatedData))}`
+    });
   };
 
   const handlePickupContactChange = (checked: boolean) => {
