@@ -31,24 +31,14 @@ export function LocationSelector({
 }: LocationSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [options, setOptions] = React.useState<LocationOption[]>([]);
+  const [locations, setLocations] = React.useState<LocationOption[]>([]);
 
-  // Handle search query changes
-  React.useEffect(() => {
-    if (searchQuery.length >= 2) {
-      const results = searchLocations(searchQuery);
-      console.log('Search results for:', searchQuery, results);
-      setOptions(results);
-    } else {
-      setOptions([]);
-    }
-  }, [searchQuery]);
-
-  const handleSelect = (currentValue: string) => {
-    onChange(currentValue);
-    setOpen(false);
-    setSearchQuery("");
-  };
+  // Simple search implementation
+  const handleSearch = React.useCallback((query: string) => {
+    const results = searchLocations(query);
+    console.log('Search results:', results); // Debug log
+    setLocations(results);
+  }, []);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -73,33 +63,39 @@ export function LocationSelector({
       <PopoverContent className="w-[400px] p-0">
         <Command>
           <CommandInput
-            placeholder="Search by city, state, or ZIP..."
+            placeholder="Type a city name..."
             value={searchQuery}
-            onValueChange={setSearchQuery}
+            onValueChange={(query) => {
+              setSearchQuery(query);
+              handleSearch(query);
+            }}
           />
           <CommandEmpty className="py-6 text-center text-sm">
             {searchQuery.length < 2 
               ? "Type at least 2 characters to search..."
               : "No locations found."}
           </CommandEmpty>
-          {options.length > 0 && (
-            <CommandGroup heading={label}>
-              {options.map((option) => (
+          {locations.length > 0 && (
+            <CommandGroup>
+              {locations.map((location) => (
                 <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={() => handleSelect(option.value)}
+                  key={location.value}
+                  value={location.value}
+                  onSelect={(currentValue) => {
+                    onChange(currentValue);
+                    setOpen(false);
+                  }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === location.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div className="flex flex-col">
-                    <span>{option.city}, {option.state}</span>
+                    <span>{location.city}, {location.state}</span>
                     <span className="text-xs text-muted-foreground">
-                      ZIP: {option.zip}
+                      ZIP: {location.zip}
                     </span>
                   </div>
                 </CommandItem>
