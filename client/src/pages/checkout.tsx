@@ -65,7 +65,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <Card className="max-w-[800px] mx-auto">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Complete Your Booking</CardTitle>
+          <CardTitle className="text-2xl">Your Confirmed Price</CardTitle>
           <p className="text-muted-foreground">
             Fill in your details to secure your vehicle transport
           </p>
@@ -177,7 +177,7 @@ export default function Checkout() {
 
             <div className="space-y-4 text-center">
               <p className="text-2xl font-bold">
-                No payment required
+                NO PAYMENT REQUIRED
               </p>
               <p className="text-sm text-muted-foreground">
                 Quotes do not account for inoperable or oversized vehicles, existing transport
