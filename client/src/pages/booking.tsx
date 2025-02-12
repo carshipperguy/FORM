@@ -14,19 +14,19 @@ import { validateAddress, calculateDistance, type Address } from "@/lib/mapquest
 import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
+  pickupContactName: z.string().min(1, "Pickup contact name is required"),
+  pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
   pickupStreetAddress: z.string().min(1, "Street address is required"),
   pickupCity: z.string(),
   pickupState: z.string(),
   pickupZip: z.string(),
-  pickupContactName: z.string().min(1, "Pickup contact name is required"),
-  pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
 
+  deliveryContactName: z.string().min(1, "Delivery contact name is required"),
+  deliveryContactPhone: z.string().min(1, "Delivery contact phone is required"),
   deliveryStreetAddress: z.string().min(1, "Street address is required"),
   deliveryCity: z.string(),
   deliveryState: z.string(),
   deliveryZip: z.string(),
-  deliveryContactName: z.string().min(1, "Delivery contact name is required"),
-  deliveryContactPhone: z.string().min(1, "Delivery contact phone is required"),
 
   notes: z.string().optional(),
   acceptTerms: z.boolean().refine(val => val === true, {
@@ -48,7 +48,6 @@ type QuoteData = {
   phone?: string;
   email?: string;
   selectedTransport: "open" | "enclosed";
-  guaranteedDate: boolean;
   finalPrice: number;
   distance: number;
   transitTime: number;
@@ -82,19 +81,19 @@ export default function Booking() {
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
+      pickupContactName: "",
+      pickupContactPhone: "",
       pickupStreetAddress: "",
       pickupCity: pickupLocation.city,
       pickupState: pickupLocation.state,
       pickupZip: pickupLocation.zip,
-      pickupContactName: "",
-      pickupContactPhone: "",
 
+      deliveryContactName: "",
+      deliveryContactPhone: "",
       deliveryStreetAddress: "",
       deliveryCity: dropoffLocation.city,
       deliveryState: dropoffLocation.state,
       deliveryZip: dropoffLocation.zip,
-      deliveryContactName: "",
-      deliveryContactPhone: "",
 
       notes: "",
       acceptTerms: false
@@ -203,8 +202,8 @@ export default function Booking() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Pickup Location */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Pickup Location</h3>
-                  <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-semibold">Pickup Details</h3>
+                  <div className="flex items-center space-x-2 mb-4">
                     <Checkbox
                       id="isPickupContact"
                       checked={isPickupContact}
@@ -215,6 +214,37 @@ export default function Booking() {
                     </label>
                   </div>
 
+                  {/* Pickup Contact Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <FormField
+                      control={form.control}
+                      name="pickupContactName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="pickupContactPhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Phone</FormLabel>
+                          <FormControl>
+                            <Input type="tel" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Pickup Address */}
                   <div className="space-y-4">
                     <FormField
                       control={form.control}
@@ -269,11 +299,27 @@ export default function Booking() {
                       />
                     </div>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Delivery Location */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Delivery Details</h3>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Checkbox
+                      id="isDeliveryContact"
+                      checked={isDeliveryContact}
+                      onCheckedChange={handleDeliveryContactChange}
+                    />
+                    <label htmlFor="isDeliveryContact" className="text-sm">
+                      I am the delivery contact
+                    </label>
+                  </div>
+
+                  {/* Delivery Contact Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <FormField
                       control={form.control}
-                      name="pickupContactName"
+                      name="deliveryContactName"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Contact Name</FormLabel>
@@ -286,7 +332,7 @@ export default function Booking() {
                     />
                     <FormField
                       control={form.control}
-                      name="pickupContactPhone"
+                      name="deliveryContactPhone"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Contact Phone</FormLabel>
@@ -298,22 +344,8 @@ export default function Booking() {
                       )}
                     />
                   </div>
-                </div>
 
-                {/* Delivery Location */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Delivery Location</h3>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="isDeliveryContact"
-                      checked={isDeliveryContact}
-                      onCheckedChange={handleDeliveryContactChange}
-                    />
-                    <label htmlFor="isDeliveryContact" className="text-sm">
-                      I am the delivery contact
-                    </label>
-                  </div>
-
+                  {/* Delivery Address */}
                   <div className="space-y-4">
                     <FormField
                       control={form.control}
@@ -367,35 +399,6 @@ export default function Booking() {
                         )}
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="deliveryContactName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="deliveryContactPhone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Phone</FormLabel>
-                          <FormControl>
-                            <Input type="tel" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
                 </div>
 
