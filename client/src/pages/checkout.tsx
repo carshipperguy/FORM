@@ -70,18 +70,18 @@ export default function Checkout() {
             Fill in your details to secure your vehicle transport
           </p>
           <div className="flex justify-center items-center gap-8 mt-4">
-            <div className="h-12">
+            <div className="h-12 w-32">
               <img
-                src="/assets/google-rating.png"
+                src="assets/google-rating.png"
                 alt="4.7 Star Google Rating"
-                className="h-full w-auto object-contain"
+                className="h-full w-full object-contain"
               />
             </div>
-            <div className="h-12">
+            <div className="h-12 w-32">
               <img
-                src="/assets/bbb-accredited.png"
+                src="assets/bbb-accredited.png"
                 alt="BBB Accredited Business"
-                className="h-full w-auto object-contain"
+                className="h-full w-full object-contain"
               />
             </div>
           </div>
@@ -170,7 +170,6 @@ export default function Checkout() {
               onClick={handleReserve}
               className="w-full h-12 text-lg font-semibold"
               size="lg"
-              disabled={!selectedTransport}
             >
               Reserve Your Spot
               <ArrowRight className="ml-2 h-5 w-5" />
