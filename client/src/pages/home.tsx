@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { QuoteForm } from "@/components/quote-form";
+import { TrustBadges } from "@/components/trust-badges";
 import { calculatePricing } from "@/lib/pricing";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +58,7 @@ export default function Home() {
           Get Your Auto Transport Quote
         </h1>
         <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+        <TrustBadges />
       </div>
     </div>
   );
