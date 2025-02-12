@@ -13,14 +13,9 @@ export default function Home() {
   const handleCalculate = async (data: QuoteFormData) => {
     setIsCalculating(true);
     try {
-      // Use mock distance for testing
-      const distance = 1000;
+      // TODO: Replace with actual distance calculation
+      const distance = 1000; // Mock distance for testing
       const pricing = calculatePricing(distance, data.vehicleType);
-
-      if (data.vehicleType !== "car/truck/suv") {
-        navigate("/thank-you");
-        return;
-      }
 
       const checkoutData = {
         ...data,
@@ -30,12 +25,21 @@ export default function Home() {
         distance,
       };
 
+      if (pricing.message) {
+        toast({
+          title: "Quote Information",
+          description: pricing.message,
+        });
+        return;
+      }
+
       const params = new URLSearchParams({
         data: encodeURIComponent(JSON.stringify(checkoutData)),
       });
 
       navigate(`/checkout?${params.toString()}`);
     } catch (error) {
+      console.error("Calculation error:", error);
       toast({
         title: "Error",
         description: "Failed to calculate the quote. Please try again.",
@@ -47,8 +51,13 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-background">
-      <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+    <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="max-w-[800px] mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Get Your Auto Transport Quote
+        </h1>
+        <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+      </div>
     </div>
   );
 }

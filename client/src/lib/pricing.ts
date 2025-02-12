@@ -1,25 +1,29 @@
 // Pricing constants
-const BASE_RATE_PER_MILE = 0.614;  // Sedan rate per mile (for long distances)
-const SUV_MULTIPLIER = 1.05;        // SUV costs 5% more than sedan
-const TRUCK_MULTIPLIER = 1.05;      // Pickup truck costs 5% more than SUV
-const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
+const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile (for long distances)
 const MINIMUM_PRICE = 450;          // Minimum charge for short routes
 
-export type VehicleType = 'Sedan' | 'SUV' | 'Pickup Truck';
+// Vehicle type multipliers
+const VEHICLE_MULTIPLIERS = {
+  "car/truck/suv": 1.0,
+  "boat": 1.4,
+  "golf cart": 0.8,
+  "motorcycle": 0.7,
+  "rv/5th wheel": 1.8,
+  "travel trailer": 1.6,
+  "atv/utv": 0.75,
+  "heavy equipment": 2.0,
+  "other": 1.3
+} as const;
+
+const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
+
+export type VehicleType = keyof typeof VEHICLE_MULTIPLIERS;
 
 interface PricingResult {
-  message?: string;
-  openTransport?: {
-    Sedan: number;
-    SUV: number;
-    'Pickup Truck': number;
-  };
-  enclosedTransport?: {
-    Sedan: number;
-    SUV: number;
-    'Pickup Truck': number;
-  };
+  openTransport: number;
+  enclosedTransport: number;
   transitTime: number;
+  message?: string;
 }
 
 export function calculatePricing(
@@ -32,42 +36,32 @@ export function calculatePricing(
   const transitTime = Math.ceil(distance / 300) + 1;
 
   // For short distances, return message only
-  if (distance <= 500) {
+  if (distance <= 100) {
     return {
-      message: "Thank you for your request! For short distances, please contact us directly for a custom quote.",
-      transitTime
+      openTransport: 0,
+      enclosedTransport: 0,
+      transitTime,
+      message: "For short distances under 100 miles, please contact us directly for a custom quote."
     };
   }
 
-  // Calculate base sedan price with distance multiplier
-  let sedanPrice = distance <= 800
+  // Calculate base price with distance multiplier
+  let basePrice = distance <= 800
     ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
     : distance * BASE_RATE_PER_MILE;
 
   // Ensure minimum price
-  sedanPrice = Math.max(sedanPrice, MINIMUM_PRICE);
+  basePrice = Math.max(basePrice, MINIMUM_PRICE);
 
-  // Calculate prices for SUVs and Pickup Trucks
-  const suvPrice = sedanPrice * SUV_MULTIPLIER;
-  const truckPrice = suvPrice * TRUCK_MULTIPLIER;
-
-  // Calculate enclosed transport prices
-  const sedanEnclosed = sedanPrice * ENCLOSED_MULTIPLIER;
-  const suvEnclosed = suvPrice * ENCLOSED_MULTIPLIER;
-  const truckEnclosed = truckPrice * ENCLOSED_MULTIPLIER;
+  // Apply vehicle type multiplier
+  const vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+  const openTransportPrice = basePrice * vehicleMultiplier;
+  const enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
 
   // Round all prices to nearest whole dollar
   return {
-    openTransport: {
-      Sedan: Math.round(sedanPrice),
-      SUV: Math.round(suvPrice),
-      'Pickup Truck': Math.round(truckPrice)
-    },
-    enclosedTransport: {
-      Sedan: Math.round(sedanEnclosed),
-      SUV: Math.round(suvEnclosed),
-      'Pickup Truck': Math.round(truckEnclosed)
-    },
+    openTransport: Math.round(openTransportPrice),
+    enclosedTransport: Math.round(enclosedTransportPrice),
     transitTime
   };
 }
