@@ -14,7 +14,7 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
   const apiKey = process.env.MAPQUEST_API_KEY;
   const url = new URL(`${baseUrl}${endpoint}`);
   url.searchParams.append('key', apiKey!);
-  
+
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.append(key, value.toString());
   }
@@ -28,7 +28,7 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
 
 export async function validateAddress(address: Address) {
   const formattedAddress = `${address.street}, ${address.city}, ${address.state} ${address.postalCode}`;
-  
+
   try {
     const response = await makeMapQuestRequest('/geocoding/v1/address', {
       location: formattedAddress,
@@ -54,21 +54,20 @@ export async function validateAddress(address: Address) {
   }
 }
 
-export async function calculateDistance(origin: Address, destination: Address) {
-  const originStr = `${origin.street}, ${origin.city}, ${origin.state} ${origin.postalCode}`;
-  const destinationStr = `${destination.street}, ${destination.city}, ${destination.state} ${destination.postalCode}`;
-
+export async function calculateDistance(origin: string, destination: string) {
   try {
-    const response = await makeMapQuestRequest('/directions/v2/route', {
-      from: originStr,
-      to: destinationStr,
-      unit: 'M' // miles
-    });
+    const response = await fetch(`https://www.mapquestapi.com/directions/v2/route?key=${process.env.MAPQUEST_API_KEY}&from=${encodeURIComponent(origin)}&to=${encodeURIComponent(destination)}&unit=M`);
 
-    if (response.route?.distance) {
+    if (!response.ok) {
+      throw new Error('MapQuest API request failed');
+    }
+
+    const data = await response.json();
+
+    if (data.route?.distance) {
       return {
-        distance: Math.round(response.route.distance),
-        time: response.route.formattedTime,
+        distance: Math.round(data.route.distance),
+        time: data.route.formattedTime,
         success: true
       };
     }

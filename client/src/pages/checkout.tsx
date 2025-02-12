@@ -28,7 +28,30 @@ export default function Checkout() {
   const [guaranteedDate, setGuaranteedDate] = useState(false);
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
-  const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
+  let data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
+
+  // Use distance from MapQuest if not already calculated
+  const calculateDistance = async (pickup: string, dropoff: string) => {
+    // Placeholder - Replace with actual MapQuest API call
+    // This example assumes a function that returns a promise with {success: boolean, distance: number}
+    return new Promise<{success: boolean, distance: number}>((resolve) => {
+      setTimeout(() => {
+        resolve({success: true, distance: 100}); //replace with actual API call
+      }, 500)
+    })
+  };
+
+  if (!data.distance) {
+    calculateDistance(data.pickupLocation, data.dropoffLocation)
+      .then(result => {
+        if (result.success) {
+          data.distance = result.distance;
+          data.transitTime = Math.ceil(result.distance / 300) + 1; // Estimate transit time
+        }
+      })
+      .catch(console.error);
+  }
+
 
   if (!data.openTransportPrice) {
     navigate("/");
