@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Calendar, Truck, Shield } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { TrustBadges } from "@/components/trust-badges";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from "@/components/ui/form";
@@ -28,29 +29,48 @@ type CheckoutData = {
 
 export default function Checkout() {
   const [selectedTransport, setSelectedTransport] = useState<"open" | "enclosed">();
+  const [guaranteedDate, setGuaranteedDate] = useState(false);
   const [, navigate] = useLocation();
   const form = useForm();
 
   const searchParams = new URLSearchParams(window.location.search);
   let data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
 
-  const calculatePrice = (basePrice: number) => {
-    return basePrice;
+  const calculateDistance = async (pickup: string, dropoff: string) => {
+    return new Promise<{success: boolean, distance: number}>((resolve) => {
+      setTimeout(() => {
+        resolve({success: true, distance: 100}); 
+      }, 500)
+    })
   };
+
+  if (!data.distance) {
+    calculateDistance(data.pickupLocation, data.dropoffLocation)
+      .then(result => {
+        if (result.success) {
+          data.distance = result.distance;
+          data.transitTime = Math.ceil(result.distance / 300) + 1; 
+        }
+      })
+      .catch(console.error);
+  }
 
   if (!data.openTransportPrice) {
     navigate("/");
     return null;
   }
 
+  const calculatePrice = (basePrice: number) => {
+    return guaranteedDate ? Math.round(basePrice * 1.3) : basePrice;
+  };
+
   const handleReserve = () => {
     const params = new URLSearchParams({
       data: encodeURIComponent(JSON.stringify({
         ...data,
         selectedTransport,
-        finalPrice: selectedTransport === "enclosed" 
-          ? calculatePrice(data.enclosedTransportPrice)
-          : calculatePrice(data.openTransportPrice)
+        guaranteedDate,
+        finalPrice: selectedTransport === "enclosed" ? calculatePrice(data.enclosedTransportPrice) : calculatePrice(data.openTransportPrice)
       }))
     });
     navigate(`/booking?${params.toString()}`);
@@ -105,24 +125,18 @@ export default function Checkout() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Additional Notes</h3>
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>If you need to add any important details, leave them here</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter any additional information about your shipment"
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="font-medium">Guaranteed Date Expedited Shipping</h3>
+              <p className="text-sm text-muted-foreground">
+                Expedited shipping ensures your vehicle is prioritized for pickup and delivery,
+                arriving faster than standard transit times. Your transport is scheduled with a
+                guaranteed pickup date for maximum convenience.
+              </p>
+            </div>
+            <Switch
+              checked={guaranteedDate}
+              onCheckedChange={setGuaranteedDate}
             />
           </div>
 
