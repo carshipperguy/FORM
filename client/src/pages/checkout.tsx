@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Calendar, Truck, Shield } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { TrustBadges } from "@/components/trust-badges";
 
 type CheckoutData = {
   vehicleType: string;
@@ -30,13 +31,10 @@ export default function Checkout() {
   const searchParams = new URLSearchParams(window.location.search);
   let data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as CheckoutData;
 
-  // Use distance from MapQuest if not already calculated
   const calculateDistance = async (pickup: string, dropoff: string) => {
-    // Placeholder - Replace with actual MapQuest API call
-    // This example assumes a function that returns a promise with {success: boolean, distance: number}
     return new Promise<{success: boolean, distance: number}>((resolve) => {
       setTimeout(() => {
-        resolve({success: true, distance: 100}); //replace with actual API call
+        resolve({success: true, distance: 100}); 
       }, 500)
     })
   };
@@ -46,7 +44,7 @@ export default function Checkout() {
       .then(result => {
         if (result.success) {
           data.distance = result.distance;
-          data.transitTime = Math.ceil(result.distance / 300) + 1; // Estimate transit time
+          data.transitTime = Math.ceil(result.distance / 300) + 1; 
         }
       })
       .catch(console.error);
@@ -78,7 +76,6 @@ export default function Checkout() {
     navigate(`/booking?${params.toString()}`);
   };
 
-  // Extract city from location string
   const extractCity = (location: string) => {
     const parts = location.split(',');
     return parts[0].trim();
@@ -92,25 +89,9 @@ export default function Checkout() {
           <p className="text-muted-foreground">
             Fill in your details to secure your vehicle transport
           </p>
-          <div className="flex justify-center items-center gap-8 mt-4">
-            <div className="h-12 w-32">
-              <img
-                src="assets/google-rating.png"
-                alt="4.7 Star Google Rating"
-                className="h-full w-full object-contain"
-              />
-            </div>
-            <div className="h-12 w-32">
-              <img
-                src="assets/bbb-accredited.png"
-                alt="BBB Accredited Business"
-                className="h-full w-full object-contain"
-              />
-            </div>
-          </div>
+          <TrustBadges />
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Transport Options */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Door to Door Service</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -146,7 +127,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Guaranteed Date Option */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h3 className="font-medium">Guaranteed Date Expedited Shipping</h3>
@@ -164,7 +144,6 @@ export default function Checkout() {
 
           <Separator />
 
-          {/* Shipping Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="h-5 w-5" />
@@ -187,7 +166,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Submit Button and Disclaimers */}
           <div className="space-y-6">
             <Button
               onClick={handleReserve}
