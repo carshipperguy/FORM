@@ -3,9 +3,10 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Calendar, Truck, Shield } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { TrustBadges } from "@/components/trust-badges";
+import Image from "@/components/ui/image";
 
 type CheckoutData = {
   vehicleType: string;
@@ -50,7 +51,6 @@ export default function Checkout() {
       .catch(console.error);
   }
 
-
   if (!data.openTransportPrice) {
     navigate("/");
     return null;
@@ -92,34 +92,62 @@ export default function Checkout() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Door-to-Door Service – We Make It Easy!</h3>
             <p className="text-muted-foreground mb-4">Fully Insured Transport – Your vehicle is covered every step of the way</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer transition-all hover:shadow-lg ${
                   selectedTransport === "open" ? "ring-2 ring-primary" : ""
                 }`}
                 onClick={() => setSelectedTransport("open")}
               >
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Truck className="h-5 w-5" />
-                    <h4 className="font-medium">Open Transport</h4>
+                <CardContent className="p-6">
+                  <div className="aspect-[2/1] relative mb-4">
+                    <Image
+                      src="/open-trailer.png"
+                      alt="Open Car Trailer"
+                      className="object-contain w-full h-full"
+                      width={300}
+                      height={150}
+                    />
                   </div>
-                  <p className="text-2xl font-bold">${calculatePrice(data.openTransportPrice)}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Open Transport</h4>
+                      <span className="text-2xl font-bold">${calculatePrice(data.openTransportPrice)}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Basic and affordable</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>✓ Insurance included</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer transition-all hover:shadow-lg ${
                   selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
                 }`}
                 onClick={() => setSelectedTransport("enclosed")}
               >
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    <h4 className="font-medium">Enclosed Transport</h4>
+                <CardContent className="p-6">
+                  <div className="aspect-[2/1] relative mb-4">
+                    <Image
+                      src="/enclosed-trailer.png"
+                      alt="Enclosed Trailer"
+                      className="object-contain w-full h-full"
+                      width={300}
+                      height={150}
+                    />
                   </div>
-                  <p className="text-2xl font-bold">${calculatePrice(data.enclosedTransportPrice)}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Enclosed Transport</h4>
+                      <span className="text-2xl font-bold">${calculatePrice(data.enclosedTransportPrice)}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Suitable for luxury cars</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>✓ Insurance included</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
