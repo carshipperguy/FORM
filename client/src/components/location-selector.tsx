@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { searchLocations, type LocationOption } from "@/lib/location-data";
+import { type LocationOption, searchLocations } from "@/lib/location-data";
 
 interface LocationSelectorProps {
   value: string;
