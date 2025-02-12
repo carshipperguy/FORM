@@ -76,10 +76,10 @@ export default function Booking() {
     navigate("/thank-you");
   };
 
-  // Extract city from location string
+  // Extract proper location details
   const extractCity = (location: string) => {
     const parts = location.split(',');
-    return parts[0].trim();
+    return parts[0].trim() || "Unknown City";
   };
 
   // Extract full location details
@@ -88,14 +88,13 @@ export default function Booking() {
     return {
       city: parts[0]?.trim() || "",
       state: parts[1]?.trim() || "",
-      zip: parts[2]?.trim().match(/\d{5}/)?.[0] || ""
+      zip: parts[2]?.trim() || ""
     };
   };
 
   const pickupLocation = extractLocation(data.pickupLocation);
   const dropoffLocation = extractLocation(data.dropoffLocation);
 
-  // Handle checkbox changes
   const handlePickupContactChange = (checked: boolean) => {
     setIsPickupContact(checked);
     if (checked && data.name && data.phone) {
@@ -129,6 +128,22 @@ export default function Booking() {
             {/* Shipping Details Summary */}
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <h3 className="font-semibold mb-2">Shipping Details</h3>
+              <div className="flex justify-center items-center gap-8 mt-4 mb-6">
+                <div className="h-12">
+                  <img
+                    src="/attached_assets/image_1739321425840.png"
+                    alt="4.7 stars on Google"
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
+                <div className="h-12">
+                  <img
+                    src="/attached_assets/image_1739321466140.png"
+                    alt="BBB A+ Rating"
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
+              </div>
               <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
@@ -162,8 +177,16 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="text-sm text-muted-foreground mt-1 bg-muted/30 p-2 rounded">
-                          {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
+                        <div className="mt-2 p-3 bg-muted rounded-md border border-border">
+                          <p className="text-sm text-muted-foreground">
+                            {pickupLocation.city && pickupLocation.state ? (
+                              <>
+                                {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
+                              </>
+                            ) : (
+                              "Location details will appear here"
+                            )}
+                          </p>
                         </div>
                       </FormItem>
                     )}
@@ -221,8 +244,16 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="text-sm text-muted-foreground mt-1 bg-muted/30 p-2 rounded">
-                          {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
+                        <div className="mt-2 p-3 bg-muted rounded-md border border-border">
+                          <p className="text-sm text-muted-foreground">
+                            {dropoffLocation.city && dropoffLocation.state ? (
+                              <>
+                                {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
+                              </>
+                            ) : (
+                              "Location details will appear here"
+                            )}
+                          </p>
                         </div>
                       </FormItem>
                     )}
