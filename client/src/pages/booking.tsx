@@ -131,8 +131,12 @@ export default function Booking() {
       return;
     }
 
-    // Calculate accurate distance
-    const distanceResult = await calculateDistance(pickupAddress, deliveryAddress);
+    // Format addresses for distance calculation
+    const pickupAddressStr = `${pickupValidation.formattedAddress}`;
+    const deliveryAddressStr = `${deliveryValidation.formattedAddress}`;
+
+    // Calculate accurate distance using formatted addresses
+    const distanceResult = await calculateDistance(pickupAddressStr, deliveryAddressStr);
 
     if (!distanceResult.success) {
       toast({
@@ -152,9 +156,8 @@ export default function Booking() {
       validatedDeliveryAddress: deliveryValidation.formattedAddress
     };
 
-    navigate("/thank-you", {
-      search: `?data=${encodeURIComponent(JSON.stringify(updatedData))}`
-    });
+    // Use template literal for the URL with query parameters
+    navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
   };
 
   const handlePickupContactChange = (checked: boolean) => {
@@ -193,7 +196,6 @@ export default function Booking() {
               <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
-              <p><span className="font-medium">Expedited:</span> {data.guaranteedDate ? "Yes" : "No"}</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
