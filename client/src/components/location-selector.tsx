@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,13 +26,14 @@ interface LocationSelectorProps {
 export function LocationSelector({
   value,
   onChange,
-  placeholder = "Search locations...",
+  placeholder = "Enter location...",
   label = "Select location"
 }: LocationSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [options, setOptions] = React.useState<LocationOption[]>([]);
 
+  // Update options when search query changes
   React.useEffect(() => {
     if (searchQuery) {
       const results = searchLocations(searchQuery);
@@ -51,38 +52,55 @@ export function LocationSelector({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value || placeholder}
+          {value ? (
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              {value}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">{placeholder}</span>
+          )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0">
         <Command>
           <CommandInput
-            placeholder={`Enter ZIP code or city name...`}
+            placeholder="Enter ZIP code or city name..."
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          <CommandEmpty>No location found.</CommandEmpty>
-          <CommandGroup heading={label}>
-            {options.map((option) => (
-              <CommandItem
-                key={option.value}
-                value={option.value}
-                onSelect={(currentValue) => {
-                  onChange(currentValue);
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === option.value ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          <CommandEmpty className="py-6 text-center text-sm">
+            {searchQuery ? "No locations found." : "Start typing to search..."}
+          </CommandEmpty>
+          {options.length > 0 && (
+            <CommandGroup heading={label}>
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  onSelect={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                    setSearchQuery("");
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === option.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    <span>{option.city}, {option.state}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ZIP: {option.zip}
+                    </span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
