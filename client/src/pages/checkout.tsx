@@ -86,14 +86,12 @@ export default function Checkout() {
       <Card className="max-w-[800px] mx-auto">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Your Confirmed Price</CardTitle>
-          <p className="text-muted-foreground">
-            Fill in your details to secure your vehicle transport
-          </p>
           <TrustBadges />
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Door to Door Service</h3>
+            <h3 className="text-lg font-semibold">Door-to-Door Service – We Make It Easy!</h3>
+            <p className="text-muted-foreground mb-4">Fully Insured Transport – Your vehicle is covered every step of the way</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card
                 className={`cursor-pointer transition-all ${
