@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
 
+// Schema definition remains the same
 const bookingSchema = z.object({
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
   pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
@@ -40,6 +41,8 @@ type QuoteData = {
   selectedTransport: "open" | "enclosed";
   guaranteedDate: boolean;
   finalPrice: number;
+  distance: number;
+  transitTime: number;
 };
 
 export default function Booking() {
@@ -49,6 +52,11 @@ export default function Booking() {
 
   const searchParams = new URLSearchParams(window.location.search);
   const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteData;
+
+  if (!data.finalPrice) {
+    navigate("/");
+    return null;
+  }
 
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -68,13 +76,19 @@ export default function Booking() {
     navigate("/thank-you");
   };
 
-  // Extract city, state from location string
+  // Extract city from location string
+  const extractCity = (location: string) => {
+    const parts = location.split(',');
+    return parts[0].trim();
+  };
+
+  // Extract full location details
   const extractLocation = (location: string) => {
     const parts = location.split(',');
     return {
       city: parts[0]?.trim() || "",
       state: parts[1]?.trim() || "",
-      zip: location.match(/\d{5}/)?.[0] || ""
+      zip: parts[2]?.trim().match(/\d{5}/)?.[0] || ""
     };
   };
 
@@ -119,7 +133,7 @@ export default function Booking() {
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
               <p><span className="font-medium">Expedited:</span> {data.guaranteedDate ? "Yes" : "No"}</p>
-              <p><span className="font-medium">Route:</span> {pickupLocation.city} to {dropoffLocation.city}</p>
+              <p><span className="font-medium">Route:</span> {extractCity(data.pickupLocation)} to {extractCity(data.dropoffLocation)}</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
@@ -253,7 +267,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel>If you need to add any important details, leave them here</FormLabel>
                         <FormControl>
-                          <Textarea 
+                          <Textarea
                             placeholder="Enter any additional information about your shipment"
                             className="min-h-[100px]"
                             {...field}
@@ -290,7 +304,6 @@ export default function Booking() {
                                   <DialogTitle>Terms and Conditions</DialogTitle>
                                 </DialogHeader>
                                 <div className="max-h-[60vh] overflow-y-auto">
-                                  {/* Add your terms and conditions content here */}
                                   <p>
                                     By accepting these terms, you agree to our service conditions...
                                     {/* Add more terms content */}
