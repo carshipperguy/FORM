@@ -76,20 +76,15 @@ export default function Booking() {
     navigate("/thank-you");
   };
 
-  // Extract city from location string
-  const extractCity = (location: string) => {
-    const parts = location.split(',');
-    return parts[0]?.trim() || "";
-  };
-
-  // Extract full location details
+  // Extract location details
   const extractLocation = (location: string) => {
     const parts = location.split(',').map(part => part.trim());
-    return {
-      city: parts[0] || "",
-      state: parts[1] || "",
-      zip: parts[2] || ""
+    const locationDetails = {
+      city: parts[0] || 'No city provided',
+      state: parts[1] || 'No state provided',
+      zip: parts[2] || 'No zip provided'
     };
+    return locationDetails;
   };
 
   const pickupLocation = extractLocation(data.pickupLocation);
@@ -132,7 +127,7 @@ export default function Booking() {
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
               <p><span className="font-medium">Expedited:</span> {data.guaranteedDate ? "Yes" : "No"}</p>
-              <p><span className="font-medium">Route:</span> {extractCity(data.pickupLocation)} to {extractCity(data.dropoffLocation)}</p>
+              <p><span className="font-medium">Route:</span> {pickupLocation.city} to {dropoffLocation.city}</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
@@ -161,12 +156,11 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md">
-                          {pickupLocation.city && (
-                            <p className="text-sm text-muted-foreground">
-                              {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
-                            </p>
-                          )}
+                        <div className="mt-2 p-3 bg-muted rounded-md border border-input">
+                          <p className="text-base font-medium mb-1">Current Location:</p>
+                          <p className="text-sm text-muted-foreground">
+                            {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
+                          </p>
                         </div>
                       </FormItem>
                     )}
@@ -224,12 +218,11 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md">
-                          {dropoffLocation.city && (
-                            <p className="text-sm text-muted-foreground">
-                              {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
-                            </p>
-                          )}
+                        <div className="mt-2 p-3 bg-muted rounded-md border border-input">
+                          <p className="text-base font-medium mb-1">Current Location:</p>
+                          <p className="text-sm text-muted-foreground">
+                            {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
+                          </p>
                         </div>
                       </FormItem>
                     )}
