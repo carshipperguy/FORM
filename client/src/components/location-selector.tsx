@@ -35,23 +35,26 @@ export function LocationSelector({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [locations, setLocations] = React.useState<LocationOption[]>([]);
 
-  // Debounced search implementation
   const debouncedSearch = React.useCallback(
-    React.useMemo(
-      () => {
-        let timeoutId: NodeJS.Timeout;
-        return (query: string) => {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => {
-            const results = searchLocations(query);
-            setLocations(results);
-          }, 300); // 300ms debounce delay
-        };
-      },
-      []
-    ),
+    (query: string) => {
+      const results = searchLocations(query);
+      setLocations(results);
+    },
     []
   );
+
+  // Use React.useEffect for debouncing
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.length >= 2) {
+        debouncedSearch(searchQuery);
+      } else {
+        setLocations([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, debouncedSearch]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -79,10 +82,7 @@ export function LocationSelector({
           <CommandInput
             placeholder="Search city or ZIP code..."
             value={searchQuery}
-            onValueChange={(query) => {
-              setSearchQuery(query);
-              debouncedSearch(query);
-            }}
+            onValueChange={setSearchQuery}
           />
           <CommandEmpty className="py-6 text-center text-sm">
             {searchQuery.length < 2 
