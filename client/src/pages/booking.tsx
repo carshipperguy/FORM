@@ -80,9 +80,9 @@ export default function Booking() {
   const extractLocation = (location: string) => {
     const parts = location.split(',').map(part => part.trim());
     const locationDetails = {
-      city: parts[0] || 'No city provided',
-      state: parts[1] || 'No state provided',
-      zip: parts[2] || 'No zip provided'
+      city: parts[0] || '',
+      state: parts[1] || '',
+      zip: parts[2] || ''
     };
     return locationDetails;
   };
@@ -156,11 +156,17 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md border border-input">
-                          <p className="text-base font-medium mb-1">Current Location:</p>
-                          <p className="text-sm text-muted-foreground">
-                            {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
-                          </p>
+                        <div className="bg-muted p-3 rounded-md mt-2">
+                          <div className="text-sm">
+                            <div className="font-medium text-foreground mb-1">Selected Location:</div>
+                            <div className="text-muted-foreground">
+                              {pickupLocation.city && pickupLocation.state ? (
+                                `${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`
+                              ) : (
+                                'Location details missing'
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </FormItem>
                     )}
@@ -218,11 +224,17 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
-                        <div className="mt-2 p-3 bg-muted rounded-md border border-input">
-                          <p className="text-base font-medium mb-1">Current Location:</p>
-                          <p className="text-sm text-muted-foreground">
-                            {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
-                          </p>
+                        <div className="bg-muted p-3 rounded-md mt-2">
+                          <div className="text-sm">
+                            <div className="font-medium text-foreground mb-1">Selected Location:</div>
+                            <div className="text-muted-foreground">
+                              {dropoffLocation.city && dropoffLocation.state ? (
+                                `${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`
+                              ) : (
+                                'Location details missing'
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </FormItem>
                     )}
