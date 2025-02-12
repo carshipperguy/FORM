@@ -422,9 +422,6 @@ export default function Booking() {
                           <FormLabel>
                             Expedited Shipping
                           </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            Priority pickup and faster delivery times
-                          </p>
                         </div>
                       </FormItem>
                     )}
