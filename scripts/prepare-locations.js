@@ -1,15 +1,22 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import AdmZip from 'adm-zip';
 
 // Get the directory name using ES modules syntax
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Read the CSV file
-const csvPath = join(__dirname, '../attached_assets/zip_code_database.csv');
-const csvContent = readFileSync(csvPath, 'utf-8');
+// Read and process the ZIP file
+const zipPath = join(__dirname, '../attached_assets/simplemaps_uscities_basicv1.90.zip');
+const zip = new AdmZip(zipPath);
+const citiesEntry = zip.getEntries().find(entry => entry.entryName.endsWith('.csv'));
+const citiesData = citiesEntry ? citiesEntry.getData().toString('utf8') : '';
 
-// Create the location-data.ts content
+// Also read the ZIP code database
+const zipDbPath = join(__dirname, '../attached_assets/zip_code_database.csv');
+const zipDbContent = readFileSync(zipDbPath, 'utf-8');
+
+// Create combined location-data.ts content
 const locationDataContent = `import { z } from "zod";
 
 export interface LocationOption {
@@ -20,51 +27,68 @@ export interface LocationOption {
   state: string;
 }
 
-// Full CSV data
-const csvData = \`${csvContent}\`;
+// Process both ZIP codes and cities data
+const locationOptions: LocationOption[] = [];
 
-export function parseLocationData(): LocationOption[] {
-  const locations: LocationOption[] = [];
-  const lines = csvData.split('\\n').slice(1);
+// Process ZIP database
+const zipDbLines = \`${zipDbContent}\`.split('\\n').slice(1);
+for (const line of zipDbLines) {
+  if (!line.trim()) continue;
 
-  for (const line of lines) {
-    if (!line.trim()) continue;
+  const [zip, type, decommissioned, primary_city, acceptable_cities, , state] = line.split(',');
 
-    const [zip, type, decommissioned, primary_city, acceptable_cities, , state] = line.split(',');
+  if (!zip || !primary_city || !state) continue;
+  if (decommissioned === '1' || (type !== 'STANDARD' && type !== 'UNIQUE')) continue;
 
-    if (!zip || !primary_city || !state) continue;
-    if (decommissioned === '1' || (type !== 'STANDARD' && type !== 'UNIQUE')) continue;
+  // Add the primary city
+  locationOptions.push({
+    value: \`\${primary_city}, \${state} \${zip}\`,
+    label: \`\${primary_city}, \${state} \${zip}\`,
+    zip,
+    city: primary_city,
+    state
+  });
 
-    locations.push({
-      value: \`\${primary_city}, \${state} \${zip}\`,
-      label: \`\${primary_city}, \${state} \${zip}\`,
-      zip,
-      city: primary_city,
-      state
-    });
+  // Add acceptable alternative cities
+  if (acceptable_cities) {
+    const altCities = acceptable_cities
+      .split(',')
+      .map(city => city.trim())
+      .filter(Boolean);
 
-    if (acceptable_cities) {
-      const altCities = acceptable_cities
-        .split(',')
-        .map(city => city.trim())
-        .filter(Boolean);
-
-      for (const altCity of altCities) {
-        locations.push({
-          value: \`\${altCity}, \${state} \${zip}\`,
-          label: \`\${altCity}, \${state} \${zip}\`,
-          zip,
-          city: altCity,
-          state
-        });
-      }
+    for (const altCity of altCities) {
+      locationOptions.push({
+        value: \`\${altCity}, \${state} \${zip}\`,
+        label: \`\${altCity}, \${state} \${zip}\`,
+        zip,
+        city: altCity,
+        state
+      });
     }
   }
-
-  return locations;
 }
 
-const locationOptions = parseLocationData();
+// Process cities data from simplemaps
+const citiesLines = \`${citiesData}\`.split('\\n').slice(1);
+for (const line of citiesLines) {
+  if (!line.trim()) continue;
+
+  const [city, state, , , , zip] = line.split(',');
+  if (!city || !state || !zip) continue;
+
+  locationOptions.push({
+    value: \`\${city}, \${state} \${zip}\`,
+    label: \`\${city}, \${state} \${zip}\`,
+    zip,
+    city,
+    state
+  });
+}
+
+// Remove duplicates based on the value field
+const uniqueLocations = Array.from(new Map(
+  locationOptions.map(item => [item.value, item])
+).values());
 
 export function searchLocations(query: string): LocationOption[] {
   const searchTerm = query.toLowerCase().trim();
@@ -73,11 +97,13 @@ export function searchLocations(query: string): LocationOption[] {
 
   // First try exact ZIP code match
   if (/^\\d{5}$/.test(searchTerm)) {
-    return locationOptions.filter(option => option.zip === searchTerm).slice(0, 10);
+    return uniqueLocations.filter(option => 
+      option.zip === searchTerm
+    ).slice(0, 10);
   }
 
   // Then try partial matches on city, state, or full address
-  return locationOptions.filter(option => 
+  return uniqueLocations.filter(option => 
     option.city.toLowerCase().includes(searchTerm) ||
     option.state.toLowerCase() === searchTerm ||
     option.value.toLowerCase().includes(searchTerm)
