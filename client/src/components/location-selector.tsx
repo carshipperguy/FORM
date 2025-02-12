@@ -33,10 +33,18 @@ export function LocationSelector({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [options, setOptions] = React.useState<LocationOption[]>([]);
 
+  // Debug logs
+  React.useEffect(() => {
+    console.log('Current value:', value);
+    console.log('Current options:', options);
+  }, [value, options]);
+
   // Update options when search query changes
   React.useEffect(() => {
     if (searchQuery) {
+      console.log('Searching with query:', searchQuery);
       const results = searchLocations(searchQuery);
+      console.log('Search results:', results);
       setOptions(results);
     } else {
       setOptions([]);
@@ -68,7 +76,10 @@ export function LocationSelector({
           <CommandInput
             placeholder="Enter ZIP code or city name..."
             value={searchQuery}
-            onValueChange={setSearchQuery}
+            onValueChange={(value) => {
+              console.log('Input value changed:', value);
+              setSearchQuery(value);
+            }}
           />
           <CommandEmpty className="py-6 text-center text-sm">
             {searchQuery ? "No locations found." : "Start typing to search..."}
@@ -80,6 +91,7 @@ export function LocationSelector({
                   key={option.value}
                   value={option.value}
                   onSelect={() => {
+                    console.log('Selected option:', option);
                     onChange(option.value);
                     setOpen(false);
                     setSearchQuery("");
