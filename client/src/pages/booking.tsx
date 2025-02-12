@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
-import { validateAddress, calculateDistance, type Address } from "@/lib/mapquest";
 import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
@@ -35,25 +34,6 @@ const bookingSchema = z.object({
   })
 });
 
-type BookingFormData = z.infer<typeof bookingSchema>;
-
-type QuoteData = {
-  vehicleType: string;
-  year: string;
-  make: string;
-  model: string;
-  pickupLocation: string;
-  dropoffLocation: string;
-  shipmentDate: Date;
-  name?: string;
-  phone?: string;
-  email?: string;
-  selectedTransport: "open" | "enclosed";
-  finalPrice: number;
-  distance: number;
-  transitTime: number;
-};
-
 const extractLocation = (location: string) => {
   // Handle different location string formats
   const parts = location.split(',').map(part => part.trim());
@@ -62,14 +42,16 @@ const extractLocation = (location: string) => {
   // Expected format: "City, State ZIP" or "City, State, ZIP"
   if (parts.length >= 2) {
     city = parts[0];
-    // Handle case where state and ZIP are in the same part
-    if (parts[1].includes(' ')) {
-      const stateParts = parts[1].split(' ');
+    const lastPart = parts[parts.length - 1];
+
+    if (lastPart.includes(' ')) {
+      const stateParts = lastPart.split(' ');
       state = stateParts[0];
-      zip = stateParts[1] || parts[2] || '';
+      zip = stateParts[1] || '';
     } else {
       state = parts[1];
-      zip = parts[2] || '';
+      // Look for ZIP in the last part if it exists
+      zip = parts[parts.length - 1].match(/\d{5}/) ? parts[parts.length - 1] : '';
     }
   }
 
@@ -88,7 +70,7 @@ export default function Booking() {
 
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ? 
-    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteData : 
+    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : 
     null;
 
   if (!data?.finalPrice) {
@@ -99,7 +81,7 @@ export default function Booking() {
   const pickupLocation = extractLocation(data.pickupLocation);
   const dropoffLocation = extractLocation(data.dropoffLocation);
 
-  const form = useForm<BookingFormData>({
+  const form = useForm({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       pickupContactName: "",
@@ -122,61 +104,24 @@ export default function Booking() {
     },
   });
 
-  const onSubmit = async (formData: BookingFormData) => {
-    // Validate addresses
-    const pickupAddress: Address = {
-      street: formData.pickupStreetAddress,
-      city: formData.pickupCity,
-      state: formData.pickupState,
-      postalCode: formData.pickupZip
-    };
+  const onSubmit = async (formData) => {
+    try {
+      // Combine the form data with the existing quote data
+      const updatedData = {
+        ...data,
+        ...formData,
+      };
 
-    const deliveryAddress: Address = {
-      street: formData.deliveryStreetAddress,
-      city: formData.deliveryCity,
-      state: formData.deliveryState,
-      postalCode: formData.deliveryZip
-    };
-
-    // Validate both addresses
-    const pickupValidation = await validateAddress(pickupAddress);
-    const deliveryValidation = await validateAddress(deliveryAddress);
-
-    if (!pickupValidation.isValid || !deliveryValidation.isValid) {
-      toast({
-        title: "Invalid Address",
-        description: "Please check both addresses and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Format addresses for distance calculation
-    const pickupAddressStr = `${pickupValidation.formattedAddress}`;
-    const deliveryAddressStr = `${deliveryValidation.formattedAddress}`;
-
-    // Calculate accurate distance using formatted addresses
-    const distanceResult = await calculateDistance(pickupAddressStr, deliveryAddressStr);
-
-    if (!distanceResult.success) {
+      // Navigate to thank you page with all data
+      navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
+    } catch (error) {
+      console.error("Form submission error:", error);
       toast({
         title: "Error",
-        description: "Could not calculate shipping distance. Please try again.",
+        description: "There was a problem submitting the form. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-
-    // Update the data with validated addresses and accurate distance
-    const updatedData = {
-      ...data,
-      ...formData,
-      distance: distanceResult.distance,
-      validatedPickupAddress: pickupValidation.formattedAddress,
-      validatedDeliveryAddress: deliveryValidation.formattedAddress
-    };
-
-    navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
   };
 
   const handlePickupContactChange = (checked: boolean) => {
