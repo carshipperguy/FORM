@@ -55,7 +55,7 @@ export default function Home() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-[800px] mx-auto">
         <h1 className="text-4xl font-bold text-center mb-8">
-          Get Your Auto Transport Quote
+          Instant Car Shipping Quote – Get Yours in 30 Seconds!
         </h1>
         <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
         <TrustBadges />
