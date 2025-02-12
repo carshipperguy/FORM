@@ -21,24 +21,37 @@ interface LocationSelectorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   label?: string;
+  disabled?: boolean;
 }
 
 export function LocationSelector({
   value,
   onChange,
   placeholder = "Enter location...",
-  label = "Select location"
+  label = "Select location",
+  disabled = false
 }: LocationSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [locations, setLocations] = React.useState<LocationOption[]>([]);
 
-  // Simple search implementation
-  const handleSearch = React.useCallback((query: string) => {
-    const results = searchLocations(query);
-    console.log('Search results:', results); // Debug log
-    setLocations(results);
-  }, []);
+  // Debounced search implementation
+  const debouncedSearch = React.useCallback(
+    React.useMemo(
+      () => {
+        let timeoutId: NodeJS.Timeout;
+        return (query: string) => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            const results = searchLocations(query);
+            setLocations(results);
+          }, 300); // 300ms debounce delay
+        };
+      },
+      []
+    ),
+    []
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,6 +61,7 @@ export function LocationSelector({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          disabled={disabled}
         >
           {value ? (
             <span className="flex items-center gap-2">
@@ -63,11 +77,11 @@ export function LocationSelector({
       <PopoverContent className="w-[400px] p-0">
         <Command>
           <CommandInput
-            placeholder="Type a city name..."
+            placeholder="Search city or ZIP code..."
             value={searchQuery}
             onValueChange={(query) => {
               setSearchQuery(query);
-              handleSearch(query);
+              debouncedSearch(query);
             }}
           />
           <CommandEmpty className="py-6 text-center text-sm">
