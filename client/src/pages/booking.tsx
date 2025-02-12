@@ -128,19 +128,19 @@ export default function Booking() {
             {/* Shipping Details Summary */}
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <h3 className="font-semibold mb-2">Shipping Details</h3>
-              <div className="flex justify-center items-center gap-8 mt-4 mb-6">
-                <div className="h-12">
+              <div className="flex justify-center items-center gap-8 mt-4">
+                <div className="h-12 w-32">
                   <img
-                    src="/attached_assets/image_1739321425840.png"
+                    src="/assets/google-reviews.png"
                     alt="4.7 stars on Google"
-                    className="h-full w-auto object-contain"
+                    className="h-full w-full object-contain"
                   />
                 </div>
-                <div className="h-12">
+                <div className="h-12 w-32">
                   <img
-                    src="/attached_assets/image_1739321466140.png"
+                    src="/assets/bbb-rating.png"
                     alt="BBB A+ Rating"
-                    className="h-full w-auto object-contain"
+                    className="h-full w-full object-contain"
                   />
                 </div>
               </div>
