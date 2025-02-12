@@ -17,16 +17,16 @@ const bookingSchema = z.object({
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
   pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
   pickupStreetAddress: z.string().min(1, "Street address is required"),
-  pickupCity: z.string(),
-  pickupState: z.string(),
-  pickupZip: z.string(),
+  pickupCity: z.string().min(1, "City is required"),
+  pickupState: z.string().min(1, "State is required"),
+  pickupZip: z.string().min(1, "ZIP code is required"),
 
   deliveryContactName: z.string().min(1, "Delivery contact name is required"),
   deliveryContactPhone: z.string().min(1, "Delivery contact phone is required"),
   deliveryStreetAddress: z.string().min(1, "Street address is required"),
-  deliveryCity: z.string(),
-  deliveryState: z.string(),
-  deliveryZip: z.string(),
+  deliveryCity: z.string().min(1, "City is required"),
+  deliveryState: z.string().min(1, "State is required"),
+  deliveryZip: z.string().min(1, "ZIP code is required"),
 
   expeditedShipping: z.boolean().optional(),
   notes: z.string().optional(),
@@ -54,27 +54,47 @@ type QuoteData = {
   transitTime: number;
 };
 
+const extractLocation = (location: string) => {
+  // Handle different location string formats
+  const parts = location.split(',').map(part => part.trim());
+  let city = '', state = '', zip = '';
+
+  // Expected format: "City, State ZIP" or "City, State, ZIP"
+  if (parts.length >= 2) {
+    city = parts[0];
+    // Handle case where state and ZIP are in the same part
+    if (parts[1].includes(' ')) {
+      const stateParts = parts[1].split(' ');
+      state = stateParts[0];
+      zip = stateParts[1] || parts[2] || '';
+    } else {
+      state = parts[1];
+      zip = parts[2] || '';
+    }
+  }
+
+  return {
+    city: city || 'N/A',
+    state: state || 'N/A',
+    zip: zip || 'N/A'
+  };
+};
+
 export default function Booking() {
   const [isPickupContact, setIsPickupContact] = useState(false);
   const [isDeliveryContact, setIsDeliveryContact] = useState(false);
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const searchParams = new URLSearchParams(window.location.search);
-  const data = JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteData;
+  const data = searchParams.get("data") ? 
+    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteData : 
+    null;
 
-  if (!data.finalPrice) {
+  if (!data?.finalPrice) {
     navigate("/");
     return null;
   }
-
-  const extractLocation = (location: string) => {
-    const parts = location.split(',').map(part => part.trim());
-    return {
-      city: parts[0] || '',
-      state: parts[1] || '',
-      zip: parts[2] || ''
-    };
-  };
 
   const pickupLocation = extractLocation(data.pickupLocation);
   const dropoffLocation = extractLocation(data.dropoffLocation);
@@ -102,9 +122,8 @@ export default function Booking() {
     },
   });
 
-  const { toast } = useToast();
-
   const onSubmit = async (formData: BookingFormData) => {
+    // Validate addresses
     const pickupAddress: Address = {
       street: formData.pickupStreetAddress,
       city: formData.pickupCity,
@@ -157,7 +176,6 @@ export default function Booking() {
       validatedDeliveryAddress: deliveryValidation.formattedAddress
     };
 
-    // Use template literal for the URL with query parameters
     navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
   };
 
@@ -270,8 +288,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -282,8 +301,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -294,8 +314,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -371,8 +392,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -383,8 +405,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -395,8 +418,9 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly disabled className="bg-muted" />
+                              <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
