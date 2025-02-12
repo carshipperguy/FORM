@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
 
 const bookingSchema = z.object({
@@ -18,6 +19,9 @@ const bookingSchema = z.object({
   pickupAddress: z.string().min(1, "Pickup address is required"),
   deliveryAddress: z.string().min(1, "Delivery address is required"),
   notes: z.string().optional(),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions"
+  })
 });
 
 type BookingFormData = z.infer<typeof bookingSchema>;
@@ -56,6 +60,7 @@ export default function Booking() {
       pickupAddress: "",
       deliveryAddress: "",
       notes: "",
+      acceptTerms: false
     },
   });
 
@@ -63,7 +68,7 @@ export default function Booking() {
     navigate("/thank-you");
   };
 
-  // Extract city, state, zip from location string
+  // Extract city, state from location string
   const extractLocation = (location: string) => {
     const parts = location.split(',');
     return {
@@ -107,12 +112,14 @@ export default function Booking() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {/* Vehicle & Shipping Summary */}
+            {/* Shipping Details Summary */}
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+              <h3 className="font-semibold mb-2">Shipping Details</h3>
+              <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
               <p><span className="font-medium">Expedited:</span> {data.guaranteedDate ? "Yes" : "No"}</p>
-              <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+              <p><span className="font-medium">Route:</span> {pickupLocation.city} to {dropoffLocation.city}</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
@@ -141,12 +148,12 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
+                        <div className="text-sm text-muted-foreground mt-1 bg-muted/30 p-2 rounded">
+                          {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
+                        </div>
                       </FormItem>
                     )}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    {pickupLocation.city}, {pickupLocation.state} {pickupLocation.zip}
-                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -200,12 +207,12 @@ export default function Booking() {
                           <Input placeholder="Enter street address" {...field} />
                         </FormControl>
                         <FormMessage />
+                        <div className="text-sm text-muted-foreground mt-1 bg-muted/30 p-2 rounded">
+                          {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
+                        </div>
                       </FormItem>
                     )}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    {dropoffLocation.city}, {dropoffLocation.state} {dropoffLocation.zip}
-                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -258,8 +265,49 @@ export default function Booking() {
                   />
                 </div>
 
+                {/* Terms and Conditions */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <FormField
+                      control={form.control}
+                      name="acceptTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-x-1">
+                            <span>I accept the</span>
+                            <Dialog>
+                              <DialogTrigger className="text-primary underline hover:text-primary/80">
+                                terms and conditions
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Terms and Conditions</DialogTitle>
+                                </DialogHeader>
+                                <div className="max-h-[60vh] overflow-y-auto">
+                                  {/* Add your terms and conditions content here */}
+                                  <p>
+                                    By accepting these terms, you agree to our service conditions...
+                                    {/* Add more terms content */}
+                                  </p>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
                 <Button type="submit" className="w-full">
-                  Complete Booking
+                  Confirm Free Reservation
                 </Button>
               </form>
             </Form>
