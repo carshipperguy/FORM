@@ -11,14 +11,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
 
-// Schema definition remains the same
 const bookingSchema = z.object({
+  pickupStreetAddress: z.string().min(1, "Street address is required"),
+  pickupCity: z.string().min(1, "City is required"),
+  pickupState: z.string().min(1, "State is required"),
+  pickupZip: z.string().min(1, "ZIP code is required"),
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
   pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
+
+  deliveryStreetAddress: z.string().min(1, "Street address is required"),
+  deliveryCity: z.string().min(1, "City is required"),
+  deliveryState: z.string().min(1, "State is required"),
+  deliveryZip: z.string().min(1, "ZIP code is required"),
   deliveryContactName: z.string().min(1, "Delivery contact name is required"),
   deliveryContactPhone: z.string().min(1, "Delivery contact phone is required"),
-  pickupAddress: z.string().min(1, "Pickup address is required"),
-  deliveryAddress: z.string().min(1, "Delivery address is required"),
+
   notes: z.string().optional(),
   acceptTerms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
@@ -58,15 +65,35 @@ export default function Booking() {
     return null;
   }
 
+  const extractLocation = (location: string) => {
+    const parts = location.split(',').map(part => part.trim());
+    return {
+      city: parts[0] || '',
+      state: parts[1] || '',
+      zip: parts[2] || ''
+    };
+  };
+
+  const pickupLocation = extractLocation(data.pickupLocation);
+  const dropoffLocation = extractLocation(data.dropoffLocation);
+
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
+      pickupStreetAddress: "",
+      pickupCity: pickupLocation.city,
+      pickupState: pickupLocation.state,
+      pickupZip: pickupLocation.zip,
       pickupContactName: "",
       pickupContactPhone: "",
+
+      deliveryStreetAddress: "",
+      deliveryCity: dropoffLocation.city,
+      deliveryState: dropoffLocation.state,
+      deliveryZip: dropoffLocation.zip,
       deliveryContactName: "",
       deliveryContactPhone: "",
-      pickupAddress: "",
-      deliveryAddress: "",
+
       notes: "",
       acceptTerms: false
     },
@@ -75,20 +102,6 @@ export default function Booking() {
   const onSubmit = async (formData: BookingFormData) => {
     navigate("/thank-you");
   };
-
-  // Extract location details
-  const extractLocation = (location: string) => {
-    const parts = location.split(',').map(part => part.trim());
-    const locationDetails = {
-      city: parts[0] || '',
-      state: parts[1] || '',
-      zip: parts[2] || ''
-    };
-    return locationDetails;
-  };
-
-  const pickupLocation = extractLocation(data.pickupLocation);
-  const dropoffLocation = extractLocation(data.dropoffLocation);
 
   const handlePickupContactChange = (checked: boolean) => {
     setIsPickupContact(checked);
@@ -127,7 +140,6 @@ export default function Booking() {
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
               <p><span className="font-medium">Expedited:</span> {data.guaranteedDate ? "Yes" : "No"}</p>
-              <p><span className="font-medium">Route:</span> {pickupLocation.city} to {dropoffLocation.city}</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
@@ -146,31 +158,65 @@ export default function Booking() {
                       I am the pickup contact
                     </label>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="pickupAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter street address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        <div className="bg-muted p-3 rounded-md mt-2">
-                          <div className="text-sm">
-                            <div className="font-medium text-foreground mb-1">Selected Location:</div>
-                            <div className="text-muted-foreground">
-                              {pickupLocation.city && pickupLocation.state ? (
-                                `${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`
-                              ) : (
-                                'Location details missing'
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="pickupStreetAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Street Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter street address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="pickupCity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="pickupState"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="pickupZip"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>ZIP Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -214,31 +260,65 @@ export default function Booking() {
                       I am the delivery contact
                     </label>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="deliveryAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter street address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        <div className="bg-muted p-3 rounded-md mt-2">
-                          <div className="text-sm">
-                            <div className="font-medium text-foreground mb-1">Selected Location:</div>
-                            <div className="text-muted-foreground">
-                              {dropoffLocation.city && dropoffLocation.state ? (
-                                `${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`
-                              ) : (
-                                'Location details missing'
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="deliveryStreetAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Street Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter street address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="deliveryCity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="deliveryState"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="deliveryZip"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>ZIP Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -318,7 +398,6 @@ export default function Booking() {
                                 <div className="max-h-[60vh] overflow-y-auto">
                                   <p>
                                     By accepting these terms, you agree to our service conditions...
-                                    {/* Add more terms content */}
                                   </p>
                                 </div>
                               </DialogContent>
