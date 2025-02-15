@@ -127,7 +127,7 @@ export default function Checkout() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h3 className="font-medium">Guaranteed Date Expedited Shipping</h3>
+              <h3 className="font-medium">Expedited Shipping</h3>
               <p className="text-sm text-muted-foreground">
                 Expedited shipping ensures your vehicle is prioritized for pickup and delivery,
                 arriving faster than standard transit times. Your transport is scheduled with a
