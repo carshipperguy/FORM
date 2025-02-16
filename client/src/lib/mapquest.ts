@@ -11,9 +11,10 @@ export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
   const baseUrl = 'https://www.mapquestapi.com';
-  const apiKey = import.meta.env.MAPQUEST_API_KEY;
+  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;  // Updated to use VITE_ prefix
 
   if (!apiKey) {
+    console.error('MapQuest API key is missing');
     throw new Error('MapQuest API key is not configured');
   }
 
@@ -25,6 +26,7 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
   }
 
   try {
+    console.log('Making MapQuest request:', url.toString());
     const response = await fetch(url.toString());
     if (!response.ok) {
       throw new Error(`MapQuest API request failed: ${response.statusText}`);
@@ -67,6 +69,7 @@ export async function validateAddress(address: Address) {
 
 export async function calculateDistance(origin: string, destination: string) {
   if (!origin || !destination) {
+    console.error('Missing origin or destination:', { origin, destination });
     return {
       success: false,
       error: 'Both origin and destination are required'
@@ -81,6 +84,7 @@ export async function calculateDistance(origin: string, destination: string) {
     });
 
     if (data.info?.statuscode === 402) {
+      console.error('Invalid locations provided:', { origin, destination });
       return {
         success: false,
         error: 'Invalid locations provided'

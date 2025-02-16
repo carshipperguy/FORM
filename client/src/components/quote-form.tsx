@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -34,6 +34,9 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
       pickupLocation: "",
       dropoffLocation: "",
       shipmentDate: undefined,
+      name: "",
+      phone: "",
+      email: "",
     },
   });
 
@@ -42,11 +45,17 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const shipmentDate = form.watch("shipmentDate");
 
   // Show contact fields when date is selected
-  if (shipmentDate && !showContactFields) {
-    setShowContactFields(true);
-  }
+  useEffect(() => {
+    if (shipmentDate && !showContactFields) {
+      setShowContactFields(true);
+    }
+  }, [shipmentDate]);
 
   const onSubmit = (data: QuoteFormData) => {
+    // Ensure locations are properly formatted
+    if (!data.pickupLocation || !data.dropoffLocation) {
+      return;
+    }
     onCalculate(data);
   };
 
@@ -118,7 +127,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                         <SelectContent>
                           {vehicleTypes.map((type) => (
                             <SelectItem key={type} value={type}>
-                              {type.split("/").map(word => 
+                              {type.split("/").map((word) =>
                                 word.charAt(0).toUpperCase() + word.slice(1)
                               ).join("/")}
                             </SelectItem>
@@ -260,9 +269,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date < new Date()
-                            }
+                            disabled={(date) => date < new Date()}
                             initialFocus
                           />
                         </PopoverContent>
