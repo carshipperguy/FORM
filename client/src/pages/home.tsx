@@ -20,8 +20,8 @@ export default function Home() {
 
       if (!distanceResult.success) {
         toast({
-          title: "Error",
-          description: "Could not calculate distance between locations. Please try again.",
+          title: "Error Calculating Distance",
+          description: distanceResult.error || "Could not calculate distance between locations. Please try again.",
           variant: "destructive",
         });
         return;
@@ -54,7 +54,7 @@ export default function Home() {
       console.error("Calculation error:", error);
       toast({
         title: "Error",
-        description: "Failed to calculate the quote. Please try again.",
+        description: "Failed to calculate the quote. Please check your location inputs and try again.",
         variant: "destructive",
       });
     } finally {

@@ -11,11 +11,11 @@ export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
   const baseUrl = 'https://www.mapquestapi.com';
-  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;  // Updated to use VITE_ prefix
+  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;
 
   if (!apiKey) {
     console.error('MapQuest API key is missing');
-    throw new Error('MapQuest API key is not configured');
+    throw new Error('Distance calculation is currently unavailable. Please try again later.');
   }
 
   const url = new URL(`${baseUrl}${endpoint}`);
@@ -28,10 +28,18 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
   try {
     console.log('Making MapQuest request:', url.toString());
     const response = await fetch(url.toString());
+
     if (!response.ok) {
-      throw new Error(`MapQuest API request failed: ${response.statusText}`);
+      throw new Error(`Distance calculation failed: ${response.statusText}`);
     }
+
     const data = await response.json();
+
+    // Check for MapQuest API-specific error responses
+    if (data.info?.messages?.length > 0) {
+      throw new Error(data.info.messages.join(', '));
+    }
+
     return data;
   } catch (error) {
     console.error('MapQuest API error:', error);
@@ -72,7 +80,7 @@ export async function calculateDistance(origin: string, destination: string) {
     console.error('Missing origin or destination:', { origin, destination });
     return {
       success: false,
-      error: 'Both origin and destination are required'
+      error: 'Please enter both pickup and delivery locations'
     };
   }
 
@@ -87,7 +95,7 @@ export async function calculateDistance(origin: string, destination: string) {
       console.error('Invalid locations provided:', { origin, destination });
       return {
         success: false,
-        error: 'Invalid locations provided'
+        error: 'Please check your location entries and try again'
       };
     }
 
@@ -101,7 +109,7 @@ export async function calculateDistance(origin: string, destination: string) {
 
     return {
       success: false,
-      error: 'Could not calculate distance'
+      error: 'Could not calculate distance between these locations'
     };
   } catch (error) {
     console.error('Distance calculation error:', error);
