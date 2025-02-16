@@ -25,7 +25,7 @@ interface LocationSelectorProps {
 }
 
 export function LocationSelector({
-  value,
+  value = "",  // Initialize with empty string
   onChange,
   placeholder = "Enter location...",
   label = "Select location",
@@ -43,7 +43,6 @@ export function LocationSelector({
     []
   );
 
-  // Use React.useEffect for debouncing
   React.useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery.length >= 2) {
