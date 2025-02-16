@@ -11,19 +11,30 @@ export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
   const baseUrl = 'https://www.mapquestapi.com';
-  const apiKey = process.env.MAPQUEST_API_KEY;
+  const apiKey = import.meta.env.MAPQUEST_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('MapQuest API key is not configured');
+  }
+
   const url = new URL(`${baseUrl}${endpoint}`);
-  url.searchParams.append('key', apiKey!);
+  url.searchParams.append('key', apiKey);
 
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.append(key, value.toString());
   }
 
-  const response = await fetch(url.toString());
-  if (!response.ok) {
-    throw new Error('MapQuest API request failed');
+  try {
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`MapQuest API request failed: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('MapQuest API error:', error);
+    throw error;
   }
-  return response.json();
 }
 
 export async function validateAddress(address: Address) {
@@ -55,20 +66,32 @@ export async function validateAddress(address: Address) {
 }
 
 export async function calculateDistance(origin: string, destination: string) {
+  if (!origin || !destination) {
+    return {
+      success: false,
+      error: 'Both origin and destination are required'
+    };
+  }
+
   try {
-    const response = await fetch(`https://www.mapquestapi.com/directions/v2/route?key=${process.env.MAPQUEST_API_KEY}&from=${encodeURIComponent(origin)}&to=${encodeURIComponent(destination)}&unit=M`);
+    const data = await makeMapQuestRequest('/directions/v2/route', {
+      from: origin,
+      to: destination,
+      unit: 'M'
+    });
 
-    if (!response.ok) {
-      throw new Error('MapQuest API request failed');
+    if (data.info?.statuscode === 402) {
+      return {
+        success: false,
+        error: 'Invalid locations provided'
+      };
     }
-
-    const data = await response.json();
 
     if (data.route?.distance) {
       return {
+        success: true,
         distance: Math.round(data.route.distance),
-        time: data.route.formattedTime,
-        success: true
+        time: data.route.formattedTime
       };
     }
 
@@ -80,7 +103,7 @@ export async function calculateDistance(origin: string, destination: string) {
     console.error('Distance calculation error:', error);
     return {
       success: false,
-      error: 'Failed to calculate distance'
+      error: error instanceof Error ? error.message : 'Failed to calculate distance'
     };
   }
 }

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { QuoteForm } from "@/components/quote-form";
 import { TrustBadges } from "@/components/trust-badges";
 import { calculatePricing } from "@/lib/pricing";
+import { calculateDistance } from "@/lib/mapquest";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,16 +15,26 @@ export default function Home() {
   const handleCalculate = async (data: QuoteFormData) => {
     setIsCalculating(true);
     try {
-      // TODO: Replace with actual distance calculation
-      const distance = 1000; // Mock distance for testing
-      const pricing = calculatePricing(distance, data.vehicleType);
+      // Calculate real distance using MapQuest API
+      const distanceResult = await calculateDistance(data.pickupLocation, data.dropoffLocation);
+
+      if (!distanceResult.success) {
+        toast({
+          title: "Error",
+          description: "Could not calculate distance between locations. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const pricing = calculatePricing(distanceResult.distance, data.vehicleType);
 
       const checkoutData = {
         ...data,
         openTransportPrice: pricing.openTransport,
         enclosedTransportPrice: pricing.enclosedTransport,
         transitTime: pricing.transitTime,
-        distance,
+        distance: distanceResult.distance,
       };
 
       if (pricing.message) {

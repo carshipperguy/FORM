@@ -27,10 +27,20 @@ interface PricingResult {
 }
 
 export function calculatePricing(
-  distance: number,
+  distance: number | undefined,
   vehicleType: VehicleType,
   date: Date = new Date()
 ): PricingResult {
+  // Handle undefined distance
+  if (!distance) {
+    return {
+      openTransport: 0,
+      enclosedTransport: 0,
+      transitTime: 0,
+      message: "Unable to calculate distance. Please try again."
+    };
+  }
+
   // Calculate transit time based on distance
   // Assume average of 300 miles per day plus 1 day for pickup/delivery
   const transitTime = Math.ceil(distance / 300) + 1;
