@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { quoteFormSchema, type QuoteFormData } from "@shared/schema";
 import { vehicleTypes, years, makes, modelsByMake } from "@/lib/vehicle-data";
+import { LocationSelector } from "@/components/location-selector";
 
 type QuoteFormProps = {
   onCalculate: (data: QuoteFormData) => void;
@@ -64,8 +65,13 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="pickupLocation"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Pickup Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ship From" {...field} />
+                        <LocationSelector
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter pickup city or ZIP"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -77,8 +83,13 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="dropoffLocation"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Dropoff Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ship To" {...field} />
+                        <LocationSelector
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter delivery city or ZIP"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
