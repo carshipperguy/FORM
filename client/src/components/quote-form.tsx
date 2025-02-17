@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -60,24 +59,25 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const isCarTruckSuv = vehicleType === "car/truck/suv";
 
   return (
-    <Card className="w-full max-w-[450px] mx-auto">
+    <Card className="w-full max-w-[400px] mx-auto">
       <CardContent className="p-3">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <div>
-              <h2 className="text-sm font-semibold mb-1.5">Origin & Destination</h2>
-              <div className="space-y-2">
+              <div className="bg-[#00334C] text-white text-xs font-medium p-1.5 mb-1.5">
+                Origin & Destination
+              </div>
+              <div className="space-y-1.5 px-1">
                 <FormField
                   control={form.control}
                   name="pickupLocation"
                   render={({ field }) => (
-                    <FormItem className="space-y-0.5">
-                      <FormLabel className="text-xs">Pickup Location</FormLabel>
+                    <FormItem>
                       <FormControl>
                         <LocationSelector
                           value={field.value}
                           onChange={field.onChange}
-                          placeholder="Enter pickup city or ZIP"
+                          placeholder="Ship From"
                         />
                       </FormControl>
                       <FormMessage />
@@ -89,13 +89,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   control={form.control}
                   name="dropoffLocation"
                   render={({ field }) => (
-                    <FormItem className="space-y-0.5">
-                      <FormLabel className="text-xs">Dropoff Location</FormLabel>
+                    <FormItem>
                       <FormControl>
                         <LocationSelector
                           value={field.value}
                           onChange={field.onChange}
-                          placeholder="Enter delivery city or ZIP"
+                          placeholder="Ship To"
                         />
                       </FormControl>
                       <FormMessage />
@@ -105,21 +104,20 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
               </div>
             </div>
 
-            <Separator className="my-1.5" />
-
             <div>
-              <h2 className="text-sm font-semibold mb-1.5">Vehicle Details</h2>
-              <div className="space-y-2">
+              <div className="bg-[#00334C] text-white text-xs font-medium p-1.5 mb-1.5">
+                Vehicle Details
+              </div>
+              <div className="space-y-1.5 px-1">
                 <FormField
                   control={form.control}
                   name="vehicleType"
                   render={({ field }) => (
-                    <FormItem className="space-y-0.5">
-                      <FormLabel className="text-xs">Vehicle Type</FormLabel>
+                    <FormItem>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Select vehicle type" />
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="What Would You Like To Ship?" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -142,12 +140,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                     control={form.control}
                     name="year"
                     render={({ field }) => (
-                      <FormItem className="space-y-0.5">
-                        <FormLabel className="text-xs">Year</FormLabel>
+                      <FormItem>
                         {isCarTruckSuv ? (
                           <Select onValueChange={field.onChange}>
                             <FormControl>
-                              <SelectTrigger className="h-8">
+                              <SelectTrigger className="h-9">
                                 <SelectValue placeholder="Year" />
                               </SelectTrigger>
                             </FormControl>
@@ -161,7 +158,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           </Select>
                         ) : (
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Year" {...field} />
+                            <Input className="h-9" placeholder="Year" {...field} />
                           </FormControl>
                         )}
                         <FormMessage />
@@ -173,12 +170,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                     control={form.control}
                     name="make"
                     render={({ field }) => (
-                      <FormItem className="space-y-0.5">
-                        <FormLabel className="text-xs">Make</FormLabel>
+                      <FormItem>
                         {isCarTruckSuv ? (
                           <Select onValueChange={field.onChange}>
                             <FormControl>
-                              <SelectTrigger className="h-8">
+                              <SelectTrigger className="h-9">
                                 <SelectValue placeholder="Make" />
                               </SelectTrigger>
                             </FormControl>
@@ -192,7 +188,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           </Select>
                         ) : (
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Make" {...field} />
+                            <Input className="h-9" placeholder="Make" {...field} />
                           </FormControl>
                         )}
                         <FormMessage />
@@ -204,12 +200,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                     control={form.control}
                     name="model"
                     render={({ field }) => (
-                      <FormItem className="space-y-0.5">
-                        <FormLabel className="text-xs">Model</FormLabel>
+                      <FormItem>
                         {isCarTruckSuv ? (
                           <Select onValueChange={field.onChange} disabled={!make}>
                             <FormControl>
-                              <SelectTrigger className="h-8">
+                              <SelectTrigger className="h-9">
                                 <SelectValue placeholder="Model" />
                               </SelectTrigger>
                             </FormControl>
@@ -223,7 +218,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           </Select>
                         ) : (
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Model" {...field} />
+                            <Input className="h-9" placeholder="Model" {...field} />
                           </FormControl>
                         )}
                         <FormMessage />
@@ -234,31 +229,30 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
               </div>
             </div>
 
-            <Separator className="my-1.5" />
-
             <div>
-              <h2 className="text-sm font-semibold mb-1.5">Shipment Details</h2>
-              <div className="space-y-2">
+              <div className="bg-[#00334C] text-white text-xs font-medium p-1.5 mb-1.5">
+                Shipment Details
+              </div>
+              <div className="space-y-1.5 px-1">
                 <FormField
                   control={form.control}
                   name="shipmentDate"
                   render={({ field }) => (
-                    <FormItem className="space-y-0.5">
-                      <FormLabel className="text-xs">Shipment Date</FormLabel>
+                    <FormItem>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full h-8 pl-3 text-left font-normal text-sm",
+                                "w-full h-9 pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
                               {field.value ? (
-                                format(field.value, "PPP")
+                                format(field.value, "MM-dd-yy")
                               ) : (
-                                <span>Pick a date</span>
+                                <span>MM-DD-YY</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -285,9 +279,9 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       control={form.control}
                       name="name"
                       render={({ field }) => (
-                        <FormItem className="space-y-0.5">
+                        <FormItem>
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Name" {...field} />
+                            <Input className="h-9" placeholder="Name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -298,9 +292,9 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
-                        <FormItem className="space-y-0.5">
+                        <FormItem>
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Phone" type="tel" {...field} />
+                            <Input className="h-9" placeholder="Phone" type="tel" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -311,9 +305,9 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       control={form.control}
                       name="email"
                       render={({ field }) => (
-                        <FormItem className="space-y-0.5">
+                        <FormItem>
                           <FormControl>
-                            <Input className="h-8 text-sm" placeholder="Email" type="email" {...field} />
+                            <Input className="h-9" placeholder="Email" type="email" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -324,8 +318,8 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
               </div>
             </div>
 
-            <Button type="submit" className="w-full h-8 text-sm mt-3" disabled={isCalculating}>
-              {isCalculating ? "Calculating..." : "Submit"}
+            <Button type="submit" className="w-full h-9 mt-2" disabled={isCalculating}>
+              Submit
             </Button>
           </form>
         </Form>
