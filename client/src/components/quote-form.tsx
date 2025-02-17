@@ -44,7 +44,6 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const make = form.watch("make");
   const shipmentDate = form.watch("shipmentDate");
 
-  // Show contact fields when date is selected
   useEffect(() => {
     if (shipmentDate && !showContactFields) {
       setShowContactFields(true);
@@ -52,7 +51,6 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   }, [shipmentDate]);
 
   const onSubmit = (data: QuoteFormData) => {
-    // Ensure locations are properly formatted
     if (!data.pickupLocation || !data.dropoffLocation) {
       return;
     }
@@ -63,18 +61,18 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
 
   return (
     <Card className="w-full max-w-[500px] mx-auto">
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold mb-4">Origin & Destination</h2>
-              <div className="space-y-4">
+              <h2 className="text-base font-semibold mb-2">Origin & Destination</h2>
+              <div className="space-y-3">
                 <FormField
                   control={form.control}
                   name="pickupLocation"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pickup Location</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-sm">Pickup Location</FormLabel>
                       <FormControl>
                         <LocationSelector
                           value={field.value}
@@ -91,8 +89,8 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   control={form.control}
                   name="dropoffLocation"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Dropoff Location</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-sm">Dropoff Location</FormLabel>
                       <FormControl>
                         <LocationSelector
                           value={field.value}
@@ -107,17 +105,17 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
               </div>
             </div>
 
-            <Separator />
+            <Separator className="my-2" />
 
             <div>
-              <h2 className="text-lg font-semibold mb-4">Vehicle Details</h2>
-              <div className="space-y-4">
+              <h2 className="text-base font-semibold mb-2">Vehicle Details</h2>
+              <div className="space-y-3">
                 <FormField
                   control={form.control}
                   name="vehicleType"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>What Would You Like To Ship?</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-sm">What Would You Like To Ship?</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -139,112 +137,114 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Year</FormLabel>
-                      {isCarTruckSuv ? (
-                        <Select onValueChange={field.onChange}>
+                <div className="grid grid-cols-3 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-sm">Year</FormLabel>
+                        {isCarTruckSuv ? (
+                          <Select onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year} value={year}>
+                                  {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
+                            <Input placeholder="Year" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            {years.map((year) => (
-                              <SelectItem key={year} value={year}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <FormControl>
-                          <Input placeholder="Enter year" {...field} />
-                        </FormControl>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="make"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Make</FormLabel>
-                      {isCarTruckSuv ? (
-                        <Select onValueChange={field.onChange}>
+                  <FormField
+                    control={form.control}
+                    name="make"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-sm">Make</FormLabel>
+                        {isCarTruckSuv ? (
+                          <Select onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Make" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {makes.map((make) => (
+                                <SelectItem key={make} value={make}>
+                                  {make}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select make" />
-                            </SelectTrigger>
+                            <Input placeholder="Make" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            {makes.map((make) => (
-                              <SelectItem key={make} value={make}>
-                                {make}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <FormControl>
-                          <Input placeholder="Enter make" {...field} />
-                        </FormControl>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="model"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Model</FormLabel>
-                      {isCarTruckSuv ? (
-                        <Select onValueChange={field.onChange} disabled={!make}>
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-sm">Model</FormLabel>
+                        {isCarTruckSuv ? (
+                          <Select onValueChange={field.onChange} disabled={!make}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Model" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {make && modelsByMake[make]?.map((model) => (
+                                <SelectItem key={model} value={model}>
+                                  {model}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select model" />
-                            </SelectTrigger>
+                            <Input placeholder="Model" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            {make && modelsByMake[make]?.map((model) => (
-                              <SelectItem key={model} value={model}>
-                                {model}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <FormControl>
-                          <Input placeholder="Enter model" {...field} />
-                        </FormControl>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
 
-            <Separator />
+            <Separator className="my-2" />
 
             <div>
-              <h2 className="text-lg font-semibold mb-4">Shipment Details</h2>
-              <div className="space-y-4">
+              <h2 className="text-base font-semibold mb-2">Shipment Details</h2>
+              <div className="space-y-3">
                 <FormField
                   control={form.control}
                   name="shipmentDate"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Shipment Date</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-sm">Shipment Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -280,12 +280,12 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                 />
 
                 {showContactFields && (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-1">
                           <FormControl>
                             <Input placeholder="Name" {...field} />
                           </FormControl>
@@ -298,7 +298,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-1">
                           <FormControl>
                             <Input placeholder="Phone" type="tel" {...field} />
                           </FormControl>
@@ -311,7 +311,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       control={form.control}
                       name="email"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-1">
                           <FormControl>
                             <Input placeholder="Email" type="email" {...field} />
                           </FormControl>
@@ -324,7 +324,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isCalculating}>
+            <Button type="submit" className="w-full mt-4" disabled={isCalculating}>
               {isCalculating ? "Calculating..." : "Submit"}
             </Button>
           </form>
