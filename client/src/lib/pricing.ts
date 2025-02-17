@@ -42,8 +42,8 @@ export function calculatePricing(
   }
 
   // Calculate transit time based on distance
-  // Assume average of 300 miles per day plus 1 day for pickup/delivery
-  const transitTime = Math.ceil(distance / 300) + 1;
+  // Updated: Assume average of 400 miles per day plus 1 day for pickup/delivery
+  const transitTime = Math.ceil(distance / 400) + 1;
 
   // For short distances, return message only
   if (distance <= 100) {
