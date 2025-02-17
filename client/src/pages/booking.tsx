@@ -34,24 +34,21 @@ const bookingSchema = z.object({
   })
 });
 
-const extractLocation = (location: string) => {
+export function extractLocation(location: string) {
   // Handle different location string formats
   const parts = location.split(',').map(part => part.trim());
   let city = '', state = '', zip = '';
 
-  // Expected format: "City, State ZIP" or "City, State, ZIP"
+  // Parse location string to extract city, state, and ZIP
   if (parts.length >= 2) {
     city = parts[0];
     const lastPart = parts[parts.length - 1];
+    const stateZipPattern = /([A-Z]{2})\s+(\d{5})/;
+    const match = lastPart.match(stateZipPattern);
 
-    if (lastPart.includes(' ')) {
-      const stateParts = lastPart.split(' ');
-      state = stateParts[0];
-      zip = stateParts[1] || '';
-    } else {
-      state = parts[1];
-      // Look for ZIP in the last part if it exists
-      zip = parts[parts.length - 1].match(/\d{5}/) ? parts[parts.length - 1] : '';
+    if (match) {
+      state = match[1];
+      zip = match[2];
     }
   }
 
@@ -60,7 +57,7 @@ const extractLocation = (location: string) => {
     state: state || 'N/A',
     zip: zip || 'N/A'
   };
-};
+}
 
 export default function Booking() {
   const [isPickupContact, setIsPickupContact] = useState(false);
@@ -69,8 +66,8 @@ export default function Booking() {
   const { toast } = useToast();
 
   const searchParams = new URLSearchParams(window.location.search);
-  const data = searchParams.get("data") ? 
-    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : 
+  const data = searchParams.get("data") ?
+    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) :
     null;
 
   if (!data?.finalPrice) {
@@ -160,6 +157,10 @@ export default function Booking() {
               <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
               <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
               <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
+              <p><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
+              <p><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
+              <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
+              <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
               <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
             </div>
 
