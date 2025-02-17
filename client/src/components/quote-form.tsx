@@ -135,97 +135,95 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   )}
                 />
 
-                <div className="grid grid-cols-3 gap-1.5">
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        {isCarTruckSuv ? (
-                          <Select onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Year" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {years.map((year) => (
-                                <SelectItem key={year} value={year}>
-                                  {year}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange}>
                           <FormControl>
-                            <Input className="h-9" placeholder="Year" {...field} />
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Year" />
+                            </SelectTrigger>
                           </FormControl>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <SelectContent>
+                            {years.map((year) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <FormControl>
+                          <Input className="h-9" placeholder="Year" {...field} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="make"
-                    render={({ field }) => (
-                      <FormItem>
-                        {isCarTruckSuv ? (
-                          <Select onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Make" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {makes.map((make) => (
-                                <SelectItem key={make} value={make}>
-                                  {make}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
+                <FormField
+                  control={form.control}
+                  name="make"
+                  render={({ field }) => (
+                    <FormItem>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange}>
                           <FormControl>
-                            <Input className="h-9" placeholder="Make" {...field} />
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Make" />
+                            </SelectTrigger>
                           </FormControl>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <SelectContent>
+                            {makes.map((make) => (
+                              <SelectItem key={make} value={make}>
+                                {make}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <FormControl>
+                          <Input className="h-9" placeholder="Make" {...field} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                      <FormItem>
-                        {isCarTruckSuv ? (
-                          <Select onValueChange={field.onChange} disabled={!make}>
-                            <FormControl>
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Model" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {make && modelsByMake[make]?.map((model) => (
-                                <SelectItem key={model} value={model}>
-                                  {model}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
+                <FormField
+                  control={form.control}
+                  name="model"
+                  render={({ field }) => (
+                    <FormItem>
+                      {isCarTruckSuv ? (
+                        <Select onValueChange={field.onChange} disabled={!make}>
                           <FormControl>
-                            <Input className="h-9" placeholder="Model" {...field} />
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Model" />
+                            </SelectTrigger>
                           </FormControl>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <SelectContent>
+                            {make && modelsByMake[make]?.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {model}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <FormControl>
+                          <Input className="h-9" placeholder="Model" {...field} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
@@ -274,7 +272,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                 />
 
                 {showContactFields && (
-                  <div className="grid grid-cols-3 gap-1.5">
+                  <div className="space-y-1.5">
                     <FormField
                       control={form.control}
                       name="name"
