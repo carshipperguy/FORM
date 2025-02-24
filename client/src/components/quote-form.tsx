@@ -121,7 +121,10 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {vehicleTypes.map((type) => (
+                          <SelectItem value="car/truck/suv">
+                            Car/Truck/SUV
+                          </SelectItem>
+                          {vehicleTypes.filter(type => type !== "car/truck/suv").map((type) => (
                             <SelectItem key={type} value={type}>
                               {type.split("/").map((word) =>
                                 word.charAt(0).toUpperCase() + word.slice(1)

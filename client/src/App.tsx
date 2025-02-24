@@ -24,7 +24,7 @@ function ShareableUrlDisplay() {
   const replit_url = `https://${import.meta.env.REPL_SLUG}.${import.meta.env.REPL_OWNER}.repl.co`;
   return (
     <div className="bg-muted/50 p-2 text-center text-sm">
-      <p>Your unique form URL: <a href={replit_url} className="text-primary hover:underline">{replit_url}</a></p>
+      <p>Share this quote calculator: <a href={replit_url} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{replit_url}</a></p>
     </div>
   );
 }
@@ -32,7 +32,7 @@ function ShareableUrlDisplay() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="w-[500px] h-[800px] mx-auto overflow-y-auto bg-white">
+      <div className="w-full max-w-[500px] min-h-[800px] mx-auto overflow-y-auto bg-white">
         <ShareableUrlDisplay />
         <Router />
       </div>
