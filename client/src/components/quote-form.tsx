@@ -121,9 +121,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="car/truck/suv">
-                            Car/Truck/SUV
-                          </SelectItem>
+                          <SelectItem value="car/truck/suv">Car/Truck/SUV</SelectItem>
                           {vehicleTypes.filter(type => type !== "car/truck/suv").map((type) => (
                             <SelectItem key={type} value={type}>
                               {type.split("/").map((word) =>
