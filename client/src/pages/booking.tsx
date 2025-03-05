@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 
+// Schema and types remain the same
 const bookingSchema = z.object({
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
   pickupContactPhone: z.string().min(1, "Pickup contact phone is required"),
@@ -35,11 +36,9 @@ const bookingSchema = z.object({
 });
 
 export function extractLocation(location: string) {
-  // Handle different location string formats
   const parts = location.split(',').map(part => part.trim());
   let city = '', state = '', zip = '';
 
-  // Parse location string to extract city, state, and ZIP
   if (parts.length >= 2) {
     city = parts[0];
     const lastPart = parts[parts.length - 1];
@@ -103,13 +102,10 @@ export default function Booking() {
 
   const onSubmit = async (formData) => {
     try {
-      // Combine the form data with the existing quote data
       const updatedData = {
         ...data,
         ...formData,
       };
-
-      // Navigate to thank you page with all data
       navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -143,217 +139,65 @@ export default function Booking() {
     }
   };
 
+  const FormSection = ({ title, children }) => (
+    <div className="bg-white rounded-lg p-4 shadow-sm">
+      <h3 className="text-lg font-semibold mb-4">{title}</h3>
+      {children}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
-      <Card className="w-full max-w-[800px] mx-auto">
-        <CardHeader>
-          <CardTitle className="text-lg md:text-xl lg:text-2xl">Complete Your Route Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Shipping Details Summary */}
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm md:text-base">
-              <h3 className="font-semibold mb-2">Shipping Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-lg mx-auto">
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle className="text-xl">Complete Your Booking</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-6">
+            {/* Quote Summary */}
+            <div className="bg-primary/5 rounded-lg p-4">
+              <h3 className="font-medium mb-3">Quote Summary</h3>
+              <div className="text-sm space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <p><span className="font-medium">Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+                  <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
+                </div>
                 <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
-                <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
+                <p><span className="font-medium">Transport:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"}</p>
                 <p><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
                 <p><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
-                <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
-                <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
-                <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
+                  <p><span className="font-medium">Transit:</span> {data.transitTime} days</p>
+                </div>
               </div>
             </div>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Pickup Details */}
-                <div className="space-y-4">
-                  <h3 className="text-base md:text-lg font-semibold">Pickup Details</h3>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Checkbox
-                      id="isPickupContact"
-                      checked={isPickupContact}
-                      onCheckedChange={handlePickupContactChange}
-                    />
-                    <label htmlFor="isPickupContact" className="text-sm">
-                      I am the pickup contact
-                    </label>
-                  </div>
-
-                  {/* Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="pickupContactName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="pickupContactPhone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Phone</FormLabel>
-                          <FormControl>
-                            <Input type="tel" {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Address Fields */}
+                {/* Pickup Information */}
+                <FormSection title="Pickup Information">
                   <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="pickupStreetAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Street Address</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter street address" {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="pickupCity"
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="w-full" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="isPickupContact"
+                        checked={isPickupContact}
+                        onCheckedChange={handlePickupContactChange}
                       />
-                      <FormField
-                        control={form.control}
-                        name="pickupState"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>State</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="w-full" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="pickupZip"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>ZIP Code</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="w-full" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <label htmlFor="isPickupContact" className="text-sm">
+                        I am the pickup contact
+                      </label>
                     </div>
-                  </div>
-                </div>
 
-                {/* Delivery Details - Similar structure to Pickup Details */}
-                <div className="space-y-4">
-                  <h3 className="text-base md:text-lg font-semibold">Delivery Details</h3>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Checkbox
-                      id="isDeliveryContact"
-                      checked={isDeliveryContact}
-                      onCheckedChange={handleDeliveryContactChange}
-                    />
-                    <label htmlFor="isDeliveryContact" className="text-sm">
-                      I am the delivery contact
-                    </label>
-                  </div>
-
-                  {/* Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="deliveryContactName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="deliveryContactPhone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact Phone</FormLabel>
-                          <FormControl>
-                            <Input type="tel" {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Address Fields */}
-                  <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="deliveryStreetAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Street Address</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter street address" {...field} className="w-full" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid gap-4">
                       <FormField
                         control={form.control}
-                        name="deliveryCity"
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="w-full" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="deliveryState"
+                        name="pickupContactName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>State</FormLabel>
+                            <FormLabel>Contact Name</FormLabel>
                             <FormControl>
-                              <Input {...field} className="w-full" />
+                              <Input {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -361,112 +205,264 @@ export default function Booking() {
                       />
                       <FormField
                         control={form.control}
-                        name="deliveryZip"
+                        name="pickupContactPhone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>ZIP Code</FormLabel>
+                            <FormLabel>Contact Phone</FormLabel>
                             <FormControl>
-                              <Input {...field} className="w-full" />
+                              <Input type="tel" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Shipping Options */}
-                <div className="space-y-4">
-                  <h3 className="text-base md:text-lg font-semibold">Shipping Options</h3>
-                  <FormField
-                    control={form.control}
-                    name="expeditedShipping"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                      <FormField
+                        control={form.control}
+                        name="pickupStreetAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="pickupCity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <FormField
+                            control={form.control}
+                            name="pickupState"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Expedited Shipping</FormLabel>
+                          <FormField
+                            control={form.control}
+                            name="pickupZip"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>ZIP</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      </div>
+                    </div>
+                  </div>
+                </FormSection>
 
-                {/* Additional Notes */}
-                <div className="space-y-4">
-                  <h3 className="text-base md:text-lg font-semibold">Additional Notes</h3>
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>If you need to add any important details, leave them here</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Enter any additional information about your shipment"
-                            className="min-h-[100px] w-full"
-                            {...field}
+                {/* Delivery Information */}
+                <FormSection title="Delivery Information">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="isDeliveryContact"
+                        checked={isDeliveryContact}
+                        onCheckedChange={handleDeliveryContactChange}
+                      />
+                      <label htmlFor="isDeliveryContact" className="text-sm">
+                        I am the delivery contact
+                      </label>
+                    </div>
+
+                    <div className="grid gap-4">
+                      <FormField
+                        control={form.control}
+                        name="deliveryContactName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="deliveryContactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Phone</FormLabel>
+                            <FormControl>
+                              <Input type="tel" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="deliveryStreetAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="deliveryCity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <FormField
+                            control={form.control}
+                            name="deliveryState"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <FormField
+                            control={form.control}
+                            name="deliveryZip"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>ZIP</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </FormSection>
 
-                {/* Terms and Conditions */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
+                {/* Additional Options */}
+                <FormSection title="Additional Options">
+                  <div className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="acceptTerms"
+                      name="expeditedShipping"
                       render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
+                        <FormItem className="flex items-center gap-2">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <div className="space-x-1">
-                            <span className="text-sm">I accept the</span>
-                            <Dialog>
-                              <DialogTrigger className="text-primary underline hover:text-primary/80 text-sm">
-                                terms and conditions
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[600px]">
-                                <DialogHeader>
-                                  <DialogTitle>Terms and Conditions</DialogTitle>
-                                </DialogHeader>
-                                <div className="max-h-[60vh] overflow-y-auto">
-                                  <p>
-                                    By accepting these terms, you agree to our service conditions...
-                                  </p>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+                          <div className="leading-none">
+                            <FormLabel>Expedited Shipping</FormLabel>
                           </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Additional Notes</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Enter any special instructions or requirements"
+                              className="min-h-[100px] resize-none"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
+                </FormSection>
+
+                {/* Terms and Conditions */}
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="acceptTerms"
+                    render={({ field }) => (
+                      <FormItem className="flex items-start gap-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-x-1 text-sm">
+                          <span>I accept the</span>
+                          <Dialog>
+                            <DialogTrigger className="text-primary hover:underline">
+                              terms and conditions
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Terms and Conditions</DialogTitle>
+                              </DialogHeader>
+                              <div className="max-h-[60vh] overflow-y-auto text-sm">
+                                <p>
+                                  By accepting these terms, you agree to our service conditions...
+                                </p>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <Button type="submit" className="w-full">
-                  Confirm Free Reservation
+                  Confirm Booking
                 </Button>
               </form>
             </Form>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
