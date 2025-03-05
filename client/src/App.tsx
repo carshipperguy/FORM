@@ -32,7 +32,7 @@ function ShareableUrlDisplay() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="w-full max-w-[500px] min-h-[800px] mx-auto overflow-y-auto bg-white">
+      <div className="w-full max-w-[308px] min-h-[574px] mx-auto overflow-y-auto bg-white">
         <ShareableUrlDisplay />
         <Router />
       </div>
