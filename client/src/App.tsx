@@ -32,9 +32,11 @@ function ShareableUrlDisplay() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="w-full max-w-[500px] min-h-[800px] mx-auto overflow-y-auto bg-white">
+      <div className="mx-auto">
         <ShareableUrlDisplay />
-        <Router />
+        <div className="[&>*:first-child]:w-[308px] [&>*:not(:first-child)]:w-[500px] mx-auto">
+          <Router />
+        </div>
       </div>
       <Toaster />
     </QueryClientProvider>
