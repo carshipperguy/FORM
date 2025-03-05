@@ -26,7 +26,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      vehicleType: "car/truck/suv",
+      vehicleType: "",
       year: "",
       make: "",
       model: "",
@@ -114,7 +114,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   name="vehicleType"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger className="h-9">
                             <SelectValue placeholder="What Would You Like To Ship?" />
