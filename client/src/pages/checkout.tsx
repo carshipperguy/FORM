@@ -3,9 +3,8 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Star, Shield, Truck } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-
 
 type CheckoutData = {
   vehicleType: string;
@@ -44,6 +43,8 @@ export default function Checkout() {
   };
 
   const handleReserve = () => {
+    if (!selectedTransport) return;
+
     const params = new URLSearchParams({
       data: encodeURIComponent(JSON.stringify({
         ...data,
@@ -62,7 +63,7 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <Card className="max-w-[500px] mx-auto">
+      <Card className="w-full max-w-[500px] mx-auto">
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-xl">Your Confirmed Price</CardTitle>
           <div className="flex items-center justify-center gap-2 mt-2">
@@ -78,7 +79,7 @@ export default function Checkout() {
             </div>
           </div>
           <div className="flex justify-center mt-2">
-            <img src="/bbb-trust-logo.webp" alt="BBB Accredited Business" className="h-12" />
+            <img src="/bbb trust logo.webp" alt="BBB Accredited Business" className="h-12" />
           </div>
         </CardHeader>
 
@@ -93,30 +94,26 @@ export default function Checkout() {
 
             <div className="grid grid-cols-2 gap-4">
               <Card
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer transition-all hover:bg-primary/5 ${
                   selectedTransport === "open" ? "ring-2 ring-primary" : ""
                 }`}
                 onClick={() => setSelectedTransport("open")}
               >
                 <CardContent className="p-4">
-                  <div className="flex flex-col">
-                    <div className="text-center mb-2">Open Transport</div>
-                    <div className="text-3xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</div>
-                  </div>
+                  <div className="text-center mb-2">Open Transport</div>
+                  <div className="text-3xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</div>
                 </CardContent>
               </Card>
 
               <Card
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer transition-all hover:bg-primary/5 ${
                   selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
                 }`}
                 onClick={() => setSelectedTransport("enclosed")}
               >
                 <CardContent className="p-4">
-                  <div className="flex flex-col">
-                    <div className="text-center mb-2">Enclosed Transport</div>
-                    <div className="text-3xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</div>
-                  </div>
+                  <div className="text-center mb-2">Enclosed Transport</div>
+                  <div className="text-3xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -137,14 +134,16 @@ export default function Checkout() {
               </div>
             </div>
 
-            <Button
-              onClick={handleReserve}
-              className="w-full h-12 text-lg font-semibold"
-              size="lg"
-            >
-              Reserve Your Spot
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            {selectedTransport && (
+              <Button
+                onClick={handleReserve}
+                className="w-full h-12 text-lg font-semibold"
+                size="lg"
+              >
+                Reserve Your Spot
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            )}
 
             <div className="text-center space-y-2">
               <p className="text-2xl font-bold">NO PAYMENT REQUIRED</p>
@@ -157,23 +156,20 @@ export default function Checkout() {
           <Separator />
 
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Shipping Details
-            </h3>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
+            <h3 className="text-lg font-semibold">Shipping Details</h3>
+            <div className="grid gap-2 text-sm">
+              <div className="grid gap-1">
                 <h4 className="font-medium">Vehicle Information</h4>
-                <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
+                <p>Vehicle: {data.year} {data.make} {data.model}</p>
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-1">
                 <h4 className="font-medium">Route Information</h4>
-                <p><span className="font-medium">From:</span> {extractCity(data.pickupLocation)}</p>
-                <p><span className="font-medium">To:</span> {extractCity(data.dropoffLocation)}</p>
-                <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
-                <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
-                <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
+                <p>From: {extractCity(data.pickupLocation)}</p>
+                <p>To: {extractCity(data.dropoffLocation)}</p>
+                <p>Ship Date: {new Date(data.shipmentDate).toLocaleDateString()}</p>
+                <p>Distance: {data.distance} miles</p>
+                <p>Transit Time: {data.transitTime} days</p>
               </div>
             </div>
           </div>
