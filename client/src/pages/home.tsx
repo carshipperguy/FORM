@@ -63,10 +63,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-[800px] mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          Instant Car Shipping Quote – Get a Price in 30 Seconds!
+    <div className="min-h-screen bg-background p-2">
+      <div className="mx-auto">
+        <h1 className="text-xl font-bold text-center mb-4">
+          Instant Car Shipping Quote
         </h1>
         <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
         <TrustBadges />
