@@ -144,31 +144,33 @@ export default function Booking() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <Card className="max-w-[800px] mx-auto">
+    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+      <Card className="w-full max-w-[800px] mx-auto">
         <CardHeader>
-          <CardTitle>Complete Your Route Details</CardTitle>
+          <CardTitle className="text-lg md:text-xl lg:text-2xl">Complete Your Route Details</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {/* Shipping Details Summary */}
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+            <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm md:text-base">
               <h3 className="font-semibold mb-2">Shipping Details</h3>
-              <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
-              <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
-              <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
-              <p><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
-              <p><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
-              <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
-              <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
-              <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
+                <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
+                <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
+                <p><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
+                <p><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
+                <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
+                <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
+                <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
+              </div>
             </div>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Pickup Details */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Pickup Details</h3>
+                  <h3 className="text-base md:text-lg font-semibold">Pickup Details</h3>
                   <div className="flex items-center space-x-2 mb-4">
                     <Checkbox
                       id="isPickupContact"
@@ -180,8 +182,8 @@ export default function Booking() {
                     </label>
                   </div>
 
-                  {/* Pickup Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Contact Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="pickupContactName"
@@ -189,7 +191,7 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Contact Name</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -202,7 +204,7 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Contact Phone</FormLabel>
                           <FormControl>
-                            <Input type="tel" {...field} />
+                            <Input type="tel" {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -210,7 +212,7 @@ export default function Booking() {
                     />
                   </div>
 
-                  {/* Pickup Address */}
+                  {/* Address Fields */}
                   <div className="space-y-4">
                     <FormField
                       control={form.control}
@@ -219,22 +221,22 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Street Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter street address" {...field} />
+                            <Input placeholder="Enter street address" {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="pickupCity"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="col-span-2 md:col-span-1">
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -247,7 +249,7 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -260,7 +262,7 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -270,9 +272,9 @@ export default function Booking() {
                   </div>
                 </div>
 
-                {/* Delivery Details */}
+                {/* Delivery Details - Similar structure to Pickup Details */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Delivery Details</h3>
+                  <h3 className="text-base md:text-lg font-semibold">Delivery Details</h3>
                   <div className="flex items-center space-x-2 mb-4">
                     <Checkbox
                       id="isDeliveryContact"
@@ -284,8 +286,8 @@ export default function Booking() {
                     </label>
                   </div>
 
-                  {/* Delivery Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Contact Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="deliveryContactName"
@@ -293,7 +295,7 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Contact Name</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -306,7 +308,7 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Contact Phone</FormLabel>
                           <FormControl>
-                            <Input type="tel" {...field} />
+                            <Input type="tel" {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -314,7 +316,7 @@ export default function Booking() {
                     />
                   </div>
 
-                  {/* Delivery Address */}
+                  {/* Address Fields */}
                   <div className="space-y-4">
                     <FormField
                       control={form.control}
@@ -323,22 +325,22 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Street Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter street address" {...field} />
+                            <Input placeholder="Enter street address" {...field} className="w-full" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="deliveryCity"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="col-span-2 md:col-span-1">
                             <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -351,7 +353,7 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -364,7 +366,7 @@ export default function Booking() {
                           <FormItem>
                             <FormLabel>ZIP Code</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} className="w-full" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -374,9 +376,9 @@ export default function Booking() {
                   </div>
                 </div>
 
-                {/* Expedited Shipping Option */}
+                {/* Shipping Options */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Shipping Options</h3>
+                  <h3 className="text-base md:text-lg font-semibold">Shipping Options</h3>
                   <FormField
                     control={form.control}
                     name="expeditedShipping"
@@ -389,18 +391,16 @@ export default function Booking() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            Expedited Shipping
-                          </FormLabel>
+                          <FormLabel>Expedited Shipping</FormLabel>
                         </div>
                       </FormItem>
                     )}
                   />
                 </div>
 
-                {/* Notes Section */}
+                {/* Additional Notes */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Additional Notes</h3>
+                  <h3 className="text-base md:text-lg font-semibold">Additional Notes</h3>
                   <FormField
                     control={form.control}
                     name="notes"
@@ -410,7 +410,7 @@ export default function Booking() {
                         <FormControl>
                           <Textarea
                             placeholder="Enter any additional information about your shipment"
-                            className="min-h-[100px]"
+                            className="min-h-[100px] w-full"
                             {...field}
                           />
                         </FormControl>
@@ -435,12 +435,12 @@ export default function Booking() {
                             />
                           </FormControl>
                           <div className="space-x-1">
-                            <span>I accept the</span>
+                            <span className="text-sm">I accept the</span>
                             <Dialog>
-                              <DialogTrigger className="text-primary underline hover:text-primary/80">
+                              <DialogTrigger className="text-primary underline hover:text-primary/80 text-sm">
                                 terms and conditions
                               </DialogTrigger>
-                              <DialogContent>
+                              <DialogContent className="sm:max-w-[600px]">
                                 <DialogHeader>
                                   <DialogTitle>Terms and Conditions</DialogTitle>
                                 </DialogHeader>
