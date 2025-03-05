@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Star, Shield, Truck } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { SiBbb } from "react-icons/si";
-import { Calendar } from "lucide-react";
 
 
 type CheckoutData = {
@@ -80,7 +78,7 @@ export default function Checkout() {
             </div>
           </div>
           <div className="flex justify-center mt-2">
-            <img src="/bbb trust logo.webp" alt="BBB Accredited Business" className="h-12" />
+            <img src="/bbb-trust-logo.webp" alt="BBB Accredited Business" className="h-12" />
           </div>
         </CardHeader>
 
@@ -101,11 +99,10 @@ export default function Checkout() {
                 onClick={() => setSelectedTransport("open")}
               >
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Truck className="h-5 w-5" />
-                    <span className="font-medium">Open Transport</span>
+                  <div className="flex flex-col">
+                    <div className="text-center mb-2">Open Transport</div>
+                    <div className="text-3xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</div>
                   </div>
-                  <p className="text-2xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</p>
                 </CardContent>
               </Card>
 
@@ -116,11 +113,10 @@ export default function Checkout() {
                 onClick={() => setSelectedTransport("enclosed")}
               >
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="h-5 w-5" />
-                    <span className="font-medium">Enclosed Transport</span>
+                  <div className="flex flex-col">
+                    <div className="text-center mb-2">Enclosed Transport</div>
+                    <div className="text-3xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</div>
                   </div>
-                  <p className="text-2xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</p>
                 </CardContent>
               </Card>
             </div>
@@ -141,16 +137,14 @@ export default function Checkout() {
               </div>
             </div>
 
-            {selectedTransport && (
-              <Button
-                onClick={handleReserve}
-                className="w-full h-12 text-lg font-semibold"
-                size="lg"
-              >
-                Reserve Your Spot
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            )}
+            <Button
+              onClick={handleReserve}
+              className="w-full h-12 text-lg font-semibold"
+              size="lg"
+            >
+              Reserve Your Spot
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
 
             <div className="text-center space-y-2">
               <p className="text-2xl font-bold">NO PAYMENT REQUIRED</p>
@@ -159,7 +153,6 @@ export default function Checkout() {
               </p>
             </div>
           </div>
-
 
           <Separator />
 
