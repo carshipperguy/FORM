@@ -94,9 +94,7 @@ export default function Checkout() {
 
             <div className="grid grid-cols-2 gap-4">
               <Card
-                className={`cursor-pointer transition-all hover:bg-primary/5 ${
-                  selectedTransport === "open" ? "ring-2 ring-primary" : ""
-                }`}
+                className={`cursor-pointer transition-all hover:bg-primary/5 ${selectedTransport === "open" ? "ring-2 ring-primary bg-primary/5" : ""}`}
                 onClick={() => setSelectedTransport("open")}
               >
                 <CardContent className="p-4">
@@ -106,9 +104,7 @@ export default function Checkout() {
               </Card>
 
               <Card
-                className={`cursor-pointer transition-all hover:bg-primary/5 ${
-                  selectedTransport === "enclosed" ? "ring-2 ring-primary" : ""
-                }`}
+                className={`cursor-pointer transition-all hover:bg-primary/5 ${selectedTransport === "enclosed" ? "ring-2 ring-primary bg-primary/5" : ""}`}
                 onClick={() => setSelectedTransport("enclosed")}
               >
                 <CardContent className="p-4">
@@ -134,16 +130,15 @@ export default function Checkout() {
               </div>
             </div>
 
-            {selectedTransport && (
-              <Button
-                onClick={handleReserve}
-                className="w-full h-12 text-lg font-semibold"
-                size="lg"
-              >
-                Reserve Your Spot
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            )}
+            <Button
+              onClick={handleReserve}
+              className="w-full h-12 text-lg font-semibold"
+              size="lg"
+              disabled={!selectedTransport}
+            >
+              Reserve Your Spot
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
 
             <div className="text-center space-y-2">
               <p className="text-2xl font-bold">NO PAYMENT REQUIRED</p>
