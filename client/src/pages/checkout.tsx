@@ -129,7 +129,6 @@ export default function Checkout() {
                 />
               </div>
             </div>
-
             <Button
               onClick={handleReserve}
               className="w-full h-12 text-lg font-semibold"
@@ -140,11 +139,8 @@ export default function Checkout() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
 
-            <div className="text-center space-y-2">
+            <div className="text-center">
               <p className="text-2xl font-bold">NO PAYMENT REQUIRED</p>
-              <p className="text-sm text-muted-foreground">
-                Get your quote instantly. We'll contact you to confirm details and schedule pickup.
-              </p>
             </div>
           </div>
 
