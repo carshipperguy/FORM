@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { type QuoteFormData } from "@shared/schema";
 
@@ -33,96 +33,106 @@ export default function FinalQuote() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-4">
-      <div className="max-w-[1200px] mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-[#003366]">
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-[#003366]">
           Choose Your Shipping Option
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {/* 2x2 Grid Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
           {/* Open Transport - Standard */}
-          <Card className="p-6 border-2">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold mb-2">Open Transport</h3>
-              <div className="text-4xl font-bold mb-4">${data.openTransportPrice}</div>
-              <ul className="space-y-2">
-                <li>Picked up within 7 business days</li>
-                <li>Open carrier</li>
-                <li>$0 Due Now</li>
-              </ul>
-            </div>
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => handleReserve('open', false)}
-            >
-              Reserve Now - No Credit Card Required
-            </Button>
+          <Card className="border-2">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex-grow space-y-4">
+                <h3 className="text-xl font-bold whitespace-nowrap">Open Transport</h3>
+                <div className="text-4xl font-bold">${data.openTransportPrice}</div>
+                <ul className="space-y-2 text-base">
+                  <li>Picked up within 7 business days</li>
+                  <li>Open carrier</li>
+                  <li>$0 Due Now</li>
+                </ul>
+              </div>
+              <Button 
+                onClick={() => handleReserve('open', false)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mt-4 text-base"
+              >
+                Reserve Now - No Credit Card Required
+              </Button>
+            </CardContent>
           </Card>
 
           {/* Enclosed Transport - Standard */}
-          <Card className="p-6 border-2">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold mb-2">Enclosed Transport</h3>
-              <div className="text-4xl font-bold mb-4">${data.enclosedTransportPrice}</div>
-              <ul className="space-y-2">
-                <li>Picked up within 7 business days</li>
-                <li>Enclosed carrier</li>
-                <li>$0 Due Now</li>
-              </ul>
-            </div>
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => handleReserve('enclosed', false)}
-            >
-              Reserve Now - No Credit Card Required
-            </Button>
+          <Card className="border-2">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex-grow space-y-4">
+                <h3 className="text-xl font-bold whitespace-nowrap">Enclosed Transport</h3>
+                <div className="text-4xl font-bold">${data.enclosedTransportPrice}</div>
+                <ul className="space-y-2 text-base">
+                  <li>Picked up within 7 business days</li>
+                  <li>Enclosed carrier</li>
+                  <li>$0 Due Now</li>
+                </ul>
+              </div>
+              <Button 
+                onClick={() => handleReserve('enclosed', false)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mt-4 text-base"
+              >
+                Reserve Now - No Credit Card Required
+              </Button>
+            </CardContent>
           </Card>
 
           {/* Open Transport - Guaranteed */}
-          <Card className="p-6 border-2">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold mb-2">Open + Guaranteed Date</h3>
-              <div className="text-4xl font-bold mb-4">
-                ${calculatePrice(data.openTransportPrice, true)}
+          <Card className="border-2">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex-grow space-y-4">
+                <h3 className="text-xl font-bold">Open + Guaranteed Date</h3>
+                <div className="text-4xl font-bold">
+                  ${calculatePrice(data.openTransportPrice, true)}
+                </div>
+                <ul className="space-y-2 text-base">
+                  <li>Guaranteed pickup date</li>
+                  <li>Open carrier</li>
+                  <li>$0 Due Now</li>
+                </ul>
               </div>
-              <ul className="space-y-2">
-                <li>Guaranteed pickup date</li>
-                <li>Open carrier</li>
-                <li>$0 Due Now</li>
-              </ul>
-            </div>
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => handleReserve('open', true)}
-            >
-              Reserve Now - No Credit Card Required
-            </Button>
+              <Button 
+                onClick={() => handleReserve('open', true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mt-4 text-base"
+              >
+                Reserve Now - No Credit Card Required
+              </Button>
+            </CardContent>
           </Card>
 
           {/* Enclosed Transport - Guaranteed */}
-          <Card className="p-6 border-2">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold mb-2">Enclosed + Guaranteed Date</h3>
-              <div className="text-4xl font-bold mb-4">
-                ${calculatePrice(data.enclosedTransportPrice, true)}
+          <Card className="border-2">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex-grow space-y-4">
+                <h3 className="text-xl font-bold">Enclosed + Guaranteed Date</h3>
+                <div className="text-4xl font-bold">
+                  ${calculatePrice(data.enclosedTransportPrice, true)}
+                </div>
+                <ul className="space-y-2 text-base">
+                  <li>Guaranteed pickup date</li>
+                  <li>Enclosed carrier</li>
+                  <li>$0 Due Now</li>
+                </ul>
               </div>
-              <ul className="space-y-2">
-                <li>Guaranteed pickup date</li>
-                <li>Enclosed carrier</li>
-                <li>$0 Due Now</li>
-              </ul>
-            </div>
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => handleReserve('enclosed', true)}
-            >
-              Reserve Now - No Credit Card Required
-            </Button>
+              <Button 
+                onClick={() => handleReserve('enclosed', true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mt-4 text-base"
+              >
+                Reserve Now - No Credit Card Required
+              </Button>
+            </CardContent>
           </Card>
         </div>
 
-        <div className="text-center text-sm max-w-[800px] mx-auto">
-          <p>
+        {/* Disclaimer */}
+        <div className="text-center max-w-2xl mx-auto text-sm mt-8">
+          <p className="leading-relaxed">
             Got more than one vehicle? Shipping something modified or inoperable?<br />
             Please call <span className="font-semibold">954-642-2118</span> for a custom quote — these require special handling.
           </p>
