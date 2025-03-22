@@ -5,7 +5,7 @@ import { type QuoteFormData } from "@shared/schema";
 
 export default function FinalQuote() {
   const [, navigate] = useLocation();
-  
+
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ?
     JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) as QuoteFormData :
@@ -20,11 +20,25 @@ export default function FinalQuote() {
     return isGuaranteed ? Math.round(basePrice * 1.3) : basePrice;
   };
 
+  const handleReserve = (type: 'open' | 'enclosed', isGuaranteed: boolean) => {
+    const params = new URLSearchParams({
+      data: encodeURIComponent(JSON.stringify({
+        ...data,
+        selectedTransport: type,
+        guaranteedDate: isGuaranteed,
+        finalPrice: calculatePrice(type === 'enclosed' ? data.enclosedTransportPrice : data.openTransportPrice, isGuaranteed)
+      }))
+    });
+    navigate(`/booking?${params.toString()}`);
+  };
+
   return (
     <div className="min-h-screen bg-white p-4">
       <div className="max-w-[1200px] mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Choose Your Shipping Option</h1>
-        
+        <h1 className="text-3xl font-bold text-center mb-8 text-[#003366]">
+          Choose Your Shipping Option
+        </h1>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {/* Open Transport - Standard */}
           <Card className="p-6 border-2">
@@ -37,7 +51,10 @@ export default function FinalQuote() {
                 <li>$0 Due Now</li>
               </ul>
             </div>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => handleReserve('open', false)}
+            >
               Reserve Now - No Credit Card Required
             </Button>
           </Card>
@@ -53,7 +70,10 @@ export default function FinalQuote() {
                 <li>$0 Due Now</li>
               </ul>
             </div>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => handleReserve('enclosed', false)}
+            >
               Reserve Now - No Credit Card Required
             </Button>
           </Card>
@@ -71,7 +91,10 @@ export default function FinalQuote() {
                 <li>$0 Due Now</li>
               </ul>
             </div>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => handleReserve('open', true)}
+            >
               Reserve Now - No Credit Card Required
             </Button>
           </Card>
@@ -89,7 +112,10 @@ export default function FinalQuote() {
                 <li>$0 Due Now</li>
               </ul>
             </div>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => handleReserve('enclosed', true)}
+            >
               Reserve Now - No Credit Card Required
             </Button>
           </Card>
@@ -98,7 +124,7 @@ export default function FinalQuote() {
         <div className="text-center text-sm max-w-[800px] mx-auto">
           <p>
             Got more than one vehicle? Shipping something modified or inoperable?<br />
-            Please call us at <span className="font-semibold">954-642-2118</span> for a custom quote — these require special handling.
+            Please call <span className="font-semibold">954-642-2118</span> for a custom quote — these require special handling.
           </p>
         </div>
       </div>
