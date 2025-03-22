@@ -29,14 +29,6 @@ export default function Home() {
 
       const pricing = calculatePricing(distanceResult.distance, data.vehicleType);
 
-      const checkoutData = {
-        ...data,
-        openTransportPrice: pricing.openTransport,
-        enclosedTransportPrice: pricing.enclosedTransport,
-        transitTime: pricing.transitTime,
-        distance: distanceResult.distance,
-      };
-
       if (pricing.message) {
         toast({
           title: "Quote Information",
@@ -45,11 +37,19 @@ export default function Home() {
         return;
       }
 
+      const quoteData = {
+        ...data,
+        openTransportPrice: pricing.openTransport,
+        enclosedTransportPrice: pricing.enclosedTransport,
+        transitTime: pricing.transitTime,
+        distance: distanceResult.distance,
+      };
+
       const params = new URLSearchParams({
-        data: encodeURIComponent(JSON.stringify(checkoutData)),
+        data: encodeURIComponent(JSON.stringify(quoteData)),
       });
 
-      navigate(`/checkout?${params.toString()}`);
+      navigate(`/final-quote?${params.toString()}`);
     } catch (error) {
       console.error("Calculation error:", error);
       toast({
