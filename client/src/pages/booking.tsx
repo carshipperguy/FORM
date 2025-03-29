@@ -34,7 +34,7 @@ const bookingSchema = z.object({
   })
 });
 
-export function extractLocation(location: string) {
+function extractLocation(location: string) {
   const parts = location.split(',').map(part => part.trim());
   let city = '', state = '', zip = '';
 
@@ -99,7 +99,7 @@ export default function Booking() {
     },
   });
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (formData: any) => {
     try {
       const updatedData = {
         ...data,
@@ -140,23 +140,53 @@ export default function Booking() {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <Card className="max-w-[800px] mx-auto">
-        <CardHeader>
-          <CardTitle>Complete Your Route Details</CardTitle>
+      <div className="flex justify-center mb-6">
+        <img 
+          src="/amerigo-logo.png" 
+          alt="Amerigo Auto Transport" 
+          className="h-12 md:h-16"
+        />
+      </div>
+      <Card className="max-w-[800px] mx-auto shadow-xl">
+        <CardHeader className="bg-[#f7f9fc] rounded-t-lg border-b">
+          <CardTitle className="text-xl md:text-2xl text-[#1E3A4C] text-center">Complete Your Route Details</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 md:p-6">
           <div className="space-y-6">
             {/* Shipping Details Summary */}
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <h3 className="font-semibold mb-2">Shipping Details</h3>
-              <p><span className="font-medium">Ship Date:</span> {new Date(data.shipmentDate).toLocaleDateString()}</p>
-              <p><span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}</p>
-              <p><span className="font-medium">Transport Type:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"} Transport</p>
-              <p><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
-              <p><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
-              <p><span className="font-medium">Distance:</span> {data.distance} miles</p>
-              <p><span className="font-medium">Transit Time:</span> {data.transitTime} days</p>
-              <p><span className="font-medium">Price:</span> ${data.finalPrice}</p>
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg shadow-sm border border-blue-200">
+              <h3 className="font-semibold text-[#1E3A4C] text-lg mb-4 text-center">Your Shipping Details</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="bg-white/80 p-3 rounded-md">
+                    <h4 className="text-sm font-medium text-blue-800">Vehicle Information</h4>
+                    <p className="text-gray-700">{data.year} {data.make} {data.model}</p>
+                    <p className="text-gray-700"><span className="font-medium">Transport:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"}</p>
+                  </div>
+                  
+                  <div className="bg-white/80 p-3 rounded-md">
+                    <h4 className="text-sm font-medium text-blue-800">Shipping Date</h4>
+                    <p className="text-gray-700">{new Date(data.shipmentDate).toLocaleDateString()}</p>
+                    <p className="text-gray-700"><span className="font-medium">Expected Transit:</span> {data.transitTime} days</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="bg-white/80 p-3 rounded-md">
+                    <h4 className="text-sm font-medium text-blue-800">Route Information</h4>
+                    <p className="text-gray-700"><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
+                    <p className="text-gray-700"><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
+                    <p className="text-gray-700"><span className="font-medium">Distance:</span> {data.distance} miles</p>
+                  </div>
+                  
+                  <div className="bg-white/80 p-3 rounded-md">
+                    <h4 className="text-sm font-medium text-blue-800">Price</h4>
+                    <p className="text-xl font-bold text-green-700">${data.finalPrice}</p>
+                    <p className="text-xs text-gray-500 mt-1">No payment required until vehicle pickup</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <Form {...form}>
@@ -452,9 +482,17 @@ export default function Booking() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Confirm Free Reservation
-                </Button>
+                <div className="mt-8 space-y-4">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-4 px-6 text-base rounded-md transition duration-200 shadow-md"
+                  >
+                    Complete Free Reservation
+                  </Button>
+                  <p className="text-center text-sm text-gray-500">
+                    No payment required until your vehicle is picked up
+                  </p>
+                </div>
               </form>
             </Form>
           </div>
