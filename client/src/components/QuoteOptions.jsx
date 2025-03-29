@@ -18,6 +18,9 @@ export default function QuoteOptions({ data }) {
     }
   };
 
+  // Calculate estimated transit time 
+  const transitTime = data?.transitTime || 5;
+
   const handleReserve = (type, isGuaranteed) => {
     if (!data) return;
     
@@ -40,6 +43,15 @@ export default function QuoteOptions({ data }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-5xl mx-auto mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#1E3A4C] text-center mb-2">
+          Your Auto Transport Quote
+        </h1>
+        <p className="text-gray-600 text-center mb-6">
+          {data?.year} {data?.make} {data?.model} • {data?.pickupLocation} to {data?.dropoffLocation}
+        </p>
+      </div>
+      
       <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Standard Transport */}
         <div className="backdrop-blur-md bg-white/60 border border-blue-100 rounded-2xl shadow-lg p-6 text-gray-800">
@@ -47,13 +59,15 @@ export default function QuoteOptions({ data }) {
           
           <div className="flex justify-center gap-4 mb-4">
             <button
-              className={`px-4 py-1 rounded-full text-sm font-medium border ${selectedStandard === "open" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]"}`}
+              className={"px-4 py-2 rounded-full text-sm font-medium border min-h-[48px] " + 
+                (selectedStandard === "open" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]")}
               onClick={() => setSelectedStandard("open")}
             >
               Open
             </button>
             <button
-              className={`px-4 py-1 rounded-full text-sm font-medium border ${selectedStandard === "enclosed" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]"}`}
+              className={"px-4 py-2 rounded-full text-sm font-medium border min-h-[48px] " + 
+                (selectedStandard === "enclosed" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]")}
               onClick={() => setSelectedStandard("enclosed")}
             >
               Enclosed
@@ -62,15 +76,31 @@ export default function QuoteOptions({ data }) {
           
           <p className="text-3xl font-bold text-[#1E3A4C] text-center mb-4">${prices.standard[selectedStandard]}</p>
           
-          <ul className="text-sm mb-4 space-y-1 text-gray-700">
-            <li>✅ Pickup within 7-day window</li>
-            <li>✅ Fully insured</li>
-            <li>✅ Door-to-door service</li>
-            <li>✅ $0 due now</li>
+          <div className="bg-blue-50/70 p-3 rounded-lg mb-4">
+            <p className="text-sm text-blue-800 text-center">Estimated Transit Time: {transitTime} days</p>
+          </div>
+          
+          <ul className="text-sm mb-4 space-y-2 text-gray-700">
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Pickup within 7-day window</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Fully insured transport</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Door-to-door service</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>$0 due now - pay carrier at delivery</span>
+            </li>
           </ul>
           
           <button 
-            className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-2 rounded-xl transition duration-200 shadow-md"
+            className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md min-h-[48px]"
             onClick={() => handleReserve(selectedStandard, false)}
           >
             Reserve Now — No credit card required
@@ -83,13 +113,15 @@ export default function QuoteOptions({ data }) {
           
           <div className="flex justify-center gap-4 mb-4">
             <button
-              className={`px-4 py-1 rounded-full text-sm font-medium border ${selectedGuaranteed === "open" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]"}`}
+              className={"px-4 py-2 rounded-full text-sm font-medium border min-h-[48px] " + 
+                (selectedGuaranteed === "open" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]")}
               onClick={() => setSelectedGuaranteed("open")}
             >
               Open
             </button>
             <button
-              className={`px-4 py-1 rounded-full text-sm font-medium border ${selectedGuaranteed === "enclosed" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]"}`}
+              className={"px-4 py-2 rounded-full text-sm font-medium border min-h-[48px] " + 
+                (selectedGuaranteed === "enclosed" ? "bg-[#1E3A4C] text-white" : "bg-white text-[#1E3A4C] border-[#1E3A4C]")}
               onClick={() => setSelectedGuaranteed("enclosed")}
             >
               Enclosed
@@ -98,15 +130,31 @@ export default function QuoteOptions({ data }) {
           
           <p className="text-3xl font-bold text-[#1E3A4C] text-center mb-4">${prices.guaranteed[selectedGuaranteed]}</p>
           
-          <ul className="text-sm mb-4 space-y-1 text-gray-700">
-            <li>✅ Guaranteed pickup window</li>
-            <li>✅ Priority dispatch</li>
-            <li>✅ Fully insured, door-to-door</li>
-            <li>✅ $0 due now</li>
+          <div className="bg-blue-50/70 p-3 rounded-lg mb-4">
+            <p className="text-sm text-blue-800 text-center">Estimated Transit Time: {Math.max(transitTime - 2, 2)} days</p>
+          </div>
+          
+          <ul className="text-sm mb-4 space-y-2 text-gray-700">
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Guaranteed pickup window</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Priority dispatch for faster service</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>Fully insured, door-to-door service</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-green-500 mr-2 flex-shrink-0">✅</span>
+              <span>$0 due now - pay carrier at delivery</span>
+            </li>
           </ul>
           
           <button 
-            className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-2 rounded-xl transition duration-200 shadow-md"
+            className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md min-h-[48px]"
             onClick={() => handleReserve(selectedGuaranteed, true)}
           >
             Reserve Now — No credit card required
@@ -115,9 +163,11 @@ export default function QuoteOptions({ data }) {
       </div>
 
       {/* Disclaimer */}
-      <p className="text-center text-sm text-gray-600 max-w-xl">
-        <strong>Note:</strong> Multi-vehicle, inoperable, modified, or vehicles booked with other companies require custom quotes – please text or call for details.
-      </p>
+      <div className="w-full max-w-2xl mx-auto">
+        <p className="text-center text-sm text-gray-600">
+          <strong>Note:</strong> Multi-vehicle, inoperable, modified, or vehicles booked with other companies require custom quotes – please text or call for details.
+        </p>
+      </div>
     </div>
   );
 }
