@@ -16,7 +16,7 @@ export default function QuoteOptions() {
 
         {/* Standard Pricing */}
         <div className="backdrop-blur-md bg-white/60 border border-blue-100 rounded-2xl shadow-lg p-6 text-gray-800">
-          <h2 className="text-xl font-semibold mb-4 text-[#1E3A4C] text-center">Standard Transport</h2>
+          <h2 className="text-xl font-semibold mb-4 text-[#1E3A4C] text-center">Standard Transportsdfs</h2>
 
           <div className="flex justify-center gap-4 mb-4">
             <button

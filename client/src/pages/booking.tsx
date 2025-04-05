@@ -2,13 +2,26 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,14 +42,16 @@ const bookingSchema = z.object({
 
   expeditedShipping: z.boolean().optional(),
   notes: z.string().optional(),
-  acceptTerms: z.boolean().refine(val => val === true, {
-    message: "You must accept the terms and conditions"
-  })
+  acceptTerms: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and conditions",
+  }),
 });
 
 function extractLocation(location: string) {
-  const parts = location.split(',').map(part => part.trim());
-  let city = '', state = '', zip = '';
+  const parts = location.split(",").map((part) => part.trim());
+  let city = "",
+    state = "",
+    zip = "";
 
   if (parts.length >= 2) {
     city = parts[0];
@@ -51,9 +66,9 @@ function extractLocation(location: string) {
   }
 
   return {
-    city: city || 'N/A',
-    state: state || 'N/A',
-    zip: zip || 'N/A'
+    city: city || "N/A",
+    state: state || "N/A",
+    zip: zip || "N/A",
   };
 }
 
@@ -64,9 +79,9 @@ export default function Booking() {
   const { toast } = useToast();
 
   const searchParams = new URLSearchParams(window.location.search);
-  const data = searchParams.get("data") ?
-    JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) :
-    null;
+  const data = searchParams.get("data")
+    ? JSON.parse(decodeURIComponent(searchParams.get("data") || "{}"))
+    : null;
 
   if (!data?.finalPrice) {
     navigate("/");
@@ -95,7 +110,7 @@ export default function Booking() {
 
       expeditedShipping: false,
       notes: "",
-      acceptTerms: false
+      acceptTerms: false,
     },
   });
 
@@ -105,12 +120,15 @@ export default function Booking() {
         ...data,
         ...formData,
       };
-      navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
+      navigate(
+        `/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`,
+      );
     } catch (error) {
       console.error("Form submission error:", error);
       toast({
         title: "Error",
-        description: "There was a problem submitting the form. Please try again.",
+        description:
+          "There was a problem submitting the form. Please try again.",
         variant: "destructive",
       });
     }
@@ -141,56 +159,94 @@ export default function Booking() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="flex justify-center mb-6">
-        <img 
-          src="/amerigo-logo.png" 
-          alt="Amerigo Auto Transport" 
+        <img
+          src="/amerigo-logo.png"
+          alt="Amerigo Auto Transport"
           className="h-12 md:h-16"
         />
       </div>
       <Card className="max-w-[800px] mx-auto shadow-xl">
         <CardHeader className="bg-[#f7f9fc] rounded-t-lg border-b">
-          <CardTitle className="text-xl md:text-2xl text-[#1E3A4C] text-center">Complete Your Route Details</CardTitle>
+          <CardTitle className="text-xl md:text-2xl text-[#1E3A4C] text-center">
+            Complete Your Route Details
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-4 md:p-6">
           <div className="space-y-6">
             {/* Shipping Details Summary */}
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg shadow-sm border border-blue-200">
-              <h3 className="font-semibold text-[#1E3A4C] text-lg mb-4 text-center">Your Shipping Details</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="font-semibold text-[#1E3A4C] text-lg mb-4 text-center">
+                Your Shipping Details
+              </h3>
+
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <div className="bg-white/80 p-3 rounded-md">
-                    <h4 className="text-sm font-medium text-blue-800">Vehicle Information</h4>
-                    <p className="text-gray-700">{data.year} {data.make} {data.model}</p>
-                    <p className="text-gray-700"><span className="font-medium">Transport:</span> {data.selectedTransport === "enclosed" ? "Enclosed" : "Open"}</p>
+                    <h4 className="text-sm font-medium text-blue-800">
+                      Vehicle Information
+                    </h4>
+                    <p className="text-gray-700">
+                      {data.year} {data.make} {data.model}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">Transport:</span>{" "}
+                      {data.selectedTransport === "enclosed"
+                        ? "Enclosed"
+                        : "Open"}
+                    </p>
                   </div>
-                  
+
                   <div className="bg-white/80 p-3 rounded-md">
-                    <h4 className="text-sm font-medium text-blue-800">Shipping Date</h4>
-                    <p className="text-gray-700">{new Date(data.shipmentDate).toLocaleDateString()}</p>
-                    <p className="text-gray-700"><span className="font-medium">Expected Transit:</span> {data.transitTime} days</p>
+                    <h4 className="text-sm font-medium text-blue-800">
+                      Shipping Date
+                    </h4>
+                    <p className="text-gray-700">
+                      {new Date(data.shipmentDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">Expected Transit:</span>{" "}
+                      {data.transitTime} days
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="bg-white/80 p-3 rounded-md">
-                    <h4 className="text-sm font-medium text-blue-800">Route Information</h4>
-                    <p className="text-gray-700"><span className="font-medium">From:</span> {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}</p>
-                    <p className="text-gray-700"><span className="font-medium">To:</span> {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}</p>
-                    <p className="text-gray-700"><span className="font-medium">Distance:</span> {data.distance} miles</p>
+                    <h4 className="text-sm font-medium text-blue-800">
+                      Route Information
+                    </h4>
+                    <p className="text-gray-700">
+                      <span className="font-medium">From:</span>{" "}
+                      {`${pickupLocation.city}, ${pickupLocation.state} ${pickupLocation.zip}`}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">To:</span>{" "}
+                      {`${dropoffLocation.city}, ${dropoffLocation.state} ${dropoffLocation.zip}`}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">Distance:</span>{" "}
+                      {data.distance} miles
+                    </p>
                   </div>
-                  
+
                   <div className="bg-white/80 p-3 rounded-md">
                     <h4 className="text-sm font-medium text-blue-800">Price</h4>
-                    <p className="text-xl font-bold text-green-700">${data.finalPrice}</p>
-                    <p className="text-xs text-gray-500 mt-1">No payment required until vehicle pickup</p>
+                    <p className="text-xl font-bold text-green-700">
+                      ${data.finalPrice}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      No payment required until vehicle pickup
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Pickup Details */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Pickup Details</h3>
@@ -244,7 +300,10 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Street Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter street address" {...field} />
+                            <Input
+                              placeholder="Enter street address"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -348,7 +407,10 @@ export default function Booking() {
                         <FormItem>
                           <FormLabel>Street Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter street address" {...field} />
+                            <Input
+                              placeholder="Enter street address"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -429,7 +491,10 @@ export default function Booking() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>If you need to add any important details, leave them here</FormLabel>
+                        <FormLabel>
+                          If you need to add any important details, leave them
+                          here
+                        </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Enter any additional information about your shipment"
@@ -465,11 +530,14 @@ export default function Booking() {
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>Terms and Conditions</DialogTitle>
+                                  <DialogTitle>
+                                    Terms and Conditions
+                                  </DialogTitle>
                                 </DialogHeader>
                                 <div className="max-h-[60vh] overflow-y-auto">
                                   <p>
-                                    By accepting these terms, you agree to our service conditions...
+                                    By accepting these terms, you agree to our
+                                    service conditions...
                                   </p>
                                 </div>
                               </DialogContent>
@@ -483,8 +551,8 @@ export default function Booking() {
                 </div>
 
                 <div className="mt-8 space-y-4">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-4 px-6 text-base rounded-md transition duration-200 shadow-md"
                   >
                     Complete Free Reservation
