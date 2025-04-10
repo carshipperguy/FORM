@@ -125,14 +125,21 @@ const SimpleQuoteForm = () => {
         enclosedTransportPrice
       });
       
-      // Create the complete quote data with real calculated values
+      // Create the complete quote data with real calculated values and ZIP codes
       const quoteData = {
         ...formData,
+        pickupZip: pickupZip,
+        dropoffZip: dropoffZip,
         openTransportPrice: openTransportPrice,
         enclosedTransportPrice: enclosedTransportPrice,
         transitTime: transitTime,
         distance: distanceData.distance
       };
+      
+      console.log("Added ZIP codes to quote data:", {
+        pickupZip,
+        dropoffZip
+      });
       
       console.log("Final quote data with real distance:", quoteData);
   
@@ -158,7 +165,7 @@ const SimpleQuoteForm = () => {
             <div className="form-field">
               <LocationMenuSelector
                 value={formData.pickupLocation}
-                onChange={(value) => handleLocationChange("pickupLocation", value)}
+                onChange={(value, zipCode) => handleLocationChange("pickupLocation", value, zipCode)}
                 placeholder="Ship From"
                 required
               />
@@ -166,7 +173,7 @@ const SimpleQuoteForm = () => {
             <div className="form-field">
               <LocationMenuSelector
                 value={formData.dropoffLocation}
-                onChange={(value) => handleLocationChange("dropoffLocation", value)}
+                onChange={(value, zipCode) => handleLocationChange("dropoffLocation", value, zipCode)}
                 placeholder="Ship To"
                 required
               />
