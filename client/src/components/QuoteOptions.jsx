@@ -6,18 +6,14 @@ const QuoteOptions = ({ data }) => {
   const [isEnclosedExpress, setIsEnclosedExpress] = useState(false);
   const [, navigate] = useLocation();
 
-  // Use passed data or fallback to default values if none provided
-  const formData = data || {
-    vehicleType: "Sedan",
-    year: "2022",
-    make: "Toyota",
-    model: "Camry",
-    shipmentDate: new Date().toLocaleDateString(),
-    distance: 1200,
-    openTransportPrice: 765,
-    enclosedTransportPrice: 1071,
-    transitTime: 3,
-  };
+  // Only use the passed data, no fallbacks
+  if (!data) {
+    console.error("No quote data provided to QuoteOptions component");
+    navigate("/");
+    return <div>Redirecting...</div>;
+  }
+  
+  const formData = data;
 
   const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
   const expressPrice = isEnclosedExpress ? Math.round(formData.enclosedTransportPrice * 1.2) : Math.round(formData.openTransportPrice * 1.2);
