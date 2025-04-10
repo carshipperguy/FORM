@@ -71,18 +71,24 @@ const SimpleQuoteForm = () => {
             <h2>Origin & Destination</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field location-field">
-              <LocationSelector
+            <div className="form-field">
+              <input
+                type="text"
+                name="pickupLocation"
                 value={formData.pickupLocation}
-                onChange={(value) => handleLocationChange("pickupLocation", value)}
-                placeholder="Ship From"
+                onChange={handleChange}
+                placeholder="Ship From (City, State or ZIP)"
+                required
               />
             </div>
-            <div className="form-field location-field">
-              <LocationSelector
+            <div className="form-field">
+              <input
+                type="text"
+                name="dropoffLocation"
                 value={formData.dropoffLocation}
-                onChange={(value) => handleLocationChange("dropoffLocation", value)}
-                placeholder="Ship To"
+                onChange={handleChange}
+                placeholder="Ship To (City, State or ZIP)"
+                required
               />
             </div>
           </div>
