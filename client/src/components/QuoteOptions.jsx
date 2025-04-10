@@ -207,7 +207,8 @@ const QuoteOptions = ({ data }) => {
           </div>
 
           <p className="text-center text-xs text-gray-600">
-            Note: Inoperable/modified vehicles require custom quotes.
+            Note: Vehicles that are inoperable or modified require a custom quote.
+            For multi-vehicle shipments, please call or text us to receive a bundled rate.
           </p>
         </div>
       </MobileContainer>
