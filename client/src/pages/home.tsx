@@ -27,16 +27,26 @@ export default function Home() {
       const pickupZip = data.pickupZip || extractZipFromLocation(data.pickupLocation);
       const dropoffZip = data.dropoffZip || extractZipFromLocation(data.dropoffLocation);
       
-      console.log("Home handleCalculate - Form Data:", data);
+      console.log("Home handleCalculate - Form Data:", JSON.stringify(data, null, 2));
       console.log("Home handleCalculate - Using ZIP codes:", { pickupZip, dropoffZip });
       
-      // Calculate real distance using MapQuest API
-      console.log("Calling MapQuest API with locations:", { 
-        pickup: data.pickupLocation, 
-        dropoff: data.dropoffLocation 
+      // Format locations with ZIP codes for better MapQuest results
+      const pickupWithZip = pickupZip ? `${data.pickupLocation} ${pickupZip}` : data.pickupLocation;
+      const dropoffWithZip = dropoffZip ? `${data.dropoffLocation} ${dropoffZip}` : data.dropoffLocation;
+      
+      console.log("Enhanced locations with ZIP codes:", {
+        original: { pickup: data.pickupLocation, dropoff: data.dropoffLocation },
+        enhanced: { pickup: pickupWithZip, dropoff: dropoffWithZip }
       });
       
-      const distanceResult = await calculateDistance(data.pickupLocation, data.dropoffLocation);
+      // Calculate real distance using MapQuest API
+      console.log("Calling MapQuest API with enhanced locations:", { 
+        pickup: pickupWithZip, 
+        dropoff: dropoffWithZip 
+      });
+      
+      // Use the enhanced location strings that include ZIP codes
+      const distanceResult = await calculateDistance(pickupWithZip, dropoffWithZip);
       console.log("MapQuest API result:", distanceResult);
 
       if (!distanceResult.success) {
