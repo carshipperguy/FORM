@@ -162,7 +162,7 @@ export default function Checkout() {
             className="w-full bg-[#002C42] text-white py-3 font-medium"
             disabled={!selectedTransport}
           >
-            Reserve Now
+            Reserve Now - No CC Required
           </Button>
           
           <p className="text-center text-xs text-gray-600 mt-2">

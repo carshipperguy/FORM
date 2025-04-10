@@ -61,7 +61,7 @@ export function PriceDisplay({
               className="w-full"
               onClick={() => onReserve("enclosed")}
             >
-              Reserve Your Spot
+              Reserve Now - No CC Required
             </Button>
           </CardContent>
         </Card>
