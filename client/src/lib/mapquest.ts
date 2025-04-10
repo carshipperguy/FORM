@@ -107,7 +107,33 @@ export async function calculateDistance(origin: string, destination: string): Pr
   }
 
   try {
-    console.log('Making MapQuest API distance request for:', { origin, destination });
+    console.log('Trying server-side distance calculation first:', { origin, destination });
+    
+    // First try the server endpoint
+    try {
+      const serverUrl = `/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+      console.log('Making server request to:', serverUrl);
+      
+      const response = await fetch(serverUrl);
+      const serverData = await response.json();
+      
+      console.log('Server distance response:', serverData);
+      
+      if (serverData.distance) {
+        const result: SuccessDistanceResult = {
+          success: true,
+          distance: Math.round(serverData.distance),
+          time: serverData.time || "Unknown" // The server might not return time
+        };
+        console.log('Server distance calculation successful:', result);
+        return result;
+      }
+    } catch (serverError) {
+      console.warn('Server distance calculation failed, trying client-side:', serverError);
+    }
+    
+    // If server fails, try client-side as fallback
+    console.log('Making MapQuest API distance request (client-side) for:', { origin, destination });
     const data = await makeMapQuestRequest('/directions/v2/route', {
       from: origin,
       to: destination,
