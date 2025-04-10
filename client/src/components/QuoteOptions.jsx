@@ -115,50 +115,50 @@ export default function QuoteOptions({ data }) {
     : expressBasePrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#ffffff] to-[#dc2626] text-black px-4 py-6 sm:px-6 lg:px-8 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-black px-2 py-4 sm:px-4 overflow-x-hidden">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-6 max-w-md mx-auto">
+        <div className="text-center mb-4 max-w-md mx-auto">
           <img
             src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
-            className="mx-auto mb-3 h-14 sm:h-16 object-contain bg-white rounded-lg p-2 shadow-md ring-2 ring-red-600"
+            className="mx-auto mb-2 h-12 object-contain bg-white rounded-lg p-2 shadow-sm"
             alt="Amerigo Auto Transport USA Themed Logo" />
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#1e3a8a] drop-shadow-md">Shipping Quote Summary</h1>
-          <p className="text-xs sm:text-sm text-gray-700 mt-2">Military Owned • Family Operated • Proudly American</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">Your Shipping Quote</h1>
+          <p className="text-xs text-gray-600">Free, no-obligation estimate</p>
         </div>
 
-        <div className="mx-auto max-w-lg md:max-w-full mb-10">
-          <div className="bg-white text-black rounded-2xl p-5 shadow-xl border border-gray-200 w-full max-w-sm mx-auto">
-            <h2 className="text-xl font-semibold text-[#1e3a8a] mb-4">Route Info</h2>
-            <div className="space-y-3 text-sm text-gray-700">
+        <div className="mx-auto max-w-lg md:max-w-full mb-4">
+          <div className="bg-white/80 backdrop-blur-md text-black rounded-xl p-4 shadow-lg border border-gray-100 w-full max-w-sm mx-auto">
+            <h2 className="text-lg font-semibold text-[#1e3a8a] mb-3">Route Information</h2>
+            <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Ship Date:</span>
-                {formatDate(validatedData.shipmentDate)}
+                <span className="block font-medium text-[#1e3a8a] text-xs">Ship Date:</span>
+                <p className="truncate">{formatDate(validatedData.shipmentDate)}</p>
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Pickup Location:</span>
-                {validatedData.pickupLocation}
+                <span className="block font-medium text-[#1e3a8a] text-xs">Transit Time:</span>
+                <p>{validatedData.transitTime} days (est.)</p>
+              </div>
+              <div className="col-span-2">
+                <span className="block font-medium text-[#1e3a8a] text-xs">Pickup Location:</span>
+                <p className="truncate">{validatedData.pickupLocation}</p>
+              </div>
+              <div className="col-span-2">
+                <span className="block font-medium text-[#1e3a8a] text-xs">Dropoff Location:</span>
+                <p className="truncate">{validatedData.dropoffLocation}</p>
+              </div>
+              <div className="col-span-2">
+                <span className="block font-medium text-[#1e3a8a] text-xs">Vehicle:</span>
+                <p>{validatedData.year} {validatedData.make} {validatedData.model}</p>
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Dropoff Location:</span>
-                {validatedData.dropoffLocation}
-              </div>
-              <div>
-                <span className="block font-medium text-[#1e3a8a]">Vehicle:</span>
-                {validatedData.year} {validatedData.make} {validatedData.model}
-              </div>
-              <div>
-                <span className="block font-medium text-[#1e3a8a]">Route Distance:</span>
-                {validatedData.distance.toLocaleString()} miles (est.)
-              </div>
-              <div>
-                <span className="block font-medium text-[#1e3a8a]">Transit Time:</span>
-                {validatedData.transitTime} days (est.)
+                <span className="block font-medium text-[#1e3a8a] text-xs">Distance:</span>
+                <p>{validatedData.distance.toLocaleString()} miles</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 mb-8 mx-auto max-w-lg lg:max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mx-auto max-w-lg md:max-w-2xl">
           {[{
             label: 'Standard Transport',
             isEnclosed: isEnclosedStandard,
@@ -174,50 +174,50 @@ export default function QuoteOptions({ data }) {
           }].map(({ label, isEnclosed, toggle, price, type }) => (
             <div
               key={label}
-              className="rounded-2xl p-6 bg-white text-center shadow-2xl flex flex-col justify-between text-black border border-gray-200 w-full"
+              className="rounded-xl p-4 bg-white/80 backdrop-blur-md text-center shadow-lg flex flex-col justify-between text-black border border-gray-100 w-full"
             >
               <div>
-                <h3 className="text-2xl font-bold mb-2 text-[#1e3a8a]">{label}</h3>
-                <div className="mb-4">
+                <h3 className="text-lg font-bold mb-2 text-[#1e3a8a]">{label}</h3>
+                <div className="mb-3">
                   <button
-                    className={`px-3 py-1 text-sm font-medium rounded-full mr-2 ${!isEnclosed ? 'bg-blue-700 text-white' : 'bg-gray-300 text-black'}`}
+                    className={`px-3 py-1 text-xs font-medium rounded-full mr-2 ${!isEnclosed ? 'bg-[#1e3a8a] text-white' : 'bg-gray-200 text-gray-700'}`}
                     onClick={() => toggle(false)}
                   >Open</button>
                   <button
-                    className={`px-3 py-1 text-sm font-medium rounded-full ${isEnclosed ? 'bg-red-600 text-white' : 'bg-gray-300 text-black'}`}
+                    className={`px-3 py-1 text-xs font-medium rounded-full ${isEnclosed ? 'bg-[#dc2626] text-white' : 'bg-gray-200 text-gray-700'}`}
                     onClick={() => toggle(true)}
                   >Enclosed</button>
                 </div>
-                <p className="text-3xl font-bold text-[#dc2626] mb-4">{formatUSD(price)}</p>
-                <ul className="text-left text-sm mb-6 text-gray-600">
+                <p className="text-2xl font-bold text-[#dc2626] mb-3">{formatUSD(price)}</p>
+                <ul className="text-left text-xs space-y-0.5 mb-4 text-gray-700">
                   {type === 'standard' ? (
                     <>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Pickup within 7-day window
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Pickup within 7-day window
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Fully insured
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Fully insured 
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Door-to-door service
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Door-to-door service
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> $0 due now
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> $0 due now
                       </li>
                     </>
                   ) : (
                     <>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Guaranteed pickup window
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Guaranteed pickup window
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Priority dispatch
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Priority dispatch
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> Fully insured, door-to-door
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> Fully insured, door-to-door
                       </li>
-                      <li className="flex items-start py-1">
-                        <span className="text-green-500 mr-2">✅</span> $0 due now
+                      <li className="flex items-center py-0.5">
+                        <span className="text-green-500 mr-1 text-xs">✓</span> $0 due now
                       </li>
                     </>
                   )}
@@ -225,9 +225,9 @@ export default function QuoteOptions({ data }) {
               </div>
               <button
                 onClick={() => handleReserve(type)}
-                className="inline-block w-full bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-3 px-6 rounded-full text-sm transition min-h-[48px]"
+                className="w-full bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 px-4 rounded-lg text-xs transition min-h-[40px]"
               >
-                Reserve Now — No credit card required
+                Reserve Now — No payment required
               </button>
             </div>
           ))}

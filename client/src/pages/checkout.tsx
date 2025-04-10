@@ -62,65 +62,68 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <Card className="w-full max-w-[500px] mx-auto">
-        <CardHeader className="text-center pb-2">
-          <CardTitle className="text-xl">Your Confirmed Price</CardTitle>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <img src="/google.png" alt="Google" className="h-6" />
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2 sm:p-4">
+      <div className="flex justify-center mb-2">
+        <img
+          src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
+          alt="Amerigo Auto Transport"
+          className="h-10 object-contain bg-white rounded-lg p-2 shadow-sm"
+        />
+      </div>
+      <Card className="w-full max-w-[500px] mx-auto border-gray-100 shadow-lg bg-white/80 backdrop-blur-md">
+        <CardHeader className="text-center pb-2 pt-3">
+          <CardTitle className="text-xl text-[#1e3a8a]">Your Confirmed Price</CardTitle>
+          <div className="flex items-center justify-center gap-2 mt-1">
+            <img src="/google.png" alt="Google" className="h-5" />
             <div className="flex items-center">
-              <span className="text-lg font-bold mr-1">4.7</span>
+              <span className="text-sm font-bold mr-1">4.9</span>
               <span className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                 ))}
               </span>
-              <span className="ml-1">Rating</span>
+              <span className="ml-1 text-xs">Rating</span>
             </div>
-          </div>
-          <div className="flex justify-center mt-2">
-            <img src="/bbb trust logo.webp" alt="BBB Accredited Business" className="h-12" />
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Door-to-Door Service – We Make It Easy!</h3>
-              <p className="text-sm text-muted-foreground">
-                Fully Insured Transport – Your vehicle is covered every step of the way
+        <CardContent className="space-y-5 p-4">
+          <div className="space-y-3">
+            <div className="text-center mb-2">
+              <h3 className="text-sm font-semibold text-[#1e3a8a]">Door-to-Door Transport Service</h3>
+              <p className="text-xs text-gray-600">
+                Fully Insured — Your vehicle is covered every step of the way
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Card
-                className={`cursor-pointer transition-all hover:bg-primary/5 ${selectedTransport === "open" ? "ring-2 ring-primary bg-primary/5" : ""}`}
+                className={`cursor-pointer transition-all hover:shadow ${selectedTransport === "open" ? "ring-2 ring-[#1e3a8a] bg-blue-50" : "bg-white"}`}
                 onClick={() => setSelectedTransport("open")}
               >
-                <CardContent className="p-4">
-                  <div className="text-center mb-2">Open Transport</div>
-                  <div className="text-3xl font-bold text-center">${calculatePrice(data.openTransportPrice)}</div>
+                <CardContent className="p-3">
+                  <div className="text-center mb-1 text-xs font-medium">Open Transport</div>
+                  <div className="text-xl font-bold text-center text-[#dc2626]">${calculatePrice(data.openTransportPrice)}</div>
                 </CardContent>
               </Card>
 
               <Card
-                className={`cursor-pointer transition-all hover:bg-primary/5 ${selectedTransport === "enclosed" ? "ring-2 ring-primary bg-primary/5" : ""}`}
+                className={`cursor-pointer transition-all hover:shadow ${selectedTransport === "enclosed" ? "ring-2 ring-[#1e3a8a] bg-blue-50" : "bg-white"}`}
                 onClick={() => setSelectedTransport("enclosed")}
               >
-                <CardContent className="p-4">
-                  <div className="text-center mb-2">Enclosed Transport</div>
-                  <div className="text-3xl font-bold text-center">${calculatePrice(data.enclosedTransportPrice)}</div>
+                <CardContent className="p-3">
+                  <div className="text-center mb-1 text-xs font-medium">Enclosed Transport</div>
+                  <div className="text-xl font-bold text-center text-[#dc2626]">${calculatePrice(data.enclosedTransportPrice)}</div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h4 className="font-medium">Expedited Shipping</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Expedited shipping ensures your vehicle is prioritized for pickup
-                    and delivery, arriving faster than standard transit times.
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <h4 className="font-medium text-sm text-[#1e3a8a]">Expedited Shipping</h4>
+                  <p className="text-xs text-gray-600">
+                    Priority dispatch with faster transit time
                   </p>
                 </div>
                 <Switch
@@ -129,38 +132,45 @@ export default function Checkout() {
                 />
               </div>
             </div>
+            
             <Button
               onClick={handleReserve}
-              className="w-full h-12 text-lg font-semibold"
-              size="lg"
+              className="w-full py-2 font-semibold bg-[#1e3a8a] hover:bg-[#0f2a63] text-white"
               disabled={!selectedTransport}
             >
               Reserve Your Spot
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
 
             <div className="text-center">
-              <p className="text-2xl font-bold">NO PAYMENT REQUIRED</p>
+              <p className="text-lg font-bold text-[#dc2626]">NO PAYMENT REQUIRED</p>
             </div>
           </div>
 
           <Separator />
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Shipping Details</h3>
-            <div className="grid gap-2 text-sm">
-              <div className="grid gap-1">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-[#1e3a8a]">Shipping Details</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div>
                 <h4 className="font-medium">Vehicle Information</h4>
-                <p>Vehicle: {data.year} {data.make} {data.model}</p>
+                <p>{data.year} {data.make} {data.model}</p>
               </div>
 
-              <div className="grid gap-1">
-                <h4 className="font-medium">Route Information</h4>
+              <div>
+                <h4 className="font-medium">Route</h4>
                 <p>From: {extractCity(data.pickupLocation)}</p>
                 <p>To: {extractCity(data.dropoffLocation)}</p>
-                <p>Ship Date: {new Date(data.shipmentDate).toLocaleDateString()}</p>
-                <p>Distance: {data.distance} miles</p>
-                <p>Transit Time: {data.transitTime} days</p>
+              </div>
+              
+              <div>
+                <h4 className="font-medium">Ship Date</h4>
+                <p>{new Date(data.shipmentDate).toLocaleDateString()}</p>
+              </div>
+              
+              <div>
+                <h4 className="font-medium">Transit Details</h4>
+                <p>{data.distance} miles | {data.transitTime} days</p>
               </div>
             </div>
           </div>

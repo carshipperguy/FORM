@@ -26,7 +26,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      vehicleType: "",
+      vehicleType: undefined,
       year: "",
       make: "",
       model: "",
