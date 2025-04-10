@@ -23,7 +23,26 @@
   }
   
   .form-container {
-    @apply w-full max-w-[308px] mx-auto;
+    @apply w-full mx-auto;
+  }
+
+  /* Form container sizes for different device widths */
+  @media (max-width: 639px) {
+    .form-container {
+      max-width: 308px; /* Mobile size (for iframe) */
+    }
+  }
+  
+  @media (min-width: 640px) {
+    .form-container {
+      max-width: 450px; /* Tablet size */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .form-container {
+      max-width: 550px; /* Desktop size */
+    }
   }
   
   .truncate-text {
