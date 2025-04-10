@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
+import { sendToWebhook } from "./utils/webhook";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -203,7 +204,8 @@ export function registerRoutes(app: Express): Server {
       
       const results = {
         email: false,
-        sms: false
+        sms: false,
+        webhook: false
       };
       
       // Send email if provided
@@ -216,14 +218,55 @@ export function registerRoutes(app: Express): Server {
         results.sms = await sendConfirmationSMS(phone, bookingDetails);
       }
       
+      // Send to webhook (CRM integration)
+      const webhookResult = await sendToWebhook(bookingDetails);
+      results.webhook = webhookResult.success;
+      
+      if (!webhookResult.success) {
+        console.warn("Webhook delivery warning:", webhookResult.message);
+      }
+      
       res.json({
         success: results.email || results.sms,
         emailSent: results.email,
-        smsSent: results.sms
+        smsSent: results.sms,
+        webhookSent: results.webhook
       });
     } catch (error) {
       console.error("Error sending confirmations:", error);
       res.status(500).json({ error: "Failed to send confirmations" });
+    }
+  });
+  
+  // Dedicated webhook endpoint for CRM integration
+  app.post("/api/webhook", async (req, res) => {
+    try {
+      const formData = req.body;
+      
+      // Validate minimal required data
+      if (!formData) {
+        return res.status(400).json({ error: "Form data is required" });
+      }
+      
+      // Send the webhook
+      const webhookResult = await sendToWebhook(formData);
+      
+      if (webhookResult.success) {
+        res.json({ success: true, message: "Data successfully sent to CRM" });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: "Failed to send data to CRM", 
+          error: webhookResult.message 
+        });
+      }
+    } catch (error) {
+      console.error("Error sending data to CRM:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Internal server error while sending data to CRM",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
