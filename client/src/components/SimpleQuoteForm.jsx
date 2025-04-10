@@ -99,7 +99,7 @@ const SimpleQuoteForm = () => {
               <LocationMenuSelector
                 value={formData.pickupLocation}
                 onChange={(value) => handleLocationChange("pickupLocation", value)}
-                placeholder="Ship From (City, State or ZIP)"
+                placeholder="Ship From"
                 required
               />
             </div>
@@ -107,7 +107,7 @@ const SimpleQuoteForm = () => {
               <LocationMenuSelector
                 value={formData.dropoffLocation}
                 onChange={(value) => handleLocationChange("dropoffLocation", value)}
-                placeholder="Ship To (City, State or ZIP)"
+                placeholder="Ship To"
                 required
               />
             </div>
@@ -235,6 +235,7 @@ const SimpleQuoteForm = () => {
                 onChange={handleChange}
                 required 
                 min={new Date().toISOString().split('T')[0]}
+                placeholder="MM-DD-YY"
               />
             </div>
             {formData.shipmentDate && (
@@ -286,13 +287,13 @@ const SimpleQuoteForm = () => {
         }
 
         .form-section {
-          margin-bottom: 15px;
+          margin-bottom: 10px;
         }
 
         .form-header {
-          background-color: #0a3252;
+          background-color: #002C42;
           color: white;
-          padding: 10px;
+          padding: 8px 15px;
           font-weight: 500;
         }
 
@@ -302,8 +303,8 @@ const SimpleQuoteForm = () => {
         }
 
         .form-fields {
-          padding: 15px;
-          background-color: #f5f5f5;
+          padding: 10px;
+          background-color: white;
         }
 
         .form-field {
@@ -322,42 +323,57 @@ const SimpleQuoteForm = () => {
         .form-field input,
         .form-field select {
           width: 100%;
-          padding: 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
+          padding: 12px;
+          border: 1px solid #E5E7EB;
+          border-radius: 0;
           font-size: 14px;
+          color: #718096;
+          box-shadow: none;
         }
         
         .location-field [role="combobox"] {
           width: 100%;
-          height: 38px;
-          border: 1px solid #ddd;
+          height: 44px;
+          border: 1px solid #e2e8f0;
           border-radius: 3px;
           font-size: 14px;
           display: flex;
           align-items: center;
           background-color: white;
+          color: #718096;
         }
 
         .submit-btn {
           width: 100%;
-          padding: 12px;
-          background-color: #0a3252;
+          padding: 15px;
+          background-color: #002C42;
           color: white;
           border: none;
           font-weight: bold;
           cursor: pointer;
           font-size: 16px;
+          margin-top: 0;
         }
 
         .submit-btn:hover {
-          background-color: #0a4169;
+          background-color: #003b59;
         }
 
         /* Always use mobile styling regardless of device (for iframe) */
         .simple-form-container {
           width: 308px !important;
           max-width: 308px !important;
+        }
+        
+        /* Override date input appearance to look like the screenshot */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          position: absolute;
+          right: 10px;
+        }
+        
+        /* Match the exact placeholders from the screenshot */
+        .form-field input::placeholder {
+          color: #a0aec0;
         }
       `}</style>
     </div>
