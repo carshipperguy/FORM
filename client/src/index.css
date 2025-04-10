@@ -23,25 +23,27 @@
   }
   
   .form-container {
-    @apply w-full mx-auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   /* Form container sizes for different device widths */
   @media (max-width: 639px) {
     .form-container {
-      max-width: 308px; /* Mobile size (for iframe) */
+      width: 308px !important; /* Mobile size (for iframe) */
     }
   }
   
-  @media (min-width: 640px) {
+  @media (min-width: 640px) and (max-width: 1023px) {
     .form-container {
-      max-width: 450px; /* Tablet size */
+      width: 560px !important; /* Tablet size */
     }
   }
   
   @media (min-width: 1024px) {
     .form-container {
-      max-width: 550px; /* Desktop size */
+      width: 800px !important; /* Desktop size */
     }
   }
   

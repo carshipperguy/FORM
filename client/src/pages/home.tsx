@@ -63,20 +63,20 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2 sm:p-4">
-      <div className="mx-auto max-w-sm">
-        <div className="text-center mb-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2 sm:p-4 md:p-6 lg:p-8">
+      <div className="form-container">
+        <div className="text-center mb-4 md:mb-6">
           <img
             src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
-            className="mx-auto mb-3 h-12 object-contain bg-white rounded-lg p-2 shadow-sm"
+            className="mx-auto mb-3 md:mb-4 h-12 md:h-14 lg:h-16 object-contain bg-white rounded-lg p-2 shadow-sm"
             alt="Amerigo Auto Transport Logo" 
           />
-          <h1 className="text-xl font-bold text-[#1e3a8a] mb-1">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1e3a8a] mb-1 md:mb-2">
             Instant Car Shipping Quote
           </h1>
-          <p className="text-xs text-gray-600">Free, no-obligation estimate - takes 30 seconds</p>
+          <p className="text-xs md:text-sm lg:text-base text-gray-600">Free, no-obligation estimate - takes 30 seconds</p>
         </div>
-        <div className="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-4 mb-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-4 md:p-6 lg:p-8 mb-6 md:mb-8 border border-gray-100">
           <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
         </div>
         <TrustBadges />
