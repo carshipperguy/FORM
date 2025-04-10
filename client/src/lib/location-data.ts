@@ -8,6 +8,7 @@ export interface LocationOption {
   city: string;
   state: string;
   zips: string[];
+  zip?: string;  // Add the single zip property
   population?: number;
 }
 
