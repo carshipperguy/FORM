@@ -5,7 +5,16 @@ import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 
 // Use MapQuest instead of Google Maps API as per the application code
+// Ensure we're using the correct API key
 const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY;
+
+// Log the API key (partially masked for security)
+if (MAPQUEST_API_KEY) {
+  const masked = MAPQUEST_API_KEY.substring(0, 4) + "..." + MAPQUEST_API_KEY.substring(MAPQUEST_API_KEY.length - 4);
+  console.log("MapQuest API key loaded:", masked);
+} else {
+  console.error("❌ MAPQUEST_API_KEY environment variable is not set!");
+}
 
 async function getDistance(origin: string, destination: string): Promise<{distance: number, time?: string}> {
   // Log detailed information about the inputs
