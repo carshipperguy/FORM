@@ -42,6 +42,28 @@ export function calculatePricing(
   vehicleType: VehicleType,
   date: Date = new Date()
 ): PricingResult {
+  // EMERGENCY OVERRIDE: Force flat rate pricing for special vehicles
+  const forceSpecialVehicleCheck = (vehicleType: VehicleType): boolean => {
+    if (!vehicleType || typeof vehicleType !== 'string') return false;
+    
+    const lowerType = vehicleType.toLowerCase();
+    return lowerType === 'boat' || 
+           lowerType === 'rv' || 
+           lowerType.includes('trailer') || 
+           lowerType.includes('equipment');
+  };
+  
+  const isSpecialVehicleForced = forceSpecialVehicleCheck(vehicleType);
+  
+  if (isSpecialVehicleForced && distance) {
+    console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $3.50/mile pricing for special vehicle:", vehicleType);
+    const flatRatePrice = distance * 3.50;
+    return {
+      openTransport: Math.round(flatRatePrice),
+      enclosedTransport: Math.round(flatRatePrice * 1.40),
+      transitTime: Math.ceil(distance / 400) + 1
+    };
+  }
   console.log('--------------------------------');
   console.log('PRICING CALCULATION FUNCTION CALLED');
   console.log('Input parameters:', { distance, vehicleType, date });
