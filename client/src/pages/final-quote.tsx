@@ -27,7 +27,24 @@ export default function FinalQuote() {
         return;
       }
       
-      const decodedData = JSON.parse(decodeURIComponent(encodedData));
+      console.log("Raw encoded URL data:", encodedData);
+      const decodedURI = decodeURIComponent(encodedData);
+      console.log("Decoded URI:", decodedURI);
+      
+      const decodedData = JSON.parse(decodedURI);
+      
+      // Debug check for the distance value
+      if (decodedData.distance) {
+        console.log("🔍 DISTANCE VALUE CHECK:", {
+          distanceValue: decodedData.distance,
+          distanceType: typeof decodedData.distance,
+          isExactly1200: decodedData.distance === 1200,
+          pickupLocation: decodedData.pickupLocation,
+          dropoffLocation: decodedData.dropoffLocation
+        });
+      } else {
+        console.warn("⚠️ NO DISTANCE FOUND IN QUOTE DATA");
+      }
       
       // Validate required properties to prevent rendering errors
       if (!decodedData.openTransportPrice || !decodedData.enclosedTransportPrice) {
