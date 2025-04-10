@@ -238,9 +238,9 @@ export default function Booking() {
           <h1 className="text-xl font-bold text-[#002C42]">Complete Details</h1>
           <div className="flex items-center justify-center mt-1">
             <img 
-              src="/generated-icon.png" 
+              src="/amerigo-logo.png" 
               alt="Amerigo Auto Transport Logo" 
-              className="h-6 mr-2"
+              className="h-7 mr-2"
             />
             <p className="text-xs text-gray-700">Military Owned • Family Operated</p>
           </div>
