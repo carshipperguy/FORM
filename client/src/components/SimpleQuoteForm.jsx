@@ -227,20 +227,26 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div 
-              className="form-field"
-              onClick={() => document.getElementById('shipDateInput').showPicker()}
-              style={{ cursor: 'pointer' }}
-            >
+            <div className="form-field date-field">
               <input 
-                id="shipDateInput"
+                type="text" 
+                name="shipmentDateDisplay" 
+                value={formData.shipmentDate ? new Date(formData.shipmentDate).toLocaleDateString() : ''} 
+                placeholder="Select Ship Date"
+                readOnly
+                onFocus={() => document.getElementById('actualDateInput').focus()}
+                onClick={() => document.getElementById('actualDateInput').focus()}
+                style={{ position: 'relative', zIndex: 1 }}
+              />
+              <input 
+                id="actualDateInput"
                 type="date" 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
                 onChange={handleChange}
                 required 
                 min={new Date().toISOString().split('T')[0]}
-                placeholder="MM-DD-YY"
+                style={{ opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
               />
             </div>
             {formData.shipmentDate && (
@@ -407,6 +413,27 @@ const SimpleQuoteForm = () => {
         /* Match the exact placeholders from the screenshot */
         .form-field input::placeholder {
           color: #a0aec0;
+        }
+        
+        /* Date field specific styling */
+        .form-field.date-field {
+          position: relative;
+          cursor: pointer;
+        }
+        
+        .form-field.date-field:after {
+          content: "";
+          display: block;
+          width: 16px;
+          height: 16px;
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'%3E%3C/path%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: center;
+          pointer-events: none;
         }
       `}</style>
     </div>
