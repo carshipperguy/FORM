@@ -36,7 +36,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="mx-auto">
         <ShareableUrlDisplay />
-        <div className="[&>*:first-child]:w-[308px] [&>*:not(:first-child)]:w-[500px] mx-auto">
+        <div className="mx-auto">
           <Router />
         </div>
       </div>
