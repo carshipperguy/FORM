@@ -115,19 +115,19 @@ export default function QuoteOptions({ data }) {
     : expressBasePrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-black px-2 py-4 sm:px-4 overflow-x-hidden">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-4 max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-black px-2 py-4 sm:px-4 md:px-6 lg:px-8 overflow-x-hidden">
+      <div className="form-container">
+        <div className="text-center mb-4 md:mb-6">
           <img
             src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
-            className="mx-auto mb-2 h-12 object-contain bg-white rounded-lg p-2 shadow-sm"
+            className="mx-auto mb-2 md:mb-4 h-12 md:h-14 lg:h-16 object-contain bg-white rounded-lg p-2 shadow-sm"
             alt="Amerigo Auto Transport USA Themed Logo" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">Your Shipping Quote</h1>
-          <p className="text-xs text-gray-600">Free, no-obligation estimate</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1e3a8a]">Your Shipping Quote</h1>
+          <p className="text-xs md:text-sm lg:text-base text-gray-600">Free, no-obligation estimate</p>
         </div>
 
-        <div className="mx-auto max-w-lg md:max-w-full mb-4">
-          <div className="bg-white/80 backdrop-blur-md text-black rounded-xl p-4 shadow-lg border border-gray-100 w-full max-w-sm mx-auto">
+        <div className="mb-4 md:mb-6">
+          <div className="bg-white/80 backdrop-blur-md text-black rounded-xl p-4 md:p-6 lg:p-8 shadow-lg border border-gray-100 w-full mx-auto">
             <h2 className="text-lg font-semibold text-[#1e3a8a] mb-3">Route Information</h2>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
               <div>
