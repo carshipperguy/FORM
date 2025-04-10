@@ -66,17 +66,17 @@ export function LocationSelector({
           disabled={disabled}
         >
           {value ? (
-            <span className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              {value}
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate-text">{value}</span>
             </span>
           ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
+            <span className="text-muted-foreground text-xs">{placeholder}</span>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0">
+      <PopoverContent className="w-full max-w-[300px] p-0">
         <Command>
           <CommandInput
             placeholder="Search city or ZIP code..."
