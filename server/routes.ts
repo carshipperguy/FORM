@@ -5,8 +5,8 @@ import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 
 // Use MapQuest with your API key
-// Using the specific key you want
-const MAPQUEST_API_KEY = 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
+// Using the new key you provided
+const MAPQUEST_API_KEY = 'YDMaftbjplfYTcQ129jOTQEkt37kNXy9';
 
 // Log the API key (partially masked for security)
 if (MAPQUEST_API_KEY) {

@@ -14,7 +14,7 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
   // Using http instead of https
   const baseUrl = 'http://www.mapquestapi.com';
   // Always use the specific key directly
-  const apiKey = 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
+  const apiKey = 'YDMaftbjplfYTcQ129jOTQEkt37kNXy9';
   
   console.log('Using MapQuest API key directly');
 
