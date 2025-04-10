@@ -68,18 +68,9 @@ export default function Home() {
         dropoff: dropoffLocation 
       });
       
-      // TEMPORARY FIX: Use a hardcoded distance to make pricing work immediately 
-      // while we troubleshoot the API issues
-      console.log("Using hardcoded distance temporarily for pricing");
-      
-      // This is a temporary solution to ensure pricing works
-      const distanceResult = {
-        success: true as const,
-        distance: 850, // Average cross-country distance to enable pricing to work
-        time: "Estimated",
-      };
-      
-      console.log("Using hardcoded distance:", distanceResult);
+      // Use the API to calculate distance correctly
+      const distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
+      console.log("MapQuest API result:", distanceResult);
 
       if (!distanceResult.success) {
         const errorMessage = 'error' in distanceResult ? distanceResult.error : "Could not calculate distance between locations";
