@@ -283,7 +283,7 @@ const SimpleQuoteForm = () => {
           width: 100%;
           max-width: 100%;
           margin: 0 auto;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          font-family: Arial, sans-serif;
           background-color: #F9FAFB;
           padding: 0;
         }
@@ -308,9 +308,8 @@ const SimpleQuoteForm = () => {
 
         .form-header h2 {
           margin: 0;
-          font-size: 13px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+          font-size: 15px;
+          font-weight: 500;
         }
 
         .form-fields {
@@ -382,8 +381,6 @@ const SimpleQuoteForm = () => {
           font-size: 16px;
           margin-top: 10px;
           height: 44px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
         }
 
         .submit-btn:hover {
