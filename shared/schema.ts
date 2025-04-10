@@ -10,7 +10,9 @@ export const quotes = pgTable("quotes", {
   make: text("make").notNull(),
   model: text("model").notNull(),
   pickupLocation: text("pickup_location").notNull(),
+  pickupZip: text("pickup_zip"),  // Store pickup ZIP explicitly
   dropoffLocation: text("dropoff_location").notNull(),
+  dropoffZip: text("dropoff_zip"), // Store dropoff ZIP explicitly
   shipmentDate: timestamp("shipment_date").notNull(),
   name: text("name"),
   phone: text("phone"),
@@ -27,7 +29,9 @@ export const quoteFormSchema = z.object({
   make: z.string().min(1, "Make is required"),
   model: z.string().min(1, "Model is required"),
   pickupLocation: z.string().min(1, "Pickup location is required"),
+  pickupZip: z.string().optional(), // Optional in schema as it will be extracted from location
   dropoffLocation: z.string().min(1, "Dropoff location is required"),
+  dropoffZip: z.string().optional(), // Optional in schema as it will be extracted from location
   shipmentDate: z.date(),
   name: z.string().optional(),
   phone: z.string().optional(),
