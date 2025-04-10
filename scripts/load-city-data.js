@@ -5,32 +5,32 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to your CSV file
-const csvFilePath = path.join(__dirname, '../uscities[1].csv');
+// Path to your CSV file - use the new city_zip_mapping.csv file
+const csvFilePath = path.join(__dirname, '../uscities.csv');
 
 // Path to output JSON file
 const outputJsonPath = path.join(__dirname, '../client/src/lib/city-data.json');
 
-// Function to parse a line of CSV data into a location object
+// Function to parse a line of CSV data into a location object for the new format
 function parseCityLine(line) {
   try {
     // Basic CSV parsing (not handling all edge cases)
-    const parts = line.split(',').map(part => part.replace(/^"|"$/g, ''));
-    if (parts.length < 16) return null;
+    const parts = line.split(',').map(part => part.replace(/^"|"$/g, '').trim());
+    if (parts.length < 4) return null;
     
     const city = parts[0];
-    const state = parts[2];
-    const zipsStr = parts[15];
-    const zips = zipsStr.split(' ').slice(0, 5); // Take only first 5 ZIP codes to limit size
-    const population = parseInt(parts[8], 10) || 0;
+    const stateId = parts[1]; 
+    const stateName = parts[2];
+    const zip = parts[3];
     
     return {
-      value: `${city}, ${state}`,
-      label: `${city}, ${state}`,
+      value: `${city}, ${stateId} ${zip}`,
+      label: `${city}, ${stateId}`,
       city,
-      state,
-      zips,
-      population
+      state: stateId,
+      stateName,
+      zips: [zip], // Put the single ZIP in an array to maintain compatibility
+      zip // Add the individual ZIP code directly as well
     };
   } catch (e) {
     console.error("Failed to parse city data:", e);
@@ -52,16 +52,23 @@ async function loadCityData() {
     
     // Process each line
     const cities = [];
+    const cityZipMap = new Map(); // Track cities we've already processed
+    
     for (const line of dataLines) {
       if (line.trim()) {
         const cityData = parseCityLine(line);
         if (cityData) {
-          cities.push(cityData);
+          // Use a key that uniquely identifies this city+state+zip combination
+          const key = `${cityData.city},${cityData.state},${cityData.zip}`;
+          
+          // Only add if we haven't seen this exact combination before
+          if (!cityZipMap.has(key)) {
+            cities.push(cityData);
+            cityZipMap.set(key, true);
+          }
         }
       }
     }
-    
-    // Include ALL cities - no filtering or limiting
     
     // Create directory if it doesn't exist
     const outputDir = path.dirname(outputJsonPath);

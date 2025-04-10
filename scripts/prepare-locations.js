@@ -5,8 +5,8 @@ import { fileURLToPath } from 'url';
 // Get the directory name using ES modules syntax
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Read the cities CSV file directly
-const citiesPath = join(__dirname, '../uscities[1].csv');
+// Read the cities CSV file directly - using the new city_zip_mapping.csv file
+const citiesPath = join(__dirname, '../uscities.csv');
 const citiesContent = readFileSync(citiesPath, 'utf-8');
 
 // Create combined location-data.ts content
@@ -33,25 +33,21 @@ for (const line of citiesLines) {
   try {
     // Parse CSV line while handling quoted values
     const parts = line.split(',').map(part => part.replace(/^"|"$/g, '').trim());
-    const [city, cityAscii, stateId, stateName, , , , , population, , , , , , , zips] = parts;
+    
+    // New format: city, state_id, state_name, zip
+    if (parts.length < 4) continue;
+    
+    const [city, stateId, stateName, zip] = parts;
 
-    if (!city || !stateId || !zips) continue;
+    if (!city || !stateId || !zip) continue;
 
-    // Only include cities with valid population data
-    const pop = parseInt(population);
-    if (isNaN(pop) || pop <= 0) continue;
-
-    // Handle multiple ZIP codes
-    const zipList = zips.split(' ').filter(Boolean);
-    for (const zip of zipList) {
-      locationOptions.push({
-        value: \`\${city}, \${stateId} \${zip}\`,
-        label: \`\${city}, \${stateId} \${zip}\`,
-        zip,
-        city,
-        state: stateId
-      });
-    }
+    locationOptions.push({
+      value: \`\${city}, \${stateId} \${zip}\`,
+      label: \`\${city}, \${stateId}\`,
+      zip,
+      city,
+      state: stateId
+    });
   } catch (error) {
     console.error('Error processing line:', line);
     continue;
