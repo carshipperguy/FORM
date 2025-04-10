@@ -11,7 +11,13 @@ export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
   const baseUrl = 'https://www.mapquestapi.com';
-  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;
+  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY || import.meta.env.MAPQUEST_API_KEY;
+  
+  console.log('MapQuest API key check:', { 
+    hasViteKey: !!import.meta.env.VITE_MAPQUEST_API_KEY,
+    hasRegularKey: !!import.meta.env.MAPQUEST_API_KEY,
+    keyBeingUsed: apiKey ? 'Using a key' : 'No key available'
+  });
 
   if (!apiKey) {
     console.error('MapQuest API key is missing');
@@ -75,7 +81,23 @@ export async function validateAddress(address: Address) {
   }
 }
 
-export async function calculateDistance(origin: string, destination: string) {
+// Define return types for the calculateDistance function
+type SuccessDistanceResult = {
+  success: true;
+  distance: number;
+  time: string;
+};
+
+type ErrorDistanceResult = {
+  success: false;
+  error: string;
+};
+
+type DistanceResult = SuccessDistanceResult | ErrorDistanceResult;
+
+export async function calculateDistance(origin: string, destination: string): Promise<DistanceResult> {
+  console.log('calculateDistance called with:', { origin, destination });
+  
   if (!origin || !destination) {
     console.error('Missing origin or destination:', { origin, destination });
     return {
@@ -85,10 +107,18 @@ export async function calculateDistance(origin: string, destination: string) {
   }
 
   try {
+    console.log('Making MapQuest API distance request for:', { origin, destination });
     const data = await makeMapQuestRequest('/directions/v2/route', {
       from: origin,
       to: destination,
       unit: 'M'
+    });
+
+    console.log('MapQuest API response:', { 
+      statuscode: data.info?.statuscode,
+      distance: data.route?.distance,
+      formattedTime: data.route?.formattedTime,
+      hasErrors: data.info?.messages?.length > 0
     });
 
     if (data.info?.statuscode === 402) {
@@ -100,11 +130,13 @@ export async function calculateDistance(origin: string, destination: string) {
     }
 
     if (data.route?.distance) {
-      return {
+      const result: SuccessDistanceResult = {
         success: true,
         distance: Math.round(data.route.distance),
         time: data.route.formattedTime
       };
+      console.log('Distance calculation successful:', result);
+      return result;
     }
 
     return {

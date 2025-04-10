@@ -31,18 +31,44 @@ export default function Home() {
       console.log("Home handleCalculate - Using ZIP codes:", { pickupZip, dropoffZip });
       
       // Calculate real distance using MapQuest API
+      console.log("Calling MapQuest API with locations:", { 
+        pickup: data.pickupLocation, 
+        dropoff: data.dropoffLocation 
+      });
+      
       const distanceResult = await calculateDistance(data.pickupLocation, data.dropoffLocation);
+      console.log("MapQuest API result:", distanceResult);
 
       if (!distanceResult.success) {
+        const errorMessage = 'error' in distanceResult ? distanceResult.error : "Could not calculate distance between locations";
+        console.error("Distance calculation failed:", errorMessage);
+        
         toast({
           title: "Error Calculating Distance",
-          description: distanceResult.error || "Could not calculate distance between locations. Please try again.",
+          description: errorMessage + ". Please try again.",
           variant: "destructive",
         });
         return;
       }
 
-      const pricing = calculatePricing(distanceResult.distance, data.vehicleType);
+      // TypeScript check: If we're here, the distanceResult is successful and has a distance property
+      if (!('distance' in distanceResult)) {
+        // This should never happen since we already checked success above,
+        // but we need this check to satisfy the TypeScript compiler
+        console.error("Unexpected error: successful distance result without distance property");
+        toast({
+          title: "Error Calculating Distance",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const distance = distanceResult.distance;
+      console.log("Calculating pricing with distance:", distance, "and vehicle type:", data.vehicleType);
+      
+      const pricing = calculatePricing(distance, data.vehicleType);
+      console.log("Pricing calculation result:", pricing);
 
       if (pricing.message) {
         toast({
@@ -60,7 +86,7 @@ export default function Home() {
         openTransportPrice: pricing.openTransport,
         enclosedTransportPrice: pricing.enclosedTransport,
         transitTime: pricing.transitTime,
-        distance: distanceResult.distance,
+        distance: distance,
       };
 
       const params = new URLSearchParams({

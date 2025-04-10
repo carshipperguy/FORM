@@ -31,8 +31,11 @@ export function calculatePricing(
   vehicleType: VehicleType,
   date: Date = new Date()
 ): PricingResult {
+  console.log('calculatePricing called with:', { distance, vehicleType, date });
+  
   // Handle undefined distance
   if (!distance) {
+    console.warn('Distance is undefined, returning error message');
     return {
       openTransport: 0,
       enclosedTransport: 0,
@@ -44,9 +47,11 @@ export function calculatePricing(
   // Calculate transit time based on distance
   // Updated: Assume average of 400 miles per day plus 1 day for pickup/delivery
   const transitTime = Math.ceil(distance / 400) + 1;
+  console.log('Calculated transit time:', transitTime);
 
   // For short distances, return message only
   if (distance <= 100) {
+    console.log('Distance <= 100 miles, returning custom quote message');
     return {
       openTransport: 0,
       enclosedTransport: 0,
@@ -59,19 +64,41 @@ export function calculatePricing(
   let basePrice = distance <= 800
     ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
     : distance * BASE_RATE_PER_MILE;
+  
+  console.log('Initial base price calculation:', { 
+    distance,
+    BASE_RATE_PER_MILE,
+    isMidRange: distance <= 800,
+    midRangeMultiplier: distance <= 800 ? 1.10 : 1,
+    basePrice
+  });
 
   // Ensure minimum price
   basePrice = Math.max(basePrice, MINIMUM_PRICE);
+  console.log('Base price after minimum check:', basePrice);
 
   // Apply vehicle type multiplier
   const vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
   const openTransportPrice = basePrice * vehicleMultiplier;
   const enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+  
+  console.log('Price calculations:', {
+    basePrice,
+    vehicleType,
+    vehicleMultiplier,
+    openTransportPrice,
+    ENCLOSED_MULTIPLIER,
+    enclosedTransportPrice
+  });
 
   // Round all prices to nearest whole dollar
-  return {
+  const result = {
     openTransport: Math.round(openTransportPrice),
     enclosedTransport: Math.round(enclosedTransportPrice),
     transitTime
   };
+  
+  console.log('Final pricing result:', result);
+  
+  return result;
 }
