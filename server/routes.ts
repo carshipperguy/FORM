@@ -8,6 +8,22 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY;
 
 async function getDistance(origin: string, destination: string): Promise<{distance: number, time?: string}> {
+  // Log detailed information about the inputs
+  console.log("Server: getDistance called with:", {
+    origin: {
+      value: origin,
+      type: typeof origin,
+      length: origin.length,
+      hasZip: /\d{5}/.test(origin)
+    },
+    destination: {
+      value: destination,
+      type: typeof destination,
+      length: destination.length,
+      hasZip: /\d{5}/.test(destination)
+    }
+  });
+
   // Use MapQuest API to get distance
   const url = `https://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
     origin
@@ -31,12 +47,16 @@ async function getDistance(origin: string, destination: string): Promise<{distan
     });
 
     if (data.route && typeof data.route.distance === 'number') {
-      return {
+      const result = {
         distance: Math.round(data.route.distance), // Already in miles
         time: data.route.formattedTime
       };
+      console.log("Server: Distance calculation successful:", result);
+      return result;
     } else {
+      console.error("Server: No route data or distance in response");
       if (data.info?.messages?.length > 0) {
+        console.error("Server: MapQuest API error messages:", data.info.messages);
         throw new Error(`MapQuest API error: ${data.info.messages.join(", ")}`);
       } else {
         throw new Error("Distance calculation failed - no distance in response");

@@ -108,6 +108,13 @@ export async function calculateDistance(origin: string, destination: string): Pr
 
   try {
     console.log('Trying server-side distance calculation first:', { origin, destination });
+    console.log('Origin type:', typeof origin, 'Value:', origin);
+    console.log('Destination type:', typeof destination, 'Value:', destination);
+    
+    // Check if locations look like they contain ZIP codes
+    const originHasZip = /\d{5}/.test(origin);
+    const destHasZip = /\d{5}/.test(destination);
+    console.log('Location ZIP check:', { originHasZip, destHasZip });
     
     // First try the server endpoint
     try {
@@ -115,9 +122,16 @@ export async function calculateDistance(origin: string, destination: string): Pr
       console.log('Making server request to:', serverUrl);
       
       const response = await fetch(serverUrl);
+      console.log('Server response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('Server returned error status:', response.status);
+        throw new Error(`Server returned status ${response.status}`);
+      }
+      
       const serverData = await response.json();
       
-      console.log('Server distance response:', serverData);
+      console.log('Server distance response full data:', serverData);
       
       if (serverData.distance) {
         const result: SuccessDistanceResult = {
@@ -127,6 +141,9 @@ export async function calculateDistance(origin: string, destination: string): Pr
         };
         console.log('Server distance calculation successful:', result);
         return result;
+      } else if (serverData.error) {
+        console.error('Server returned error:', serverData.error);
+        throw new Error(serverData.error);
       }
     } catch (serverError) {
       console.warn('Server distance calculation failed, trying client-side:', serverError);
