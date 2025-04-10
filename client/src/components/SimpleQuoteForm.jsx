@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { LocationSelector } from "@/components/location-selector";
 import { vehicleTypes, years, makes, modelsByMake } from "@/lib/vehicle-data";
+import LocationAutocomplete from "./LocationAutocomplete";
 
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
@@ -72,21 +72,17 @@ const SimpleQuoteForm = () => {
           </div>
           <div className="form-fields">
             <div className="form-field">
-              <input
-                type="text"
-                name="pickupLocation"
+              <LocationAutocomplete
                 value={formData.pickupLocation}
-                onChange={handleChange}
+                onChange={(value) => handleLocationChange("pickupLocation", value)}
                 placeholder="Ship From (City, State or ZIP)"
                 required
               />
             </div>
             <div className="form-field">
-              <input
-                type="text"
-                name="dropoffLocation"
+              <LocationAutocomplete
                 value={formData.dropoffLocation}
-                onChange={handleChange}
+                onChange={(value) => handleLocationChange("dropoffLocation", value)}
                 placeholder="Ship To (City, State or ZIP)"
                 required
               />
