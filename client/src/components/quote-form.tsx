@@ -76,7 +76,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       <FormControl>
                         <LocationSelector
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(value, zipCode) => {
+                            field.onChange(value);
+                            // Store the ZIP code in a separate field
+                            form.setValue("pickupZip", zipCode || "");
+                          }}
                           placeholder="Ship From"
                         />
                       </FormControl>
