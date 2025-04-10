@@ -227,28 +227,21 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field date-select-field">
-              <div className="custom-date-input">
-                <input 
-                  type="text" 
-                  name="shipmentDateText"
-                  value={formData.shipmentDate ? new Date(formData.shipmentDate).toLocaleDateString() : ''}
-                  readOnly
-                  placeholder="Select Ship Date"
-                  onClick={() => document.getElementById('hiddenDateInput').showPicker()}
-                />
-                <input 
-                  id="hiddenDateInput"
-                  type="date" 
-                  name="shipmentDate" 
-                  value={formData.shipmentDate} 
-                  onChange={handleChange}
-                  required 
-                  min={new Date().toISOString().split('T')[0]}
-                  style={{ opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }}
-                />
-                <span className="calendar-icon">📅</span>
-              </div>
+            <div 
+              className="form-field"
+              onClick={() => document.getElementById('shipDateInput').showPicker()}
+              style={{ cursor: 'pointer' }}
+            >
+              <input 
+                id="shipDateInput"
+                type="date" 
+                name="shipmentDate" 
+                value={formData.shipmentDate} 
+                onChange={handleChange}
+                required 
+                min={new Date().toISOString().split('T')[0]}
+                placeholder="MM-DD-YY"
+              />
             </div>
             {formData.shipmentDate && (
               <>
@@ -414,27 +407,6 @@ const SimpleQuoteForm = () => {
         /* Match the exact placeholders from the screenshot */
         .form-field input::placeholder {
           color: #a0aec0;
-        }
-        
-        /* Custom date input styling */
-        .custom-date-input {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-        
-        .custom-date-input input[type="text"] {
-          width: 100%;
-          cursor: pointer;
-        }
-        
-        .calendar-icon {
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          pointer-events: none;
-          font-size: 16px;
         }
       `}</style>
     </div>
