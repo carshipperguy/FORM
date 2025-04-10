@@ -4,9 +4,9 @@ import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 
-// Use MapQuest instead of Google Maps API as per the application code
-// Ensure we're using the correct API key
-const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY || 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
+// Use MapQuest with your API key
+// Using the specific key you want
+const MAPQUEST_API_KEY = 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
 
 // Log the API key (partially masked for security)
 if (MAPQUEST_API_KEY) {
