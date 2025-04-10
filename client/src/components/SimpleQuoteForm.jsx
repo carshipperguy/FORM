@@ -227,27 +227,25 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field date-field">
-              <input 
-                type="text" 
-                name="shipmentDateDisplay" 
-                value={formData.shipmentDate ? new Date(formData.shipmentDate).toLocaleDateString() : ''} 
-                placeholder="Select Ship Date"
-                readOnly
-                onFocus={() => document.getElementById('actualDateInput').focus()}
-                onClick={() => document.getElementById('actualDateInput').focus()}
-                style={{ position: 'relative', zIndex: 1 }}
-              />
-              <input 
-                id="actualDateInput"
-                type="date" 
+            <div className="form-field">
+              <select 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
                 onChange={handleChange}
-                required 
-                min={new Date().toISOString().split('T')[0]}
-                style={{ opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
-              />
+                required
+              >
+                <option value="">Select Ship Date</option>
+                {Array.from({ length: 30 }, (_, i) => {
+                  const date = new Date();
+                  date.setDate(date.getDate() + i);
+                  const dateString = date.toISOString().split('T')[0];
+                  return (
+                    <option key={dateString} value={dateString}>
+                      {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
             {formData.shipmentDate && (
               <>
