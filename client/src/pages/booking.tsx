@@ -24,6 +24,7 @@ import {
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import MobileContainer from "@/components/MobileContainer";
+import { Loader2 } from "lucide-react";
 
 const bookingSchema = z.object({
   pickupContactName: z.string().min(1, "Pickup contact name is required"),
@@ -99,6 +100,7 @@ function extractLocation(location: string) {
 export default function Booking() {
   const [isPickupContact, setIsPickupContact] = useState(false);
   const [isDeliveryContact, setIsDeliveryContact] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
 

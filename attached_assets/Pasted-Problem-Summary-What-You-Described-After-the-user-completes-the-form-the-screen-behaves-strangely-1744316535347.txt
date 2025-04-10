@@ -1,0 +1,47 @@
+Problem Summary (What You Described)
+After the user completes the form, the screen behaves strangely — it looks like it's "trying to render something," but doesn't finish cleanly. The result is visually painful, clunky, or broken.
+
+🩺 Likely Causes (Technical Diagnosis)
+1. Missing or Incomplete Final State
+If you’re using React (or any JS framework), and the form doesn’t cleanly redirect or display a clear confirmation, it may hang on an undefined or broken state:
+
+No "Thank You" screen
+
+No redirect handler
+
+Just tries to re-render the form or gets stuck
+
+✅ Fix: Ensure the final screen is a dedicated component or route that cleanly replaces the form view when submission is complete.
+
+2. Page Is Re-rendering the Form Again (Without Reset)
+Sometimes the form component itself is being rendered again after submission without clearing state — so it reloads with broken or undefined input values.
+
+✅ Fix: After submission, either:
+
+Redirect to a new route (/thank-you)
+
+Or show a Success component that unmounts the form
+
+3. Unexpected Redirect or Network Lag
+If you're doing fetch() or Axios POST on submit, and there's no loading state or delay handling, the user sees an awkward flash or partial re-render as the network request completes.
+
+✅ Fix: Add a proper loading spinner (isLoading state), and only show the next screen once submission is complete.
+
+4. Form Still in Mobile-Size Iframe, but Trying to Load Something Desktop-Sized
+If your confirmation page or redirect loads a layout not styled for mobile dimensions, it will look broken or painfully squeezed inside your 390px iframe.
+
+✅ Fix:
+
+The confirmation screen must match the same fixed mobile width as the form
+
+All routing inside the iframe must preserve this constraint
+
+✅ How to Fix This in Plain Terms
+Confirm you’re showing a clean, static confirmation page or success message inside the same mobile frame
+
+Do not re-show the form after submission
+
+Avoid full page reloads — just replace the form component with a visual success screen
+
+Test inside the actual iframe environment — not just your dev view
+
