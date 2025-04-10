@@ -31,7 +31,9 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
       make: "",
       model: "",
       pickupLocation: "",
+      pickupZip: "",  // Add pickup ZIP field
       dropoffLocation: "",
+      dropoffZip: "",  // Add dropoff ZIP field
       shipmentDate: undefined,
       name: "",
       phone: "",
@@ -97,7 +99,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                       <FormControl>
                         <LocationSelector
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(value, zipCode) => {
+                            field.onChange(value);
+                            // Store the ZIP code in a separate field
+                            form.setValue("dropoffZip", zipCode || "");
+                          }}
                           placeholder="Ship To"
                         />
                       </FormControl>

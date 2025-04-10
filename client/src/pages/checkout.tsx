@@ -13,7 +13,9 @@ type CheckoutData = {
   make: string;
   model: string;
   pickupLocation: string;
+  pickupZip?: string;  // Add pickup ZIP field
   dropoffLocation: string;
+  dropoffZip?: string;  // Add dropoff ZIP field
   shipmentDate: Date;
   name?: string;
   phone?: string;
@@ -88,11 +90,11 @@ export default function Checkout() {
               </div>
               <div>
                 <span className="font-medium text-[#002C42]">Pickup:</span>{" "}
-                {data.pickupLocation}
+                {data.pickupLocation} {data.pickupZip && <span className="text-gray-800">(ZIP: {data.pickupZip})</span>}
               </div>
               <div>
                 <span className="font-medium text-[#002C42]">Dropoff:</span>{" "}
-                {data.dropoffLocation}
+                {data.dropoffLocation} {data.dropoffZip && <span className="text-gray-800">(ZIP: {data.dropoffZip})</span>}
               </div>
               <div>
                 <span className="font-medium text-[#002C42]">Distance:</span>{" "}
