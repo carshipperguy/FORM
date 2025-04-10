@@ -113,9 +113,48 @@ export default function Home() {
       }
       
       const distance = distanceResult.distance;
-      console.log("Calculating pricing with distance:", distance, "and vehicle type:", data.vehicleType);
+      // Force lowercase for vehicle type to ensure consistent matching
+      const normalizedVehicleType = typeof data.vehicleType === 'string' ? data.vehicleType.toLowerCase() : data.vehicleType;
       
-      const pricing = calculatePricing(distance, data.vehicleType);
+      console.log("Calculating pricing with distance:", distance, "and vehicle type:", {
+        original: data.vehicleType,
+        normalized: normalizedVehicleType,
+        isBoat: normalizedVehicleType === 'boat',
+        containsBoat: typeof normalizedVehicleType === 'string' ? normalizedVehicleType.includes('boat') : false,
+        typeOfVariable: typeof normalizedVehicleType
+      });
+      
+      // DEBUG: Force a known vehicle type for testing
+      console.log("*** TESTING DIRECT HARD-CODED VALUES ***");
+      const flatRateTest = calculatePricing(distance, "boat");
+      console.log("Flat rate test (should be $3.50/mile):", {
+        boatPrice: flatRateTest,
+        expectedFlatRate: Math.round(distance * 3.5)
+      });
+      
+      // CALCULATE PRICE BASED ON VEHICLE TYPE
+      let pricing;
+      
+      // EMERGENCY OVERRIDE - Force flat rate pricing for special vehicle types directly in the component
+      const isSpecialVehicle = normalizedVehicleType === 'boat' || 
+                              normalizedVehicleType === 'rv' || 
+                              normalizedVehicleType.includes('rv') ||
+                              normalizedVehicleType.includes('trailer') || 
+                              normalizedVehicleType.includes('equipment');
+      
+      if (isSpecialVehicle) {
+        console.log("🚨 HOME COMPONENT EMERGENCY OVERRIDE - Using flat rate pricing for special vehicle:", normalizedVehicleType);
+        const flatRatePrice = distance * 3.50;
+        pricing = {
+          openTransport: Math.round(flatRatePrice),
+          enclosedTransport: Math.round(flatRatePrice * 1.40),
+          transitTime: Math.ceil(distance / 400) + 1
+        };
+      } else {
+        // Use normal pricing for standard vehicles
+        pricing = calculatePricing(distance, normalizedVehicleType);
+      }
+      
       console.log("Pricing calculation result:", pricing);
 
       if (pricing.message) {
