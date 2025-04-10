@@ -187,7 +187,30 @@ export default function Booking() {
       const updatedData = {
         ...data,
         ...formData,
+        submissionDate: new Date().toISOString(),
       };
+      
+      // Send the form data to the webhook endpoint
+      try {
+        console.log("Sending form data to webhook:", updatedData);
+        const webhookResponse = await fetch("/api/webhook", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        });
+        
+        const webhookResult = await webhookResponse.json();
+        console.log("Webhook response:", webhookResult);
+        
+        if (!webhookResponse.ok) {
+          console.warn("Warning: Webhook delivery unsuccessful, but proceeding with booking", webhookResult);
+        }
+      } catch (webhookError) {
+        // Don't fail the entire submission if the webhook fails
+        console.error("Error sending data to webhook:", webhookError);
+      }
       
       // Use setTimeout to create a smooth transition
       // This helps prevent the "strange behavior" during page transitions
