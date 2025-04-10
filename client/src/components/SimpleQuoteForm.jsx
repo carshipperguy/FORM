@@ -237,8 +237,15 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field">
+            <div 
+              className="form-field date-field" 
+              onClick={() => {
+                const dateInput = document.getElementById('shipmentDateInput');
+                if (dateInput) dateInput.focus();
+              }}
+            >
               <input 
+                id="shipmentDateInput"
                 type="date" 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
@@ -246,6 +253,7 @@ const SimpleQuoteForm = () => {
                 required 
                 min={new Date().toISOString().split('T')[0]}
                 placeholder="MM-DD-YY"
+                style={{ width: '100%', cursor: 'pointer' }}
               />
             </div>
             {formData.shipmentDate && (
@@ -412,6 +420,12 @@ const SimpleQuoteForm = () => {
         /* Match the exact placeholders from the screenshot */
         .form-field input::placeholder {
           color: #a0aec0;
+        }
+        
+        /* Make the date field clickable */
+        .form-field.date-field {
+          position: relative;
+          cursor: pointer;
         }
       `}</style>
     </div>
