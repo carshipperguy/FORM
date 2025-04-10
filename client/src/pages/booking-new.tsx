@@ -40,7 +40,7 @@ const bookingSchema = z.object({
   deliveryState: z.string().min(1, "State is required"),
   deliveryZip: z.string().min(1, "ZIP code is required"),
 
-  expeditedShipping: z.boolean().optional(),
+
   notes: z.string().optional(),
   acceptTerms: z.boolean().refine((val) => val === true, {
     message: "You must accept the terms and conditions",
@@ -420,24 +420,6 @@ export default function Booking() {
                 <h2 className="text-sm font-medium">Additional Information</h2>
               </div>
               <div className="p-3 space-y-3">
-                <FormField
-                  control={form.control}
-                  name="expeditedShipping"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div>
-                        <FormLabel className="text-sm font-medium">Expedited Shipping</FormLabel>
-                        <p className="text-xs text-gray-500">Priority dispatch with faster transit</p>
-                      </div>
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
                   control={form.control}
