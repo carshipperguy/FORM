@@ -77,10 +77,12 @@ const QuoteOptions = ({ data }) => {
                 <div>
                   <span className="font-medium text-[#002C42]">Pickup:</span>{" "}
                   {formData.pickupLocation}
+                  {formData.pickupZip && <span className="text-xs ml-1">(ZIP: {formData.pickupZip})</span>}
                 </div>
                 <div>
                   <span className="font-medium text-[#002C42]">Dropoff:</span>{" "}
                   {formData.dropoffLocation}
+                  {formData.dropoffZip && <span className="text-xs ml-1">(ZIP: {formData.dropoffZip})</span>}
                 </div>
                 <div>
                   <span className="font-medium text-[#002C42]">Vehicle:</span>{" "}
