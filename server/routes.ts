@@ -7,24 +7,43 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 // Use MapQuest instead of Google Maps API as per the application code
 const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY;
 
-async function getDistance(origin: string, destination: string): Promise<number> {
+async function getDistance(origin: string, destination: string): Promise<{distance: number, time?: string}> {
   // Use MapQuest API to get distance
   const url = `https://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
     origin
   )}&to=${encodeURIComponent(destination)}&unit=M`;
 
   try {
-    console.log("Making MapQuest request:", url);
+    console.log("Server: Making MapQuest request:", url);
+    console.log("Server: Using MapQuest API key:", MAPQUEST_API_KEY ? "Key exists" : "No key found!");
+    
     const response = await fetch(url);
     const data = await response.json();
+    
+    console.log("Server: MapQuest API response status:", response.status);
+    console.log("Server: MapQuest API response data:", {
+      statuscode: data.info?.statuscode,
+      hasRoute: !!data.route,
+      distance: data.route?.distance,
+      formattedTime: data.route?.formattedTime,
+      hasErrors: data.info?.messages?.length > 0,
+      messages: data.info?.messages
+    });
 
-    if (data.route && data.route.distance) {
-      return Math.round(data.route.distance); // Already in miles
+    if (data.route && typeof data.route.distance === 'number') {
+      return {
+        distance: Math.round(data.route.distance), // Already in miles
+        time: data.route.formattedTime
+      };
     } else {
-      throw new Error("Distance calculation failed");
+      if (data.info?.messages?.length > 0) {
+        throw new Error(`MapQuest API error: ${data.info.messages.join(", ")}`);
+      } else {
+        throw new Error("Distance calculation failed - no distance in response");
+      }
     }
   } catch (error) {
-    console.error("MapQuest API Error:", error);
+    console.error("Server: MapQuest API Error:", error);
     throw error;
   }
 }
@@ -32,16 +51,25 @@ async function getDistance(origin: string, destination: string): Promise<number>
 export function registerRoutes(app: Express): Server {
   app.get("/api/distance", async (req, res) => {
     const { origin, destination } = req.query;
+    
+    console.log("Server: Distance API called with:", { origin, destination });
 
     if (!origin || !destination) {
+      console.log("Server: Missing origin or destination");
       return res.status(400).json({ error: "Origin and destination are required" });
     }
 
     try {
-      const distance = await getDistance(origin as string, destination as string);
-      res.json({ distance });
+      const result = await getDistance(origin as string, destination as string);
+      console.log("Server: Distance calculation successful:", result);
+      res.json({ 
+        distance: result.distance,
+        time: result.time || undefined
+      });
     } catch (error) {
-      res.status(500).json({ error: "Failed to calculate distance" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Server: Distance calculation failed:", errorMessage);
+      res.status(500).json({ error: errorMessage });
     }
   });
 
