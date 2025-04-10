@@ -504,7 +504,7 @@ export default function Booking() {
                   type="submit"
                   className="w-full bg-[#002C42] hover:bg-[#001c32] text-white py-2"
                 >
-                  Complete Reservation
+                  Complete Reservation - No CC Required
                 </Button>
                 
                 <p className="text-center text-xs text-gray-500">
