@@ -19,21 +19,43 @@ const SimpleQuoteForm = () => {
   });
   
   const [availableModels, setAvailableModels] = useState([]);
+  const [isStandardVehicle, setIsStandardVehicle] = useState(false);
 
+  // Determine if vehicle type is a standard car/truck/SUV
   useEffect(() => {
-    if (formData.make) {
+    const standardType = formData.vehicleType === "car" || 
+                         formData.vehicleType === "truck" || 
+                         formData.vehicleType === "suv";
+    setIsStandardVehicle(standardType);
+  }, [formData.vehicleType]);
+
+  // Get available models for standard vehicles
+  useEffect(() => {
+    if (isStandardVehicle && formData.make) {
       setAvailableModels(modelsByMake[formData.make] || []);
     } else {
       setAvailableModels([]);
     }
-  }, [formData.make]);
+  }, [formData.make, isStandardVehicle]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // When vehicle type changes, reset the year, make, and model fields
+    if (name === "vehicleType") {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        year: "",
+        make: "",
+        model: ""
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   const handleLocationChange = (field, value) => {
@@ -110,52 +132,91 @@ const SimpleQuoteForm = () => {
                 ))}
               </select>
             </div>
-            <div className="form-field">
-              <select
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Year</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-field">
-              <select
-                name="make"
-                value={formData.make}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Make</option>
-                {makes.map((make) => (
-                  <option key={make} value={make}>
-                    {make}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-field">
-              <select
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
-                required
-                disabled={!formData.make}
-              >
-                <option value="">Model</option>
-                {availableModels.map((model) => (
-                  <option key={model} value={model}>
-                    {model}
-                  </option>
-                ))}
-              </select>
-            </div>
+{isStandardVehicle ? (
+              // Dropdown menus for standard vehicles (car/truck/SUV)
+              <>
+                <div className="form-field">
+                  <select
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Year</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <select
+                    name="make"
+                    value={formData.make}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Make</option>
+                    {makes.map((make) => (
+                      <option key={make} value={make}>
+                        {make}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <select
+                    name="model"
+                    value={formData.model}
+                    onChange={handleChange}
+                    required
+                    disabled={!formData.make}
+                  >
+                    <option value="">Model</option>
+                    {availableModels.map((model) => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              // Free text inputs for non-standard vehicles (anything else)
+              <>
+                <div className="form-field">
+                  <input
+                    type="text"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    placeholder="Year"
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <input
+                    type="text"
+                    name="make"
+                    value={formData.make}
+                    onChange={handleChange}
+                    placeholder="Make"
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <input
+                    type="text"
+                    name="model"
+                    value={formData.model}
+                    onChange={handleChange}
+                    placeholder="Model"
+                    required
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -291,22 +352,10 @@ const SimpleQuoteForm = () => {
           background-color: #0a4169;
         }
 
-        @media (max-width: 639px) {
-          .simple-form-container {
-            width: 308px !important;
-          }
-        }
-        
-        @media (min-width: 640px) and (max-width: 1023px) {
-          .simple-form-container {
-            width: 560px !important;
-          }
-        }
-        
-        @media (min-width: 1024px) {
-          .simple-form-container {
-            width: 1125px !important;
-          }
+        /* Always use mobile styling regardless of device (for iframe) */
+        .simple-form-container {
+          width: 308px !important;
+          max-width: 308px !important;
         }
       `}</style>
     </div>
