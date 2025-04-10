@@ -79,6 +79,13 @@ export function calculatePricing(
   const specialVehicleTypes = ['boat', 'rv/5th wheel', 'travel trailer', 'heavy equipment'];
   const FLAT_RATE_PER_MILE = 3.50; // $3.50 per mile for special vehicle types
   
+  // Add debug logging
+  console.log('DEBUG: Vehicle type check:', {
+    vehicleType,
+    isExactMatch: specialVehicleTypes.includes(vehicleType),
+    specialVehicleTypes
+  });
+  
   let openTransportPrice: number;
   let enclosedTransportPrice: number;
   
