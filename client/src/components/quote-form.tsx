@@ -55,6 +55,14 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
     if (!data.pickupLocation || !data.dropoffLocation) {
       return;
     }
+    
+    // Log the entire form data before submission to verify ZIP codes are included
+    console.log("QuoteForm onSubmit - Full form data:", { 
+      ...data,
+      pickupZip: form.getValues("pickupZip"),
+      dropoffZip: form.getValues("dropoffZip")
+    });
+    
     onCalculate(data);
   };
 
@@ -82,6 +90,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                             field.onChange(value);
                             // Store the ZIP code in a separate field
                             form.setValue("pickupZip", zipCode || "");
+                            console.log("Setting pickupZip:", zipCode);
                           }}
                           placeholder="Ship From"
                         />
@@ -103,6 +112,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                             field.onChange(value);
                             // Store the ZIP code in a separate field
                             form.setValue("dropoffZip", zipCode || "");
+                            console.log("Setting dropoffZip:", zipCode);
                           }}
                           placeholder="Ship To"
                         />
