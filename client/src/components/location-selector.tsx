@@ -97,14 +97,13 @@ export function LocationSelector({
                   onSelect={(currentValue) => {
                     // Get the ZIP code if available
                     const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
-                    // Format location display value (City, STATE)
-                    const displayValue = `${location.city}, ${location.state} ${zip}`;
+                    // Format location display value (City, STATE) - don't include ZIP in display
+                    const displayValue = `${location.city}, ${location.state}`;
                     
                     console.log("LocationSelector selected with ZIP:", { 
                       city: location.city, 
                       state: location.state, 
                       zip: zip,
-                      displayValue: displayValue,
                       zips: location.zips 
                     });
                     
