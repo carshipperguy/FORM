@@ -116,7 +116,7 @@ const QuoteOptions = ({ data }) => {
                   onClick={() => handleReserve("standard", isEnclosedStandard)}
                   className="w-full bg-[#002C42] text-white py-2 text-sm"
                 >
-                  Reserve Now
+                  Reserve Now - No CC Required
                 </button>
               </div>
             </div>
@@ -148,7 +148,7 @@ const QuoteOptions = ({ data }) => {
                   onClick={() => handleReserve("express", isEnclosedExpress)}
                   className="w-full bg-[#002C42] text-white py-2 text-sm"
                 >
-                  Reserve Now
+                  Reserve Now - No CC Required
                 </button>
               </div>
             </div>
