@@ -112,8 +112,21 @@ export default function Booking() {
     return null;
   }
 
-  const pickupLocation = extractLocation(data.pickupLocation);
-  const dropoffLocation = extractLocation(data.dropoffLocation);
+  // Get location data - preferably use the explicit ZIP codes if available
+  const pickupLocation = {
+    ...extractLocation(data.pickupLocation),
+    zip: data.pickupZip || extractLocation(data.pickupLocation).zip // Use provided ZIP if available
+  };
+  
+  const dropoffLocation = {
+    ...extractLocation(data.dropoffLocation),
+    zip: data.dropoffZip || extractLocation(data.dropoffLocation).zip // Use provided ZIP if available
+  };
+  
+  console.log("Using ZIP codes in booking:", { 
+    pickupZip: pickupLocation.zip, 
+    dropoffZip: dropoffLocation.zip 
+  });
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
