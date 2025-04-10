@@ -1,24 +1,65 @@
 import React, { useState } from "react";
+import { useLocation } from "wouter";
 
-const QuoteOptions = () => {
+const QuoteOptions = ({ data }) => {
   const [selectedTransport, setSelectedTransport] = useState("Open");
-  const [formData, setFormData] = useState({
-    name: "John Doe",
-    phone: "555-123-4567",
-    email: "john@example.com",
-    shipDate: "April 15, 2025",
-    vehicle: "2022 Toyota Camry",
-    basePrice: 765,
-  });
+  const [, navigate] = useLocation();
+
+  // Use passed data or fallback to default values if none provided
+  const formData = data || {
+    vehicleType: "Sedan",
+    year: "2022",
+    make: "Toyota",
+    model: "Camry",
+    shipmentDate: new Date().toLocaleDateString(),
+    distance: 1200,
+    openTransportPrice: 765,
+    enclosedTransportPrice: 1071,
+    transitTime: 3,
+  };
 
   const getPrice = (type) => {
-    return type === "Enclosed" ? (formData.basePrice * 1.4).toFixed(0) : formData.basePrice;
+    return type === "Enclosed" ? formData.enclosedTransportPrice : formData.openTransportPrice;
+  };
+  
+  const handleReserve = () => {
+    const transportType = selectedTransport === "Open" ? "open" : "enclosed";
+    const price = transportType === "open" ? formData.openTransportPrice : formData.enclosedTransportPrice;
+    
+    const searchParams = new URLSearchParams();
+    searchParams.append("transportType", transportType);
+    searchParams.append("price", price);
+    searchParams.append("data", encodeURIComponent(JSON.stringify(formData)));
+    
+    navigate(`/checkout?${searchParams.toString()}`);
   };
 
   return (
     <div className="form-container">
       <div className="quote-summary">
         <h2>Quote Details</h2>
+        
+        <div className="vehicle-info">
+          <h3>Vehicle Information</h3>
+          <p>{formData.year} {formData.make} {formData.model}</p>
+          <p>
+            <span className="label">Distance:</span> 
+            <span className="value">{formData.distance} miles</span>
+          </p>
+          <p>
+            <span className="label">Estimated Transit Time:</span> 
+            <span className="value">{formData.transitTime} days</span>
+          </p>
+          <p>
+            <span className="label">From:</span> 
+            <span className="value">{formData.pickupLocation}</span>
+          </p>
+          <p>
+            <span className="label">To:</span> 
+            <span className="value">{formData.dropoffLocation}</span>
+          </p>
+        </div>
+        
         <div className="pricing-cards">
           <div className="card">
             <h3>Standard Transport</h3>
@@ -35,6 +76,9 @@ const QuoteOptions = () => {
               Enclosed
             </button>
             <p>${getPrice(selectedTransport)}</p>
+            <button className="reserve-btn" onClick={handleReserve}>
+              Reserve Now
+            </button>
           </div>
           <div className="card">
             <h3>Express Transport</h3>
@@ -50,7 +94,10 @@ const QuoteOptions = () => {
             >
               Enclosed
             </button>
-            <p>${getPrice(selectedTransport)}</p>
+            <p>${Math.round(getPrice(selectedTransport) * 1.2)}</p>
+            <button className="reserve-btn" onClick={handleReserve}>
+              Reserve Now
+            </button>
           </div>
         </div>
       </div>
@@ -67,6 +114,35 @@ const QuoteOptions = () => {
           display: flex;
           flex-direction: column; /* Stack vertically for mobile */
           gap: 20px;
+        }
+        
+        .vehicle-info {
+          background: #f8fafc;
+          padding: 15px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .vehicle-info h3 {
+          font-size: 1.2rem;
+          margin-bottom: 10px;
+          color: #1e3a8a;
+        }
+        
+        .vehicle-info p {
+          margin-bottom: 8px;
+          font-size: 0.95rem;
+        }
+        
+        .vehicle-info .label {
+          font-weight: 600;
+          color: #4b5563;
+          display: inline-block;
+          width: 150px;
+        }
+        
+        .vehicle-info .value {
+          color: #1f2937;
         }
 
         .pricing-cards {
@@ -102,6 +178,18 @@ const QuoteOptions = () => {
         .card button.active {
           background: #1e3a8a;
           color: #fff;
+        }
+        
+        .card button.reserve-btn {
+          background: #dc2626;
+          color: #fff;
+          width: 100%;
+          margin-top: 15px;
+          padding: 12px;
+        }
+        
+        .card button.reserve-btn:hover {
+          background: #b91c1c;
         }
 
         .card p {
