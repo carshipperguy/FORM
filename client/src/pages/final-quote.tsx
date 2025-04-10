@@ -36,6 +36,7 @@ export default function FinalQuote() {
         return;
       }
       
+      console.log("DECODED FINAL QUOTE DATA:", JSON.stringify(decodedData, null, 2));
       setQuoteData(decodedData);
     } catch (error) {
       console.error("Error parsing quote data:", error);

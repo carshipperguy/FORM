@@ -69,6 +69,18 @@ export default function Home() {
       });
       
       // Use the API to calculate distance correctly
+      // Call the MapQuest API directly to check if it's working
+      try {
+        const directApiUrl = `http://www.mapquestapi.com/directions/v2/route?key=YDMaftbjplfYTcQ129jOTQEkt37kNXy9&from=${encodeURIComponent(pickupLocation)}&to=${encodeURIComponent(dropoffLocation)}&unit=m`;
+        console.log("DIRECT TEST: Calling MapQuest API directly:", directApiUrl);
+        const directResponse = await fetch(directApiUrl);
+        const directData = await directResponse.json();
+        console.log("DIRECT TEST: MapQuest direct distance result:", directData.route?.distance);
+      } catch (directApiError) {
+        console.error("DIRECT TEST: Failed to call MapQuest directly:", directApiError);
+      }
+      
+      // Now use our regular API call
       const distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
       console.log("MapQuest API result:", distanceResult);
 
@@ -121,6 +133,9 @@ export default function Home() {
         transitTime: pricing.transitTime,
         distance: distance,
       };
+      
+      // Log the full quoteData being passed to the URL
+      console.log("FULL QUOTE DATA BEING PASSED:", JSON.stringify(quoteData, null, 2));
 
       const params = new URLSearchParams({
         data: encodeURIComponent(JSON.stringify(quoteData)),

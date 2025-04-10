@@ -31,7 +31,14 @@ export function calculatePricing(
   vehicleType: VehicleType,
   date: Date = new Date()
 ): PricingResult {
-  console.log('calculatePricing called with:', { distance, vehicleType, date });
+  console.log('PRICING calculatePricing called with DISTANCE:', distance, 'VEHICLE:', vehicleType, 'DATE:', date);
+  
+  // Debug check - is distance being overridden to 1200?
+  if (distance && distance !== 1200) {
+    console.log('IMPORTANT: Real distance is being calculated:', distance);
+  } else {
+    console.log('WARNING: Distance is either undefined or exactly 1200 miles');
+  }
   
   // Handle undefined distance
   if (!distance) {
@@ -42,6 +49,14 @@ export function calculatePricing(
       transitTime: 0,
       message: "Unable to calculate distance. Please try again."
     };
+  }
+  
+  // Hard debugging check - is someone forcing it to 1200?
+  if (distance === 1200) {
+    console.error('CRITICAL DEBUG: Distance is exactly 1200 - is this correct?');
+    
+    // Remove the hardcoded override for debugging purposes only
+    // UNCOMMENT TO TEST: distance = 2000; // Force a different value for testing
   }
 
   // Calculate transit time based on distance

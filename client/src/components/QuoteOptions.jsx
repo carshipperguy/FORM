@@ -13,6 +13,10 @@ const QuoteOptions = ({ data }) => {
     return <div>Redirecting...</div>;
   }
   
+  // Log the data coming in to see exactly what we have
+  console.log("QUOTE OPTIONS RECEIVED DATA:", data);
+  console.log("DISTANCE FROM RECEIVED DATA:", data.distance);
+  
   const formData = data;
 
   const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
