@@ -6,7 +6,7 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 
 // Use MapQuest instead of Google Maps API as per the application code
 // Ensure we're using the correct API key
-const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY;
+const MAPQUEST_API_KEY = process.env.MAPQUEST_API_KEY || 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
 
 // Log the API key (partially masked for security)
 if (MAPQUEST_API_KEY) {
