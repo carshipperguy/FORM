@@ -75,36 +75,63 @@ export function calculatePricing(
     };
   }
 
-  // Calculate base price with distance multiplier
-  let basePrice = distance <= 800
-    ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
-    : distance * BASE_RATE_PER_MILE;
+  // Check if it's a special vehicle type that uses flat rate pricing
+  const specialVehicleTypes = ['boat', 'rv/5th wheel', 'travel trailer', 'heavy equipment'];
+  const FLAT_RATE_PER_MILE = 3.50; // $3.50 per mile for special vehicle types
   
-  console.log('Initial base price calculation:', { 
-    distance,
-    BASE_RATE_PER_MILE,
-    isMidRange: distance <= 800,
-    midRangeMultiplier: distance <= 800 ? 1.10 : 1,
-    basePrice
-  });
-
-  // Ensure minimum price
-  basePrice = Math.max(basePrice, MINIMUM_PRICE);
-  console.log('Base price after minimum check:', basePrice);
-
-  // Apply vehicle type multiplier
-  const vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
-  const openTransportPrice = basePrice * vehicleMultiplier;
-  const enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+  let openTransportPrice: number;
+  let enclosedTransportPrice: number;
   
-  console.log('Price calculations:', {
-    basePrice,
-    vehicleType,
-    vehicleMultiplier,
-    openTransportPrice,
-    ENCLOSED_MULTIPLIER,
-    enclosedTransportPrice
-  });
+  if (specialVehicleTypes.includes(vehicleType)) {
+    // Special vehicle types use flat rate pricing
+    console.log(`Applying flat rate pricing for ${vehicleType}: $${FLAT_RATE_PER_MILE} per mile`);
+    openTransportPrice = distance * FLAT_RATE_PER_MILE;
+    enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+  } else {
+    // Standard vehicle types use the progressive pricing model
+    // Calculate base price with distance multiplier
+    let basePrice = distance <= 800
+      ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
+      : distance * BASE_RATE_PER_MILE;
+    
+    console.log('Initial base price calculation:', { 
+      distance,
+      BASE_RATE_PER_MILE,
+      isMidRange: distance <= 800,
+      midRangeMultiplier: distance <= 800 ? 1.10 : 1,
+      basePrice
+    });
+
+    // Ensure minimum price
+    basePrice = Math.max(basePrice, MINIMUM_PRICE);
+    console.log('Base price after minimum check:', basePrice);
+
+    // Apply vehicle type multiplier
+    const vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+    openTransportPrice = basePrice * vehicleMultiplier;
+    enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+  }
+  
+  // Log different information based on the pricing method used
+  if (specialVehicleTypes.includes(vehicleType)) {
+    console.log('Flat rate price calculations:', {
+      vehicleType,
+      flatRatePerMile: FLAT_RATE_PER_MILE,
+      distance,
+      openTransportPrice,
+      ENCLOSED_MULTIPLIER,
+      enclosedTransportPrice
+    });
+  } else {
+    console.log('Standard price calculations:', {
+      vehicleType,
+      distance,
+      multiplier: VEHICLE_MULTIPLIERS[vehicleType],
+      openTransportPrice,
+      ENCLOSED_MULTIPLIER,
+      enclosedTransportPrice
+    });
+  }
 
   // Round all prices to nearest whole dollar
   const result = {
