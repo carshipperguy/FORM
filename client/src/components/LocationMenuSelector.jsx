@@ -37,8 +37,20 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   };
   
   const handleOptionSelect = (option) => {
-    onChange(option.value);
+    // Pass both the location string and the first ZIP code
+    const primaryZip = option.zips && option.zips.length > 0 ? option.zips[0] : null;
+    
+    console.log('Selected location with ZIP:', {
+      location: option.value,
+      primaryZip
+    });
+    
+    // Update the visible input field
     setSearchInput(option.value);
+    
+    // Pass both the location value and ZIP to the parent component
+    onChange(option.value, primaryZip);
+    
     setShowDropdown(false);
   };
   

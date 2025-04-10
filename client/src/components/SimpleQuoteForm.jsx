@@ -70,31 +70,81 @@ const SimpleQuoteForm = () => {
     }
   };
   
-  const handleLocationChange = (field, value) => {
+  // Track ZIP codes separately for each location
+  const [pickupZip, setPickupZip] = useState(null);
+  const [dropoffZip, setDropoffZip] = useState(null);
+  
+  const handleLocationChange = (field, value, zipCode) => {
+    console.log(`Location changed - Field: ${field}, Value: ${value}, ZIP: ${zipCode}`);
+    
+    // Update the form data with the location string
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Store the ZIP code separately
+    if (field === "pickupLocation" && zipCode) {
+      setPickupZip(zipCode);
+    } else if (field === "dropoffLocation" && zipCode) {
+      setDropoffZip(zipCode);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Normally we would validate the form here
     
-    // For demonstration, navigate to the quote page with sample data
-    const quoteData = {
-      ...formData,
-      openTransportPrice: 1200,
-      enclosedTransportPrice: 1680,
-      transitTime: 3,
-      distance: 1200
-    };
-
-    const params = new URLSearchParams({
-      data: encodeURIComponent(JSON.stringify(quoteData))
-    });
-
-    navigate(`/final-quote?${params.toString()}`);
+    try {
+      // Calculate real distance using the server API
+      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
+      console.log("Calculating real distance using server API");
+      
+      const distanceResponse = await fetch(serverDistanceUrl);
+      const distanceData = await distanceResponse.json();
+      
+      if (distanceData.error) {
+        console.error("Error calculating distance:", distanceData.error);
+        alert("There was an error calculating the distance. Please check your locations and try again.");
+        return;
+      }
+      
+      console.log("Distance calculation result:", distanceData);
+      
+      // Calculate transit time based on distance (average 400 miles per day plus 1 day for pickup/delivery)
+      const transitTime = Math.ceil(distanceData.distance / 400) + 1;
+      
+      // Calculate pricing based on distance
+      const basePrice = Math.max(distanceData.distance * 0.65, 650); // 65 cents per mile with $650 minimum
+      const openTransportPrice = Math.round(basePrice);
+      const enclosedTransportPrice = Math.round(basePrice * 1.4); // 40% premium for enclosed
+      
+      console.log("Calculated pricing:", {
+        distance: distanceData.distance,
+        transitTime,
+        openTransportPrice,
+        enclosedTransportPrice
+      });
+      
+      // Create the complete quote data with real calculated values
+      const quoteData = {
+        ...formData,
+        openTransportPrice: openTransportPrice,
+        enclosedTransportPrice: enclosedTransportPrice,
+        transitTime: transitTime,
+        distance: distanceData.distance
+      };
+      
+      console.log("Final quote data with real distance:", quoteData);
+  
+      const params = new URLSearchParams({
+        data: encodeURIComponent(JSON.stringify(quoteData))
+      });
+  
+      navigate(`/final-quote?${params.toString()}`);
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      alert("There was an error processing your request. Please try again.");
+    }
   };
 
   return (
