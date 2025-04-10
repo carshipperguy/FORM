@@ -95,10 +95,12 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         
         .location-input {
           width: 100%;
-          padding: 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
+          padding: 12px;
+          border: 1px solid #E5E7EB;
+          border-radius: 0;
           font-size: 14px;
+          color: #718096;
+          box-shadow: none;
         }
         
         .location-dropdown {
@@ -109,11 +111,11 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           max-height: 300px;
           overflow-y: auto;
           background-color: white;
-          border: 1px solid #ddd;
+          border: 1px solid #E5E7EB;
           border-top: none;
-          border-radius: 0 0 3px 3px;
+          border-radius: 0;
           z-index: 1000;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: none;
         }
         
         .location-option {
