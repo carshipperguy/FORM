@@ -172,36 +172,40 @@ const SimpleQuoteForm = () => {
                 min={new Date().toISOString().split('T')[0]}
               />
             </div>
-            <div className="form-field">
-              <input 
-                type="text"
-                name="name"
-                value={formData.name || ''}
-                onChange={handleChange}
-                placeholder="Your Name"
-                required
-              />
-            </div>
-            <div className="form-field">
-              <input 
-                type="tel"
-                name="phone"
-                value={formData.phone || ''}
-                onChange={handleChange}
-                placeholder="Phone Number"
-                required
-              />
-            </div>
-            <div className="form-field">
-              <input 
-                type="email"
-                name="email"
-                value={formData.email || ''}
-                onChange={handleChange}
-                placeholder="Email Address"
-                required
-              />
-            </div>
+            {formData.shipmentDate && (
+              <>
+                <div className="form-field">
+                  <input 
+                    type="text"
+                    name="name"
+                    value={formData.name || ''}
+                    onChange={handleChange}
+                    placeholder="Your Name"
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <input 
+                    type="tel"
+                    name="phone"
+                    value={formData.phone || ''}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <input 
+                    type="email"
+                    name="email"
+                    value={formData.email || ''}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    required
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -239,6 +243,15 @@ const SimpleQuoteForm = () => {
 
         .form-field {
           margin-bottom: 10px;
+          transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .form-field.hidden {
+          opacity: 0;
+          transform: translateY(-10px);
+          height: 0;
+          margin: 0;
+          overflow: hidden;
         }
 
         .form-field input,
