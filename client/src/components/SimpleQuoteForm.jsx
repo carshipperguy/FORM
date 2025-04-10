@@ -23,10 +23,12 @@ const SimpleQuoteForm = () => {
 
   // Determine if vehicle type is a standard car/truck/SUV
   useEffect(() => {
-    const standardType = formData.vehicleType === "car" || 
-                         formData.vehicleType === "truck" || 
-                         formData.vehicleType === "suv";
+    // Only the "car/truck/suv" type should use dropdown menus
+    const standardType = formData.vehicleType === "car/truck/suv";
     setIsStandardVehicle(standardType);
+    
+    console.log("Vehicle type changed:", formData.vehicleType);
+    console.log("Is standard vehicle:", standardType);
   }, [formData.vehicleType]);
 
   // Get available models for standard vehicles
