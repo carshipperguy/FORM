@@ -95,12 +95,14 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         
         .location-input {
           width: 100%;
-          padding: 12px;
+          padding: 10px;
           border: 1px solid #E5E7EB;
           border-radius: 0;
           font-size: 14px;
           color: #718096;
           box-shadow: none;
+          height: 40px;
+          box-sizing: border-box;
         }
         
         .location-dropdown {
@@ -119,13 +121,17 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         }
         
         .location-option {
-          padding: 8px 12px;
+          padding: 8px 10px;
           cursor: pointer;
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .location-option:last-child {
+          border-bottom: none;
         }
         
         .location-option:hover {
-          background-color: #f8f8f8;
+          background-color: #f9fafb;
         }
         
         .location-option-city {
@@ -134,7 +140,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         
         .location-option-zip {
           font-size: 12px;
-          color: #666;
+          color: #718096;
           margin-top: 2px;
         }
       `}</style>
