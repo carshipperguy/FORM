@@ -627,7 +627,10 @@ export default function Booking() {
                                   </div>
                                 </div>
                                 <div className="mt-4 pt-3 border-t border-gray-200 flex justify-end">
-                                  <Button variant="outline" className="text-sm bg-[#002C42] text-white hover:bg-[#001c32]" onClick={() => document.querySelector("[data-state='open'] button[aria-label='Close']")?.click()}>
+                                  <Button variant="outline" className="text-sm bg-[#002C42] text-white hover:bg-[#001c32]" onClick={() => {
+                                    const closeButton = document.querySelector("[data-state='open'] button[aria-label='Close']") as HTMLButtonElement;
+                                    closeButton?.click();
+                                  }}>
                                     I Understand
                                   </Button>
                                 </div>
