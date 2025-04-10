@@ -105,73 +105,38 @@ export function LocationSelector({
           {locations.length > 0 && (
             <CommandGroup>
               {locations.map((location) => {
-                // For locations with no ZIP codes or just one ZIP code
-                if (!location.zips || location.zips.length <= 1) {
-                  const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
-                  const displayValue = `${location.city}, ${location.state}`;
-                  
-                  return (
-                    <CommandItem
-                      key={location.value}
-                      value={location.value}
-                      onSelect={() => {
-                        console.log("Selected single ZIP location:", { 
-                          city: location.city, 
-                          state: location.state, 
-                          zip: zip
-                        });
-                        onChange(displayValue, zip);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === location.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <div className="flex flex-col">
-                        <span>{location.city}, {location.state}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ZIP: {zip || "N/A"}
-                        </span>
-                      </div>
-                    </CommandItem>
-                  );
-                } 
-                // For locations with multiple ZIP codes, show each as a separate option
-                else {
-                  return location.zips.map((zip) => (
-                    <CommandItem
-                      key={`${location.value}-${zip}`}
-                      value={`${location.value}-${zip}`}
-                      onSelect={() => {
-                        console.log("Selected multi-ZIP location:", { 
-                          city: location.city, 
-                          state: location.state, 
-                          zip: zip
-                        });
-                        // Pass both the display value and the specific ZIP code to parent
-                        const displayValue = `${location.city}, ${location.state}`;
-                        onChange(displayValue, zip);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === `${location.value}-${zip}` ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <div className="flex flex-col">
-                        <span>{location.city}, {location.state}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ZIP: {zip}
-                        </span>
-                      </div>
-                    </CommandItem>
-                  ));
-                }
+                // With our new data format, each location has a single ZIP code
+                const zip = location.zips && location.zips.length > 0 ? location.zips[0] : location.zip || "";
+                const displayValue = `${location.city}, ${location.state}`;
+                
+                return (
+                  <CommandItem
+                    key={location.value}
+                    value={location.value}
+                    onSelect={() => {
+                      console.log("Selected location with ZIP:", { 
+                        city: location.city, 
+                        state: location.state, 
+                        zip: zip
+                      });
+                      onChange(displayValue, zip);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === location.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <div className="flex flex-col">
+                      <span>{location.city}, {location.state}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ZIP: {zip || "N/A"}
+                      </span>
+                    </div>
+                  </CommandItem>
+                );
               })}
             </CommandGroup>
           )}
