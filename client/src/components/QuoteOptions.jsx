@@ -1,244 +1,151 @@
 import React, { useState } from "react";
-import { useLocation } from "wouter";
 
-export default function QuoteOptions({ data }) {
-  const [, navigate] = useLocation();
-  const [isEnclosedStandard, setIsEnclosedStandard] = useState(false);
-  const [isEnclosedExpress, setIsEnclosedExpress] = useState(false);
+const QuoteOptions = () => {
+  const [selectedTransport, setSelectedTransport] = useState("Open");
+  const [formData, setFormData] = useState({
+    name: "John Doe",
+    phone: "555-123-4567",
+    email: "john@example.com",
+    shipDate: "April 15, 2025",
+    vehicle: "2022 Toyota Camry",
+    basePrice: 765,
+  });
 
-  const validatedData = React.useMemo(() => {
-    if (!data) return null;
-
-    return {
-      year: data.year || "N/A",
-      make: data.make || "N/A",
-      model: data.model || "N/A",
-      pickupLocation: data.pickupLocation || "N/A",
-      dropoffLocation: data.dropoffLocation || "N/A",
-      openTransportPrice:
-        typeof data.openTransportPrice === "number"
-          ? data.openTransportPrice
-          : 450,
-      enclosedTransportPrice:
-        typeof data.enclosedTransportPrice === "number"
-          ? data.enclosedTransportPrice
-          : 765,
-      transitTime: typeof data.transitTime === "number" ? data.transitTime : 5,
-      distance: typeof data.distance === "number" ? data.distance : 0,
-      shipmentDate: data.shipmentDate || new Date()
-    };
-  }, [data]);
-
-  // Format values as USD
-  const formatUSD = (price) => new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(price);
-
-  // Handle the Reserve button click
-  const handleReserve = (type) => {
-    if (!validatedData) return;
-
-    // Calculate pricing
-    const standardPrice = isEnclosedStandard 
-      ? validatedData.enclosedTransportPrice 
-      : validatedData.openTransportPrice;
-    
-    const expressBasePrice = Math.round(validatedData.openTransportPrice * 1.3);
-    const expressPrice = isEnclosedExpress 
-      ? Math.round(validatedData.enclosedTransportPrice * 1.3) 
-      : expressBasePrice;
-
-    const transportType = type === "standard" 
-      ? (isEnclosedStandard ? "enclosed" : "open") 
-      : (isEnclosedExpress ? "enclosed" : "open");
-    
-    const finalPrice = type === "standard" 
-      ? standardPrice 
-      : expressPrice;
-    
-    const isExpress = type === "express";
-
-    const params = new URLSearchParams({
-      data: encodeURIComponent(JSON.stringify({
-        ...data,
-        selectedTransport: transportType,
-        isExpress,
-        finalPrice
-      }))
-    });
-    
-    navigate(`/booking?${params.toString()}`);
+  const getPrice = (type) => {
+    return type === "Enclosed" ? (formData.basePrice * 1.4).toFixed(0) : formData.basePrice;
   };
-
-  // Format date for display
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
-
-
-  if (!validatedData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#ffffff] to-[#dc2626] flex flex-col items-center justify-center p-4">
-        <div className="bg-white/80 p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold text-[#1e3a8a] mb-4">
-            Quote Data Error
-          </h2>
-          <p className="text-gray-600">
-            There was a problem loading your quote. Please try again.
-          </p>
-          <button
-            onClick={() => navigate("/")}
-            className="mt-4 w-full bg-[#1e3a8a] text-white py-2 rounded-lg"
-          >
-            Return to Quote Form
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Standard prices
-  const standardPrice = isEnclosedStandard 
-    ? validatedData.enclosedTransportPrice 
-    : validatedData.openTransportPrice;
-  
-  // Express prices (30% more than standard)
-  const expressBasePrice = Math.round(validatedData.openTransportPrice * 1.3);
-  const expressPrice = isEnclosedExpress 
-    ? Math.round(validatedData.enclosedTransportPrice * 1.3) 
-    : expressBasePrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-black px-2 py-4 sm:px-4 md:px-6 lg:px-8 overflow-x-hidden">
-      <div className="form-container">
-        <div className="text-center mb-4 md:mb-6">
-          <img
-            src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
-            className="mx-auto mb-2 md:mb-4 h-12 md:h-14 lg:h-16 object-contain bg-white rounded-lg p-2 shadow-sm"
-            alt="Amerigo Auto Transport USA Themed Logo" />
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1e3a8a]">Your Shipping Quote</h1>
-          <p className="text-xs md:text-sm lg:text-base text-gray-600">Free, no-obligation estimate</p>
-        </div>
-
-        <div className="mb-4 md:mb-6">
-          <div className="bg-white/80 backdrop-blur-md text-black rounded-xl p-4 md:p-6 lg:p-8 shadow-lg border border-gray-100 w-full mx-auto">
-            <h2 className="text-lg font-semibold text-[#1e3a8a] mb-3">Route Information</h2>
-            <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-              <div>
-                <span className="block font-medium text-[#1e3a8a] text-xs">Ship Date:</span>
-                <p className="truncate">{formatDate(validatedData.shipmentDate)}</p>
-              </div>
-              <div>
-                <span className="block font-medium text-[#1e3a8a] text-xs">Transit Time:</span>
-                <p>{validatedData.transitTime} days (est.)</p>
-              </div>
-              <div className="col-span-2">
-                <span className="block font-medium text-[#1e3a8a] text-xs">Pickup Location:</span>
-                <p className="truncate">{validatedData.pickupLocation}</p>
-              </div>
-              <div className="col-span-2">
-                <span className="block font-medium text-[#1e3a8a] text-xs">Dropoff Location:</span>
-                <p className="truncate">{validatedData.dropoffLocation}</p>
-              </div>
-              <div className="col-span-2">
-                <span className="block font-medium text-[#1e3a8a] text-xs">Vehicle:</span>
-                <p>{validatedData.year} {validatedData.make} {validatedData.model}</p>
-              </div>
-              <div>
-                <span className="block font-medium text-[#1e3a8a] text-xs">Distance:</span>
-                <p>{validatedData.distance.toLocaleString()} miles</p>
-              </div>
-            </div>
+    <div className="form-container">
+      <div className="quote-summary">
+        <h2>Quote Details</h2>
+        <div className="pricing-cards">
+          <div className="card">
+            <h3>Standard Transport</h3>
+            <button 
+              className={selectedTransport === "Open" ? "active" : ""} 
+              onClick={() => setSelectedTransport("Open")}
+            >
+              Open
+            </button>
+            <button 
+              className={selectedTransport === "Enclosed" ? "active" : ""} 
+              onClick={() => setSelectedTransport("Enclosed")}
+            >
+              Enclosed
+            </button>
+            <p>${getPrice(selectedTransport)}</p>
+          </div>
+          <div className="card">
+            <h3>Express Transport</h3>
+            <button 
+              className={selectedTransport === "Open" ? "active" : ""} 
+              onClick={() => setSelectedTransport("Open")}
+            >
+              Open
+            </button>
+            <button 
+              className={selectedTransport === "Enclosed" ? "active" : ""} 
+              onClick={() => setSelectedTransport("Enclosed")}
+            >
+              Enclosed
+            </button>
+            <p>${getPrice(selectedTransport)}</p>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mx-auto max-w-full md:max-w-4xl lg:max-w-5xl">
-          {[{
-            label: 'Standard Transport',
-            isEnclosed: isEnclosedStandard,
-            toggle: setIsEnclosedStandard,
-            price: standardPrice,
-            type: "standard"
-          }, {
-            label: 'Express Transport',
-            isEnclosed: isEnclosedExpress,
-            toggle: setIsEnclosedExpress,
-            price: expressPrice,
-            type: "express"
-          }].map(({ label, isEnclosed, toggle, price, type }) => (
-            <div
-              key={label}
-              className="rounded-xl p-4 bg-white/80 backdrop-blur-md text-center shadow-lg flex flex-col justify-between text-black border border-gray-100 w-full"
-            >
-              <div>
-                <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 text-[#1e3a8a]">{label}</h3>
-                <div className="mb-3">
-                  <button
-                    className={`px-3 py-1 text-xs md:text-sm lg:text-base font-medium rounded-full mr-2 ${!isEnclosed ? 'bg-[#1e3a8a] text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => toggle(false)}
-                  >Open</button>
-                  <button
-                    className={`px-3 py-1 text-xs md:text-sm lg:text-base font-medium rounded-full ${isEnclosed ? 'bg-[#dc2626] text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => toggle(true)}
-                  >Enclosed</button>
-                </div>
-                <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#dc2626] mb-3">{formatUSD(price)}</p>
-                <ul className="text-left text-xs md:text-sm lg:text-base space-y-0.5 mb-4 text-gray-700">
-                  {type === 'standard' ? (
-                    <>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Pickup within 7-day window
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Fully insured 
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Door-to-door service
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> $0 due now
-                      </li>
-                    </>
-                  ) : (
-                    <>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Guaranteed pickup window
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Priority dispatch
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> Fully insured, door-to-door
-                      </li>
-                      <li className="flex items-center py-0.5">
-                        <span className="text-green-500 mr-1 text-xs">✓</span> $0 due now
-                      </li>
-                    </>
-                  )}
-                </ul>
-              </div>
-              <button
-                onClick={() => handleReserve(type)}
-                className="w-full bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 md:py-3 lg:py-4 px-4 rounded-lg text-xs md:text-sm lg:text-base transition min-h-[40px] md:min-h-[48px] lg:min-h-[56px]"
-              >
-                Reserve Now — No payment required
-              </button>
-            </div>
-          ))}
-        </div>
-
-
-
-        <p className="mt-10 text-center text-xs text-gray-800 max-w-2xl mx-auto">
-          Note: Multi-vehicle, inoperable, modified, or vehicles booked with other companies require custom quotes — please text or call for details.
-        </p>
       </div>
+
+      <style>{`
+        /* Base Styles (Mobile-first design) */
+        .form-container {
+          padding: 20px;
+          max-width: 308px;
+          margin: 0 auto;
+        }
+
+        .quote-summary {
+          display: flex;
+          flex-direction: column; /* Stack vertically for mobile */
+          gap: 20px;
+        }
+
+        .pricing-cards {
+          display: flex;
+          flex-direction: column; /* Stack vertically on mobile */
+          gap: 20px;
+          width: 100%;
+        }
+
+        .card {
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+        }
+
+        .card button {
+          background: #e5e7eb;
+          color: #374151;
+          border: none;
+          padding: 10px 15px;
+          margin: 5px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+        .card button.active {
+          background: #1e3a8a;
+          color: #fff;
+        }
+
+        .card p {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #1e3a8a;
+          margin-top: 15px;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 800px) {
+          .form-container {
+            max-width: 800px;
+          }
+
+          .pricing-cards {
+            flex-direction: row; /* Display cards in a row on desktop */
+            justify-content: space-between;
+            gap: 20px;
+          }
+
+          .card {
+            width: 48%; /* Make each card 48% wide for desktop */
+          }
+        }
+
+        /* Ensure it looks good at the tablet breakpoint too */
+        @media (min-width: 560px) and (max-width: 799px) {
+          .form-container {
+            max-width: 560px;
+          }
+          
+          .pricing-cards {
+            flex-direction: row;
+            flex-wrap: wrap;
+          }
+          
+          .card {
+            width: 48%;
+          }
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default QuoteOptions;
