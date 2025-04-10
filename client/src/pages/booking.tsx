@@ -113,6 +113,33 @@ export default function Booking() {
     navigate("/");
     return null;
   }
+  
+  // EMERGENCY OVERRIDE: Double-check for special vehicle types and apply $3.50/mile pricing
+  // This ensures consistent pricing between pages
+  const vehicleType = (data.vehicleType || '').toLowerCase();
+  const isSpecialVehicle = vehicleType === 'boat' || 
+                           vehicleType.includes('rv') || 
+                           vehicleType.includes('trailer') || 
+                           vehicleType.includes('equipment');
+  
+  if (isSpecialVehicle && data.distance) {
+    console.log("🚨 BOOKING PAGE EMERGENCY OVERRIDE - Applying $3.50/mile for", vehicleType);
+    const flatRatePrice = Math.round(data.distance * 3.50);
+    
+    // Determine which price to update based on selected transport type
+    if (data.selectedTransport === 'enclosed') {
+      data.finalPrice = Math.round(flatRatePrice * 1.40); // 40% more for enclosed
+    } else {
+      data.finalPrice = flatRatePrice;
+    }
+    
+    console.log("FIXED FINAL PRICE:", {
+      distance: data.distance,
+      ratePerMile: "$3.50",
+      transportType: data.selectedTransport,
+      finalPrice: data.finalPrice
+    });
+  }
 
   // Get location data - preferably use the explicit ZIP codes if available
   const pickupLocation = {

@@ -24,6 +24,29 @@ const QuoteOptions = ({ data }) => {
   console.log("⚠️ CHECKING DISTANCE: Original passed:", data.distance, 
     "Using:", formData.distance, 
     "Changed?", formData.distance !== data.distance);
+    
+  // EMERGENCY OVERRIDE: Check for special vehicle types and apply $3.50/mile pricing
+  const vehicleType = formData.vehicleType?.toLowerCase() || '';
+  const isSpecialVehicle = vehicleType === 'boat' || 
+                         vehicleType.includes('rv') || 
+                         vehicleType.includes('trailer') || 
+                         vehicleType.includes('equipment');
+                         
+  // Override prices for special vehicles
+  if (isSpecialVehicle) {
+    console.log("🚨 QUOTE OPTIONS EMERGENCY OVERRIDE - Applying $3.50/mile for", vehicleType);
+    const flatRate = Math.round(formData.distance * 3.50);
+    formData.openTransportPrice = flatRate;
+    formData.enclosedTransportPrice = Math.round(flatRate * 1.40);
+    
+    console.log("FIXED PRICES:", {
+      distance: formData.distance,
+      rate: "$3.50/mile",
+      calculation: `${formData.distance} × $3.50 = $${flatRate}`,
+      openTransport: formData.openTransportPrice,
+      enclosedTransport: formData.enclosedTransportPrice
+    });
+  }
 
   const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
   const expressPrice = isEnclosedExpress ? Math.round(formData.enclosedTransportPrice * 1.2) : Math.round(formData.openTransportPrice * 1.2);
