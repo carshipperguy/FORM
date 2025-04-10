@@ -12,6 +12,8 @@ export default function FinalQuote() {
     enclosedTransportPrice: number;
     transitTime: number;
     distance: number;
+    pickupZip?: string;
+    dropoffZip?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 

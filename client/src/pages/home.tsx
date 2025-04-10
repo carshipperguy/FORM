@@ -7,6 +7,14 @@ import { calculateDistance } from "@/lib/mapquest";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
+// Function to extract ZIP code from a location string
+function extractZipFromLocation(location: string): string {
+  // Look for a 5-digit ZIP code pattern, optionally followed by a dash and 4 more digits
+  const zipPattern = /\b(\d{5}(-\d{4})?)\b/;
+  const match = location.match(zipPattern);
+  return match ? match[1] : "";
+}
+
 export default function Home() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [, navigate] = useLocation();
@@ -15,6 +23,10 @@ export default function Home() {
   const handleCalculate = async (data: QuoteFormData) => {
     setIsCalculating(true);
     try {
+      // Extract ZIP codes from locations
+      const pickupZip = extractZipFromLocation(data.pickupLocation);
+      const dropoffZip = extractZipFromLocation(data.dropoffLocation);
+      
       // Calculate real distance using MapQuest API
       const distanceResult = await calculateDistance(data.pickupLocation, data.dropoffLocation);
 
@@ -39,6 +51,9 @@ export default function Home() {
 
       const quoteData = {
         ...data,
+        // Store ZIP codes explicitly
+        pickupZip,
+        dropoffZip,
         openTransportPrice: pricing.openTransport,
         enclosedTransportPrice: pricing.enclosedTransport,
         transitTime: pricing.transitTime,
