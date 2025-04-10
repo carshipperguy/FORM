@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { getFallbackDistance } from "./distance-fallback";
 
 const addressSchema = z.object({
   street: z.string(),
@@ -203,16 +202,13 @@ export async function calculateDistance(origin: string, destination: string): Pr
       return result;
     }
 
-    // Don't use any fallbacks
-    
+    // MapQuest API should always work with correct locations
     return {
       success: false,
-      error: 'Could not calculate distance between these locations'
+      error: 'Could not calculate distance between these locations. Please check your entries.'
     };
   } catch (error) {
     console.error('Distance calculation error:', error);
-    
-    // No fallbacks used
     
     return {
       success: false,
