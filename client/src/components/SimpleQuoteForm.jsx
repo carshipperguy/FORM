@@ -20,7 +20,6 @@ const SimpleQuoteForm = () => {
   
   const [availableModels, setAvailableModels] = useState([]);
   const [isStandardVehicle, setIsStandardVehicle] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Determine if vehicle type is a standard car/truck/SUV
   useEffect(() => {
@@ -228,8 +227,13 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field">
+            <div 
+              className="form-field"
+              onClick={() => document.getElementById('shipDateInput').showPicker()}
+              style={{ cursor: 'pointer' }}
+            >
               <input 
+                id="shipDateInput"
                 type="date" 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
@@ -237,11 +241,6 @@ const SimpleQuoteForm = () => {
                 required 
                 min={new Date().toISOString().split('T')[0]}
                 placeholder="MM-DD-YY"
-                style={{ 
-                  cursor: 'pointer',
-                  colorScheme: 'light',
-                  width: '100%'
-                }}
               />
             </div>
             {formData.shipmentDate && (
