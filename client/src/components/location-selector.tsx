@@ -99,6 +99,14 @@ export function LocationSelector({
                     const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
                     // Format location display value (City, STATE)
                     const displayValue = `${location.city}, ${location.state}`;
+                    
+                    console.log("LocationSelector selected:", { 
+                      city: location.city, 
+                      state: location.state, 
+                      zip: zip,
+                      zips: location.zips 
+                    });
+                    
                     // Pass both the display value and the ZIP code to parent
                     onChange(displayValue, zip);
                     setOpen(false);
