@@ -9,5 +9,56 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+}
+
+/* Iframe-specific styles */
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-gray-100 shadow-lg;
+  }
+  
+  .form-container {
+    @apply w-full max-w-[308px] mx-auto;
+  }
+  
+  .truncate-text {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap max-w-full;
+  }
+}
+
+/* For iframe embed environment */
+@media (max-width: 320px) {
+  .form-container {
+    max-width: 95vw;
+    padding: 0.25rem;
+  }
+  
+  .text-xs {
+    font-size: 0.65rem;
+  }
+  
+  .text-sm {
+    font-size: 0.75rem;
+  }
+  
+  .p-2 {
+    padding: 0.35rem;
+  }
+  
+  .gap-2 {
+    gap: 0.35rem;
+  }
+}
+
+/* Touch-friendly adjustment for buttons in mobile */
+@media (max-width: 640px) {
+  button, .button, [type="button"], [type="submit"] {
+    min-height: 40px;
+    min-width: 40px;
   }
 }

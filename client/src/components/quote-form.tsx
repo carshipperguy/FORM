@@ -59,7 +59,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
   const isCarTruckSuv = vehicleType === "car/truck/suv";
 
   return (
-    <Card className="w-full max-w-[308px] mx-auto border-0 shadow-none">
+    <Card className="form-container border-0 shadow-none">
       <CardContent className="p-[10px] pt-2">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[10px]">
