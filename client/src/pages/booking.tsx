@@ -825,7 +825,7 @@ export default function Booking() {
                     type="submit"
                     className="w-full bg-[#1E3A4C] hover:bg-[#163140] text-white font-semibold py-4 px-6 text-base rounded-md transition duration-200 shadow-md"
                   >
-                    Complete Free Reservation
+                    Complete Free Reservation - No CC Required
                   </Button>
                   <p className="text-center text-sm text-gray-500">
                     No payment required until your vehicle is picked up
