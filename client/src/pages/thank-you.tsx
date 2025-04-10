@@ -1,54 +1,14 @@
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, Share2, Mail, Phone } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { CheckCircle, Share2 } from "lucide-react";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import MobileContainer from "@/components/MobileContainer";
 
 export default function ThankYou() {
   const { toast } = useToast();
-  const [isSending, setIsSending] = useState(false);
-  const [sentEmail, setSentEmail] = useState(false);
-  const [sentSMS, setSentSMS] = useState(false);
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ? JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : {};
-
-  useEffect(() => {
-    async function sendConfirmations() {
-      if (data.email || data.phone) {
-        setIsSending(true);
-        try {
-          const response = await apiRequest("POST", '/api/send-confirmations', data);
-          const result = await response.json();
-          
-          if (result.emailSent) {
-            setSentEmail(true);
-          }
-          
-          if (result.smsSent) {
-            setSentSMS(true);
-          }
-          
-          if (!result.success) {
-            throw new Error('Failed to send confirmations');
-          }
-        } catch (error) {
-          console.error("Error sending confirmations:", error);
-          toast({
-            title: "Notice",
-            description: "We'll send your confirmation details shortly.",
-            variant: "default",
-          });
-        } finally {
-          setIsSending(false);
-        }
-      }
-    }
-
-    sendConfirmations();
-  }, [data, toast]);
 
   // Calculate and format the price
   const formattedPrice = new Intl.NumberFormat('en-US', {
@@ -128,35 +88,6 @@ export default function ThankYou() {
             </div>
           )}
           
-          {isSending ? (
-            <div className="flex items-center justify-center mb-4 p-2 bg-gray-50 border-t border-b border-gray-200">
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              <p className="text-sm text-gray-600">Sending confirmations...</p>
-            </div>
-          ) : (
-            <>
-              {(sentEmail || sentSMS) && (
-                <div className="mb-4 p-3 bg-gray-50 border-t border-b border-gray-200">
-                  <h3 className="font-medium text-sm mb-2">Confirmations Sent:</h3>
-                  <div className="flex justify-center space-x-6">
-                    {sentEmail && (
-                      <div className="flex items-center text-green-600">
-                        <Mail className="w-4 h-4 mr-1" />
-                        <span className="text-sm">Email</span>
-                      </div>
-                    )}
-                    {sentSMS && (
-                      <div className="flex items-center text-green-600">
-                        <Phone className="w-4 h-4 mr-1" />
-                        <span className="text-sm">SMS</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-          
           <div className="flex flex-col p-3 gap-3 mb-3">
             <Button asChild className="bg-[#002C42] hover:bg-[#001C32] w-full">
               <Link href="/">Get Another Quote</Link>
@@ -168,7 +99,7 @@ export default function ThankYou() {
         </div>
         
         <p className="text-center text-xs text-gray-600 mb-4">
-          You will receive a confirmation email with your booking details.
+          Thank you for choosing Amerigo Auto Transport!
         </p>
       </div>
     </MobileContainer>
