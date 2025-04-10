@@ -55,10 +55,12 @@ async function getDistance(origin: string, destination: string): Promise<{distan
     console.log("Simplified destination to:", destinationFormatted);
   }
 
-  // Use MapQuest API to get distance
-  const url = `https://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
+  // Use MapQuest API to get distance - ensure we have the correct format
+  const url = `http://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
     originFormatted
-  )}&to=${encodeURIComponent(destinationFormatted)}&unit=M`;
+  )}&to=${encodeURIComponent(destinationFormatted)}&unit=m`;
+  
+  // Note: Changed https to http, and unit=M to unit=m as the API may be case-sensitive
 
   try {
     console.log("Server: Making MapQuest request:", url);

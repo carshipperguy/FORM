@@ -11,13 +11,14 @@ const addressSchema = z.object({
 export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
-  const baseUrl = 'https://www.mapquestapi.com';
-  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY || import.meta.env.MAPQUEST_API_KEY;
+  // Using http instead of https as it may be more reliable with the API
+  const baseUrl = 'http://www.mapquestapi.com';
+  // Match the environment variable format seen in the logs
+  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;
   
   console.log('MapQuest API key check:', { 
     hasViteKey: !!import.meta.env.VITE_MAPQUEST_API_KEY,
-    hasRegularKey: !!import.meta.env.MAPQUEST_API_KEY,
-    keyBeingUsed: apiKey ? 'Using a key' : 'No key available'
+    keyLength: apiKey ? apiKey.length : 0
   });
 
   if (!apiKey) {
@@ -177,7 +178,7 @@ export async function calculateDistance(origin: string, destination: string): Pr
     const data = await makeMapQuestRequest('/directions/v2/route', {
       from: cleanOrigin,
       to: cleanDestination,
-      unit: 'M'
+      unit: 'm' // Use lowercase to ensure better compatibility
     });
 
     console.log('MapQuest API response:', { 
