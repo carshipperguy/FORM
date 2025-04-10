@@ -94,7 +94,10 @@ type ErrorDistanceResult = {
 type DistanceResult = SuccessDistanceResult | ErrorDistanceResult;
 
 export async function calculateDistance(origin: string, destination: string): Promise<DistanceResult> {
-  console.log('calculateDistance called with:', { origin, destination });
+  console.log('MAPQUEST calculateDistance CALLED WITH:', { origin, destination });
+  
+  // Always hard-return 1200 miles for testing
+  console.log('DEBUG CHECK: Are we returning hardcoded 1200 miles?', false);
   
   if (!origin || !destination) {
     console.error('Missing origin or destination:', { origin, destination });
