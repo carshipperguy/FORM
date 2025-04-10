@@ -8,7 +8,6 @@ import ThankYou from "@/pages/thank-you";
 import Checkout from "@/pages/checkout";
 import Booking from "@/pages/booking";
 import FinalQuote from "@/pages/final-quote";
-import DevicePreview from "@/pages/device-preview";
 
 function Router() {
   return (
@@ -18,7 +17,6 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/booking" component={Booking} />
       <Route path="/thank-you" component={ThankYou} />
-      <Route path="/device-preview" component={DevicePreview} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -34,23 +32,13 @@ function ShareableUrlDisplay() {
 }
 
 function App() {
-  const location = window.location.pathname;
-  const isDevicePreview = location.includes('/device-preview');
-  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="mx-auto">
         <ShareableUrlDisplay />
-        {/* Don't apply width constraints to device preview page */}
-        {isDevicePreview ? (
-          <div className="mx-auto">
-            <Router />
-          </div>
-        ) : (
-          <div className="[&>*:first-child]:w-[308px] [&>*:not(:first-child)]:w-[500px] mx-auto">
-            <Router />
-          </div>
-        )}
+        <div className="[&>*:first-child]:w-[308px] [&>*:not(:first-child)]:w-[500px] mx-auto">
+          <Router />
+        </div>
       </div>
       <Toaster />
     </QueryClientProvider>

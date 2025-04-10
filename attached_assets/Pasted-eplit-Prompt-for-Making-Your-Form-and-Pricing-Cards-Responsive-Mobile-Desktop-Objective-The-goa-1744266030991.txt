@@ -1,0 +1,186 @@
+eplit Prompt for Making Your Form and Pricing Cards Responsive (Mobile & Desktop)
+Objective: The goal is to ensure that after the user submits their details, the price display page, checkout page, and thank you page are sized and displayed correctly across mobile and desktop screens. We'll also ensure that the pricing cards toggle properly for Open vs. Enclosed transport, and the overall layout is responsive.
+
+Key Concepts You Need to Implement:
+Flexbox Layout:
+
+Flexbox is used to create flexible layouts, and it's ideal for creating responsive designs. We will use it to control how the pricing cards are laid out on different devices.
+
+Media Queries:
+
+Media queries are used to apply different styles based on the viewport size (i.e., screen width). We will use media queries to ensure that the layout is responsive and adjusts based on whether the screen is mobile or desktop size.
+
+Viewport Sizing:
+
+Use relative units (%, em, rem) rather than absolute units (px) for elements so that they can resize dynamically based on the screen size.
+
+CSS Flexbox and Grid:
+
+Use CSS Flexbox for arranging items in a row (for desktop) or in a column (for mobile).
+
+Overflow Prevention:
+
+Ensure elements do not overflow on small screens by setting overflow: hidden; or using flex-wrap: wrap; to ensure that content remains within the viewport.
+
+Step-by-Step Guide:
+Step 1: Setting up the Form
+You will use a basic React component with form fields and pricing cards. Let’s start with the structure.
+
+jsx
+Copy
+import React, { useState } from "react";
+
+const QuoteForm = () => {
+  const [selectedTransport, setSelectedTransport] = useState("Open");
+  const [formData, setFormData] = useState({
+    name: "John Doe",
+    phone: "555-123-4567",
+    email: "john@example.com",
+    shipDate: "April 15, 2025",
+    vehicle: "2022 Toyota Camry",
+    basePrice: 765,
+  });
+
+  const getPrice = (type) => {
+    return type === "Enclosed" ? (formData.basePrice * 1.4).toFixed(0) : formData.basePrice;
+  };
+
+  return (
+    <div className="form-container">
+      <div className="quote-summary">
+        <h2>Quote Details</h2>
+        <div className="pricing-cards">
+          <div className="card">
+            <h3>Standard Transport</h3>
+            <button onClick={() => setSelectedTransport("Open")}>Open</button>
+            <button onClick={() => setSelectedTransport("Enclosed")}>Enclosed</button>
+            <p>{getPrice(selectedTransport)}</p>
+          </div>
+          <div className="card">
+            <h3>Express Transport</h3>
+            <button onClick={() => setSelectedTransport("Open")}>Open</button>
+            <button onClick={() => setSelectedTransport("Enclosed")}>Enclosed</button>
+            <p>{getPrice(selectedTransport)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default QuoteForm;
+Step 2: Implementing Responsive Layout Using Flexbox
+In your CSS file, use Flexbox to create a responsive design for the cards and form elements.
+
+css
+Copy
+/* Base Styles (Mobile-first design) */
+.form-container {
+  padding: 20px;
+}
+
+.quote-summary {
+  display: flex;
+  flex-direction: column; /* Stack vertically for mobile */
+  gap: 20px;
+}
+
+.pricing-cards {
+  display: flex;
+  flex-direction: column; /* Stack vertically on mobile */
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.card button {
+  background: #1e3a8a;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Desktop Styles (Breakpoints for larger screens) */
+@media (min-width: 768px) {
+  .quote-summary {
+    flex-direction: row; /* Align horizontally on desktop */
+    gap: 40px;
+  }
+
+  .pricing-cards {
+    flex-direction: row; /* Display cards in a row on desktop */
+    gap: 40px;
+  }
+
+  .card {
+    width: 48%; /* Make each card 48% wide for desktop */
+  }
+}
+Step 3: Use Media Queries for Dynamic Sizing
+Add media queries to adjust layout for various screen sizes. This will ensure that the form and pricing cards resize correctly.
+
+css
+Copy
+/* Mobile-first Styles */
+@media (max-width: 480px) {
+  .card {
+    width: 100%;
+    padding: 15px;
+  }
+  .pricing-cards {
+    flex-direction: column; /* Stack cards vertically on mobile */
+  }
+}
+
+/* Tablet and Small Devices */
+@media (min-width: 481px) and (max-width: 768px) {
+  .card {
+    width: 48%;
+  }
+  .pricing-cards {
+    flex-direction: row; /* Align cards in a row on medium-sized screens */
+  }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .card {
+    width: 48%; /* Adjust cards to fit two per row on larger screens */
+  }
+}
+Step 4: Testing and Adjusting Layout
+Use the Chrome Developer Tools (or any browser’s developer tools) to simulate different screen sizes.
+
+Test the form for various sizes, ensuring that on mobile, the cards stack, and on desktop, they are displayed in a row.
+
+Adjust any overflow or padding issues as needed to make the design clean and user-friendly.
+
+Conclusion:
+With these steps, you can now ensure that your form, including the pricing cards, submit button, and thank you page, all render correctly across mobile and desktop screens.
+
+Key steps include:
+
+Using Flexbox to create flexible layouts.
+
+Applying media queries to adjust the layout for different screen sizes.
+
+Testing the design to ensure responsiveness and adjusting the layout dynamically.
+
+This approach will make sure that your form will look professional and work seamlessly across all devices.
