@@ -67,8 +67,35 @@ const QuoteOptions = ({ data }) => {
       ...formData,
       selectedTransport: transportType === "enclosed" || transportType === "enclosed-express" ? "enclosed" : "open",
       guaranteedDate: transport === "express",
-      finalPrice: price
+      finalPrice: price,
+      quoteSelectedAt: new Date().toISOString()
     };
+    
+    // Send the quote selection data to the webhook
+    try {
+      console.log("Sending quote selection to webhook:", finalData);
+      fetch("/api/webhook", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...finalData,
+          eventType: "quote_selection",
+          eventDate: new Date().toISOString()
+        }),
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log("Webhook response:", result);
+      })
+      .catch(webhookError => {
+        // Don't prevent navigation if webhook fails
+        console.error("Error sending data to webhook:", webhookError);
+      });
+    } catch (error) {
+      console.error("Error preparing webhook data:", error);
+    }
     
     // Skip checkout and go directly to booking page
     const searchParams = new URLSearchParams({

@@ -179,6 +179,32 @@ export default function Home() {
       // Log the full quoteData being passed to the URL
       console.log("FULL QUOTE DATA BEING PASSED:", JSON.stringify(quoteData, null, 2));
 
+      // Send initial form data to webhook
+      try {
+        console.log("Sending initial quote data to webhook");
+        fetch("/api/webhook", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...quoteData,
+            eventType: "initial_quote_submission",
+            eventDate: new Date().toISOString()
+          }),
+        })
+        .then(response => response.json())
+        .then(result => {
+          console.log("Webhook response:", result);
+        })
+        .catch(webhookError => {
+          // Don't prevent navigation if webhook fails
+          console.error("Error sending data to webhook:", webhookError);
+        });
+      } catch (error) {
+        console.error("Error preparing webhook data:", error);
+      }
+
       const params = new URLSearchParams({
         data: encodeURIComponent(JSON.stringify(quoteData)),
       });
