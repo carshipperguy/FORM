@@ -27,20 +27,27 @@ export function PriceDisplay({
     );
   }
 
+  const formatUSD = (price: number) => new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+
   return (
     <div className="w-full max-w-4xl mx-auto mt-8 space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="min-h-[240px] flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Truck className="h-6 w-6" />
               Open Transport
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold mb-4">${openTransport}</div>
+          <CardContent className="flex-1 flex flex-col justify-between">
+            <div className="text-4xl font-bold mb-4">{formatUSD(openTransport)}</div>
             <Button
-              className="w-full"
+              className="w-full mt-auto"
               onClick={() => onReserve("open")}
             >
               Reserve Now - No CC Required
@@ -48,17 +55,17 @@ export function PriceDisplay({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[240px] flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-6 w-6" />
               Enclosed Transport
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold mb-4">${enclosedTransport}</div>
+          <CardContent className="flex-1 flex flex-col justify-between">
+            <div className="text-4xl font-bold mb-4">{formatUSD(enclosedTransport)}</div>
             <Button
-              className="w-full"
+              className="w-full mt-auto"
               onClick={() => onReserve("enclosed")}
             >
               Reserve Now - No CC Required

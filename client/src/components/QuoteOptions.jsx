@@ -24,7 +24,9 @@ const QuoteOptions = ({ data }) => {
   
   const formatUSD = (price) => new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(price);
   
   const handleReserve = (transport, isEnclosed) => {
@@ -98,11 +100,11 @@ const QuoteOptions = ({ data }) => {
 
           <div className="space-y-4 mb-4">
             {/* Standard Transport Card */}
-            <div className="border border-gray-200">
+            <div className="border border-gray-200 min-h-[250px] flex flex-col">
               <div className="bg-[#002C42] text-white p-2">
                 <h3 className="text-sm font-medium">Standard Transport</h3>
               </div>
-              <div className="p-3">
+              <div className="p-3 flex-1 flex flex-col">
                 <div className="mb-3 text-center">
                   <button
                     className={`px-3 py-1 text-xs font-medium mr-2 ${!isEnclosedStandard ? 'bg-[#002C42] text-white' : 'bg-gray-200 text-black'}`}
@@ -116,7 +118,7 @@ const QuoteOptions = ({ data }) => {
                 <div className="h-10 flex items-center justify-center">
                   <p className="text-xl font-bold text-center">{formatUSD(standardPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1">
+                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1">
                   <li>✓ Pickup within 7-day window</li>
                   <li>✓ Fully insured</li>
                   <li>✓ Door-to-door service</li>
@@ -124,7 +126,7 @@ const QuoteOptions = ({ data }) => {
                 </ul>
                 <button
                   onClick={() => handleReserve("standard", isEnclosedStandard)}
-                  className="w-full bg-[#002C42] text-white py-2 text-sm"
+                  className="w-full bg-[#002C42] text-white py-2 text-sm mt-auto"
                 >
                   Reserve Now - No CC Required
                 </button>
@@ -132,11 +134,11 @@ const QuoteOptions = ({ data }) => {
             </div>
 
             {/* Express Transport Card */}
-            <div className="border border-gray-200">
+            <div className="border border-gray-200 min-h-[250px] flex flex-col">
               <div className="bg-[#002C42] text-white p-2">
                 <h3 className="text-sm font-medium">Express Transport</h3>
               </div>
-              <div className="p-3">
+              <div className="p-3 flex-1 flex flex-col">
                 <div className="mb-3 text-center">
                   <button
                     className={`px-3 py-1 text-xs font-medium mr-2 ${!isEnclosedExpress ? 'bg-[#002C42] text-white' : 'bg-gray-200 text-black'}`}
@@ -150,7 +152,7 @@ const QuoteOptions = ({ data }) => {
                 <div className="h-10 flex items-center justify-center">
                   <p className="text-xl font-bold text-center">{formatUSD(expressPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1">
+                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1">
                   <li>✓ Guaranteed pickup window</li>
                   <li>✓ Priority dispatch</li>
                   <li>✓ Fully insured, door-to-door</li>
@@ -158,7 +160,7 @@ const QuoteOptions = ({ data }) => {
                 </ul>
                 <button
                   onClick={() => handleReserve("express", isEnclosedExpress)}
-                  className="w-full bg-[#002C42] text-white py-2 text-sm"
+                  className="w-full bg-[#002C42] text-white py-2 text-sm mt-auto"
                 >
                   Reserve Now - No CC Required
                 </button>
