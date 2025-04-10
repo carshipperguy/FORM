@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Star } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import MobileContainer from "@/components/MobileContainer";
 
 type CheckoutData = {
   vehicleType: string;
@@ -62,106 +63,113 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#ffffff] to-[#dc2626] text-black px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#1e3a8a] drop-shadow-md">Finalize Your Booking</h1>
-          <p className="text-sm text-gray-700 mt-2">Military Owned • Family Operated • Proudly American</p>
+    <MobileContainer>
+      <div className="p-4 bg-white">
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-bold text-[#002C42]">Finalize Your Booking</h1>
+          <p className="text-xs text-gray-700 mt-1">Military Owned • Family Operated</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 mb-10">
-          <div className="bg-white text-black rounded-2xl p-5 shadow-xl border border-gray-200">
-            <h2 className="text-xl font-semibold text-[#1e3a8a] mb-4">Your Shipping Details</h2>
-            <div className="space-y-3 text-sm text-gray-700">
+        <div className="mb-4">
+          <div className="bg-white text-black border border-gray-200 mb-3">
+            <div className="bg-[#002C42] text-white p-2">
+              <h2 className="text-sm font-medium">Your Shipping Details</h2>
+            </div>
+            <div className="p-3 space-y-2 text-sm text-gray-700">
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Ship Date:</span>
+                <span className="font-medium text-[#002C42]">Ship Date:</span>{" "}
                 {data.shipmentDate instanceof Date 
                   ? data.shipmentDate.toLocaleDateString() 
                   : new Date(data.shipmentDate).toLocaleDateString()}
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Vehicle:</span>
+                <span className="font-medium text-[#002C42]">Vehicle:</span>{" "}
                 {data.year} {data.make} {data.model}
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Pickup Location:</span>
+                <span className="font-medium text-[#002C42]">Pickup:</span>{" "}
                 {data.pickupLocation}
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Dropoff Location:</span>
+                <span className="font-medium text-[#002C42]">Dropoff:</span>{" "}
                 {data.dropoffLocation}
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Route Distance:</span>
-                {data.distance} miles (est.)
+                <span className="font-medium text-[#002C42]">Distance:</span>{" "}
+                {data.distance} miles
               </div>
               <div>
-                <span className="block font-medium text-[#1e3a8a]">Transit Time:</span>
-                {data.transitTime} days (est.)
+                <span className="font-medium text-[#002C42]">Transit Time:</span>{" "}
+                {data.transitTime} days
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="bg-white text-black rounded-2xl p-5 shadow-xl border border-gray-200">
-            <h2 className="text-xl font-semibold text-[#1e3a8a] mb-4">Choose Your Transport Method</h2>
-            
-            <div className="flex flex-col space-y-4">
-              <div 
-                className={`p-4 rounded-xl cursor-pointer border ${selectedTransport === "open" 
-                  ? "border-blue-600 bg-blue-50" 
-                  : "border-gray-200 hover:bg-gray-50"}`}
-                onClick={() => setSelectedTransport("open")}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Open Transport</span>
-                  <span className="text-xl font-bold text-[#dc2626]">
-                    ${calculatePrice(data.openTransportPrice)}
-                  </span>
+        <div className="mb-4">
+          <div className="bg-white text-black border border-gray-200 mb-3">
+            <div className="bg-[#002C42] text-white p-2">
+              <h2 className="text-sm font-medium">Choose Transport Method</h2>
+            </div>
+            <div className="p-3">
+              <div className="flex flex-col space-y-3">
+                <div 
+                  className={`p-3 cursor-pointer border ${selectedTransport === "open" 
+                    ? "border-[#002C42] bg-blue-50" 
+                    : "border-gray-200"}`}
+                  onClick={() => setSelectedTransport("open")}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Open Transport</span>
+                    <span className="text-lg font-bold">
+                      ${calculatePrice(data.openTransportPrice)}
+                    </span>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`p-3 cursor-pointer border ${selectedTransport === "enclosed" 
+                    ? "border-[#002C42] bg-blue-50" 
+                    : "border-gray-200"}`}
+                  onClick={() => setSelectedTransport("enclosed")}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Enclosed Transport</span>
+                    <span className="text-lg font-bold">
+                      ${calculatePrice(data.enclosedTransportPrice)}
+                    </span>
+                  </div>
                 </div>
               </div>
               
-              <div 
-                className={`p-4 rounded-xl cursor-pointer border ${selectedTransport === "enclosed" 
-                  ? "border-blue-600 bg-blue-50" 
-                  : "border-gray-200 hover:bg-gray-50"}`}
-                onClick={() => setSelectedTransport("enclosed")}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Enclosed Transport</span>
-                  <span className="text-xl font-bold text-[#dc2626]">
-                    ${calculatePrice(data.enclosedTransportPrice)}
-                  </span>
+              <div className="mt-3 flex items-center justify-between p-2 bg-gray-50 border border-gray-200">
+                <div>
+                  <h4 className="text-sm font-medium text-[#002C42]">Expedited Shipping</h4>
+                  <p className="text-xs text-gray-600">Priority dispatch</p>
                 </div>
+                <Switch
+                  checked={guaranteedDate}
+                  onCheckedChange={setGuaranteedDate}
+                />
               </div>
-            </div>
-            
-            <div className="mt-5 flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-              <div>
-                <h4 className="font-medium text-[#1e3a8a]">Expedited Shipping</h4>
-                <p className="text-xs text-gray-600">Priority dispatch with faster transit time</p>
-              </div>
-              <Switch
-                checked={guaranteedDate}
-                onCheckedChange={setGuaranteedDate}
-              />
             </div>
           </div>
         </div>
         
-        <div className="text-center space-y-4">
+        <div className="mb-4">
           <Button
             onClick={handleReserve}
-            className="px-10 py-3 text-base font-semibold bg-[#1e3a8a] hover:bg-[#0f2a63] rounded-full text-white transition"
+            className="w-full bg-[#002C42] text-white py-3 font-medium"
             disabled={!selectedTransport}
           >
-            Reserve Now — No credit card required
+            Reserve Now
           </Button>
           
-          <p className="text-center text-xs text-gray-800 max-w-2xl mx-auto">
-            Note: By reserving, you'll secure your spot in our dispatch system. Our transport specialist will contact you to confirm all details before pickup.
+          <p className="text-center text-xs text-gray-600 mt-2">
+            No payment required until vehicle pickup
           </p>
         </div>
       </div>
-    </div>
+    </MobileContainer>
   );
 }
