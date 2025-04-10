@@ -12,7 +12,10 @@ const SimpleQuoteForm = () => {
     year: "",
     make: "",
     model: "",
-    shipmentDate: ""
+    shipmentDate: "",
+    name: "",
+    phone: "",
+    email: ""
   });
   
   const [availableModels, setAvailableModels] = useState([]);
@@ -167,6 +170,36 @@ const SimpleQuoteForm = () => {
                 onChange={handleChange}
                 required 
                 min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <div className="form-field">
+              <input 
+                type="text"
+                name="name"
+                value={formData.name || ''}
+                onChange={handleChange}
+                placeholder="Your Name"
+                required
+              />
+            </div>
+            <div className="form-field">
+              <input 
+                type="tel"
+                name="phone"
+                value={formData.phone || ''}
+                onChange={handleChange}
+                placeholder="Phone Number"
+                required
+              />
+            </div>
+            <div className="form-field">
+              <input 
+                type="email"
+                name="email"
+                value={formData.email || ''}
+                onChange={handleChange}
+                placeholder="Email Address"
+                required
               />
             </div>
           </div>
