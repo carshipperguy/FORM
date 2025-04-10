@@ -75,21 +75,39 @@ export function calculatePricing(
     };
   }
 
-  // Check if it's a special vehicle type that uses flat rate pricing
-  const specialVehicleTypes = ['boat', 'rv/5th wheel', 'travel trailer', 'heavy equipment'];
+  // FIXED: Check if it's one of the special vehicle types that uses flat rate pricing.
+  // The direct comparison was failing because we were trying to do exact matches
+  // but the vehicle types might not match exactly what we expect.
+  
+  // We don't need this anymore but keep for reference
+  // const specialVehicleTypes = ['boat', 'rv/5th wheel', 'travel trailer', 'heavy equipment'];
+  
   const FLAT_RATE_PER_MILE = 3.50; // $3.50 per mile for special vehicle types
   
-  // Add debug logging
+  // Check if the vehicle type contains any of these keywords
+  const isBoat = vehicleType.includes('boat');
+  const isRV = vehicleType.includes('rv') || vehicleType.includes('5th wheel');
+  const isTrailer = vehicleType.includes('trailer');
+  const isHeavyEquipment = vehicleType.includes('heavy') || vehicleType.includes('equipment');
+  
+  // Determine if this is a special vehicle type
+  const isSpecialVehicleType = isBoat || isRV || isTrailer || isHeavyEquipment;
+  
+  // Debug logging with improved validation
   console.log('DEBUG: Vehicle type check:', {
     vehicleType,
-    isExactMatch: specialVehicleTypes.includes(vehicleType),
-    specialVehicleTypes
+    isBoat,
+    isRV,
+    isTrailer,
+    isHeavyEquipment,
+    isSpecialVehicleType,
+    usesFlatRatePricing: isSpecialVehicleType
   });
   
   let openTransportPrice: number;
   let enclosedTransportPrice: number;
   
-  if (specialVehicleTypes.includes(vehicleType)) {
+  if (isSpecialVehicleType) {
     // Special vehicle types use flat rate pricing
     console.log(`Applying flat rate pricing for ${vehicleType}: $${FLAT_RATE_PER_MILE} per mile`);
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
@@ -120,7 +138,7 @@ export function calculatePricing(
   }
   
   // Log different information based on the pricing method used
-  if (specialVehicleTypes.includes(vehicleType)) {
+  if (isSpecialVehicleType) {
     console.log('Flat rate price calculations:', {
       vehicleType,
       flatRatePerMile: FLAT_RATE_PER_MILE,
