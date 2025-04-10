@@ -18,6 +18,7 @@ const SimpleQuoteForm = () => {
     email: ""
   });
   
+  const [showContactFields, setShowContactFields] = useState(false);
   const [availableModels, setAvailableModels] = useState([]);
   const [isStandardVehicle, setIsStandardVehicle] = useState(false);
 
@@ -30,6 +31,15 @@ const SimpleQuoteForm = () => {
     console.log("Vehicle type changed:", formData.vehicleType);
     console.log("Is standard vehicle:", standardType);
   }, [formData.vehicleType]);
+
+  // Show contact fields when shipment date is selected
+  useEffect(() => {
+    if (formData.shipmentDate) {
+      setShowContactFields(true);
+    } else {
+      setShowContactFields(false);
+    }
+  }, [formData.shipmentDate]);
 
   // Get available models for standard vehicles
   useEffect(() => {
@@ -228,24 +238,15 @@ const SimpleQuoteForm = () => {
           </div>
           <div className="form-fields">
             <div className="form-field">
-              <select 
+              <input 
+                type="date" 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
                 onChange={handleChange}
-                required
-              >
-                <option value="">Select Ship Date</option>
-                {Array.from({ length: 30 }, (_, i) => {
-                  const date = new Date();
-                  date.setDate(date.getDate() + i);
-                  const dateString = date.toISOString().split('T')[0];
-                  return (
-                    <option key={dateString} value={dateString}>
-                      {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                    </option>
-                  );
-                })}
-              </select>
+                required 
+                min={new Date().toISOString().split('T')[0]}
+                placeholder="MM-DD-YY"
+              />
             </div>
             {formData.shipmentDate && (
               <>
@@ -411,27 +412,6 @@ const SimpleQuoteForm = () => {
         /* Match the exact placeholders from the screenshot */
         .form-field input::placeholder {
           color: #a0aec0;
-        }
-        
-        /* Date field specific styling */
-        .form-field.date-field {
-          position: relative;
-          cursor: pointer;
-        }
-        
-        .form-field.date-field:after {
-          content: "";
-          display: block;
-          width: 16px;
-          height: 16px;
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'%3E%3C/path%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: center;
-          pointer-events: none;
         }
       `}</style>
     </div>
