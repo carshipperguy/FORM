@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getFallbackDistance } from "./distance-fallback";
 
 const addressSchema = z.object({
   street: z.string(),
@@ -182,12 +183,41 @@ export async function calculateDistance(origin: string, destination: string): Pr
       return result;
     }
 
+    // Try to get a fallback distance if API methods fail
+    console.log('API methods failed, trying fallback distance calculation');
+    const fallbackDistance = getFallbackDistance(origin, destination);
+    
+    if (fallbackDistance) {
+      console.log('Found fallback distance:', fallbackDistance);
+      const result: SuccessDistanceResult = {
+        success: true,
+        distance: fallbackDistance,
+        time: "Estimated" // We don't have travel time in fallback data
+      };
+      return result;
+    }
+    
     return {
       success: false,
       error: 'Could not calculate distance between these locations'
     };
   } catch (error) {
     console.error('Distance calculation error:', error);
+    
+    // Try fallback as a last resort
+    console.log('Error occurred, trying fallback distance as last resort');
+    const fallbackDistance = getFallbackDistance(origin, destination);
+    
+    if (fallbackDistance) {
+      console.log('Found fallback distance after error:', fallbackDistance);
+      const result: SuccessDistanceResult = {
+        success: true,
+        distance: fallbackDistance,
+        time: "Estimated" // We don't have travel time in fallback data
+      };
+      return result;
+    }
+    
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to calculate distance'
