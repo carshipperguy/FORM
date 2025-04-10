@@ -24,10 +24,32 @@ async function getDistance(origin: string, destination: string): Promise<{distan
     }
   });
 
+  // Simplify location format to ensure MapQuest API compatibility
+  // Extract just the city and state for better compatibility
+  let originFormatted = origin;
+  let destinationFormatted = destination;
+  
+  // Regex to extract "City, ST" from the string
+  const cityStateRegex = /([^,]+,\s*[A-Z]{2})/i;
+  
+  // Apply the regex to origin and destination
+  const originMatch = origin.match(cityStateRegex);
+  const destMatch = destination.match(cityStateRegex);
+  
+  if (originMatch && originMatch[1]) {
+    originFormatted = originMatch[1].trim();
+    console.log("Simplified origin to:", originFormatted);
+  }
+  
+  if (destMatch && destMatch[1]) {
+    destinationFormatted = destMatch[1].trim();
+    console.log("Simplified destination to:", destinationFormatted);
+  }
+
   // Use MapQuest API to get distance
   const url = `https://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
-    origin
-  )}&to=${encodeURIComponent(destination)}&unit=M`;
+    originFormatted
+  )}&to=${encodeURIComponent(destinationFormatted)}&unit=M`;
 
   try {
     console.log("Server: Making MapQuest request:", url);
