@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { type LocationOption, searchLocations } from "@/lib/location-data";
+import { type LocationOption, searchCitiesByQuery } from "@/lib/location-data";
 
 interface LocationSelectorProps {
   value: string;
@@ -37,7 +37,7 @@ export function LocationSelector({
 
   const debouncedSearch = React.useCallback(
     (query: string) => {
-      const results = searchLocations(query);
+      const results = searchCitiesByQuery(query);
       setLocations(results);
     },
     []
@@ -108,7 +108,7 @@ export function LocationSelector({
                   <div className="flex flex-col">
                     <span>{location.city}, {location.state}</span>
                     <span className="text-xs text-muted-foreground">
-                      ZIP: {location.zip}
+                      ZIP: {location.zips && location.zips.length > 0 ? location.zips[0] : "N/A"}
                     </span>
                   </div>
                 </CommandItem>
