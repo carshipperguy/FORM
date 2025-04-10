@@ -13,13 +13,10 @@ export type Address = z.infer<typeof addressSchema>;
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
   // Using http instead of https as it may be more reliable with the API
   const baseUrl = 'http://www.mapquestapi.com';
-  // Match the environment variable format seen in the logs
-  const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY;
+  // Use the hardcoded key directly
+  const apiKey = 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
   
-  console.log('MapQuest API key check:', { 
-    hasViteKey: !!import.meta.env.VITE_MAPQUEST_API_KEY,
-    keyLength: apiKey ? apiKey.length : 0
-  });
+  console.log('MapQuest API key:', 'Using hardcoded key');
 
   if (!apiKey) {
     console.error('MapQuest API key is missing');
