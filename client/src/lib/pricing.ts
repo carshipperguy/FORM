@@ -84,11 +84,19 @@ export function calculatePricing(
   
   const FLAT_RATE_PER_MILE = 3.50; // $3.50 per mile for special vehicle types
   
+  // Convert vehicle type to lowercase for consistent comparison
+  const vehicleTypeLower = vehicleType.toLowerCase();
+  
   // Check if the vehicle type contains any of these keywords
-  const isBoat = vehicleType.includes('boat');
-  const isRV = vehicleType.includes('rv') || vehicleType.includes('5th wheel');
-  const isTrailer = vehicleType.includes('trailer');
-  const isHeavyEquipment = vehicleType.includes('heavy') || vehicleType.includes('equipment');
+  const isBoat = vehicleTypeLower.includes('boat');
+  const isRV = vehicleTypeLower.includes('rv') || vehicleTypeLower.includes('5th wheel');
+  const isTrailer = vehicleTypeLower.includes('trailer');
+  const isHeavyEquipment = vehicleTypeLower.includes('heavy') || vehicleTypeLower.includes('equipment');
+  
+  console.log('Vehicle type detection:', {
+    original: vehicleType,
+    lowercase: vehicleTypeLower
+  });
   
   // Determine if this is a special vehicle type
   const isSpecialVehicleType = isBoat || isRV || isTrailer || isHeavyEquipment;
@@ -110,7 +118,18 @@ export function calculatePricing(
   if (isSpecialVehicleType) {
     // Special vehicle types use flat rate pricing
     console.log(`Applying flat rate pricing for ${vehicleType}: $${FLAT_RATE_PER_MILE} per mile`);
+    
+    // Calculate with flat rate pricing
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
+    
+    // Show detailed calculation
+    console.log('FLAT RATE CALCULATION:', {
+      distance,
+      flatRatePerMile: FLAT_RATE_PER_MILE,
+      calculation: `${distance} miles × $${FLAT_RATE_PER_MILE} = $${openTransportPrice}`,
+      openTransportPrice
+    });
+    
     enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
   } else {
     // Standard vehicle types use the progressive pricing model
@@ -136,6 +155,13 @@ export function calculatePricing(
     openTransportPrice = basePrice * vehicleMultiplier;
     enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
   }
+  
+  // This should show the problem or verify the fix is working
+  console.log('PRICE CHECK - Is using flat rate?', { 
+    isSpecialVehicleType,
+    openTransportPrice,
+    flatRateCalculation: isSpecialVehicleType ? distance * FLAT_RATE_PER_MILE : 'N/A'
+  });
   
   // Log different information based on the pricing method used
   if (isSpecialVehicleType) {
