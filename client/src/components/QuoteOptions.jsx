@@ -158,7 +158,7 @@ export default function QuoteOptions({ data }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mx-auto max-w-lg md:max-w-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mx-auto max-w-full md:max-w-4xl lg:max-w-5xl">
           {[{
             label: 'Standard Transport',
             isEnclosed: isEnclosedStandard,
@@ -177,19 +177,19 @@ export default function QuoteOptions({ data }) {
               className="rounded-xl p-4 bg-white/80 backdrop-blur-md text-center shadow-lg flex flex-col justify-between text-black border border-gray-100 w-full"
             >
               <div>
-                <h3 className="text-lg font-bold mb-2 text-[#1e3a8a]">{label}</h3>
+                <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 text-[#1e3a8a]">{label}</h3>
                 <div className="mb-3">
                   <button
-                    className={`px-3 py-1 text-xs font-medium rounded-full mr-2 ${!isEnclosed ? 'bg-[#1e3a8a] text-white' : 'bg-gray-200 text-gray-700'}`}
+                    className={`px-3 py-1 text-xs md:text-sm lg:text-base font-medium rounded-full mr-2 ${!isEnclosed ? 'bg-[#1e3a8a] text-white' : 'bg-gray-200 text-gray-700'}`}
                     onClick={() => toggle(false)}
                   >Open</button>
                   <button
-                    className={`px-3 py-1 text-xs font-medium rounded-full ${isEnclosed ? 'bg-[#dc2626] text-white' : 'bg-gray-200 text-gray-700'}`}
+                    className={`px-3 py-1 text-xs md:text-sm lg:text-base font-medium rounded-full ${isEnclosed ? 'bg-[#dc2626] text-white' : 'bg-gray-200 text-gray-700'}`}
                     onClick={() => toggle(true)}
                   >Enclosed</button>
                 </div>
-                <p className="text-2xl font-bold text-[#dc2626] mb-3">{formatUSD(price)}</p>
-                <ul className="text-left text-xs space-y-0.5 mb-4 text-gray-700">
+                <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#dc2626] mb-3">{formatUSD(price)}</p>
+                <ul className="text-left text-xs md:text-sm lg:text-base space-y-0.5 mb-4 text-gray-700">
                   {type === 'standard' ? (
                     <>
                       <li className="flex items-center py-0.5">
@@ -225,7 +225,7 @@ export default function QuoteOptions({ data }) {
               </div>
               <button
                 onClick={() => handleReserve(type)}
-                className="w-full bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 px-4 rounded-lg text-xs transition min-h-[40px]"
+                className="w-full bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 md:py-3 lg:py-4 px-4 rounded-lg text-xs md:text-sm lg:text-base transition min-h-[40px] md:min-h-[48px] lg:min-h-[56px]"
               >
                 Reserve Now — No payment required
               </button>
