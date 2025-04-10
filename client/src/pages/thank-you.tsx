@@ -12,19 +12,8 @@ export default function ThankYou() {
   const [isSending, setIsSending] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
   const [sentSMS, setSentSMS] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ? JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : {};
-  
-  // Use an effect to simulate a smooth loading transition
-  useEffect(() => {
-    // Set a timeout to give the impression of loading and allow browser to render
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 800); // 800ms loading time for better user experience
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     async function sendConfirmations() {
@@ -98,15 +87,6 @@ export default function ThankYou() {
 
   return (
     <MobileContainer>
-      {/* Loading overlay */}
-      {isPageLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50">
-          <div className="text-center">
-            <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-[#002C42]" />
-            <p className="text-[#002C42] font-medium">Confirming your booking...</p>
-          </div>
-        </div>
-      )}
       
       <div className="p-4 bg-white">
         <div className="text-center mb-4">

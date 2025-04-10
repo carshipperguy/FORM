@@ -510,55 +510,70 @@ export default function Booking() {
                             <DialogTrigger className="text-blue-600 underline hover:text-blue-800 px-1">
                               terms and conditions
                             </DialogTrigger>
-                            <DialogContent className="max-w-[90vw] w-[280px]">
-                              <DialogHeader>
-                                <DialogTitle>
+                            <DialogContent className="max-w-[90vw] md:max-w-[500px] w-[290px] md:w-[500px]">
+                              <DialogHeader className="border-b border-gray-200 pb-2">
+                                <DialogTitle className="text-[#002C42] text-lg font-semibold">
                                   Terms and Conditions
                                 </DialogTitle>
                               </DialogHeader>
-                              <div className="max-h-[300px] overflow-y-auto text-xs">
-                                <h3 className="font-bold mb-2">Amerigo Auto Transport – Terms of Service</h3>
+                              <div className="max-h-[350px] overflow-y-auto text-sm py-2 pr-2">
+                                <div className="bg-[#f8fafc] p-3 rounded-md mb-4 border-l-4 border-[#002C42]">
+                                  <h3 className="font-bold text-[#002C42] mb-2">Amerigo Auto Transport – Terms of Service</h3>
+                                  <p className="text-gray-600 text-xs">Last updated: April 10, 2025</p>
+                                </div>
                                 
-                                <p className="font-semibold mt-2">1. Agreement to Terms</p>
-                                <p>By using our auto transport services, you agree to these Terms and Conditions in their entirety.</p>
+                                <div className="space-y-4">
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">1. Agreement to Terms</h4>
+                                    <p className="pl-1 text-gray-700">By using our auto transport services, you agree to these Terms and Conditions in their entirety.</p>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">2. Service Description</h4>
+                                    <p className="pl-1 text-gray-700">Amerigo Auto Transport arranges for the transportation of vehicles between specified locations through contracted carriers. We operate as a licensed broker, connecting customers with qualified, vetted auto transport carriers.</p>
+                                  </div>
                                 
-                                <p className="font-semibold mt-2">2. Service Description</p>
-                                <p>Amerigo Auto Transport arranges for the transportation of vehicles between specified locations through contracted carriers. We operate as a licensed broker, connecting customers with qualified, vetted auto transport carriers.</p>
-                                
-                                <p className="font-semibold mt-2">3. Pricing and Payment</p>
-                                <p>a) The price quoted is based on the information provided at the time of booking, including but not limited to: vehicle type, condition, operability, transport type (open/enclosed), accurate pickup and dropoff locations, timing needs, and any special requirements.</p>
-                                <p>b) Payment methods accepted include credit card, debit card, or electronic payment.</p>
-                                <p>c) A deposit may be required at the time of booking, with the remaining balance due before or at the time of delivery.</p>
-                                
-                                <p className="font-semibold mt-2">4. Cancellation Policy</p>
-                                <p>a) There is no cancellation fee unless a carrier has already been assigned and dispatched.</p>
-                                <p>b) Once a carrier is assigned and the order is dispatched, an obligation has been made to that specific carrier. Cancelling at that point may result in the forfeiture of the deposit.</p>
-                                <p>c) This policy exists to protect both the customer and the carrier from losses due to last-minute cancellations after a driver has committed to the order.</p>
-                                <p>d) Amerigo Auto Transport reserves the right to cancel service due to unforeseen circumstances or carrier availability issues.</p>
-                                
-                                <p className="font-semibold mt-2">5. Vehicle Condition</p>
-                                <p>a) Customers must provide accurate and complete information regarding the vehicle's condition, modifications, and operability.</p>
-                                <p>b) Vehicles must be in the same condition at pickup as described at the time of booking.</p>
-                                <p>c) Personal belongings should be removed unless explicitly approved. Any items left in the vehicle may not be insured or protected from loss or damage.</p>
-                                
-                                <p className="font-semibold mt-2">6. Pickup and Delivery</p>
-                                <p>a) Estimated pickup and delivery dates are provided for planning purposes only and are not guaranteed.</p>
-                                <p>b) Delays may occur due to weather, road closures, traffic, mechanical issues, or other unforeseen events.</p>
-                                <p>c) The carrier will attempt to provide at least 24 hours' notice prior to both pickup and delivery.</p>
-                                <p>d) The customer or an authorized party must be present for both pickup and delivery to sign inspection reports and release forms.</p>
-                                
-                                <p className="font-semibold mt-2">7. Insurance and Liability</p>
-                                <p>a) All carriers contracted through Amerigo Auto Transport maintain active insurance coverage as required by federal law.</p>
-                                <p>b) A pre-transport inspection report will be completed to document the vehicle's condition.</p>
-                                <p>c) Any damage claims must be noted on the final delivery inspection report at the time of dropoff.</p>
-                                <p>d) Claims not recorded at the time of delivery may be denied.</p>
-                                
-                                <p className="font-semibold mt-2">8. Governing Law</p>
-                                <p>These Terms and Conditions shall be governed by and interpreted in accordance with the laws of the state of Florida, with jurisdiction in Broward County.</p>
-                                
-                                <p className="font-semibold mt-2">9. Amendments</p>
-                                <p>Amerigo Auto Transport reserves the right to modify these Terms of Service at any time. The most current version will be made available upon request or on our website.</p>
-                              </div>
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">3. Pricing and Payment</h4>
+                                    <ul className="pl-4 list-disc space-y-1 text-gray-700">
+                                      <li>The price quoted is based on the information provided at the time of booking, including vehicle type, condition, operability, transport type, pickup and dropoff locations.</li>
+                                      <li>Payment methods accepted include credit card, debit card, or electronic payment.</li>
+                                      <li>A deposit may be required at the time of booking, with the remaining balance due before or at the time of delivery.</li>
+                                    </ul>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">4. Cancellation Policy</h4>
+                                    <ul className="pl-4 list-disc space-y-1 text-gray-700">
+                                      <li>There is no cancellation fee unless a carrier has already been assigned and dispatched.</li>
+                                      <li>Once a carrier is assigned and the order is dispatched, an obligation has been made to that specific carrier.</li>
+                                      <li>Amerigo Auto Transport reserves the right to cancel service due to unforeseen circumstances.</li>
+                                    </ul>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">5. Vehicle Condition</h4>
+                                    <ul className="pl-4 list-disc space-y-1 text-gray-700">
+                                      <li>Customers must provide accurate information regarding the vehicle's condition and operability.</li>
+                                      <li>Vehicles must be in the same condition at pickup as described at the time of booking.</li>
+                                      <li>Personal belongings should be removed unless explicitly approved.</li>
+                                    </ul>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-semibold text-[#002C42] mb-1">6. Insurance and Liability</h4>
+                                    <ul className="pl-4 list-disc space-y-1 text-gray-700">
+                                      <li>All carriers maintain active insurance coverage as required by federal law.</li>
+                                      <li>A pre-transport inspection report will document the vehicle's condition.</li>
+                                      <li>Any damage claims must be noted on the delivery inspection report.</li>
+                                    </ul>
+                                  </div>
+                                </div>
+                                <div className="mt-4 pt-3 border-t border-gray-200 flex justify-end">
+                                  <Button variant="outline" className="text-sm bg-[#002C42] text-white hover:bg-[#001c32]" onClick={() => document.querySelector("[data-state='open'] button[aria-label='Close']")?.click()}>
+                                    I Understand
+                                  </Button>
+                                </div>
                             </DialogContent>
                           </Dialog>
                         </div>
