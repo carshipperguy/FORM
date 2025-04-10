@@ -270,7 +270,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">City</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -283,7 +283,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">State</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -296,7 +296,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">ZIP</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -378,7 +378,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">City</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -391,7 +391,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">State</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -404,7 +404,7 @@ export default function Booking() {
                       <FormItem>
                         <FormLabel className="text-sm">ZIP</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-8 text-sm" />
+                          <Input {...field} className="h-8 text-sm bg-gray-50" readOnly />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
