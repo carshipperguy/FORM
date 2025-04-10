@@ -80,8 +80,12 @@ export async function sendConfirmationEmail(email: string, bookingDetails: any) 
             <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${bookingDetails.year} ${bookingDetails.make} ${bookingDetails.model}</td>
           </tr>
           <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: bold;">Route:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${bookingDetails.pickupLocation} to ${bookingDetails.dropoffLocation}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: bold;">Pickup:</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${bookingDetails.pickupLocation}${bookingDetails.pickupZip ? ` (ZIP: ${bookingDetails.pickupZip})` : ''}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: bold;">Dropoff:</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${bookingDetails.dropoffLocation}${bookingDetails.dropoffZip ? ` (ZIP: ${bookingDetails.dropoffZip})` : ''}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: bold;">Ship Date:</td>
@@ -149,7 +153,8 @@ export async function sendConfirmationSMS(phone: string, bookingDetails: any) {
       AMERIGO AUTO TRANSPORT: Your quote is ready!
       
       Vehicle: ${bookingDetails.year} ${bookingDetails.make} ${bookingDetails.model}
-      Route: ${bookingDetails.pickupLocation} to ${bookingDetails.dropoffLocation}
+      From: ${bookingDetails.pickupLocation}${bookingDetails.pickupZip ? ` (${bookingDetails.pickupZip})` : ''}
+      To: ${bookingDetails.dropoffLocation}${bookingDetails.dropoffZip ? ` (${bookingDetails.dropoffZip})` : ''}
       Price: ${formattedPrice}
       
       $0 due now. To complete your booking, visit: https://amerigotransport.com/book

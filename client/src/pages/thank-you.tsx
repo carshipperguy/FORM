@@ -57,7 +57,7 @@ export default function ThankYou() {
   }).format(data.finalPrice || 0);
 
   // Generate a shareable message for quick share feature
-  const shareText = `I'm shipping my ${data.year} ${data.make} ${data.model} from ${data.pickupLocation} to ${data.dropoffLocation} for ${formattedPrice}. Check out Amerigo Auto Transport!`;
+  const shareText = `I'm shipping my ${data.year} ${data.make} ${data.model} from ${data.pickupLocation}${data.pickupZip ? ` (${data.pickupZip})` : ''} to ${data.dropoffLocation}${data.dropoffZip ? ` (${data.dropoffZip})` : ''} for ${formattedPrice}. Check out Amerigo Auto Transport!`;
 
   // Handle sharing functionality
   const handleShare = async () => {
@@ -114,9 +114,11 @@ export default function ThankYou() {
                 </div>
                 <div>
                   <span className="font-medium">From:</span> {data.pickupLocation}
+                  {data.pickupZip && <span className="ml-1 text-gray-600">(ZIP: {data.pickupZip})</span>}
                 </div>
                 <div>
                   <span className="font-medium">To:</span> {data.dropoffLocation}
+                  {data.dropoffZip && <span className="ml-1 text-gray-600">(ZIP: {data.dropoffZip})</span>}
                 </div>
                 <div>
                   <span className="font-medium">Price:</span> <span className="text-base font-bold text-green-600">{formattedPrice}</span>
