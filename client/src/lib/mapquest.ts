@@ -117,9 +117,28 @@ export async function calculateDistance(origin: string, destination: string): Pr
     const destHasZip = /\d{5}/.test(destination);
     console.log('Location ZIP check:', { originHasZip, destHasZip });
     
-    // First try the server endpoint
+    // Clean the location formats for better compatibility
+    let cleanOrigin = origin.trim();
+    let cleanDestination = destination.trim();
+    
+    // Extract basic City, State format using regex
+    const cityStateRegex = /([^,]+,\s*[A-Z]{2})/i;
+    const originMatch = cleanOrigin.match(cityStateRegex);
+    const destMatch = cleanDestination.match(cityStateRegex);
+    
+    if (originMatch && originMatch[1]) {
+      cleanOrigin = originMatch[1].trim();
+      console.log('Simplified origin to:', cleanOrigin);
+    }
+    
+    if (destMatch && destMatch[1]) {
+      cleanDestination = destMatch[1].trim();
+      console.log('Simplified destination to:', cleanDestination);
+    }
+    
+    // First try the server endpoint with cleaned locations
     try {
-      const serverUrl = `/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+      const serverUrl = `/api/distance?origin=${encodeURIComponent(cleanOrigin)}&destination=${encodeURIComponent(cleanDestination)}`;
       console.log('Making server request to:', serverUrl);
       
       const response = await fetch(serverUrl);
@@ -150,11 +169,14 @@ export async function calculateDistance(origin: string, destination: string): Pr
       console.warn('Server distance calculation failed, trying client-side:', serverError);
     }
     
-    // If server fails, try client-side as fallback
-    console.log('Making MapQuest API distance request (client-side) for:', { origin, destination });
+    // If server fails, try client-side as fallback with the simplified locations
+    console.log('Making MapQuest API distance request (client-side) for:', { 
+      cleanOrigin, 
+      cleanDestination 
+    });
     const data = await makeMapQuestRequest('/directions/v2/route', {
-      from: origin,
-      to: destination,
+      from: cleanOrigin,
+      to: cleanDestination,
       unit: 'M'
     });
 

@@ -30,23 +30,46 @@ export default function Home() {
       console.log("Home handleCalculate - Form Data:", JSON.stringify(data, null, 2));
       console.log("Home handleCalculate - Using ZIP codes:", { pickupZip, dropoffZip });
       
-      // Format locations with ZIP codes for better MapQuest results
-      const pickupWithZip = pickupZip ? `${data.pickupLocation} ${pickupZip}` : data.pickupLocation;
-      const dropoffWithZip = dropoffZip ? `${data.dropoffLocation} ${dropoffZip}` : data.dropoffLocation;
+      // Format locations in a simpler format that's guaranteed to work with MapQuest API
+      // MapQuest prefers "City, State ZIP" format or "City, State" without commas in the city name
+      let pickupLocation = data.pickupLocation.trim();
+      let dropoffLocation = data.dropoffLocation.trim();
       
-      console.log("Enhanced locations with ZIP codes:", {
-        original: { pickup: data.pickupLocation, dropoff: data.dropoffLocation },
-        enhanced: { pickup: pickupWithZip, dropoff: dropoffWithZip }
+      // Make sure pickup location has a state code (2-letter)
+      if (!/,\s*[A-Z]{2}/i.test(pickupLocation)) {
+        console.log("Pickup location missing state code, cannot proceed with MapQuest API");
+        toast({
+          title: "Invalid Pickup Location",
+          description: "Please select a location with city and state (e.g., 'Los Angeles, CA')",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Make sure dropoff location has a state code (2-letter)
+      if (!/,\s*[A-Z]{2}/i.test(dropoffLocation)) {
+        console.log("Dropoff location missing state code, cannot proceed with MapQuest API");
+        toast({
+          title: "Invalid Dropoff Location",
+          description: "Please select a location with city and state (e.g., 'Los Angeles, CA')",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("Using simplified location format for MapQuest API:", {
+        pickup: pickupLocation,
+        dropoff: dropoffLocation
       });
       
       // Calculate real distance using MapQuest API
-      console.log("Calling MapQuest API with enhanced locations:", { 
-        pickup: pickupWithZip, 
-        dropoff: dropoffWithZip 
+      console.log("Calling MapQuest API with locations:", { 
+        pickup: pickupLocation, 
+        dropoff: dropoffLocation 
       });
       
-      // Use the enhanced location strings that include ZIP codes
-      const distanceResult = await calculateDistance(pickupWithZip, dropoffWithZip);
+      // Use the simplified location format
+      const distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
       console.log("MapQuest API result:", distanceResult);
 
       if (!distanceResult.success) {
@@ -54,8 +77,8 @@ export default function Home() {
         console.error("Distance calculation failed:", errorMessage);
         
         toast({
-          title: "Error Calculating Distance",
-          description: errorMessage + ". Please try again.",
+          title: "Location Error",
+          description: "Please verify both pickup and delivery locations are valid cities with state codes (e.g., 'Los Angeles, CA'). Try entering just the city and state without ZIP codes.",
           variant: "destructive",
         });
         return;

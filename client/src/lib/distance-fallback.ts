@@ -79,12 +79,6 @@ const DISTANCE_CHART: DistanceData = {
  * @returns Distance in miles or null if not found
  */
 export function getFallbackDistance(origin: string, destination: string): number | null {
-  // TEMPORARY FIX: Always return a reasonable distance for testing
-  // This ensures the pricing works even when the API fails
-  console.log("⚠️ Using override fallback distance for testing!");
-  return 850; // A medium-range distance that will give reasonable pricing
-  
-  /*
   // Extract city names from location strings
   const originCity = extractCityName(origin);
   const destCity = extractCityName(destination);
@@ -105,10 +99,8 @@ export function getFallbackDistance(origin: string, destination: string): number
   }
   
   // If we can't find a direct match, try to estimate from closest major cities
-  // This would be more complex and is not implemented here
-  
+  // For now, return null and let the API method be the source of truth
   return null;
-  */
 }
 
 /**
