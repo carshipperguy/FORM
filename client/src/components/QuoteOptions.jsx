@@ -31,12 +31,20 @@ const QuoteOptions = ({ data }) => {
     const transportType = transport === "standard" ? (isEnclosed ? "enclosed" : "open") : (isEnclosed ? "enclosed-express" : "open-express");
     const price = transport === "standard" ? standardPrice : expressPrice;
     
-    const searchParams = new URLSearchParams();
-    searchParams.append("transportType", transportType);
-    searchParams.append("price", price);
-    searchParams.append("data", encodeURIComponent(JSON.stringify(formData)));
+    // Create the data object with all necessary information for booking
+    const finalData = {
+      ...formData,
+      selectedTransport: transportType === "enclosed" || transportType === "enclosed-express" ? "enclosed" : "open",
+      guaranteedDate: transport === "express",
+      finalPrice: price
+    };
     
-    navigate(`/checkout?${searchParams.toString()}`);
+    // Skip checkout and go directly to booking page
+    const searchParams = new URLSearchParams({
+      data: encodeURIComponent(JSON.stringify(finalData))
+    });
+    
+    navigate(`/booking?${searchParams.toString()}`);
   };
 
   // Import at the top of the file
@@ -105,7 +113,9 @@ const QuoteOptions = ({ data }) => {
                     onClick={() => setIsEnclosedStandard(true)}
                   >Enclosed</button>
                 </div>
-                <p className="text-xl font-bold text-center mb-2">{formatUSD(standardPrice)}</p>
+                <div className="h-10 flex items-center justify-center">
+                  <p className="text-xl font-bold text-center">{formatUSD(standardPrice)}</p>
+                </div>
                 <ul className="text-xs mb-3 text-gray-600 space-y-1">
                   <li>✓ Pickup within 7-day window</li>
                   <li>✓ Fully insured</li>
@@ -137,7 +147,9 @@ const QuoteOptions = ({ data }) => {
                     onClick={() => setIsEnclosedExpress(true)}
                   >Enclosed</button>
                 </div>
-                <p className="text-xl font-bold text-center mb-2">{formatUSD(expressPrice)}</p>
+                <div className="h-10 flex items-center justify-center">
+                  <p className="text-xl font-bold text-center">{formatUSD(expressPrice)}</p>
+                </div>
                 <ul className="text-xs mb-3 text-gray-600 space-y-1">
                   <li>✓ Guaranteed pickup window</li>
                   <li>✓ Priority dispatch</li>
