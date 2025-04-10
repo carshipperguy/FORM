@@ -6,7 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ThankYou from "@/pages/thank-you";
 import Checkout from "@/pages/checkout";
-import Booking from "@/pages/booking";
+import Booking from "@/pages/booking-new";
 import FinalQuote from "@/pages/final-quote";
 import SimpleQuote from "@/pages/simple-quote";
 
