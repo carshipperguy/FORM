@@ -51,7 +51,14 @@ export default function ThankYou() {
       <div className="p-4 bg-white">
         <div className="text-center mb-4">
           <h1 className="text-xl font-bold text-[#002C42]">Thank You!</h1>
-          <p className="text-xs text-gray-700 mt-1">Military Owned • Family Operated</p>
+          <div className="flex items-center justify-center mt-1">
+            <img 
+              src="/generated-icon.png" 
+              alt="Amerigo Auto Transport Logo" 
+              className="h-6 mr-2"
+            />
+            <p className="text-xs text-gray-700">Military Owned • Family Operated</p>
+          </div>
         </div>
         
         <div className="bg-white text-black border border-gray-200 mb-4">
