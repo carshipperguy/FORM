@@ -275,7 +275,7 @@ const SimpleQuoteForm = () => {
           </div>
         </div>
 
-        <button type="submit" className="submit-btn">Submit</button>
+        <button type="submit" className="submit-btn">Get Quote</button>
       </form>
 
       <style>{`
@@ -283,33 +283,48 @@ const SimpleQuoteForm = () => {
           width: 100%;
           max-width: 100%;
           margin: 0 auto;
-          font-family: Arial, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          background-color: #F9FAFB;
+          padding: 0;
         }
 
         .form-section {
-          margin-bottom: 10px;
+          margin-bottom: 2px;
+          border: 1px solid #E5E7EB;
+          border-bottom: none;
+        }
+        
+        .form-section:last-of-type {
+          margin-bottom: 0;
+          border-bottom: 1px solid #E5E7EB;
         }
 
         .form-header {
           background-color: #002C42;
           color: white;
-          padding: 8px 15px;
+          padding: 10px 10px;
           font-weight: 500;
         }
 
         .form-header h2 {
           margin: 0;
-          font-size: 16px;
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         .form-fields {
-          padding: 10px;
+          padding: 8px;
           background-color: white;
         }
 
         .form-field {
-          margin-bottom: 10px;
+          margin-bottom: 8px;
           transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .form-field:last-child {
+          margin-bottom: 0;
         }
         
         .form-field.hidden {
@@ -323,36 +338,52 @@ const SimpleQuoteForm = () => {
         .form-field input,
         .form-field select {
           width: 100%;
-          padding: 12px;
+          padding: 10px;
           border: 1px solid #E5E7EB;
           border-radius: 0;
           font-size: 14px;
           color: #718096;
           box-shadow: none;
+          height: 40px;
+          box-sizing: border-box;
+          -webkit-appearance: none;
+        }
+        
+        .form-field select {
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+          background-position: right 10px center;
+          background-repeat: no-repeat;
+          background-size: 20px 20px;
+          padding-right: 30px;
         }
         
         .location-field [role="combobox"] {
           width: 100%;
-          height: 44px;
-          border: 1px solid #e2e8f0;
-          border-radius: 3px;
+          height: 40px;
+          border: 1px solid #E5E7EB;
+          border-radius: 0;
           font-size: 14px;
           display: flex;
           align-items: center;
           background-color: white;
           color: #718096;
+          padding: 10px;
+          box-sizing: border-box;
         }
 
         .submit-btn {
           width: 100%;
-          padding: 15px;
+          padding: 0;
           background-color: #002C42;
           color: white;
           border: none;
-          font-weight: bold;
+          font-weight: 500;
           cursor: pointer;
           font-size: 16px;
-          margin-top: 0;
+          margin-top: 10px;
+          height: 44px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         .submit-btn:hover {
