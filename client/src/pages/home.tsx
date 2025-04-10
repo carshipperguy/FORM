@@ -63,12 +63,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-2">
-      <div className="mx-auto">
-        <h1 className="text-xl font-bold text-center mb-4">
-          Instant Car Shipping Quote
-        </h1>
-        <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2 sm:p-4">
+      <div className="mx-auto max-w-sm">
+        <div className="text-center mb-4">
+          <img
+            src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
+            className="mx-auto mb-3 h-12 object-contain bg-white rounded-lg p-2 shadow-sm"
+            alt="Amerigo Auto Transport Logo" 
+          />
+          <h1 className="text-xl font-bold text-[#1e3a8a] mb-1">
+            Instant Car Shipping Quote
+          </h1>
+          <p className="text-xs text-gray-600">Free, no-obligation estimate - takes 30 seconds</p>
+        </div>
+        <div className="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-4 mb-6 border border-gray-100">
+          <QuoteForm onCalculate={handleCalculate} isCalculating={isCalculating} />
+        </div>
         <TrustBadges />
       </div>
     </div>
