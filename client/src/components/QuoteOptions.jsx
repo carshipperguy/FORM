@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 
 const QuoteOptions = ({ data }) => {
-  const [selectedTransport, setSelectedTransport] = useState("Open");
+  const [isEnclosedStandard, setIsEnclosedStandard] = useState(false);
+  const [isEnclosedExpress, setIsEnclosedExpress] = useState(false);
   const [, navigate] = useLocation();
 
   // Use passed data or fallback to default values if none provided
@@ -18,13 +19,17 @@ const QuoteOptions = ({ data }) => {
     transitTime: 3,
   };
 
-  const getPrice = (type) => {
-    return type === "Enclosed" ? formData.enclosedTransportPrice : formData.openTransportPrice;
-  };
+  const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
+  const expressPrice = isEnclosedExpress ? Math.round(formData.enclosedTransportPrice * 1.2) : Math.round(formData.openTransportPrice * 1.2);
   
-  const handleReserve = () => {
-    const transportType = selectedTransport === "Open" ? "open" : "enclosed";
-    const price = transportType === "open" ? formData.openTransportPrice : formData.enclosedTransportPrice;
+  const formatUSD = (price) => new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(price);
+  
+  const handleReserve = (transport, isEnclosed) => {
+    const transportType = transport === "standard" ? (isEnclosed ? "enclosed" : "open") : (isEnclosed ? "enclosed-express" : "open-express");
+    const price = transport === "standard" ? standardPrice : expressPrice;
     
     const searchParams = new URLSearchParams();
     searchParams.append("transportType", transportType);
@@ -35,203 +40,113 @@ const QuoteOptions = ({ data }) => {
   };
 
   return (
-    <div className="form-container">
-      <div className="quote-summary">
-        <h2>Quote Details</h2>
-        
-        <div className="vehicle-info">
-          <h3>Vehicle Information</h3>
-          <p>{formData.year} {formData.make} {formData.model}</p>
-          <p>
-            <span className="label">Distance:</span> 
-            <span className="value">{formData.distance} miles</span>
-          </p>
-          <p>
-            <span className="label">Estimated Transit Time:</span> 
-            <span className="value">{formData.transitTime} days</span>
-          </p>
-          <p>
-            <span className="label">From:</span> 
-            <span className="value">{formData.pickupLocation}</span>
-          </p>
-          <p>
-            <span className="label">To:</span> 
-            <span className="value">{formData.dropoffLocation}</span>
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#ffffff] to-[#dc2626] text-black px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-6">
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#1e3a8a] drop-shadow-md">Shipping Quote Summary</h1>
+          <p className="text-sm text-gray-700 mt-2">Military Owned • Family Operated • Proudly American</p>
         </div>
-        
-        <div className="pricing-cards">
-          <div className="card">
-            <h3>Standard Transport</h3>
-            <button 
-              className={selectedTransport === "Open" ? "active" : ""} 
-              onClick={() => setSelectedTransport("Open")}
-            >
-              Open
-            </button>
-            <button 
-              className={selectedTransport === "Enclosed" ? "active" : ""} 
-              onClick={() => setSelectedTransport("Enclosed")}
-            >
-              Enclosed
-            </button>
-            <p>${getPrice(selectedTransport)}</p>
-            <button className="reserve-btn" onClick={handleReserve}>
-              Reserve Now
-            </button>
-          </div>
-          <div className="card">
-            <h3>Express Transport</h3>
-            <button 
-              className={selectedTransport === "Open" ? "active" : ""} 
-              onClick={() => setSelectedTransport("Open")}
-            >
-              Open
-            </button>
-            <button 
-              className={selectedTransport === "Enclosed" ? "active" : ""} 
-              onClick={() => setSelectedTransport("Enclosed")}
-            >
-              Enclosed
-            </button>
-            <p>${Math.round(getPrice(selectedTransport) * 1.2)}</p>
-            <button className="reserve-btn" onClick={handleReserve}>
-              Reserve Now
-            </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 mb-10">
+          <div className="bg-white text-black rounded-2xl p-3 shadow-xl border border-gray-200">
+            <h2 className="text-xl font-semibold text-[#1e3a8a] mb-4">Route Info</h2>
+            <div className="space-y-3 text-sm text-gray-700">
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Ship Date:</span>
+                {formData.shipmentDate instanceof Date 
+                  ? formData.shipmentDate.toLocaleDateString() 
+                  : formData.shipmentDate}
+              </div>
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Pickup Location:</span>
+                {formData.pickupLocation}
+              </div>
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Dropoff Location:</span>
+                {formData.dropoffLocation}
+              </div>
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Vehicle:</span>
+                {formData.year} {formData.make} {formData.model}
+              </div>
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Route Distance:</span>
+                {formData.distance} miles (est.)
+              </div>
+              <div>
+                <span className="block font-medium text-[#1e3a8a]">Transit Time:</span>
+                {formData.transitTime} days (est.)
+              </div>
+            </div>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+          {/* Standard Transport Card */}
+          <div className="rounded-2xl p-6 bg-white text-center shadow-2xl flex flex-col justify-between text-black border border-gray-200">
+            <div>
+              <h3 className="text-2xl font-bold mb-2 text-[#1e3a8a]">Standard Transport</h3>
+              <div className="mb-4">
+                <button
+                  className={`px-3 py-1 text-sm font-medium rounded-full mr-2 ${!isEnclosedStandard ? 'bg-blue-700 text-white' : 'bg-gray-300 text-black'}`}
+                  onClick={() => setIsEnclosedStandard(false)}
+                >Open</button>
+                <button
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${isEnclosedStandard ? 'bg-red-600 text-white' : 'bg-gray-300 text-black'}`}
+                  onClick={() => setIsEnclosedStandard(true)}
+                >Enclosed</button>
+              </div>
+              <p className="text-3xl font-bold text-[#dc2626] mb-4">{formatUSD(standardPrice)}</p>
+              <ul className="text-left text-sm mb-6 text-gray-600">
+                <li>✅ Pickup within 7-day window</li>
+                <li>✅ Fully insured</li>
+                <li>✅ Door-to-door service</li>
+                <li>✅ $0 due now</li>
+              </ul>
+            </div>
+            <button
+              onClick={() => handleReserve("standard", isEnclosedStandard)}
+              className="inline-block bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 px-6 rounded-full text-sm transition"
+            >
+              Reserve Now — No credit card required
+            </button>
+          </div>
+
+          {/* Express Transport Card */}
+          <div className="rounded-2xl p-6 bg-white text-center shadow-2xl flex flex-col justify-between text-black border border-gray-200">
+            <div>
+              <h3 className="text-2xl font-bold mb-2 text-[#1e3a8a]">Express Transport</h3>
+              <div className="mb-4">
+                <button
+                  className={`px-3 py-1 text-sm font-medium rounded-full mr-2 ${!isEnclosedExpress ? 'bg-blue-700 text-white' : 'bg-gray-300 text-black'}`}
+                  onClick={() => setIsEnclosedExpress(false)}
+                >Open</button>
+                <button
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${isEnclosedExpress ? 'bg-red-600 text-white' : 'bg-gray-300 text-black'}`}
+                  onClick={() => setIsEnclosedExpress(true)}
+                >Enclosed</button>
+              </div>
+              <p className="text-3xl font-bold text-[#dc2626] mb-4">{formatUSD(expressPrice)}</p>
+              <ul className="text-left text-sm mb-6 text-gray-600">
+                <li>✅ Guaranteed pickup window</li>
+                <li>✅ Priority dispatch</li>
+                <li>✅ Fully insured, door-to-door</li>
+                <li>✅ $0 due now</li>
+              </ul>
+            </div>
+            <button
+              onClick={() => handleReserve("express", isEnclosedExpress)}
+              className="inline-block bg-[#1e3a8a] hover:bg-[#0f2a63] text-white font-bold py-2 px-6 rounded-full text-sm transition"
+            >
+              Reserve Now — No credit card required
+            </button>
+          </div>
+        </div>
+
+        <p className="mt-10 text-center text-xs text-gray-800">
+          Note: Multi-vehicle, inoperable, modified, or vehicles booked with other companies require custom quotes — please text or call for details.
+        </p>
       </div>
-
-      <style>{`
-        /* Base Styles (Mobile-first design) */
-        .form-container {
-          padding: 20px;
-          max-width: 308px;
-          margin: 0 auto;
-        }
-
-        .quote-summary {
-          display: flex;
-          flex-direction: column; /* Stack vertically for mobile */
-          gap: 20px;
-        }
-        
-        .vehicle-info {
-          background: #f8fafc;
-          padding: 15px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .vehicle-info h3 {
-          font-size: 1.2rem;
-          margin-bottom: 10px;
-          color: #1e3a8a;
-        }
-        
-        .vehicle-info p {
-          margin-bottom: 8px;
-          font-size: 0.95rem;
-        }
-        
-        .vehicle-info .label {
-          font-weight: 600;
-          color: #4b5563;
-          display: inline-block;
-          width: 150px;
-        }
-        
-        .vehicle-info .value {
-          color: #1f2937;
-        }
-
-        .pricing-cards {
-          display: flex;
-          flex-direction: column; /* Stack vertically on mobile */
-          gap: 20px;
-          width: 100%;
-        }
-
-        .card {
-          background: #fff;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          width: 100%;
-        }
-
-        .card button {
-          background: #e5e7eb;
-          color: #374151;
-          border: none;
-          padding: 10px 15px;
-          margin: 5px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-weight: bold;
-        }
-
-        .card button.active {
-          background: #1e3a8a;
-          color: #fff;
-        }
-        
-        .card button.reserve-btn {
-          background: #dc2626;
-          color: #fff;
-          width: 100%;
-          margin-top: 15px;
-          padding: 12px;
-        }
-        
-        .card button.reserve-btn:hover {
-          background: #b91c1c;
-        }
-
-        .card p {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: #1e3a8a;
-          margin-top: 15px;
-        }
-
-        /* Desktop Styles */
-        @media (min-width: 800px) {
-          .form-container {
-            max-width: 800px;
-          }
-
-          .pricing-cards {
-            flex-direction: row; /* Display cards in a row on desktop */
-            justify-content: space-between;
-            gap: 20px;
-          }
-
-          .card {
-            width: 48%; /* Make each card 48% wide for desktop */
-          }
-        }
-
-        /* Ensure it looks good at the tablet breakpoint too */
-        @media (min-width: 560px) and (max-width: 799px) {
-          .form-container {
-            max-width: 560px;
-          }
-          
-          .pricing-cards {
-            flex-direction: row;
-            flex-wrap: wrap;
-          }
-          
-          .card {
-            width: 48%;
-          }
-        }
-      `}</style>
     </div>
   );
 };
