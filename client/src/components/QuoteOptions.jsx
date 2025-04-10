@@ -17,7 +17,13 @@ const QuoteOptions = ({ data }) => {
   console.log("QUOTE OPTIONS RECEIVED DATA:", data);
   console.log("DISTANCE FROM RECEIVED DATA:", data.distance);
   
-  const formData = data;
+  // Create a copy and make sure we're not modifying the distance
+  const formData = { ...data };
+  
+  // Debug check - make sure we're not overwriting the actual distance
+  console.log("⚠️ CHECKING DISTANCE: Original passed:", data.distance, 
+    "Using:", formData.distance, 
+    "Changed?", formData.distance !== data.distance);
 
   const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
   const expressPrice = isEnclosedExpress ? Math.round(formData.enclosedTransportPrice * 1.2) : Math.round(formData.openTransportPrice * 1.2);

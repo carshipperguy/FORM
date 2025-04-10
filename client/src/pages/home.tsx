@@ -69,20 +69,23 @@ export default function Home() {
       });
       
       // Use the API to calculate distance correctly
-      // Call the MapQuest API directly to check if it's working
-      try {
-        const directApiUrl = `http://www.mapquestapi.com/directions/v2/route?key=YDMaftbjplfYTcQ129jOTQEkt37kNXy9&from=${encodeURIComponent(pickupLocation)}&to=${encodeURIComponent(dropoffLocation)}&unit=m`;
-        console.log("DIRECT TEST: Calling MapQuest API directly:", directApiUrl);
-        const directResponse = await fetch(directApiUrl);
-        const directData = await directResponse.json();
-        console.log("DIRECT TEST: MapQuest direct distance result:", directData.route?.distance);
-      } catch (directApiError) {
-        console.error("DIRECT TEST: Failed to call MapQuest directly:", directApiError);
-      }
+      // Use our server-side API to calculate distance
+      console.log("UPDATED APPROACH: Using server-side distance calculation directly");
       
-      // Now use our regular API call
-      const distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
-      console.log("MapQuest API result:", distanceResult);
+      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(pickupLocation)}&destination=${encodeURIComponent(dropoffLocation)}`;
+      console.log("UPDATED APPROACH: Calling server API:", serverDistanceUrl);
+      
+      const serverDistanceResponse = await fetch(serverDistanceUrl);
+      const serverDistanceData = await serverDistanceResponse.json();
+      
+      console.log("UPDATED APPROACH: Server API response:", serverDistanceData);
+      
+      // Convert server response to our DistanceResult format
+      const distanceResult = serverDistanceData.error
+        ? { success: false, error: serverDistanceData.error }
+        : { success: true, distance: serverDistanceData.distance, time: serverDistanceData.time };
+      
+      console.log("UPDATED APPROACH: Final distance result:", distanceResult);
 
       if (!distanceResult.success) {
         const errorMessage = 'error' in distanceResult ? distanceResult.error : "Could not calculate distance between locations";
