@@ -1,152 +1,85 @@
-import React, { useState, useEffect, useRef } from 'react';
-
-// Top US cities for autocomplete suggestions
-const popularLocations = [
-  "New York, NY",
-  "Los Angeles, CA",
-  "Chicago, IL",
-  "Houston, TX",
-  "Phoenix, AZ",
-  "Philadelphia, PA",
-  "San Antonio, TX",
-  "San Diego, CA",
-  "Dallas, TX",
-  "San Jose, CA",
-  "Austin, TX",
-  "Jacksonville, FL",
-  "Columbus, OH",
-  "San Francisco, CA",
-  "Charlotte, NC",
-  "Indianapolis, IN",
-  "Seattle, WA",
-  "Denver, CO",
-  "Washington, DC",
-  "Boston, MA",
-  "Miami, FL"
-];
+import React, { useState, useEffect } from 'react';
+import { locationOptions } from '../lib/location-data';
 
 const LocationAutocomplete = ({ value, onChange, placeholder, required }) => {
-  const [inputValue, setInputValue] = useState(value || '');
-  const [suggestions, setSuggestions] = useState([]);
-  const [isFocused, setIsFocused] = useState(false);
-  const wrapperRef = useRef(null);
-
+  const [filteredOptions, setFilteredOptions] = useState([]);
+  const [searchInput, setSearchInput] = useState(value || '');
+  const [showDropdown, setShowDropdown] = useState(false);
+  
+  // Update filtered options when search input changes
   useEffect(() => {
-    // Set input value when the component prop changes
-    if (value !== undefined && value !== inputValue) {
-      setInputValue(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    // Add click outside listener to close the suggestions dropdown
-    function handleClickOutside(event) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setIsFocused(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
-
-  const handleInputChange = (e) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    
-    // Notify parent component of the change
-    onChange(newValue);
-    
-    // Filter suggestions based on input
-    if (newValue.trim().length > 1) {
-      const filteredLocations = popularLocations.filter(location => 
-        location.toLowerCase().includes(newValue.toLowerCase())
-      );
-      setSuggestions(filteredLocations);
-    } else {
-      setSuggestions([]);
-    }
-  };
-
-  const handleSuggestionClick = (suggestion) => {
-    setInputValue(suggestion);
-    onChange(suggestion);
-    setSuggestions([]);
-    setIsFocused(false);
-  };
-
-  return (
-    <div className="location-autocomplete" ref={wrapperRef}>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        onFocus={() => setIsFocused(true)}
-        placeholder={placeholder || "Enter location"}
-        required={required}
-        className="location-input"
-      />
+    if (searchInput.length >= 2) {
+      const lowerInput = searchInput.toLowerCase();
+      const results = locationOptions
+        .filter(option => 
+          option.city.toLowerCase().includes(lowerInput) || 
+          option.state.toLowerCase().includes(lowerInput) ||
+          (option.zips && option.zips.some(zip => zip.includes(lowerInput)))
+        )
+        .slice(0, 200); // Limit for performance
       
-      {isFocused && suggestions.length > 0 && (
-        <ul className="suggestions-list">
-          {suggestions.map((suggestion, index) => (
-            <li 
-              key={index} 
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="suggestion-item"
-            >
-              {suggestion}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <style>
-        {`
-          .location-autocomplete {
-            position: relative;
-            width: 100%;
-          }
-          
-          .location-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 14px;
-          }
-          
-          .suggestions-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 3px 3px;
-            z-index: 10;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          }
-          
-          .suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 14px;
-          }
-          
-          .suggestion-item:hover {
-            background-color: #f0f0f0;
-          }
-        `}
-      </style>
+      setFilteredOptions(results);
+    } else {
+      // Show most populated cities by default
+      setFilteredOptions(locationOptions.slice(0, 200));
+    }
+  }, [searchInput]);
+  
+  // Update the input value when the value prop changes
+  useEffect(() => {
+    setSearchInput(value || '');
+  }, [value]);
+  
+  const handleInputChange = (e) => {
+    const input = e.target.value;
+    setSearchInput(input);
+    onChange(input);
+    setShowDropdown(true);
+  };
+  
+  const handleOptionSelect = (option) => {
+    onChange(option.value);
+    setSearchInput(option.value);
+    setShowDropdown(false);
+  };
+  
+  return (
+    <div className="location-autocomplete-container">
+      <div className="location-input-container">
+        <input
+          type="text"
+          value={searchInput}
+          onChange={handleInputChange}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          placeholder={placeholder || "Enter city, state, or ZIP"}
+          required={required}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+        />
+        
+        {showDropdown && filteredOptions.length > 0 && (
+          <div className="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
+            {filteredOptions.map((option, index) => (
+              <div 
+                key={index} 
+                className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
+                onClick={() => handleOptionSelect(option)}
+              >
+                <div className="flex items-center">
+                  <span className="font-normal block truncate">
+                    {option.city}, {option.state}
+                  </span>
+                </div>
+                {option.zips && option.zips.length > 0 && (
+                  <span className="text-gray-500 text-xs block ml-2">
+                    ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

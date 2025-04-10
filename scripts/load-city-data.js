@@ -61,11 +61,7 @@ async function loadCityData() {
       }
     }
     
-    // Sort by population (largest first)
-    cities.sort((a, b) => b.population - a.population);
-    
-    // Take top 1000 cities to keep file size manageable
-    const topCities = cities.slice(0, 1000);
+    // Include ALL cities - no filtering or limiting
     
     // Create directory if it doesn't exist
     const outputDir = path.dirname(outputJsonPath);
@@ -74,9 +70,9 @@ async function loadCityData() {
     }
     
     // Write to JSON file
-    fs.writeFileSync(outputJsonPath, JSON.stringify(topCities, null, 2));
+    fs.writeFileSync(outputJsonPath, JSON.stringify(cities, null, 2));
     
-    console.log(`Successfully processed ${topCities.length} cities and wrote to ${outputJsonPath}`);
+    console.log(`Successfully processed ${cities.length} cities and wrote to ${outputJsonPath}`);
   } catch (error) {
     console.error('Error processing city data:', error);
   }
