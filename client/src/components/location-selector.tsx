@@ -95,7 +95,11 @@ export function LocationSelector({
                   key={location.value}
                   value={location.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue);
+                    // Ensure we include the ZIP code in the value
+                    const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
+                    // Format as "City, STATE ZIP" to always include ZIP
+                    const valueWithZip = `${location.city}, ${location.state} ${zip}`;
+                    onChange(valueWithZip);
                     setOpen(false);
                   }}
                 >
