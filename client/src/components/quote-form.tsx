@@ -56,14 +56,24 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
       return;
     }
     
-    // Log the entire form data before submission to verify ZIP codes are included
-    console.log("QuoteForm onSubmit - Full form data:", { 
-      ...data,
+    // Make sure the ZIP codes are explicitly included in the data object
+    const formZips = {
       pickupZip: form.getValues("pickupZip"),
       dropoffZip: form.getValues("dropoffZip")
-    });
+    };
     
-    onCalculate(data);
+    // Create an enriched data object with all fields, including zipCodes
+    const enrichedData = {
+      ...data,
+      ...formZips
+    };
+    
+    // Log the entire form data before submission to verify ZIP codes are included
+    console.log("QuoteForm onSubmit - Full form data:", enrichedData);
+    console.log("ZIP codes being sent:", formZips);
+    
+    // Pass the enriched data with ZIP codes to parent
+    onCalculate(enrichedData);
   };
 
   const isCarTruckSuv = vehicleType === "car/truck/suv";
@@ -90,7 +100,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                             field.onChange(value);
                             // Store the ZIP code in a separate field
                             form.setValue("pickupZip", zipCode || "");
-                            console.log("Setting pickupZip:", zipCode);
+                            console.log("Setting pickupZip:", zipCode, "for location:", value);
+                            // Check the current value after setting
+                            setTimeout(() => {
+                              console.log("Pickup ZIP in form:", form.getValues("pickupZip"));
+                            }, 100);
                           }}
                           placeholder="Ship From"
                         />
@@ -112,7 +126,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                             field.onChange(value);
                             // Store the ZIP code in a separate field
                             form.setValue("dropoffZip", zipCode || "");
-                            console.log("Setting dropoffZip:", zipCode);
+                            console.log("Setting dropoffZip:", zipCode, "for location:", value);
+                            // Check the current value after setting
+                            setTimeout(() => {
+                              console.log("Dropoff ZIP in form:", form.getValues("dropoffZip"));
+                            }, 100);
                           }}
                           placeholder="Ship To"
                         />

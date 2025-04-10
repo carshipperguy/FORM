@@ -38,6 +38,20 @@ export function LocationSelector({
   const debouncedSearch = React.useCallback(
     (query: string) => {
       const results = searchCitiesByQuery(query);
+      
+      // Log info about cities with multiple ZIP codes for debugging
+      const citiesWithMultipleZips = results.filter(loc => loc.zips && loc.zips.length > 1);
+      if (citiesWithMultipleZips.length > 0) {
+        console.log("Cities with multiple ZIP codes:", 
+          citiesWithMultipleZips.map(loc => ({
+            city: loc.city,
+            state: loc.state,
+            zipCount: loc.zips.length,
+            zips: loc.zips.slice(0, 5) // Show just first 5 zips
+          }))
+        );
+      }
+      
       setLocations(results);
     },
     []
