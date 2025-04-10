@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { LocationSelector } from "@/components/location-selector";
+import { vehicleTypes, years, makes, modelsByMake } from "@/lib/vehicle-data";
 
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
@@ -12,12 +14,29 @@ const SimpleQuoteForm = () => {
     model: "",
     shipmentDate: ""
   });
+  
+  const [availableModels, setAvailableModels] = useState([]);
+
+  useEffect(() => {
+    if (formData.make) {
+      setAvailableModels(modelsByMake[formData.make] || []);
+    } else {
+      setAvailableModels([]);
+    }
+  }, [formData.make]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+  
+  const handleLocationChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
     }));
   };
 
@@ -49,24 +68,18 @@ const SimpleQuoteForm = () => {
             <h2>Origin & Destination</h2>
           </div>
           <div className="form-fields">
-            <div className="form-field">
-              <input 
-                type="text" 
-                name="pickupLocation" 
-                value={formData.pickupLocation} 
-                onChange={handleChange}
-                placeholder="Ship From" 
-                required 
+            <div className="form-field location-field">
+              <LocationSelector
+                value={formData.pickupLocation}
+                onChange={(value) => handleLocationChange("pickupLocation", value)}
+                placeholder="Ship From"
               />
             </div>
-            <div className="form-field">
-              <input 
-                type="text" 
-                name="dropoffLocation" 
-                value={formData.dropoffLocation} 
-                onChange={handleChange}
-                placeholder="Ship To" 
-                required 
+            <div className="form-field location-field">
+              <LocationSelector
+                value={formData.dropoffLocation}
+                onChange={(value) => handleLocationChange("dropoffLocation", value)}
+                placeholder="Ship To"
               />
             </div>
           </div>
@@ -85,41 +98,58 @@ const SimpleQuoteForm = () => {
                 required
               >
                 <option value="">What Would You Like To Ship?</option>
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Truck">Truck</option>
-                <option value="Van">Van</option>
+                {vehicleTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-field">
-              <input 
-                type="text" 
-                name="year" 
-                value={formData.year} 
+              <select
+                name="year"
+                value={formData.year}
                 onChange={handleChange}
-                placeholder="Year" 
-                required 
-              />
+                required
+              >
+                <option value="">Year</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-field">
-              <input 
-                type="text" 
-                name="make" 
-                value={formData.make} 
+              <select
+                name="make"
+                value={formData.make}
                 onChange={handleChange}
-                placeholder="Vehicle Make" 
-                required 
-              />
+                required
+              >
+                <option value="">Make</option>
+                {makes.map((make) => (
+                  <option key={make} value={make}>
+                    {make}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-field">
-              <input 
-                type="text" 
-                name="model" 
-                value={formData.model} 
+              <select
+                name="model"
+                value={formData.model}
                 onChange={handleChange}
-                placeholder="Model" 
-                required 
-              />
+                required
+                disabled={!formData.make}
+              >
+                <option value="">Model</option>
+                {availableModels.map((model) => (
+                  <option key={model} value={model}>
+                    {model}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -131,12 +161,12 @@ const SimpleQuoteForm = () => {
           <div className="form-fields">
             <div className="form-field">
               <input 
-                type="text" 
+                type="date" 
                 name="shipmentDate" 
                 value={formData.shipmentDate} 
                 onChange={handleChange}
-                placeholder="MM-DD-YY" 
                 required 
+                min={new Date().toISOString().split('T')[0]}
               />
             </div>
           </div>
@@ -185,6 +215,17 @@ const SimpleQuoteForm = () => {
           border: 1px solid #ddd;
           border-radius: 3px;
           font-size: 14px;
+        }
+        
+        .location-field [role="combobox"] {
+          width: 100%;
+          height: 38px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          background-color: white;
         }
 
         .submit-btn {
