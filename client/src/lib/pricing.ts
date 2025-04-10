@@ -1,23 +1,34 @@
 // Pricing constants
 const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile (for long distances)
-const MINIMUM_PRICE = 450;          // Minimum charge for short routes
+const MINIMUM_PRICE = 450;         // Minimum charge for short routes
+const FLAT_RATE_PER_MILE = 3.50;   // $3.50 per mile for special vehicle types (boats, RVs, trailers, heavy equipment)
 
-// Vehicle type multipliers
-const VEHICLE_MULTIPLIERS = {
+// Vehicle type multipliers for standard vehicles
+const VEHICLE_MULTIPLIERS: Record<string, number> = {
   "car/truck/suv": 1.0,
-  "boat": 1.4,
+  "boat": 1.4,         // Only used if not using flat rate
   "golf cart": 0.8,
   "motorcycle": 0.7,
-  "rv/5th wheel": 1.8,
-  "travel trailer": 1.6,
+  "rv/5th wheel": 1.8, // Only used if not using flat rate
+  "travel trailer": 1.6, // Only used if not using flat rate
   "atv/utv": 0.75,
-  "heavy equipment": 2.0,
+  "heavy equipment": 2.0, // Only used if not using flat rate
   "other": 1.3
-} as const;
+};
+
+// Special vehicle types that should use flat rate pricing
+const SPECIAL_VEHICLE_KEYWORDS = [
+  'boat',
+  'rv',
+  '5th wheel',
+  'trailer',
+  'heavy',
+  'equipment'
+];
 
 const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
 
-export type VehicleType = keyof typeof VEHICLE_MULTIPLIERS;
+export type VehicleType = string; // Allow any string for vehicle type
 
 interface PricingResult {
   openTransport: number;
@@ -31,14 +42,9 @@ export function calculatePricing(
   vehicleType: VehicleType,
   date: Date = new Date()
 ): PricingResult {
-  console.log('PRICING calculatePricing called with DISTANCE:', distance, 'VEHICLE:', vehicleType, 'DATE:', date);
-  
-  // Debug check - is distance being overridden to 1200?
-  if (distance && distance !== 1200) {
-    console.log('IMPORTANT: Real distance is being calculated:', distance);
-  } else {
-    console.log('WARNING: Distance is either undefined or exactly 1200 miles');
-  }
+  console.log('--------------------------------');
+  console.log('PRICING CALCULATION FUNCTION CALLED');
+  console.log('Input parameters:', { distance, vehicleType, date });
   
   // Handle undefined distance
   if (!distance) {
@@ -51,16 +57,8 @@ export function calculatePricing(
     };
   }
   
-  // Hard debugging check - is someone forcing it to 1200?
-  if (distance === 1200) {
-    console.error('CRITICAL DEBUG: Distance is exactly 1200 - is this correct?');
-    
-    // Remove the hardcoded override for debugging purposes only
-    // UNCOMMENT TO TEST: distance = 2000; // Force a different value for testing
-  }
-
   // Calculate transit time based on distance
-  // Updated: Assume average of 400 miles per day plus 1 day for pickup/delivery
+  // Assume average of 400 miles per day plus 1 day for pickup/delivery
   const transitTime = Math.ceil(distance / 400) + 1;
   console.log('Calculated transit time:', transitTime);
 
@@ -75,123 +73,112 @@ export function calculatePricing(
     };
   }
 
-  // FIXED: Check if it's one of the special vehicle types that uses flat rate pricing.
-  // The direct comparison was failing because we were trying to do exact matches
-  // but the vehicle types might not match exactly what we expect.
-  
-  // We don't need this anymore but keep for reference
-  // const specialVehicleTypes = ['boat', 'rv/5th wheel', 'travel trailer', 'heavy equipment'];
-  
-  const FLAT_RATE_PER_MILE = 3.50; // $3.50 per mile for special vehicle types
-  
+  // DETERMINE PRICING MODEL TO USE
   // Convert vehicle type to lowercase for consistent comparison
-  const vehicleTypeLower = vehicleType.toLowerCase();
+  const vehicleTypeLower = typeof vehicleType === 'string' ? vehicleType.toLowerCase() : '';
   
-  // Check if the vehicle type contains any of these keywords
-  const isBoat = vehicleTypeLower.includes('boat');
-  const isRV = vehicleTypeLower.includes('rv') || vehicleTypeLower.includes('5th wheel');
-  const isTrailer = vehicleTypeLower.includes('trailer');
-  const isHeavyEquipment = vehicleTypeLower.includes('heavy') || vehicleTypeLower.includes('equipment');
+  // Check if we should use flat rate pricing by looking for special vehicle keywords
+  let usesFlatRatePricing = false;
   
-  console.log('Vehicle type detection:', {
+  for (const keyword of SPECIAL_VEHICLE_KEYWORDS) {
+    if (vehicleTypeLower.includes(keyword)) {
+      usesFlatRatePricing = true;
+      console.log(`Special vehicle detected: Found keyword "${keyword}" in "${vehicleTypeLower}"`);
+      break;
+    }
+  }
+  
+  console.log('Vehicle type analysis:', {
     original: vehicleType,
-    lowercase: vehicleTypeLower
+    lowercase: vehicleTypeLower,
+    usesFlatRatePricing
   });
-  
-  // Determine if this is a special vehicle type
-  const isSpecialVehicleType = isBoat || isRV || isTrailer || isHeavyEquipment;
-  
-  // Debug logging with improved validation
-  console.log('DEBUG: Vehicle type check:', {
-    vehicleType,
-    isBoat,
-    isRV,
-    isTrailer,
-    isHeavyEquipment,
-    isSpecialVehicleType,
-    usesFlatRatePricing: isSpecialVehicleType
-  });
-  
+
+  // CALCULATE PRICE BASED ON DETERMINED PRICING MODEL
   let openTransportPrice: number;
   let enclosedTransportPrice: number;
   
-  if (isSpecialVehicleType) {
-    // Special vehicle types use flat rate pricing
-    console.log(`Applying flat rate pricing for ${vehicleType}: $${FLAT_RATE_PER_MILE} per mile`);
+  if (usesFlatRatePricing) {
+    // SPECIAL VEHICLE TYPE - USE FLAT RATE
+    console.log(`*** USING FLAT RATE PRICING: $${FLAT_RATE_PER_MILE} per mile ***`);
     
-    // Calculate with flat rate pricing
+    // Simple flat rate calculation
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
     
-    // Show detailed calculation
-    console.log('FLAT RATE CALCULATION:', {
+    console.log('Flat rate calculation:', {
       distance,
       flatRatePerMile: FLAT_RATE_PER_MILE,
-      calculation: `${distance} miles × $${FLAT_RATE_PER_MILE} = $${openTransportPrice}`,
-      openTransportPrice
+      formula: `${distance} miles × $${FLAT_RATE_PER_MILE}/mile = $${openTransportPrice.toFixed(2)}`
     });
     
     enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+    
+    console.log('Enclosed transport calculation:', {
+      openTransportPrice,
+      enclosedMultiplier: ENCLOSED_MULTIPLIER,
+      formula: `$${openTransportPrice.toFixed(2)} × ${ENCLOSED_MULTIPLIER} = $${enclosedTransportPrice.toFixed(2)}`
+    });
   } else {
-    // Standard vehicle types use the progressive pricing model
+    // STANDARD VEHICLE TYPE - USE PROGRESSIVE MODEL
+    console.log('*** USING STANDARD VEHICLE PRICING MODEL ***');
+    
     // Calculate base price with distance multiplier
     let basePrice = distance <= 800
       ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
       : distance * BASE_RATE_PER_MILE;
     
-    console.log('Initial base price calculation:', { 
+    console.log('Base price calculation:', { 
       distance,
-      BASE_RATE_PER_MILE,
-      isMidRange: distance <= 800,
+      ratePerMile: BASE_RATE_PER_MILE,
       midRangeMultiplier: distance <= 800 ? 1.10 : 1,
-      basePrice
+      formula: distance <= 800 
+        ? `${distance} miles × $${BASE_RATE_PER_MILE}/mile × 1.10 = $${basePrice.toFixed(2)}`
+        : `${distance} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`
     });
 
     // Ensure minimum price
+    const priceBeforeMinimum = basePrice;
     basePrice = Math.max(basePrice, MINIMUM_PRICE);
-    console.log('Base price after minimum check:', basePrice);
+    
+    if (basePrice > priceBeforeMinimum) {
+      console.log(`Base price adjusted to minimum: $${priceBeforeMinimum.toFixed(2)} → $${MINIMUM_PRICE} (minimum price)`);
+    }
 
-    // Apply vehicle type multiplier
-    const vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+    // Apply vehicle type multiplier - default to 1.0 if not found
+    let vehicleMultiplier = 1.0;
+    
+    if (vehicleType in VEHICLE_MULTIPLIERS) {
+      vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+    } else {
+      console.warn(`Vehicle type "${vehicleType}" not found in multipliers, using default multiplier: 1.0`);
+    }
+    
     openTransportPrice = basePrice * vehicleMultiplier;
-    enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
-  }
-  
-  // This should show the problem or verify the fix is working
-  console.log('PRICE CHECK - Is using flat rate?', { 
-    isSpecialVehicleType,
-    openTransportPrice,
-    flatRateCalculation: isSpecialVehicleType ? distance * FLAT_RATE_PER_MILE : 'N/A'
-  });
-  
-  // Log different information based on the pricing method used
-  if (isSpecialVehicleType) {
-    console.log('Flat rate price calculations:', {
-      vehicleType,
-      flatRatePerMile: FLAT_RATE_PER_MILE,
-      distance,
-      openTransportPrice,
-      ENCLOSED_MULTIPLIER,
-      enclosedTransportPrice
+    
+    console.log('Open transport calculation:', {
+      basePrice,
+      vehicleMultiplier,
+      formula: `$${basePrice.toFixed(2)} × ${vehicleMultiplier} = $${openTransportPrice.toFixed(2)}`
     });
-  } else {
-    console.log('Standard price calculations:', {
-      vehicleType,
-      distance,
-      multiplier: VEHICLE_MULTIPLIERS[vehicleType],
+    
+    enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
+    
+    console.log('Enclosed transport calculation:', {
       openTransportPrice,
-      ENCLOSED_MULTIPLIER,
-      enclosedTransportPrice
+      enclosedMultiplier: ENCLOSED_MULTIPLIER,
+      formula: `$${openTransportPrice.toFixed(2)} × ${ENCLOSED_MULTIPLIER} = $${enclosedTransportPrice.toFixed(2)}`
     });
   }
 
-  // Round all prices to nearest whole dollar
+  // Round prices to nearest whole dollar
   const result = {
     openTransport: Math.round(openTransportPrice),
     enclosedTransport: Math.round(enclosedTransportPrice),
     transitTime
   };
   
-  console.log('Final pricing result:', result);
+  console.log('FINAL PRICING RESULT:', result);
+  console.log('--------------------------------');
   
   return result;
 }
