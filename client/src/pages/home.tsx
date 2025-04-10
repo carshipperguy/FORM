@@ -27,7 +27,8 @@ export default function Home() {
       const pickupZip = data.pickupZip || extractZipFromLocation(data.pickupLocation);
       const dropoffZip = data.dropoffZip || extractZipFromLocation(data.dropoffLocation);
       
-      console.log("Using ZIP codes:", { pickupZip, dropoffZip });
+      console.log("Home handleCalculate - Form Data:", data);
+      console.log("Home handleCalculate - Using ZIP codes:", { pickupZip, dropoffZip });
       
       // Calculate real distance using MapQuest API
       const distanceResult = await calculateDistance(data.pickupLocation, data.dropoffLocation);

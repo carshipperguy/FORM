@@ -98,12 +98,13 @@ export function LocationSelector({
                     // Get the ZIP code if available
                     const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
                     // Format location display value (City, STATE)
-                    const displayValue = `${location.city}, ${location.state}`;
+                    const displayValue = `${location.city}, ${location.state} ${zip}`;
                     
-                    console.log("LocationSelector selected:", { 
+                    console.log("LocationSelector selected with ZIP:", { 
                       city: location.city, 
                       state: location.state, 
                       zip: zip,
+                      displayValue: displayValue,
                       zips: location.zips 
                     });
                     
