@@ -4,7 +4,6 @@ import { QuoteForm } from "@/components/quote-form";
 import { TrustBadges } from "@/components/trust-badges";
 import { calculatePricing } from "@/lib/pricing";
 import { calculateDistance } from "@/lib/mapquest";
-import { getFallbackDistance } from "@/lib/distance-fallback";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -69,58 +68,20 @@ export default function Home() {
         dropoff: dropoffLocation 
       });
       
-      // Try to get distance from MapQuest API first
-      let distanceResult;
-      
-      try {
-        distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
-        console.log("MapQuest API result:", distanceResult);
-      } catch (apiError) {
-        console.error("MapQuest API error:", apiError);
-        // If API throws an error, try fallback
-        const fallbackDistance = getFallbackDistance(pickupLocation, dropoffLocation);
-        
-        if (fallbackDistance) {
-          console.log("Using fallback distance calculation:", fallbackDistance);
-          distanceResult = {
-            success: true as const,
-            distance: fallbackDistance,
-            time: "Estimated"
-          };
-        } else {
-          // If no fallback found, use a default distance
-          console.log("No fallback distance found, using default distance");
-          distanceResult = {
-            success: true as const,
-            distance: 850, // Average distance that works for reasonable pricing
-            time: "Estimated"
-          };
-        }
-      }
+      // Use the API to calculate distance correctly
+      const distanceResult = await calculateDistance(pickupLocation, dropoffLocation);
+      console.log("MapQuest API result:", distanceResult);
 
       if (!distanceResult.success) {
         const errorMessage = 'error' in distanceResult ? distanceResult.error : "Could not calculate distance between locations";
         console.error("Distance calculation failed:", errorMessage);
         
-        // Try fallback distance as a last resort
-        const fallbackDistance = getFallbackDistance(pickupLocation, dropoffLocation);
-        
-        if (fallbackDistance) {
-          console.log("Using fallback distance after API failure:", fallbackDistance);
-          distanceResult = {
-            success: true as const,
-            distance: fallbackDistance,
-            time: "Estimated"
-          };
-        } else {
-          // Show error only if all methods fail
-          toast({
-            title: "Location Error",
-            description: "Please verify both pickup and delivery locations are valid cities with state codes (e.g., 'Los Angeles, CA').",
-            variant: "destructive",
-          });
-          return;
-        }
+        toast({
+          title: "Location Error",
+          description: "Please verify both pickup and delivery locations are valid cities with state codes (e.g., 'Los Angeles, CA'). Try entering just the city and state without ZIP codes.",
+          variant: "destructive",
+        });
+        return;
       }
 
       // TypeScript check: If we're here, the distanceResult is successful and has a distance property

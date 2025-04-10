@@ -11,12 +11,12 @@ const addressSchema = z.object({
 export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
-  // Using http instead of https as it may be more reliable with the API
+  // Using http instead of https
   const baseUrl = 'http://www.mapquestapi.com';
-  // Use the hardcoded key directly
+  // Always use the specific key directly
   const apiKey = 'jV0ooBmJ51jGmPkXdxCAExWtL3BlFSH1';
   
-  console.log('MapQuest API key:', 'Using hardcoded key');
+  console.log('Using MapQuest API key directly');
 
   if (!apiKey) {
     console.error('MapQuest API key is missing');
@@ -203,19 +203,7 @@ export async function calculateDistance(origin: string, destination: string): Pr
       return result;
     }
 
-    // Try to get a fallback distance if API methods fail
-    console.log('API methods failed, trying fallback distance calculation');
-    const fallbackDistance = getFallbackDistance(origin, destination);
-    
-    if (fallbackDistance) {
-      console.log('Found fallback distance:', fallbackDistance);
-      const result: SuccessDistanceResult = {
-        success: true,
-        distance: fallbackDistance,
-        time: "Estimated" // We don't have travel time in fallback data
-      };
-      return result;
-    }
+    // Don't use any fallbacks
     
     return {
       success: false,
@@ -224,19 +212,7 @@ export async function calculateDistance(origin: string, destination: string): Pr
   } catch (error) {
     console.error('Distance calculation error:', error);
     
-    // Try fallback as a last resort
-    console.log('Error occurred, trying fallback distance as last resort');
-    const fallbackDistance = getFallbackDistance(origin, destination);
-    
-    if (fallbackDistance) {
-      console.log('Found fallback distance after error:', fallbackDistance);
-      const result: SuccessDistanceResult = {
-        success: true,
-        distance: fallbackDistance,
-        time: "Estimated" // We don't have travel time in fallback data
-      };
-      return result;
-    }
+    // No fallbacks used
     
     return {
       success: false,
