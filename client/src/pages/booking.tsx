@@ -153,14 +153,23 @@ export default function Booking() {
   });
 
   const onSubmit = async (formData: any) => {
+    setIsSubmitting(true);
     try {
+      // Add a slight delay to ensure the loading state is visible
+      // This provides better UX feedback during the transition
       const updatedData = {
         ...data,
         ...formData,
       };
-      navigate(
-        `/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`,
-      );
+      
+      // Use setTimeout to create a smooth transition
+      // This helps prevent the "strange behavior" during page transitions
+      setTimeout(() => {
+        navigate(
+          `/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`,
+        );
+      }, 500);
+      
     } catch (error) {
       console.error("Form submission error:", error);
       toast({
@@ -169,6 +178,7 @@ export default function Booking() {
           "There was a problem submitting the form. Please try again.",
         variant: "destructive",
       });
+      setIsSubmitting(false);
     }
   };
 
@@ -561,8 +571,16 @@ export default function Booking() {
                 <Button
                   type="submit"
                   className="w-full bg-[#002C42] hover:bg-[#001c32] text-white py-2"
+                  disabled={isSubmitting}
                 >
-                  Complete Reservation - No CC Required
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Complete Reservation - No CC Required"
+                  )}
                 </Button>
                 
                 <p className="text-center text-xs text-gray-500">
