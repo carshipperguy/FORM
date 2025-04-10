@@ -54,14 +54,44 @@ function extractLocation(location: string) {
     zip = "";
 
   if (parts.length >= 2) {
+    // First part is the city
     city = parts[0];
+    
+    // Last part should contain state and zip
     const lastPart = parts[parts.length - 1];
-    const stateZipPattern = /([A-Z]{2})\s+(\d{5})/;
+    
+    // Try to match "STATE ZIP" pattern (e.g., "NY 10001")
+    const stateZipPattern = /([A-Z]{2})\s+(\d{5}(-\d{4})?)/;
     const match = lastPart.match(stateZipPattern);
 
     if (match) {
       state = match[1];
       zip = match[2];
+    } else {
+      // If no match, try to extract state and zip separately
+      // Check if last part only contains the state
+      if (/^[A-Z]{2}$/.test(lastPart)) {
+        state = lastPart;
+        // Try to find zip in second to last part if there are more than 2 parts
+        if (parts.length > 2) {
+          const zipMatch = parts[parts.length - 2].match(/(\d{5}(-\d{4})?)/);
+          if (zipMatch) {
+            zip = zipMatch[1];
+          }
+        }
+      } else {
+        // Last attempt to extract state code
+        const stateMatch = lastPart.match(/\b([A-Z]{2})\b/);
+        if (stateMatch) {
+          state = stateMatch[1];
+        }
+        
+        // Last attempt to extract zip code
+        const zipMatch = lastPart.match(/\b(\d{5}(-\d{4})?)\b/);
+        if (zipMatch) {
+          zip = zipMatch[1];
+        }
+      }
     }
   }
 
