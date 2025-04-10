@@ -85,84 +85,87 @@ export default function ThankYou() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
-      <div className="w-full form-container">
-        <div className="mb-4 md:mb-6 text-center">
-          <img
-            src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
-            className="mx-auto h-10 md:h-12 lg:h-16 object-contain bg-white rounded-lg p-2 shadow-sm"
-            alt="Amerigo Auto Transport Logo" 
-          />
+    <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#ffffff] to-[#dc2626] text-black px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-6">
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#1e3a8a] drop-shadow-md">Thank You!</h1>
+          <p className="text-sm text-gray-700 mt-2">Military Owned • Family Operated • Proudly American</p>
         </div>
-        <Card className="border-gray-100 shadow-lg bg-white/80 backdrop-blur-md">
-          <CardContent className="pt-5 md:pt-8 pb-4 md:pb-6 px-4 md:px-6 lg:px-8 text-center">
-            <div className="bg-green-50 w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-5">
-              <CheckCircle className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-green-500" />
-            </div>
-            
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 text-[#1e3a8a]">Thank You!</h1>
-            <p className="text-sm md:text-base lg:text-lg text-gray-600 mb-4 md:mb-6">
+        
+        <div className="bg-white text-black rounded-2xl p-5 shadow-xl border border-gray-200 max-w-2xl mx-auto">
+          <div className="bg-green-50 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-green-500" />
+          </div>
+          
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-semibold text-[#1e3a8a] mb-2">Booking Confirmed</h2>
+            <p className="text-gray-600">
               Your booking request has been received. Our team will contact you soon to confirm your vehicle transport.
             </p>
-            
-            {data.finalPrice && (
-              <div className="bg-blue-50 p-3 md:p-5 rounded-lg mb-4 md:mb-6">
-                <h2 className="font-medium text-sm md:text-base lg:text-lg">Booking Summary</h2>
-                <p className="text-xs md:text-sm text-gray-600">
-                  {data.year} {data.make} {data.model}
-                </p>
-                <div className="text-xs md:text-sm text-gray-600 mb-1 md:mb-2 flex items-center justify-center">
-                  <span className="truncate max-w-[140px] md:max-w-[200px]">{data.pickupLocation}</span>
-                  <span className="mx-1 md:mx-2">→</span>
-                  <span className="truncate max-w-[140px] md:max-w-[200px]">{data.dropoffLocation}</span>
+          </div>
+          
+          {data.finalPrice && (
+            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              <h3 className="font-medium text-[#1e3a8a] mb-3">Booking Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}
                 </div>
-                <p className="text-lg md:text-xl lg:text-2xl font-bold text-[#dc2626]">{formattedPrice}</p>
+                <div>
+                  <span className="font-medium">From:</span> {data.pickupLocation}
+                </div>
+                <div>
+                  <span className="font-medium">To:</span> {data.dropoffLocation}
+                </div>
+                <div>
+                  <span className="font-medium">Price:</span> <span className="text-lg font-bold text-[#dc2626]">{formattedPrice}</span>
+                </div>
               </div>
-            )}
-            
-            {isSending ? (
-              <div className="flex items-center justify-center mb-4 md:mb-6">
-                <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin mr-2" />
-                <p className="text-xs md:text-sm text-gray-600">Sending confirmations...</p>
-              </div>
-            ) : (
-              <>
-                {(sentEmail || sentSMS) && (
-                  <div className="mb-4 md:mb-6 bg-gray-50 p-2 md:p-4 rounded-lg">
-                    <h3 className="text-xs md:text-sm font-medium mb-1 md:mb-2">Confirmations Sent:</h3>
-                    <div className="flex justify-center space-x-4 md:space-x-6">
-                      {sentEmail && (
-                        <div className="flex items-center text-green-600">
-                          <Mail className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          <span className="text-xs md:text-sm">Email</span>
-                        </div>
-                      )}
-                      {sentSMS && (
-                        <div className="flex items-center text-green-600">
-                          <Phone className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          <span className="text-xs md:text-sm">SMS</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-            
-            <div className="grid grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-5">
-              <Button asChild size="sm" className="text-xs md:text-sm lg:text-base py-1 md:py-2 lg:py-3 h-auto md:h-auto bg-[#1e3a8a] hover:bg-[#0f2a63]">
-                <Link href="/">Get Another Quote</Link>
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs md:text-sm lg:text-base py-1 md:py-2 lg:py-3 h-auto md:h-auto" onClick={handleShare}>
-                <Share2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" /> Share Quote
-              </Button>
             </div>
-            
-            <p className="text-xs md:text-sm text-gray-500">
-              Military Owned • Family Operated • Proudly American
-            </p>
-          </CardContent>
-        </Card>
+          )}
+          
+          {isSending ? (
+            <div className="flex items-center justify-center mb-6 p-3 bg-gray-50 rounded-lg">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              <p className="text-gray-600">Sending confirmations...</p>
+            </div>
+          ) : (
+            <>
+              {(sentEmail || sentSMS) && (
+                <div className="mb-6 bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium mb-2">Confirmations Sent:</h3>
+                  <div className="flex justify-center space-x-6">
+                    {sentEmail && (
+                      <div className="flex items-center text-green-600">
+                        <Mail className="w-4 h-4 mr-2" />
+                        <span>Email</span>
+                      </div>
+                    )}
+                    {sentSMS && (
+                      <div className="flex items-center text-green-600">
+                        <Phone className="w-4 h-4 mr-2" />
+                        <span>SMS</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-4">
+            <Button asChild className="bg-[#1e3a8a] hover:bg-[#0f2a63] rounded-full px-6">
+              <Link href="/">Get Another Quote</Link>
+            </Button>
+            <Button variant="outline" className="rounded-full" onClick={handleShare}>
+              <Share2 className="w-4 h-4 mr-2" /> Share Quote
+            </Button>
+          </div>
+        </div>
+        
+        <p className="text-center text-xs text-gray-800 mt-6">
+          Note: You will receive a confirmation email with your booking details and next steps.
+        </p>
       </div>
     </div>
   );
