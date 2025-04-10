@@ -18,7 +18,7 @@ import { type LocationOption, searchCitiesByQuery } from "@/lib/location-data";
 
 interface LocationSelectorProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, zipCode?: string) => void;  // Updated to include ZIP code
   placeholder?: string;
   label?: string;
   disabled?: boolean;
@@ -95,11 +95,12 @@ export function LocationSelector({
                   key={location.value}
                   value={location.value}
                   onSelect={(currentValue) => {
-                    // Ensure we include the ZIP code in the value
+                    // Get the ZIP code if available
                     const zip = location.zips && location.zips.length > 0 ? location.zips[0] : "";
-                    // Format as "City, STATE ZIP" to always include ZIP
-                    const valueWithZip = `${location.city}, ${location.state} ${zip}`;
-                    onChange(valueWithZip);
+                    // Format location display value (City, STATE)
+                    const displayValue = `${location.city}, ${location.state}`;
+                    // Pass both the display value and the ZIP code to parent
+                    onChange(displayValue, zip);
                     setOpen(false);
                   }}
                 >
