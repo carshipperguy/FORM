@@ -108,7 +108,7 @@ export default function Booking() {
       deliveryState: dropoffLocation.state,
       deliveryZip: dropoffLocation.zip,
 
-      expeditedShipping: false,
+
       notes: "",
       acceptTerms: false,
     },
