@@ -9,6 +9,7 @@ import Checkout from "@/pages/checkout";
 import Booking from "@/pages/booking-new";
 import FinalQuote from "@/pages/final-quote";
 import SimpleQuote from "@/pages/simple-quote";
+import TestMapQuest from "@/pages/test-mapquest";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/booking" component={Booking} />
       <Route path="/thank-you" component={ThankYou} />
+      <Route path="/test-mapquest" component={TestMapQuest} />
       <Route component={NotFound} />
     </Switch>
   );
