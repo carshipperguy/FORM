@@ -8,11 +8,13 @@ import ThankYou from "@/pages/thank-you";
 import Checkout from "@/pages/checkout";
 import Booking from "@/pages/booking";
 import FinalQuote from "@/pages/final-quote";
+import SimpleQuote from "@/pages/simple-quote";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={SimpleQuote} />
+      <Route path="/home" component={Home} />
       <Route path="/final-quote" component={FinalQuote} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/booking" component={Booking} />

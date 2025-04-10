@@ -43,7 +43,8 @@
   
   @media (min-width: 1024px) {
     .form-container {
-      width: 800px !important; /* Desktop size */
+      width: 1125px !important; /* Desktop size */
+      height: 858px !important; /* Height for desktop */
     }
   }
   
