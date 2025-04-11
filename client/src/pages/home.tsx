@@ -127,9 +127,9 @@ export default function Home() {
       // DEBUG: Force a known vehicle type for testing
       console.log("*** TESTING DIRECT HARD-CODED VALUES ***");
       const flatRateTest = calculatePricing(distance, "boat");
-      console.log("Flat rate test (should be $3.50/mile):", {
+      console.log("Flat rate test (should be $2.50/mile):", {
         boatPrice: flatRateTest,
-        expectedFlatRate: Math.round(distance * 3.5)
+        expectedFlatRate: Math.round(distance * 2.5)
       });
       
       // CALCULATE PRICE BASED ON VEHICLE TYPE
@@ -144,7 +144,7 @@ export default function Home() {
       
       if (isSpecialVehicle) {
         console.log("🚨 HOME COMPONENT EMERGENCY OVERRIDE - Using flat rate pricing for special vehicle:", normalizedVehicleType);
-        const flatRatePrice = distance * 3.50;
+        const flatRatePrice = distance * 2.50;
         pricing = {
           openTransport: Math.round(flatRatePrice),
           enclosedTransport: Math.round(flatRatePrice * 1.40),
