@@ -238,27 +238,23 @@ export default function Booking() {
   return (
     <MobileContainer>
       <div className="p-4 bg-white">
-        <div className="text-center mb-4">
-          <img
-            src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
-            alt="Amerigo Auto Transport Logo"
-            style={{
-              width: '200px',
-              display: 'block',
-              margin: '0 auto 10px',
-              maxWidth: '100%',
-              height: 'auto',
-              objectFit: 'contain'
-            }}
-            onError={(e) => {
-              e.currentTarget.src = 'https://via.placeholder.com/200x80?text=Amerigo+Logo';
-            }}
-          />
-        </div>
+
         
         <div className="bg-white text-black border border-gray-200 mb-4">
-          <div className="bg-[#002C42] text-white p-2">
-            <h2 className="text-sm font-medium">Your Shipping Details</h2>
+          <div className="bg-[#002C42] text-white p-2 flex items-center justify-center">
+            <img
+              src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+              alt="Amerigo Auto Transport Logo"
+              style={{
+                width: '140px',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/140x50?text=Amerigo+Logo';
+              }}
+            />
           </div>
           <div className="p-3 space-y-2 text-sm text-gray-700">
             <div>
