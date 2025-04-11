@@ -181,29 +181,49 @@ export default function Home() {
 
       // Send initial form data to webhook
       try {
-        console.log("Sending initial quote data to webhook");
-        fetch("/api/webhook", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            ...quoteData,
-            eventType: "initial_quote_submission",
-            eventDate: new Date().toISOString()
-          }),
-        })
-        .then(response => response.json())
-        .then(result => {
-          console.log("Webhook response:", result);
-        })
-        .catch(webhookError => {
-          // Don't prevent navigation if webhook fails
-          console.error("Error sending data to webhook:", webhookError);
-        });
+        const webhookData = {
+          ...quoteData,
+          eventType: "initial_quote_submission",
+          eventDate: new Date().toISOString()
+        };
+        
+        console.log("🔴 SENDING INITIAL QUOTE DATA TO WEBHOOK:", JSON.stringify(webhookData, null, 2));
+        
+        // Use await to ensure we catch any errors properly
+        (async () => {
+          try {
+            const webhookResponse = await fetch("/api/webhook", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+              },
+              body: JSON.stringify(webhookData),
+            });
+            
+            const responseText = await webhookResponse.text();
+            console.log("🔴 WEBHOOK RESPONSE STATUS:", webhookResponse.status, webhookResponse.statusText);
+            console.log("🔴 WEBHOOK RESPONSE BODY:", responseText);
+            
+            // Try to parse the response if it's JSON
+            try {
+              const result = JSON.parse(responseText);
+              console.log("🔴 WEBHOOK PARSED RESPONSE:", result);
+            } catch (e) {
+              console.log("🔴 WEBHOOK RESPONSE IS NOT JSON");
+            }
+            
+            if (!webhookResponse.ok) {
+              console.error("🔴 WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
+            } else {
+              console.log("🔴 WEBHOOK SENT SUCCESSFULLY");
+            }
+          } catch (webhookError) {
+            console.error("🔴 ERROR SENDING DATA TO WEBHOOK:", webhookError);
+          }
+        })();
       } catch (error) {
-        console.error("Error preparing webhook data:", error);
+        console.error("🔴 ERROR PREPARING WEBHOOK DATA:", error);
       }
 
       const params = new URLSearchParams({
