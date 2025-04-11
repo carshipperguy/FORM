@@ -405,6 +405,13 @@ export function registerRoutes(app: Express): Server {
       console.log("🚀 SENDING FINAL SUBMISSION TO:", webhookUrl);
       
       try {
+        // Convert data to JSON string
+        const jsonData = JSON.stringify(finalSubmissionData);
+        
+        // Log the exact JSON being sent
+        console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER:");
+        console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+        
         const response = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
@@ -412,7 +419,7 @@ export function registerRoutes(app: Express): Server {
             'Accept': 'application/json',
             'User-Agent': 'Amerigo-Auto-Transport/1.0',
           },
-          body: JSON.stringify(finalSubmissionData),
+          body: jsonData,
         });
         
         console.log(`📡 FINAL SUBMISSION RESPONSE STATUS: ${response.status} ${response.statusText}`);
@@ -654,6 +661,13 @@ export function registerRoutes(app: Express): Server {
       const finalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       
       try {
+        // Convert data to JSON string
+        const jsonData = JSON.stringify(enhancedTestData);
+        
+        // Log the exact JSON being sent
+        console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER:");
+        console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+        
         const response = await fetch(finalWebhookUrl, {
           method: 'POST',
           headers: {
@@ -661,7 +675,7 @@ export function registerRoutes(app: Express): Server {
             'Accept': 'application/json',
             'User-Agent': 'Amerigo-Auto-Transport/1.0',
           },
-          body: JSON.stringify(enhancedTestData),
+          body: jsonData,
         });
         
         console.log(`📡 FINAL WEBHOOK TEST RESPONSE STATUS: ${response.status} ${response.statusText}`);
