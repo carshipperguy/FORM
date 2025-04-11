@@ -285,6 +285,79 @@ export function registerRoutes(app: Express): Server {
       // Send to the dedicated final submission webhook
       console.log("📤 SENDING FINAL SUBMISSION TO DEDICATED WEBHOOK");
       
+      // Parse addresses to extract city, state, and zip
+      const parseAddress = (address: string) => {
+        const parts = address ? address.split(',').map(part => part.trim()) : [];
+        
+        // If there are no parts, return default values
+        if (parts.length === 0) {
+          return { street: 'Not provided', city: 'Not provided', state: 'Not provided', zip: 'Not provided' };
+        }
+        
+        // First part is usually the street address
+        const street = parts[0];
+        
+        // Last part usually contains state and zip
+        const lastPart = parts[parts.length - 1];
+        
+        // Try to match "STATE ZIP" pattern (e.g., "NY 10001")
+        const stateZipPattern = /([A-Z]{2})\s+(\d{5}(-\d{4})?)/;
+        const match = lastPart ? lastPart.match(stateZipPattern) : null;
+        
+        let state = 'Not provided';
+        let zip = 'Not provided';
+        
+        if (match) {
+          state = match[1];
+          zip = match[2];
+        } else {
+          // If no match, try to extract state and zip separately
+          const stateMatch = lastPart ? lastPart.match(/([A-Z]{2})/) : null;
+          const zipMatch = lastPart ? lastPart.match(/(\d{5}(-\d{4})?)/) : null;
+          
+          if (stateMatch) state = stateMatch[1];
+          if (zipMatch) zip = zipMatch[1];
+        }
+        
+        // If we have more than 2 parts, the city is usually the second to last part
+        // Otherwise, we can't reliably determine the city
+        let city = 'Not provided';
+        if (parts.length > 1) {
+          // If last part has state and zip, then second to last is city
+          // Otherwise, we need to look at parts before that
+          if (parts.length === 2) {
+            // Extract city from the middle of the address if it's not just a street
+            const cityParts = parts[1].split(' ');
+            if (cityParts.length > 1) {
+              // Remove zip code and state from city if present
+              city = cityParts.filter(part => !part.match(/^\d{5}(-\d{4})?$/) && !part.match(/^[A-Z]{2}$/)).join(' ');
+            }
+          } else {
+            // Second to last part is usually the city
+            city = parts[parts.length - 2];
+          }
+        }
+        
+        return { street, city, state, zip };
+      };
+      
+      // Parse the pickup and dropoff addresses
+      const pickupAddressParsed = parseAddress(formData.pickupAddress);
+      const dropoffAddressParsed = parseAddress(formData.dropoffAddress);
+      
+      // Format the shipment date properly if it exists
+      let formattedShipmentDate = 'Not provided';
+      if (formData.shipmentDate) {
+        try {
+          const shipDate = new Date(formData.shipmentDate);
+          // Format as MM/DD/YYYY
+          formattedShipmentDate = `${shipDate.getMonth() + 1}/${shipDate.getDate()}/${shipDate.getFullYear()}`;
+        } catch (e) {
+          console.error("Error formatting shipment date:", e);
+          formattedShipmentDate = String(formData.shipmentDate);
+        }
+      }
+      
       // Structure the data for Zapier
       const finalSubmissionData = {
         ...formData,
@@ -296,6 +369,7 @@ export function registerRoutes(app: Express): Server {
         "Contact Email": formData.email || 'Not provided',
         "Contact Phone": formData.phone || 'Not provided',
         
+        // Original pickup and dropoff locations
         "Pickup Location": formData.pickupLocation || 'Not provided',
         "Pickup Address": formData.pickupAddress || 'Not provided',
         "Pickup Contact Name": formData.pickupContactName || 'Not provided',
@@ -306,9 +380,20 @@ export function registerRoutes(app: Express): Server {
         "Dropoff Contact Name": formData.dropoffContactName || 'Not provided',
         "Dropoff Contact Phone": formData.dropoffContactPhone || 'Not provided',
         
+        // Parsed address components
+        "Pickup Street": pickupAddressParsed.street,
+        "Pickup City": pickupAddressParsed.city,
+        "Pickup State": pickupAddressParsed.state,
+        "Pickup Zip": pickupAddressParsed.zip,
+        
+        "Dropoff Street": dropoffAddressParsed.street,
+        "Dropoff City": dropoffAddressParsed.city,
+        "Dropoff State": dropoffAddressParsed.state,
+        "Dropoff Zip": dropoffAddressParsed.zip,
+        
         "Vehicle Details": `${formData.year || ''} ${formData.make || ''} ${formData.model || ''}`,
         "Transport Type": formData.transportType || 'Not provided',
-        "Shipment Date": formData.shipmentDate || 'Not provided',
+        "Shipment Date": formattedShipmentDate,
         "Price": formData.openTransportPrice || formData.selectedPrice || 'Not provided',
         "Distance": formData.distance || 'Not provided',
         "Transit Time": formData.transitTime || 'Not provided'
@@ -427,7 +512,11 @@ export function registerRoutes(app: Express): Server {
   // Test endpoint for testing the final-submission webhook
   app.get("/api/test-final-webhook", async (req, res) => {
     try {
-      console.log("\n🧪 TESTING FINAL SUBMISSION WEBHOOK...");
+      console.log("\n🧪 TESTING FINAL SUBMISSION WEBHOOK (WITH ADDRESS PARSING AND SHIPMENT DATE)...");
+      
+      // Create a shipment date for testing (2 weeks from now)
+      const shipmentDate = new Date();
+      shipmentDate.setDate(shipmentDate.getDate() + 14);
       
       // Create comprehensive test data with address information
       const testData = {
@@ -457,10 +546,110 @@ export function registerRoutes(app: Express): Server {
         transportType: "open",
         selectedPrice: 100,
         isExpeditedShipping: false,
+        shipmentDate: shipmentDate.toISOString(),
         submissionDate: new Date().toISOString()
       };
       
-      console.log("📤 SENDING TEST FINAL SUBMISSION DATA...");
+      console.log("📤 SENDING TEST FINAL SUBMISSION DATA WITH PARSED ADDRESSES...");
+      
+      // Parse the addresses for the test data
+      const parseAddress = (address: string) => {
+        const parts = address ? address.split(',').map(part => part.trim()) : [];
+        
+        // If there are no parts, return default values
+        if (parts.length === 0) {
+          return { street: 'Not provided', city: 'Not provided', state: 'Not provided', zip: 'Not provided' };
+        }
+        
+        // First part is usually the street address
+        const street = parts[0];
+        
+        // Last part usually contains state and zip
+        const lastPart = parts[parts.length - 1];
+        
+        // Try to match "STATE ZIP" pattern (e.g., "NY 10001")
+        const stateZipPattern = /([A-Z]{2})\s+(\d{5}(-\d{4})?)/;
+        const match = lastPart ? lastPart.match(stateZipPattern) : null;
+        
+        let state = 'Not provided';
+        let zip = 'Not provided';
+        
+        if (match) {
+          state = match[1];
+          zip = match[2];
+        } else {
+          // If no match, try to extract state and zip separately
+          const stateMatch = lastPart ? lastPart.match(/([A-Z]{2})/) : null;
+          const zipMatch = lastPart ? lastPart.match(/(\d{5}(-\d{4})?)/) : null;
+          
+          if (stateMatch) state = stateMatch[1];
+          if (zipMatch) zip = zipMatch[1];
+        }
+        
+        // If we have more than 2 parts, the city is usually the second to last part
+        // Otherwise, we can't reliably determine the city
+        let city = 'Not provided';
+        if (parts.length > 1) {
+          // If last part has state and zip, then second to last is city
+          // Otherwise, we need to look at parts before that
+          if (parts.length === 2) {
+            // Extract city from the middle of the address if it's not just a street
+            const cityParts = parts[1].split(' ');
+            if (cityParts.length > 1) {
+              // Remove zip code and state from city if present
+              city = cityParts.filter(part => !part.match(/^\d{5}(-\d{4})?$/) && !part.match(/^[A-Z]{2}$/)).join(' ');
+            }
+          } else {
+            // Second to last part is usually the city
+            city = parts[parts.length - 2];
+          }
+        }
+        
+        return { street, city, state, zip };
+      };
+      
+      // Parse the pickup and dropoff addresses
+      const pickupAddressParsed = parseAddress(testData.pickupAddress);
+      const dropoffAddressParsed = parseAddress(testData.dropoffAddress);
+      
+      // Format shipment date as MM/DD/YYYY
+      const shipDate = new Date(testData.shipmentDate);
+      const formattedShipmentDate = `${shipDate.getMonth() + 1}/${shipDate.getDate()}/${shipDate.getFullYear()}`;
+      
+      // Create enhanced test data with parsed addresses and formatted date
+      const enhancedTestData = {
+        ...testData,
+        
+        // Parsed address components
+        "Pickup Street": pickupAddressParsed.street,
+        "Pickup City": pickupAddressParsed.city,
+        "Pickup State": pickupAddressParsed.state,
+        "Pickup Zip": pickupAddressParsed.zip,
+        
+        "Dropoff Street": dropoffAddressParsed.street,
+        "Dropoff City": dropoffAddressParsed.city,
+        "Dropoff State": dropoffAddressParsed.state,
+        "Dropoff Zip": dropoffAddressParsed.zip,
+        
+        // Formatted shipment date
+        "Shipment Date": formattedShipmentDate
+      };
+      
+      console.log("📄 ENHANCED TEST DATA:", {
+        pickupAddress: {
+          street: pickupAddressParsed.street,
+          city: pickupAddressParsed.city,
+          state: pickupAddressParsed.state,
+          zip: pickupAddressParsed.zip
+        },
+        dropoffAddress: {
+          street: dropoffAddressParsed.street,
+          city: dropoffAddressParsed.city,
+          state: dropoffAddressParsed.state,
+          zip: dropoffAddressParsed.zip
+        },
+        shipmentDate: formattedShipmentDate
+      });
       
       const finalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       
@@ -472,7 +661,7 @@ export function registerRoutes(app: Express): Server {
             'Accept': 'application/json',
             'User-Agent': 'Amerigo-Auto-Transport/1.0',
           },
-          body: JSON.stringify(testData),
+          body: JSON.stringify(enhancedTestData),
         });
         
         console.log(`📡 FINAL WEBHOOK TEST RESPONSE STATUS: ${response.status} ${response.statusText}`);
@@ -501,7 +690,7 @@ export function registerRoutes(app: Express): Server {
         
         res.json({
           success: true,
-          message: "Final webhook test successful - check your Zapier dashboard for a complete test submission"
+          message: "Final webhook test successful with parsed addresses and formatted shipment date - check your Zapier dashboard"
         });
       } catch (webhookError) {
         console.error("❌ FINAL WEBHOOK TEST FAILED:", webhookError);
