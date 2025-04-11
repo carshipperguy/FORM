@@ -61,6 +61,25 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
         formattedShipmentDate = data.shipmentDate; // fallback to original
       }
     }
+    
+    // Log the Zapier field mapping to help debug integration
+    console.log('📋 ZAPIER FIELD MAPPING KEYS:');
+    console.log('- Contact Info Name');
+    console.log('- Contact Info Email');
+    console.log('- Contact Info Phone (required)');
+    console.log('- Route Details Pickup City');
+    console.log('- Route Details Pickup State');
+    console.log('- Route Details Pickup Zip');
+    console.log('- Route Details Dropoff City');
+    console.log('- Route Details Dropoff State');
+    console.log('- Route Details Dropoff Zip');
+    console.log('- Route Details Distance (in miles)');
+    console.log('- Route Details Estimated Transit Time');
+    console.log('- Route Details Shipment Date');
+    console.log('- Price Details Total Price (Open Transport Only)');
+    console.log('- Vehicle Details Year');
+    console.log('- Vehicle Details Make');
+    console.log('- Vehicle Details Model');
 
     // 3. Format the data with the exact field names requested for Zapier mapping
     const formattedData = {
@@ -152,6 +171,19 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       // Not JSON, just log the text
       console.log('✅ WEBHOOK SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
     }
+    
+    // Log the actual data we sent for debugging
+    console.log('📦 WEBHOOK DATA SENT TO ZAPIER:');
+    console.log('- Contact Info Name:', formattedData["Contact Info Name"]);
+    console.log('- Contact Info Email:', formattedData["Contact Info Email"]);
+    console.log('- Contact Info Phone:', formattedData["Contact Info Phone (required)"]);
+    console.log('- Route Details Pickup City:', formattedData["Route Details Pickup City"]);
+    console.log('- Route Details Pickup State:', formattedData["Route Details Pickup State"]);
+    console.log('- Route Details Pickup Zip:', formattedData["Route Details Pickup Zip"]);
+    console.log('- Route Details Dropoff City:', formattedData["Route Details Dropoff City"]);
+    console.log('- Route Details Dropoff State:', formattedData["Route Details Dropoff State"]);
+    console.log('- Route Details Dropoff Zip:', formattedData["Route Details Dropoff Zip"]);
+    console.log('- Route Details Shipment Date:', formattedData["Route Details Shipment Date"]);
 
     console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY\n');
     return { success: true, message: 'Webhook sent successfully' };
