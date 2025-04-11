@@ -1,5 +1,27 @@
 import fetch from 'node-fetch';
 
+// Helper functions to parse location data
+const extractCity = (location?: string): string => {
+  if (!location) return 'Not provided';
+  // Extract everything before the comma
+  const match = location.match(/^([^,]+)/);
+  return match ? match[1].trim() : 'Not provided';
+};
+
+const extractState = (location?: string): string => {
+  if (!location) return 'Not provided';
+  // Match the state code (2 uppercase letters after a comma)
+  const match = location.match(/,\s*([A-Z]{2})/);
+  return match ? match[1].trim() : 'Not provided';
+};
+
+const extractZip = (location?: string): string => {
+  if (!location) return 'Not provided';
+  // Match 5 digits at the end of the string (standard ZIP code format)
+  const match = location.match(/(\d{5})(?:\s*$|-\d{4}\s*$)/);
+  return match ? match[1].trim() : 'Not provided';
+};
+
 /**
  * Send data to a webhook URL
  * @param data The data to send to the webhook
@@ -21,41 +43,42 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     const submissionDate = data.submissionDate || new Date().toISOString();
     const eventType = data.eventType || "form_submission";
     
-    // 3. Format the data in a way that's optimized for webhook consumers
+    // 3. Format the data with the exact field names requested for Zapier mapping
     const formattedData = {
+      // Event metadata
       submissionId,
       submissionDate,
       eventType,
       
-      // Essential contact and quote information  
-      name: data.name || 'Not provided',
-      email: data.email || 'Not provided',
-      phone: data.phone || 'Not provided',
+      // Contact Info fields
+      "Contact Info Name": data.name || 'Not provided',
+      "Contact Info Email": data.email || 'Not provided',
+      "Contact Info Phone (required)": data.phone || 'Not provided',
       
-      // Vehicle information
-      vehicleInfo: {
-        type: data.vehicleType || 'Not provided',
-        year: data.year || 'Not provided',
-        make: data.make || 'Not provided',
-        model: data.model || 'Not provided',
-      },
+      // Route Details fields
+      "Route Details Pickup City": extractCity(data.pickupLocation),
+      "Route Details Pickup State": extractState(data.pickupLocation),
+      "Route Details Pickup Zip": data.pickupZip || extractZip(data.pickupLocation) || 'Not provided',
+      "Route Details Dropoff City": extractCity(data.dropoffLocation),
+      "Route Details Dropoff State": extractState(data.dropoffLocation),
+      "Route Details Dropoff Zip": data.dropoffZip || extractZip(data.dropoffLocation) || 'Not provided',
+      "Route Details Distance (in miles)": data.distance || 0,
+      "Route Details Estimated Transit Time": data.transitTime || 0,
       
-      // Route information
-      routeInfo: {
-        pickupLocation: data.pickupLocation || 'Not provided',
-        pickupZip: data.pickupZip || 'Not provided',
-        dropoffLocation: data.dropoffLocation || 'Not provided',
-        dropoffZip: data.dropoffZip || 'Not provided',
-        distance: data.distance || 0,
-        transitTime: data.transitTime || 0,
-      },
+      // Price Details fields
+      "Price Details Total Price (Open Transport Only)": data.openTransportPrice || 'Not provided',
       
-      // Shipping preferences
-      shippingInfo: {
-        shipmentDate: data.shipmentDate || 'Not provided',
-        openTransportPrice: data.openTransportPrice || 'Not provided',
-        enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
-      },
+      // Vehicle Details fields
+      "Vehicle Details Year": data.year || 'Not provided',
+      "Vehicle Details Make": data.make || 'Not provided',
+      "Vehicle Details Model": data.model || 'Not provided',
+      
+      // Also include original fields for backward compatibility
+      pickupLocation: data.pickupLocation || 'Not provided',
+      dropoffLocation: data.dropoffLocation || 'Not provided',
+      vehicleType: data.vehicleType || 'Not provided',
+      shipmentDate: data.shipmentDate || 'Not provided',
+      enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
     };
 
     // 4. Log webhook event details
