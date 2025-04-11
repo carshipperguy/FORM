@@ -41,7 +41,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       
       // Fall back to the hardcoded webhook URL if in production and no env var is set
       // IMPORTANT: This is a temporary measure to ensure the webhook works in production
-      webhookUrl = "https://hooks.zapier.com/hooks/catch/14924349/3v7e2yl/";
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
       console.log('⚠️ USING FALLBACK WEBHOOK URL:', webhookUrl);
     } else {
       // Print the first 30 characters of the webhook URL (safe to show part of it)
