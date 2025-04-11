@@ -182,16 +182,52 @@ export default function Booking() {
   const onSubmit = async (formData: any) => {
     setIsSubmitting(true);
     try {
-      // Add a slight delay to ensure the loading state is visible
-      // This provides better UX feedback during the transition
+      // Create formatted address strings
+      const pickupAddress = `${formData.pickupStreetAddress}, ${formData.pickupCity}, ${formData.pickupState} ${formData.pickupZip}`;
+      const dropoffAddress = `${formData.deliveryStreetAddress}, ${formData.deliveryCity}, ${formData.deliveryState} ${formData.deliveryZip}`;
+      
+      // Combine all data
       const updatedData = {
         ...data,
         ...formData,
         submissionDate: new Date().toISOString(),
+        
+        // Add properly formatted address fields for webhook integration
+        pickupContactName: formData.pickupContactName,
+        pickupContactPhone: formData.pickupContactPhone,
+        pickupAddress: pickupAddress,
+        
+        dropoffContactName: formData.deliveryContactName,
+        dropoffContactPhone: formData.deliveryContactPhone,
+        dropoffAddress: dropoffAddress,
+        
+        // Add transport selection details
+        transportType: data.selectedTransport,
+        selectedPrice: data.finalPrice,
+        isExpeditedShipping: data.guaranteedDate
       };
       
-      // No webhook call at booking completion - we only send data when the initial form is submitted
-      console.log("Completing booking without webhook - data already sent at initial form submission");
+      console.log("📝 SENDING COMPLETE BOOKING DATA TO FINAL SUBMISSION ENDPOINT");
+      
+      try {
+        // Send the complete data to our new final-submission endpoint
+        const response = await fetch("/api/final-submission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        });
+        
+        if (response.ok) {
+          console.log("✅ SUCCESSFULLY SENT COMPLETE BOOKING DATA TO ZAPIER");
+        } else {
+          console.error("❌ ERROR SENDING FINAL SUBMISSION:", await response.text());
+        }
+      } catch (webhookError) {
+        console.error("❌ WEBHOOK REQUEST FAILED:", webhookError);
+        // Continue with booking process despite webhook failure
+      }
       
       // Use setTimeout to create a smooth transition
       // This helps prevent the "strange behavior" during page transitions

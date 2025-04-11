@@ -423,6 +423,103 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
+  
+  // Test endpoint for testing the final-submission webhook
+  app.get("/api/test-final-webhook", async (req, res) => {
+    try {
+      console.log("\n🧪 TESTING FINAL SUBMISSION WEBHOOK...");
+      
+      // Create comprehensive test data with address information
+      const testData = {
+        name: "TEST_FINAL_USER",
+        email: "test-final@example.com",
+        phone: "555-555-5555",
+        eventType: "final_webhook_test",
+        year: "2025",
+        make: "Test",
+        model: "Model",
+        pickupLocation: "Test Pickup City, TX 12345",
+        dropoffLocation: "Test Dropoff City, TX 67890",
+        distance: 100,
+        openTransportPrice: 100,
+        enclosedTransportPrice: 150,
+        transitTime: 1,
+        
+        // Final submission specific data
+        pickupContactName: "Test Pickup Contact",
+        pickupContactPhone: "111-111-1111",
+        pickupAddress: "123 Pickup St, Test Pickup City, TX 12345",
+        
+        dropoffContactName: "Test Dropoff Contact",
+        dropoffContactPhone: "222-222-2222",
+        dropoffAddress: "456 Dropoff St, Test Dropoff City, TX 67890",
+        
+        transportType: "open",
+        selectedPrice: 100,
+        isExpeditedShipping: false,
+        submissionDate: new Date().toISOString()
+      };
+      
+      console.log("📤 SENDING TEST FINAL SUBMISSION DATA...");
+      
+      const finalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      
+      try {
+        const response = await fetch(finalWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'Amerigo-Auto-Transport/1.0',
+          },
+          body: JSON.stringify(testData),
+        });
+        
+        console.log(`📡 FINAL WEBHOOK TEST RESPONSE STATUS: ${response.status} ${response.statusText}`);
+        
+        const responseText = await response.text();
+        
+        if (!response.ok) {
+          console.error(`❌ FINAL WEBHOOK TEST FAILED: ${response.status} ${response.statusText}`);
+          console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Final webhook test failed" 
+          });
+        }
+        
+        // Try to parse the response if it's JSON
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          console.log('✅ FINAL WEBHOOK TEST SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
+        } catch (e) {
+          // Not JSON, just log the text
+          console.log('✅ FINAL WEBHOOK TEST SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
+        }
+        
+        console.log('✅ FINAL WEBHOOK TEST SUCCESSFUL\n');
+        
+        res.json({
+          success: true,
+          message: "Final webhook test successful - check your Zapier dashboard for a complete test submission"
+        });
+      } catch (webhookError) {
+        console.error("❌ FINAL WEBHOOK TEST FAILED:", webhookError);
+        res.status(500).json({
+          success: false,
+          message: "Final webhook test failed",
+          error: webhookError instanceof Error ? webhookError.message : String(webhookError)
+        });
+      }
+    } catch (error) {
+      console.error("❌ FINAL WEBHOOK TEST ERROR:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error testing final webhook",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
 
   // Dedicated webhook endpoint for CRM integration
   // This is the ONLY endpoint that sends data to the webhook
