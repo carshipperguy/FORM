@@ -35,7 +35,6 @@ export default function ThankYou() {
                 e.currentTarget.src = 'https://via.placeholder.com/160x60?text=Amerigo+Logo';
               }}
             />
-            <p className="text-xs text-gray-700">Amerigo Auto Transport</p>
           </div>
         </div>
         
@@ -53,7 +52,22 @@ export default function ThankYou() {
           
           {data.finalPrice && (
             <div className="bg-gray-50 p-3 border-t border-b border-gray-200 mb-4">
-              <h3 className="font-medium text-[#002C42] mb-2 text-sm">Booking Summary</h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium text-[#002C42] text-sm">Booking Summary</h3>
+                <img
+                  src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+                  alt="Amerigo Auto Transport Logo"
+                  style={{
+                    width: '100px',
+                    maxWidth: '100%',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/100x40?text=Amerigo+Logo';
+                  }}
+                />
+              </div>
               <div className="space-y-1 text-sm">
                 <div>
                   <span className="font-medium">Vehicle:</span> {data.year} {data.make} {data.model}
