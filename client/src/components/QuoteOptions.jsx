@@ -95,12 +95,22 @@ const QuoteOptions = ({ data }) => {
           <div className="text-center mb-4 p-3 bg-[#002868] rounded-md shadow-md">
             <h1 className="text-xl font-bold text-white">Shipping Quote Summary</h1>
             <div className="flex items-center justify-center mt-2">
-              <img 
-                src="/amerigo-logo.png" 
-                alt="Amerigo Auto Transport Logo" 
-                className="h-7 mr-2"
+              <img
+                src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+                alt="Amerigo Auto Transport Logo"
+                style={{
+                  width: '120px',
+                  display: 'block',
+                  margin: '0 auto 5px',
+                  maxWidth: '100%',
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/120x45?text=Amerigo+Logo';
+                }}
               />
-              <p className="text-xs text-white font-semibold">
+              <p className="text-xs text-white font-semibold ml-2">
                 Military Owned • Family Operated • Proudly American
               </p>
             </div>
