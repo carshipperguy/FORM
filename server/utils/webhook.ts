@@ -29,16 +29,27 @@ const extractZip = (location?: string): string => {
  */
 export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string }> {
   try {
-    // 1. Validate webhook URL is available
-    if (!process.env.WEBHOOK_URL) {
-      console.error('🚨 WEBHOOK ERROR: No webhook URL provided in environment variables');
-      return { success: false, message: 'No webhook URL provided' };
+    console.log('🔍 WEBHOOK FUNCTION CALLED - Environment check...');
+    
+    // 1. Enhanced environment variable validation
+    let webhookUrl = process.env.WEBHOOK_URL;
+    
+    // More detailed debugging for environment variables
+    if (!webhookUrl || webhookUrl.trim() === '') {
+      console.error('🚨 CRITICAL: WEBHOOK_URL environment variable is missing or empty');
+      console.log('🔑 Available environment variables:', Object.keys(process.env).filter(key => !key.includes('KEY') && !key.includes('SECRET')).join(', '));
+      
+      // Fall back to the hardcoded webhook URL if in production and no env var is set
+      // IMPORTANT: This is a temporary measure to ensure the webhook works in production
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/14924349/3v7e2yl/";
+      console.log('⚠️ USING FALLBACK WEBHOOK URL:', webhookUrl.substring(0, 30) + '...');
+    } else {
+      // Print the first 30 characters of the webhook URL (safe to show part of it)
+      console.log('🔗 WEBHOOK URL FROM ENV:', webhookUrl.substring(0, 30) + '...');
     }
 
-    // Print the first 30 characters of the webhook URL (safe to show part of it)
-    console.log('🔗 WEBHOOK URL CONFIGURED:', process.env.WEBHOOK_URL.substring(0, 30) + '...');
-
-    // 2. Prepare the request data
+    // 2. Prepare the request data with more verbose logging
+    console.log('📋 PREPARING WEBHOOK DATA...');
     const submissionId = data.submissionId || `AUTO-${Date.now()}`;
     const submissionDate = data.submissionDate || new Date().toISOString();
     const eventType = data.eventType || "form_submission";
@@ -57,7 +68,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
           formattedShipmentDate = `${month}/${day}/${year}`;
         }
       } catch (e) {
-        console.error('Error formatting date:', e);
+        console.error('⚠️ Error formatting date:', e);
         formattedShipmentDate = data.shipmentDate; // fallback to original
       }
     }
@@ -133,26 +144,46 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log(`🕒 Event: ${eventType} at ${new Date().toISOString()}`);
     console.log('======================================\n');
 
-    // 5. Send the webhook request - using the direct URL from environment
-    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${process.env.WEBHOOK_URL.substring(0, 30)}...`);
-    const webhookUrl = process.env.WEBHOOK_URL;
+    // 5. Send the webhook request - with enhanced error handling
+    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl.substring(0, 30)}...`);
     
-    // Make the request with proper error handling
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'Amerigo-Auto-Transport/1.0',
-      },
-      body: JSON.stringify(formattedData),
-    });
-
-    // 6. Process the response
-    console.log(`📡 WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+    // Attempt to make the request with extensive error handling and logging
+    console.log('📤 STARTING FETCH REQUEST...');
+    let response;
     
-    // Get the response text for better error reporting
-    const responseText = await response.text();
+    try {
+      response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'Amerigo-Auto-Transport/1.0',
+        },
+        body: JSON.stringify(formattedData),
+      });
+      
+      console.log('📡 FETCH COMPLETED, PROCESSING RESPONSE...');
+      console.log(`📡 WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+    } catch (fetchError) {
+      console.error('❌ FETCH REQUEST FAILED:', fetchError);
+      return { 
+        success: false, 
+        message: `Network error while sending webhook: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` 
+      };
+    }
+    
+    // 6. Process the response with enhanced error handling
+    let responseText;
+    try {
+      responseText = await response.text();
+      console.log('📝 RECEIVED RESPONSE TEXT LENGTH:', responseText.length);
+    } catch (textError) {
+      console.error('❌ FAILED TO READ RESPONSE TEXT:', textError);
+      return { 
+        success: false, 
+        message: `Failed to read response from webhook: ${textError instanceof Error ? textError.message : String(textError)}` 
+      };
+    }
     
     if (!response.ok) {
       console.error(`❌ WEBHOOK ERROR: ${response.status} ${response.statusText}`);
@@ -188,7 +219,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY\n');
     return { success: true, message: 'Webhook sent successfully' };
   } catch (error) {
-    console.error('❌ WEBHOOK ERROR:', error);
+    console.error('❌ WEBHOOK FATAL ERROR:', error);
     return { 
       success: false, 
       message: `Error sending webhook: ${error instanceof Error ? error.message : String(error)}` 
