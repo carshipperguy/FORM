@@ -253,6 +253,128 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // New endpoint specifically for final form submissions
+  // This endpoint fires only when the final "Submit" button is clicked
+  app.post("/api/final-submission", async (req, res) => {
+    try {
+      console.log("\n🔔 FINAL FORM SUBMISSION - Complete booking data received");
+      const formData = req.body;
+      
+      // Log the incoming data for debugging
+      console.log("📝 FINAL FORM DATA RECEIVED:", {
+        name: formData?.name || 'Not provided',
+        email: formData?.email || 'Not provided',
+        phone: formData?.phone || 'Not provided',
+        vehicle: `${formData?.year || ''} ${formData?.make || ''} ${formData?.model || ''}`,
+        from: formData?.pickupLocation || 'Not provided',
+        to: formData?.dropoffLocation || 'Not provided',
+        pickupContactName: formData?.pickupContactName || 'Not provided',
+        pickupContactPhone: formData?.pickupContactPhone || 'Not provided',
+        pickupAddress: formData?.pickupAddress || 'Not provided',
+        dropoffContactName: formData?.dropoffContactName || 'Not provided',
+        dropoffContactPhone: formData?.dropoffContactPhone || 'Not provided',
+        dropoffAddress: formData?.dropoffAddress || 'Not provided'
+      });
+      
+      // Validate minimal required data
+      if (!formData) {
+        console.error("❌ FINAL SUBMISSION ERROR: No form data provided");
+        return res.status(400).json({ error: "Form data is required" });
+      }
+      
+      // Send to the dedicated final submission webhook
+      console.log("📤 SENDING FINAL SUBMISSION TO DEDICATED WEBHOOK");
+      
+      // Structure the data for Zapier
+      const finalSubmissionData = {
+        ...formData,
+        eventType: "final_submission",
+        eventDate: new Date().toISOString(),
+        
+        // Explicitly map fields for Zapier
+        "Contact Name": formData.name || 'Not provided',
+        "Contact Email": formData.email || 'Not provided',
+        "Contact Phone": formData.phone || 'Not provided',
+        
+        "Pickup Location": formData.pickupLocation || 'Not provided',
+        "Pickup Address": formData.pickupAddress || 'Not provided',
+        "Pickup Contact Name": formData.pickupContactName || 'Not provided',
+        "Pickup Contact Phone": formData.pickupContactPhone || 'Not provided',
+        
+        "Dropoff Location": formData.dropoffLocation || 'Not provided',
+        "Dropoff Address": formData.dropoffAddress || 'Not provided',
+        "Dropoff Contact Name": formData.dropoffContactName || 'Not provided',
+        "Dropoff Contact Phone": formData.dropoffContactPhone || 'Not provided',
+        
+        "Vehicle Details": `${formData.year || ''} ${formData.make || ''} ${formData.model || ''}`,
+        "Transport Type": formData.transportType || 'Not provided',
+        "Shipment Date": formData.shipmentDate || 'Not provided',
+        "Price": formData.openTransportPrice || formData.selectedPrice || 'Not provided',
+        "Distance": formData.distance || 'Not provided',
+        "Transit Time": formData.transitTime || 'Not provided'
+      };
+      
+      // Send to the dedicated final submission webhook URL
+      const webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      
+      console.log("🚀 SENDING FINAL SUBMISSION TO:", webhookUrl);
+      
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'Amerigo-Auto-Transport/1.0',
+          },
+          body: JSON.stringify(finalSubmissionData),
+        });
+        
+        console.log(`📡 FINAL SUBMISSION RESPONSE STATUS: ${response.status} ${response.statusText}`);
+        
+        const responseText = await response.text();
+        
+        if (!response.ok) {
+          console.error(`❌ FINAL SUBMISSION ERROR: ${response.status} ${response.statusText}`);
+          console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Failed to send final submission to CRM" 
+          });
+        }
+        
+        // Try to parse the response if it's JSON
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          console.log('✅ FINAL SUBMISSION SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
+        } catch (e) {
+          // Not JSON, just log the text
+          console.log('✅ FINAL SUBMISSION SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
+        }
+        
+        console.log('✅ FINAL SUBMISSION DELIVERED SUCCESSFULLY\n');
+        
+        res.json({
+          success: true,
+          message: "Final submission successfully sent to CRM system"
+        });
+      } catch (fetchError) {
+        console.error('❌ FINAL SUBMISSION REQUEST FAILED:', fetchError);
+        res.status(500).json({ 
+          success: false, 
+          message: `Network error while sending final submission: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` 
+        });
+      }
+    } catch (error) {
+      console.error("❌ FINAL SUBMISSION ENDPOINT ERROR:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Internal server error while sending final submission to CRM",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+  
   // Test endpoint for webhook connectivity
   app.get("/api/test-webhook", async (req, res) => {
     try {
