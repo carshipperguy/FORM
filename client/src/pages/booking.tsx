@@ -243,7 +243,7 @@ export default function Booking() {
             src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
             alt="Amerigo Auto Transport Logo"
             style={{
-              width: '180px',
+              width: '200px',
               display: 'block',
               margin: '0 auto 10px',
               maxWidth: '100%',
@@ -251,10 +251,9 @@ export default function Booking() {
               objectFit: 'contain'
             }}
             onError={(e) => {
-              e.currentTarget.src = 'https://via.placeholder.com/180x70?text=Amerigo+Logo';
+              e.currentTarget.src = 'https://via.placeholder.com/200x80?text=Amerigo+Logo';
             }}
           />
-          <h2 className="text-sm text-gray-600">Complete Details</h2>
         </div>
         
         <div className="bg-white text-black border border-gray-200 mb-4">
