@@ -253,6 +253,55 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // Test endpoint for webhook connectivity
+  app.get("/api/test-webhook", async (req, res) => {
+    try {
+      console.log("🧪 RUNNING WEBHOOK TEST...");
+      
+      // Create test data
+      const testData = {
+        name: "TEST_USER",
+        email: "test@example.com",
+        phone: "555-555-5555",
+        eventType: "webhook_test",
+        year: "2025",
+        make: "Test",
+        model: "Model",
+        pickupLocation: "Test City, TX 12345",
+        dropoffLocation: "Test City, TX 12345",
+        distance: 100,
+        openTransportPrice: 100,
+        enclosedTransportPrice: 150,
+        transitTime: 1
+      };
+      
+      console.log("📤 SENDING TEST DATA TO WEBHOOK...");
+      const webhookResult = await sendToWebhook(testData);
+      
+      if (webhookResult.success) {
+        console.log("✅ WEBHOOK TEST SUCCESSFUL");
+        res.json({
+          success: true,
+          message: "Webhook test successful - check your Zapier dashboard for a test lead"
+        });
+      } else {
+        console.error("❌ WEBHOOK TEST FAILED:", webhookResult.message);
+        res.status(500).json({
+          success: false,
+          message: "Webhook test failed",
+          error: webhookResult.message
+        });
+      }
+    } catch (error) {
+      console.error("❌ WEBHOOK TEST ERROR:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error testing webhook",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Dedicated webhook endpoint for CRM integration
   // This is the ONLY endpoint that sends data to the webhook
   app.post("/api/webhook", async (req, res) => {
@@ -277,13 +326,9 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Form data is required" });
       }
       
-      // Ensure we have the WEBHOOK_URL environment variable
+      // We'll continue even if WEBHOOK_URL isn't set, as we now have a fallback in the webhook.ts file
       if (!process.env.WEBHOOK_URL) {
-        console.error("❌ WEBHOOK ERROR: WEBHOOK_URL environment variable is not set");
-        return res.status(500).json({ 
-          success: false, 
-          message: "Webhook URL is not configured" 
-        });
+        console.warn("⚠️ WARNING: WEBHOOK_URL environment variable is not set - will use fallback URL");
       }
       
       console.log("✅ WEBHOOK DATA VALIDATION PASSED - Sending to external system");
