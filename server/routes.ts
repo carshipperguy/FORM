@@ -239,32 +239,62 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Dedicated webhook endpoint for CRM integration
+  // This is the ONLY endpoint that sends data to the webhook
   app.post("/api/webhook", async (req, res) => {
     try {
+      console.log("\n🔔 /api/webhook ENDPOINT CALLED - Lead submission to CRM system");
       const formData = req.body;
+      
+      // Log the incoming data for debugging
+      console.log("📝 WEBHOOK DATA RECEIVED:", {
+        name: formData?.name || 'Not provided',
+        email: formData?.email || 'Not provided',
+        phone: formData?.phone || 'Not provided',
+        vehicle: `${formData?.year || ''} ${formData?.make || ''} ${formData?.model || ''}`,
+        from: formData?.pickupLocation || 'Not provided',
+        to: formData?.dropoffLocation || 'Not provided',
+        eventType: formData?.eventType || 'Not specified'
+      });
       
       // Validate minimal required data
       if (!formData) {
+        console.error("❌ WEBHOOK ERROR: No form data provided");
         return res.status(400).json({ error: "Form data is required" });
       }
       
-      // Send the webhook
+      // Ensure we have the WEBHOOK_URL environment variable
+      if (!process.env.WEBHOOK_URL) {
+        console.error("❌ WEBHOOK ERROR: WEBHOOK_URL environment variable is not set");
+        return res.status(500).json({ 
+          success: false, 
+          message: "Webhook URL is not configured" 
+        });
+      }
+      
+      console.log("✅ WEBHOOK DATA VALIDATION PASSED - Sending to external system");
+      
+      // Send the webhook - this is the actual CRM integration
       const webhookResult = await sendToWebhook(formData);
       
       if (webhookResult.success) {
-        res.json({ success: true, message: "Data successfully sent to CRM" });
+        console.log("🎉 WEBHOOK SUCCESSFULLY DELIVERED TO CRM");
+        res.json({ 
+          success: true, 
+          message: "Lead successfully sent to CRM system"
+        });
       } else {
+        console.error("❌ WEBHOOK DELIVERY FAILED:", webhookResult.message);
         res.status(500).json({ 
           success: false, 
-          message: "Failed to send data to CRM", 
+          message: "Failed to send lead to CRM system", 
           error: webhookResult.message 
         });
       }
     } catch (error) {
-      console.error("Error sending data to CRM:", error);
+      console.error("❌ WEBHOOK ENDPOINT ERROR:", error);
       res.status(500).json({ 
         success: false,
-        message: "Internal server error while sending data to CRM",
+        message: "Internal server error while sending lead to CRM",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

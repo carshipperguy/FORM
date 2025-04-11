@@ -7,42 +7,41 @@ import fetch from 'node-fetch';
  */
 export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string }> {
   try {
+    // 1. Validate webhook URL is available
     if (!process.env.WEBHOOK_URL) {
-      console.error('No webhook URL provided');
+      console.error('🚨 WEBHOOK ERROR: No webhook URL provided in environment variables');
       return { success: false, message: 'No webhook URL provided' };
     }
 
-    // Generate unique submission ID if not already present
+    // Print the first 30 characters of the webhook URL (safe to show part of it)
+    console.log('🔗 WEBHOOK URL CONFIGURED:', process.env.WEBHOOK_URL.substring(0, 30) + '...');
+
+    // 2. Prepare the request data
     const submissionId = data.submissionId || `AUTO-${Date.now()}`;
     const submissionDate = data.submissionDate || new Date().toISOString();
-    
-    // Determine event type (default to "form_submission" if not specified)
     const eventType = data.eventType || "form_submission";
     
-    // Format the data in a way that's optimized for Zapier and other webhook consumers
+    // 3. Format the data in a way that's optimized for webhook consumers
     const formattedData = {
       submissionId,
       submissionDate,
       eventType,
       
-      // Primary contact information (high-level for easy access)
+      // Essential contact and quote information  
       name: data.name || 'Not provided',
       email: data.email || 'Not provided',
       phone: data.phone || 'Not provided',
       
-      // Formatted data in nested structure (for organized CRM mapping)
-      contactInfo: {
-        name: data.name || 'Not provided',
-        email: data.email || 'Not provided',
-        phone: data.phone || 'Not provided',
-      },
-      vehicleDetails: {
+      // Vehicle information
+      vehicleInfo: {
         type: data.vehicleType || 'Not provided',
         year: data.year || 'Not provided',
         make: data.make || 'Not provided',
         model: data.model || 'Not provided',
       },
-      routeDetails: {
+      
+      // Route information
+      routeInfo: {
         pickupLocation: data.pickupLocation || 'Not provided',
         pickupZip: data.pickupZip || 'Not provided',
         dropoffLocation: data.dropoffLocation || 'Not provided',
@@ -50,57 +49,32 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
         distance: data.distance || 0,
         transitTime: data.transitTime || 0,
       },
-      transportDetails: {
-        shipmentDate: data.shipmentDate || 'Not provided',
-        transportType: data.selectedTransport || 'open',
-        guaranteedDate: data.guaranteedDate || false,
-        price: data.finalPrice || data.openTransportPrice || 'Not provided',
-      },
-      additionalDetails: {
-        pickupContact: {
-          name: data.pickupContactName || 'Not provided',
-          phone: data.pickupContactPhone || 'Not provided',
-          address: data.pickupStreetAddress || 'Not provided',
-          city: data.pickupCity || 'Not provided',
-          state: data.pickupState || 'Not provided',
-          zip: data.pickupZip || 'Not provided',
-        },
-        deliveryContact: {
-          name: data.deliveryContactName || 'Not provided',
-          phone: data.deliveryContactPhone || 'Not provided',
-          address: data.deliveryStreetAddress || 'Not provided',
-          city: data.deliveryCity || 'Not provided',
-          state: data.deliveryState || 'Not provided',
-          zip: data.deliveryZip || 'Not provided',
-        },
-        notes: data.notes || '',
-      },
       
-      // Include the raw data for maximum compatibility
-      // This ensures any field we didn't explicitly map is still available
-      rawData: data,
+      // Shipping preferences
+      shippingInfo: {
+        shipmentDate: data.shipmentDate || 'Not provided',
+        openTransportPrice: data.openTransportPrice || 'Not provided',
+        enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
+      },
     };
 
-    // Log webhook event in a very visible format for tracking
-    console.log('\n==============================================================');
-    console.log(`🔔 ZAPIER WEBHOOK EVENT: ${eventType || 'form_submission'}`);
-    console.log(`🕒 TIMESTAMP: ${new Date().toISOString()}`);
-    console.log('--------------------------------------------------------------');
-    console.log('📤 SENDING DATA TO ZAPIER:', JSON.stringify({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      vehicleType: data.vehicleType,
-      pickupLocation: data.pickupLocation,
-      dropoffLocation: data.dropoffLocation,
-      eventType: eventType || 'form_submission',
-    }, null, 2));
-    console.log('--------------------------------------------------------------');
-    console.log('📡 WEBHOOK URL:', process.env.WEBHOOK_URL.substring(0, 15) + '...');
-    console.log('==============================================================\n');
+    // 4. Log webhook event details
+    console.log('\n======================================');
+    console.log(`🔔 WEBHOOK: SENDING LEAD TO CRM SYSTEM`);
+    console.log(`📧 Email: ${data.email || 'Not provided'}`);
+    console.log(`☎️ Phone: ${data.phone || 'Not provided'}`);
+    console.log(`🚗 Vehicle: ${data.year || ''} ${data.make || ''} ${data.model || ''}`);
+    console.log(`📍 Route: ${data.pickupLocation || ''} → ${data.dropoffLocation || ''}`);
+    console.log(`💰 Quote: $${data.openTransportPrice || 'N/A'} (Open) / $${data.enclosedTransportPrice || 'N/A'} (Enclosed)`);
+    console.log(`🕒 Event: ${eventType} at ${new Date().toISOString()}`);
+    console.log('======================================\n');
 
-    // Make sure to use correct fetch options for most webhook providers
-    const response = await fetch(process.env.WEBHOOK_URL, {
+    // 5. Send the webhook request - using the direct URL from environment
+    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${process.env.WEBHOOK_URL.substring(0, 30)}...`);
+    const webhookUrl = process.env.WEBHOOK_URL;
+    
+    // Make the request with proper error handling
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -110,36 +84,34 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       body: JSON.stringify(formattedData),
     });
 
-    // Log the response status and headers for debugging
-    console.log(`Webhook response status: ${response.status} ${response.statusText}`);
+    // 6. Process the response
+    console.log(`📡 WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+    
+    // Get the response text for better error reporting
+    const responseText = await response.text();
     
     if (!response.ok) {
-      let errorText = '';
-      try {
-        errorText = await response.text();
-      } catch (e) {
-        errorText = 'Could not extract error text from response';
-      }
-      
-      console.error(`Webhook error: ${response.status} ${response.statusText}`, errorText);
+      console.error(`❌ WEBHOOK ERROR: ${response.status} ${response.statusText}`);
+      console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
       return { 
         success: false, 
-        message: `Webhook error: ${response.status} ${response.statusText}` 
+        message: `Webhook error (${response.status}): ${response.statusText}` 
       };
     }
 
-    // Try to parse the response for more detailed logging
+    // Try to parse the response if it's JSON
     try {
-      const responseBody = await response.text();
-      console.log('Webhook response body:', responseBody.substring(0, 200) + (responseBody.length > 200 ? '...' : ''));
+      const jsonResponse = JSON.parse(responseText);
+      console.log('✅ WEBHOOK SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
     } catch (e) {
-      console.log('Could not parse webhook response body');
+      // Not JSON, just log the text
+      console.log('✅ WEBHOOK SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
     }
 
-    console.log('Webhook sent successfully');
+    console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY\n');
     return { success: true, message: 'Webhook sent successfully' };
   } catch (error) {
-    console.error('Error sending webhook:', error);
+    console.error('❌ WEBHOOK ERROR:', error);
     return { 
       success: false, 
       message: `Error sending webhook: ${error instanceof Error ? error.message : String(error)}` 
