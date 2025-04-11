@@ -199,25 +199,41 @@ export default function Booking() {
           eventDate: new Date().toISOString()
         };
         
-        console.log("Sending booking completion data to webhook:", webhookData);
-        const webhookResponse = await fetch("/api/webhook", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json" 
-          },
-          body: JSON.stringify(webhookData),
-        });
+        console.log("🔵 SENDING BOOKING COMPLETION DATA TO WEBHOOK:", JSON.stringify(webhookData, null, 2));
         
-        const webhookResult = await webhookResponse.json();
-        console.log("Webhook response:", webhookResult);
-        
-        if (!webhookResponse.ok) {
-          console.warn("Warning: Webhook delivery unsuccessful, but proceeding with booking", webhookResult);
+        try {
+          const webhookResponse = await fetch("/api/webhook", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json" 
+            },
+            body: JSON.stringify(webhookData),
+          });
+          
+          const responseText = await webhookResponse.text();
+          console.log("🔵 WEBHOOK RESPONSE STATUS:", webhookResponse.status, webhookResponse.statusText);
+          console.log("🔵 WEBHOOK RESPONSE BODY:", responseText);
+          
+          // Try to parse the response if it's JSON
+          try {
+            const result = JSON.parse(responseText);
+            console.log("🔵 WEBHOOK PARSED RESPONSE:", result);
+          } catch (e) {
+            console.log("🔵 WEBHOOK RESPONSE IS NOT JSON");
+          }
+          
+          if (!webhookResponse.ok) {
+            console.error("🔵 WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
+          } else {
+            console.log("🔵 WEBHOOK SENT SUCCESSFULLY");
+          }
+        } catch (webhookError) {
+          // Don't fail the entire submission if the webhook fails
+          console.error("🔵 ERROR SENDING DATA TO WEBHOOK:", webhookError);
         }
-      } catch (webhookError) {
-        // Don't fail the entire submission if the webhook fails
-        console.error("Error sending data to webhook:", webhookError);
+      } catch (error) {
+        console.error("🔵 ERROR PREPARING WEBHOOK DATA:", error);
       }
       
       // Use setTimeout to create a smooth transition
