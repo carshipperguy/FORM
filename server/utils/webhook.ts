@@ -43,6 +43,25 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     const submissionDate = data.submissionDate || new Date().toISOString();
     const eventType = data.eventType || "form_submission";
     
+    // Format shipment date in MM/DD/YYYY format
+    let formattedShipmentDate = 'Not provided';
+    if (data.shipmentDate) {
+      try {
+        // Handle different date formats
+        const date = new Date(data.shipmentDate);
+        if (!isNaN(date.getTime())) {
+          // Format as MM/DD/YYYY
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          const year = date.getFullYear();
+          formattedShipmentDate = `${month}/${day}/${year}`;
+        }
+      } catch (e) {
+        console.error('Error formatting date:', e);
+        formattedShipmentDate = data.shipmentDate; // fallback to original
+      }
+    }
+
     // 3. Format the data with the exact field names requested for Zapier mapping
     const formattedData = {
       // Event metadata
@@ -73,11 +92,14 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       "Vehicle Details Make": data.make || 'Not provided',
       "Vehicle Details Model": data.model || 'Not provided',
       
+      // Shipment Date field with proper formatting
+      "Route Details Shipment Date": formattedShipmentDate,
+      
       // Also include original fields for backward compatibility
       pickupLocation: data.pickupLocation || 'Not provided',
       dropoffLocation: data.dropoffLocation || 'Not provided',
       vehicleType: data.vehicleType || 'Not provided',
-      shipmentDate: data.shipmentDate || 'Not provided',
+      shipmentDate: formattedShipmentDate, // Use formatted date here too
       enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
     };
 
