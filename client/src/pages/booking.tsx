@@ -192,13 +192,21 @@ export default function Booking() {
       
       // Send the form data to the webhook endpoint
       try {
-        console.log("Sending form data to webhook:", updatedData);
+        // Add event type and date to identify this as the final booking submission
+        const webhookData = {
+          ...updatedData,
+          eventType: "booking_completed",
+          eventDate: new Date().toISOString()
+        };
+        
+        console.log("Sending booking completion data to webhook:", webhookData);
         const webhookResponse = await fetch("/api/webhook", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json" 
           },
-          body: JSON.stringify(updatedData),
+          body: JSON.stringify(webhookData),
         });
         
         const webhookResult = await webhookResponse.json();
