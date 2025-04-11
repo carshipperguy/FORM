@@ -637,7 +637,7 @@ export default function Booking() {
                       Processing...
                     </>
                   ) : (
-                    "Complete Reservation - No CC Required"
+                    "Submit"
                   )}
                 </Button>
                 
