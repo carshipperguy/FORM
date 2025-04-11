@@ -142,6 +142,35 @@ const SimpleQuoteForm = () => {
       });
       
       console.log("Final quote data with real distance:", quoteData);
+      
+      // Send data to webhook when "Get Quote" is clicked
+      console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
+      try {
+        const webhookData = {
+          ...quoteData,
+          eventType: "quote_submission",
+          eventDate: new Date().toISOString()
+        };
+        
+        // Use await to ensure we catch any errors properly
+        const webhookResponse = await fetch("/api/webhook", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(webhookData),
+        });
+        
+        if (!webhookResponse.ok) {
+          console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
+        } else {
+          console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
+        }
+      } catch (webhookError) {
+        console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
+        // Continue with navigation even if webhook fails
+      }
   
       const params = new URLSearchParams({
         data: encodeURIComponent(JSON.stringify(quoteData))
