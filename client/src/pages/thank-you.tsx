@@ -20,10 +20,20 @@ export default function ThankYou() {
         <div className="text-center mb-4">
           <h1 className="text-xl font-bold text-[#002C42]">Thank You!</h1>
           <div className="flex flex-col items-center justify-center mt-1">
-            <img 
-              src="/amerigo-transport-logo.png" 
-              alt="Amerigo Auto Transport Logo" 
-              className="h-12 mb-1"
+            <img
+              src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+              alt="Amerigo Auto Transport Logo"
+              style={{
+                width: '160px',
+                display: 'block',
+                margin: '0 auto',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/160x60?text=Amerigo+Logo';
+              }}
             />
             <p className="text-xs text-gray-700">Amerigo Auto Transport</p>
           </div>
