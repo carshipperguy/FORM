@@ -114,7 +114,7 @@ export default function Booking() {
     return null;
   }
   
-  // EMERGENCY OVERRIDE: Double-check for special vehicle types and apply $3.50/mile pricing
+  // EMERGENCY OVERRIDE: Double-check for special vehicle types and apply $2.50/mile pricing
   // This ensures consistent pricing between pages
   const vehicleType = (data.vehicleType || '').toLowerCase();
   const isSpecialVehicle = vehicleType === 'boat' || 
@@ -123,8 +123,8 @@ export default function Booking() {
                            vehicleType.includes('equipment');
   
   if (isSpecialVehicle && data.distance) {
-    console.log("🚨 BOOKING PAGE EMERGENCY OVERRIDE - Applying $3.50/mile for", vehicleType);
-    const flatRatePrice = Math.round(data.distance * 3.50);
+    console.log("🚨 BOOKING PAGE EMERGENCY OVERRIDE - Applying $2.50/mile for", vehicleType);
+    const flatRatePrice = Math.round(data.distance * 2.50);
     
     // Determine which price to update based on selected transport type
     if (data.selectedTransport === 'enclosed') {
@@ -135,7 +135,7 @@ export default function Booking() {
     
     console.log("FIXED FINAL PRICE:", {
       distance: data.distance,
-      ratePerMile: "$3.50",
+      ratePerMile: "$2.50",
       transportType: data.selectedTransport,
       finalPrice: data.finalPrice
     });
@@ -240,13 +240,22 @@ export default function Booking() {
       <div className="p-4 bg-white">
         <div className="text-center mb-4">
           <h1 className="text-xl font-bold text-[#002C42]">Complete Details</h1>
-          <div className="flex items-center justify-center mt-1">
-            <img 
-              src="/amerigo-logo.png" 
-              alt="Amerigo Auto Transport Logo" 
-              className="h-7 mr-2"
+          <div className="flex flex-col items-center justify-center mt-1">
+            <img
+              src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+              alt="Amerigo Auto Transport Logo"
+              style={{
+                width: '160px',
+                display: 'block',
+                margin: '0 auto',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/160x60?text=Amerigo+Logo';
+              }}
             />
-            <p className="text-xs text-gray-700">Military Owned • Family Operated</p>
           </div>
         </div>
         
