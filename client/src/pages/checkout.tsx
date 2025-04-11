@@ -168,7 +168,7 @@ export default function Checkout() {
           </Button>
           
           <p className="text-center text-xs text-gray-600 mt-2">
-            No payment required until vehicle pickup
+            No payment is required until the vehicle is dispatched.
           </p>
         </div>
       </div>
