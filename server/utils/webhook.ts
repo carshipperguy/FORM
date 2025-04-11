@@ -145,7 +145,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log('======================================\n');
 
     // 5. Send the webhook request - with enhanced error handling
-    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl.substring(0, 30)}...`);
+    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl}`);
     
     // Attempt to make the request with extensive error handling and logging
     console.log('📤 STARTING FETCH REQUEST...');
