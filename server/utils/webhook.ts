@@ -81,8 +81,23 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       rawData: data,
     };
 
-    console.log('Sending webhook data to CRM:', JSON.stringify(formattedData, null, 2));
-    console.log('Using webhook URL:', process.env.WEBHOOK_URL.substring(0, 15) + '...');
+    // Log webhook event in a very visible format for tracking
+    console.log('\n==============================================================');
+    console.log(`🔔 ZAPIER WEBHOOK EVENT: ${eventType || 'form_submission'}`);
+    console.log(`🕒 TIMESTAMP: ${new Date().toISOString()}`);
+    console.log('--------------------------------------------------------------');
+    console.log('📤 SENDING DATA TO ZAPIER:', JSON.stringify({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      vehicleType: data.vehicleType,
+      pickupLocation: data.pickupLocation,
+      dropoffLocation: data.dropoffLocation,
+      eventType: eventType || 'form_submission',
+    }, null, 2));
+    console.log('--------------------------------------------------------------');
+    console.log('📡 WEBHOOK URL:', process.env.WEBHOOK_URL.substring(0, 15) + '...');
+    console.log('==============================================================\n');
 
     // Make sure to use correct fetch options for most webhook providers
     const response = await fetch(process.env.WEBHOOK_URL, {
