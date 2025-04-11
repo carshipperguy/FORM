@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Share2 } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { Link } from "wouter";
-import { useToast } from "@/hooks/use-toast";
 import MobileContainer from "@/components/MobileContainer";
 
 export default function ThankYou() {
-  const { toast } = useToast();
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ? JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : {};
 
@@ -15,35 +12,6 @@ export default function ThankYou() {
     style: 'currency',
     currency: 'USD'
   }).format(data.finalPrice || 0);
-
-  // Generate a shareable message for quick share feature
-  const shareText = `I'm shipping my ${data.year} ${data.make} ${data.model} from ${data.pickupLocation}${data.pickupZip ? ` (${data.pickupZip})` : ''} to ${data.dropoffLocation}${data.dropoffZip ? ` (${data.dropoffZip})` : ''} for ${formattedPrice}. Check out Amerigo Auto Transport!`;
-
-  // Handle sharing functionality
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'My Auto Transport Quote',
-          text: shareText,
-          url: window.location.origin
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    } else {
-      // Fallback for browsers that don't support navigator.share
-      try {
-        await navigator.clipboard.writeText(shareText);
-        toast({
-          title: "Copied to clipboard",
-          description: "Share text copied to clipboard!",
-        });
-      } catch (error) {
-        console.error('Error copying to clipboard:', error);
-      }
-    }
-  };
 
   return (
     <MobileContainer>
@@ -57,7 +25,7 @@ export default function ThankYou() {
               alt="Amerigo Auto Transport Logo" 
               className="h-7 mr-2"
             />
-            <p className="text-xs text-gray-700">Military Owned • Family Operated</p>
+            <p className="text-xs text-gray-700">Amerigo Auto Transport</p>
           </div>
         </div>
         
@@ -98,9 +66,6 @@ export default function ThankYou() {
           <div className="flex flex-col p-3 gap-3 mb-3">
             <Button asChild className="bg-[#002C42] hover:bg-[#001C32] w-full">
               <Link href="/">Get Another Quote</Link>
-            </Button>
-            <Button variant="outline" className="w-full border-[#002C42] text-[#002C42]" onClick={handleShare}>
-              <Share2 className="w-4 h-4 mr-2" /> Share Quote
             </Button>
           </div>
         </div>
