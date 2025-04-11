@@ -12,10 +12,25 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       return { success: false, message: 'No webhook URL provided' };
     }
 
-    // Format the data in a way that's easier to read in most CRM systems
+    // Generate unique submission ID if not already present
+    const submissionId = data.submissionId || `AUTO-${Date.now()}`;
+    const submissionDate = data.submissionDate || new Date().toISOString();
+    
+    // Determine event type (default to "form_submission" if not specified)
+    const eventType = data.eventType || "form_submission";
+    
+    // Format the data in a way that's optimized for Zapier and other webhook consumers
     const formattedData = {
-      submissionId: `AUTO-${Date.now()}`,
-      submissionDate: new Date().toISOString(),
+      submissionId,
+      submissionDate,
+      eventType,
+      
+      // Primary contact information (high-level for easy access)
+      name: data.name || 'Not provided',
+      email: data.email || 'Not provided',
+      phone: data.phone || 'Not provided',
+      
+      // Formatted data in nested structure (for organized CRM mapping)
       contactInfo: {
         name: data.name || 'Not provided',
         email: data.email || 'Not provided',
@@ -39,7 +54,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
         shipmentDate: data.shipmentDate || 'Not provided',
         transportType: data.selectedTransport || 'open',
         guaranteedDate: data.guaranteedDate || false,
-        price: data.finalPrice || 'Not provided',
+        price: data.finalPrice || data.openTransportPrice || 'Not provided',
       },
       additionalDetails: {
         pickupContact: {
@@ -60,27 +75,50 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
         },
         notes: data.notes || '',
       },
+      
       // Include the raw data for maximum compatibility
+      // This ensures any field we didn't explicitly map is still available
       rawData: data,
     };
 
     console.log('Sending webhook data to CRM:', JSON.stringify(formattedData, null, 2));
+    console.log('Using webhook URL:', process.env.WEBHOOK_URL.substring(0, 15) + '...');
 
+    // Make sure to use correct fetch options for most webhook providers
     const response = await fetch(process.env.WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'Amerigo-Auto-Transport/1.0',
       },
       body: JSON.stringify(formattedData),
     });
 
+    // Log the response status and headers for debugging
+    console.log(`Webhook response status: ${response.status} ${response.statusText}`);
+    
     if (!response.ok) {
-      const errorText = await response.text();
+      let errorText = '';
+      try {
+        errorText = await response.text();
+      } catch (e) {
+        errorText = 'Could not extract error text from response';
+      }
+      
       console.error(`Webhook error: ${response.status} ${response.statusText}`, errorText);
       return { 
         success: false, 
         message: `Webhook error: ${response.status} ${response.statusText}` 
       };
+    }
+
+    // Try to parse the response for more detailed logging
+    try {
+      const responseBody = await response.text();
+      console.log('Webhook response body:', responseBody.substring(0, 200) + (responseBody.length > 200 ? '...' : ''));
+    } catch (e) {
+      console.log('Could not parse webhook response body');
     }
 
     console.log('Webhook sent successfully');
