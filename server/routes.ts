@@ -400,9 +400,10 @@ export function registerRoutes(app: Express): Server {
       };
       
       // Send to the dedicated final submission webhook URL
-      const webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      // Use NEW_WEBHOOK_URL first, then fall back to the old Zapier webhook
+      const webhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       
-      console.log("🚀 SENDING FINAL SUBMISSION TO:", webhookUrl);
+      console.log("🚀 SENDING FINAL SUBMISSION TO:", webhookUrl.substring(0, 30) + "...");
       
       try {
         // Convert data to JSON string
@@ -658,7 +659,9 @@ export function registerRoutes(app: Express): Server {
         shipmentDate: formattedShipmentDate
       });
       
-      const finalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      // Use NEW_WEBHOOK_URL first, then fall back to the old Zapier webhook
+      const finalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      console.log("🚀 USING WEBHOOK URL:", finalWebhookUrl.substring(0, 30) + "...");
       
       try {
         // Convert data to JSON string
