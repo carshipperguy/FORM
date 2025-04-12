@@ -32,11 +32,12 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log('🔍 WEBHOOK FUNCTION CALLED - Environment check...');
     
     // 1. Enhanced environment variable validation
-    let webhookUrl = process.env.WEBHOOK_URL;
+    // Try NEW_WEBHOOK_URL first, then fall back to WEBHOOK_URL if not available
+    let webhookUrl = process.env.NEW_WEBHOOK_URL || process.env.WEBHOOK_URL;
     
     // More detailed debugging for environment variables
     if (!webhookUrl || webhookUrl.trim() === '') {
-      console.error('🚨 CRITICAL: WEBHOOK_URL environment variable is missing or empty');
+      console.error('🚨 CRITICAL: Neither NEW_WEBHOOK_URL nor WEBHOOK_URL environment variables are set');
       console.log('🔑 Available environment variables:', Object.keys(process.env).filter(key => !key.includes('KEY') && !key.includes('SECRET')).join(', '));
       
       // Fall back to the hardcoded webhook URL if in production and no env var is set
@@ -45,7 +46,8 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       console.log('⚠️ USING FALLBACK WEBHOOK URL:', webhookUrl);
     } else {
       // Print the first 30 characters of the webhook URL (safe to show part of it)
-      console.log('🔗 WEBHOOK URL FROM ENV:', webhookUrl.substring(0, 30) + '...');
+      const sourceVar = process.env.NEW_WEBHOOK_URL ? 'NEW_WEBHOOK_URL' : 'WEBHOOK_URL';
+      console.log(`🔗 WEBHOOK URL FROM ENV (${sourceVar}):`, webhookUrl.substring(0, 30) + '...');
     }
 
     // 2. Prepare the request data with more verbose logging
