@@ -183,7 +183,7 @@ const QuoteOptions = ({ data }) => {
                     onClick={() => setIsEnclosedStandard(true)}
                   >Enclosed</button>
                 </div>
-                <div className="h-10 flex items-center justify-center mb-1">
+                <div className="h-10 flex items-center justify-center mb-1" style={{ minHeight: '40px' }}>
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(standardPrice)}</p>
                 </div>
                 <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1">
