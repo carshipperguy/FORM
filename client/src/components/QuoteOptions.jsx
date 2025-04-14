@@ -168,25 +168,27 @@ const QuoteOptions = ({ data }) => {
 
           <div className="space-y-4 mb-4">
             {/* Standard Transport Card with USA theme */}
-            <div className="border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px] flex flex-col">
+            <div className="border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px] flex flex-col" style={{ height: '250px' }}>
               <div className="bg-[#002868] text-white p-2">
                 <h3 className="text-sm font-medium">Standard Transport</h3>
               </div>
               <div className="p-3 flex-1 flex flex-col bg-white">
-                <div className="mb-3 text-center">
+                <div className="mb-3 text-center" style={{ height: '28px' }}>
                   <button
                     className={`px-3 py-1 text-xs font-medium mr-2 ${!isEnclosedStandard ? 'bg-[#002868] text-white' : 'bg-gray-200 text-black'}`}
                     onClick={() => setIsEnclosedStandard(false)}
+                    style={{ height: '24px', minWidth: '70px' }}
                   >Open</button>
                   <button
                     className={`px-3 py-1 text-xs font-medium ${isEnclosedStandard ? 'bg-[#002868] text-white' : 'bg-gray-200 text-black'}`}
                     onClick={() => setIsEnclosedStandard(true)}
+                    style={{ height: '24px', minWidth: '70px' }}
                   >Enclosed</button>
                 </div>
                 <div className="h-10 flex items-center justify-center mb-1" style={{ minHeight: '40px' }}>
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(standardPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1">
+                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1" style={{ minHeight: '80px' }}>
                   <li>✓ Pickup within 7-day window</li>
                   <li>✓ Fully insured</li>
                   <li>✓ Door-to-door service</li>
@@ -202,25 +204,27 @@ const QuoteOptions = ({ data }) => {
             </div>
 
             {/* Express Transport Card with USA theme */}
-            <div className="border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px] flex flex-col">
+            <div className="border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px] flex flex-col" style={{ height: '250px' }}>
               <div className="bg-[#BF0A30] text-white p-2">
                 <h3 className="text-sm font-medium">Express Transport</h3>
               </div>
               <div className="p-3 flex-1 flex flex-col bg-white">
-                <div className="mb-3 text-center">
+                <div className="mb-3 text-center" style={{ height: '28px' }}>
                   <button
                     className={`px-3 py-1 text-xs font-medium mr-2 ${!isEnclosedExpress ? 'bg-[#BF0A30] text-white' : 'bg-gray-200 text-black'}`}
                     onClick={() => setIsEnclosedExpress(false)}
+                    style={{ height: '24px', minWidth: '70px' }}
                   >Open</button>
                   <button
                     className={`px-3 py-1 text-xs font-medium ${isEnclosedExpress ? 'bg-[#BF0A30] text-white' : 'bg-gray-200 text-black'}`}
                     onClick={() => setIsEnclosedExpress(true)}
+                    style={{ height: '24px', minWidth: '70px' }}
                   >Enclosed</button>
                 </div>
-                <div className="h-10 flex items-center justify-center mb-1">
+                <div className="h-10 flex items-center justify-center mb-1" style={{ minHeight: '40px' }}>
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(expressPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1">
+                <ul className="text-xs mb-3 text-gray-600 space-y-1 flex-1" style={{ minHeight: '80px' }}>
                   <li>✓ Guaranteed pickup window</li>
                   <li>✓ Priority dispatch</li>
                   <li>✓ Fully insured, door-to-door</li>
