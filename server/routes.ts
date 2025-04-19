@@ -400,8 +400,9 @@ export function registerRoutes(app: Express): Server {
       };
       
       // IMPORTANT: Define both webhook URLs with the proper Zapier hook URLs
-      // Force using the actual Zapier webhook URL for the new endpoint
-      const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      // For the original webhook, always use the original one that was sending leads to CRM
+      const originalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
+      // The second webhook is the additional one requested
       const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
       // Log entire webhook URLs in development or when debugging
@@ -687,8 +688,9 @@ export function registerRoutes(app: Express): Server {
       });
       
       // Define both webhook URLs for testing with explicit URLs
-      // Force using the actual Zapier webhook URL for all environments
-      const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      // For the original webhook, always use the original one that was sending leads to CRM
+      const originalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
+      // The second webhook is the additional one requested
       const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
       console.log("🚀 TESTING ORIGINAL WEBHOOK URL (FULL URL):", originalWebhookUrl);
