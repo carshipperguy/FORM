@@ -204,13 +204,30 @@ export default function Home() {
               body: JSON.stringify(webhookData),
             });
             
-            if (!webhookResponse.ok) {
-              console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
-            } else {
-              console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
+            try {
+              // Try to parse the response JSON
+              const responseData = await webhookResponse.json();
+              
+              if (webhookResponse.ok || responseData.success) {
+                console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
+                console.log("⚡ WEBHOOK RESPONSE:", responseData);
+              } else {
+                console.warn("⚡ WEBHOOK RETURNED ERROR:", responseData);
+                // Even if we get an error, continue with the quote process
+                // The server is handling any Zapier-side errors (e.g. 503s)
+              }
+            } catch (jsonError) {
+              // If we can't parse JSON, just check the response status
+              if (webhookResponse.ok) {
+                console.log("⚡ WEBHOOK SENT SUCCESSFULLY (no JSON response)");
+              } else {
+                console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
+              }
             }
           } catch (webhookError) {
             console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
+            // Continue with the quote process even if the webhook fails
+            // This ensures users can still get quotes even if CRM integration has issues
           }
         })();
       } catch (error) {
