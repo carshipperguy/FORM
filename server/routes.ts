@@ -399,15 +399,12 @@ export function registerRoutes(app: Express): Server {
         "Transit Time": formData.transitTime || 'Not provided'
       };
       
-      // IMPORTANT: Define both webhook URLs with the proper Zapier hook URLs
-      // For the original webhook, always use the original one that was sending leads to CRM
-      const originalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
-      // The second webhook is the additional one requested
-      const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
+      // IMPORTANT: For FINAL submissions, we only want to use the ORDER webhook URL
+      // This webhook is specifically for completed orders with full details
+      const orderWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
-      // Log entire webhook URLs in development or when debugging
-      console.log("🚀 SENDING FINAL SUBMISSION TO ORIGINAL WEBHOOK (FULL URL):", originalWebhookUrl);
-      console.log("🚀 SENDING FINAL SUBMISSION TO NEW WEBHOOK (FULL URL):", newWebhookUrl);
+      // Log the webhook URL in development or when debugging
+      console.log("🚀 SENDING FINAL ORDER SUBMISSION TO ORDER WEBHOOK (FULL URL):", orderWebhookUrl);
       
       // Convert data to JSON string once
       const jsonData = JSON.stringify(finalSubmissionData);
@@ -459,17 +456,16 @@ export function registerRoutes(app: Express): Server {
       };
       
       try {
-        // Send to both webhooks
-        const originalWebhookResult = await sendToWebhookUrl(originalWebhookUrl, "ORIGINAL");
-        const newWebhookResult = await sendToWebhookUrl(newWebhookUrl, "NEW");
+        // Send only to the order webhook for completed orders
+        const orderWebhookResult = await sendToWebhookUrl(orderWebhookUrl, "ORDER");
         
-        // As long as one webhook succeeds, we consider the operation successful
-        const isSuccessful = originalWebhookResult.success || newWebhookResult.success;
+        // Check if the order webhook succeeded
+        const isSuccessful = orderWebhookResult.success;
         
         if (!isSuccessful) {
           return res.status(500).json({ 
             success: false, 
-            message: "Failed to send final submission to any CRM endpoint" 
+            message: "Failed to send final submission to order system" 
           });
         }
         
@@ -687,14 +683,11 @@ export function registerRoutes(app: Express): Server {
         shipmentDate: formattedShipmentDate
       });
       
-      // Define both webhook URLs for testing with explicit URLs
-      // For the original webhook, always use the original one that was sending leads to CRM
-      const originalWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
-      // The second webhook is the additional one requested
-      const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
+      // For final orders, we only use the order webhook URL
+      // This webhook is specifically for completed orders with full details
+      const orderWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
-      console.log("🚀 TESTING ORIGINAL WEBHOOK URL (FULL URL):", originalWebhookUrl);
-      console.log("🚀 TESTING NEW WEBHOOK URL (FULL URL):", newWebhookUrl);
+      console.log("🚀 TESTING ORDER WEBHOOK URL (FULL URL):", orderWebhookUrl);
       
       // Convert data to JSON string once
       const jsonData = JSON.stringify(enhancedTestData);
@@ -746,17 +739,16 @@ export function registerRoutes(app: Express): Server {
       };
       
       try {
-        // Send test data to both webhooks
-        const originalResult = await sendToWebhookUrl(originalWebhookUrl, "ORIGINAL");
-        const newResult = await sendToWebhookUrl(newWebhookUrl, "NEW");
+        // For final orders, only send to the order webhook
+        const orderResult = await sendToWebhookUrl(orderWebhookUrl, "ORDER");
         
-        // Consider the test successful if at least one webhook succeeds
-        const isSuccessful = originalResult.success || newResult.success;
+        // Check if the order webhook succeeded
+        const isSuccessful = orderResult.success;
         
         if (!isSuccessful) {
           return res.status(500).json({ 
             success: false, 
-            message: "Both webhook tests failed" 
+            message: "Order webhook test failed" 
           });
         }
         
