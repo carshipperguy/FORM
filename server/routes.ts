@@ -399,7 +399,8 @@ export function registerRoutes(app: Express): Server {
         "Transit Time": formData.transitTime || 'Not provided'
       };
       
-      // Define both webhook URLs - original and new
+      // IMPORTANT: Define both webhook URLs with the proper Zapier hook URLs
+      // Force using the actual Zapier webhook URL for the new endpoint
       const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
@@ -685,12 +686,13 @@ export function registerRoutes(app: Express): Server {
         shipmentDate: formattedShipmentDate
       });
       
-      // Define both webhook URLs for testing
+      // Define both webhook URLs for testing with explicit URLs
+      // Force using the actual Zapier webhook URL for all environments
       const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
-      console.log("🚀 TESTING ORIGINAL WEBHOOK URL:", originalWebhookUrl.substring(0, 30) + "...");
-      console.log("🚀 TESTING NEW WEBHOOK URL:", newWebhookUrl.substring(0, 30) + "...");
+      console.log("🚀 TESTING ORIGINAL WEBHOOK URL (FULL URL):", originalWebhookUrl);
+      console.log("🚀 TESTING NEW WEBHOOK URL (FULL URL):", newWebhookUrl);
       
       // Convert data to JSON string once
       const jsonData = JSON.stringify(enhancedTestData);

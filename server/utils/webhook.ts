@@ -44,10 +44,10 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       console.error('🚨 CRITICAL: Neither NEW_WEBHOOK_URL nor WEBHOOK_URL environment variables are set');
       console.log('🔑 Available environment variables:', Object.keys(process.env).filter(key => !key.includes('KEY') && !key.includes('SECRET')).join(', '));
       
-      // Fall back to the hardcoded webhook URL if in production and no env var is set
+      // Fall back to the ORIGINAL hardcoded webhook URL if in production and no env var is set
       // IMPORTANT: This is a temporary measure to ensure the webhook works in production
-      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
-      console.log('⚠️ USING NEW HARDCODED FALLBACK WEBHOOK URL:', webhookUrl);
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
+      console.log('⚠️ USING ORIGINAL HARDCODED FALLBACK WEBHOOK URL:', webhookUrl);
     } else {
       // Print the FULL webhook URL when debugging
       const sourceVar = process.env.NEW_WEBHOOK_URL ? 'NEW_WEBHOOK_URL' : 'WEBHOOK_URL';
