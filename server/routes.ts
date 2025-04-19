@@ -403,8 +403,9 @@ export function registerRoutes(app: Express): Server {
       const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
       const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
-      console.log("🚀 SENDING FINAL SUBMISSION TO ORIGINAL WEBHOOK:", originalWebhookUrl.substring(0, 30) + "...");
-      console.log("🚀 SENDING FINAL SUBMISSION TO NEW WEBHOOK:", newWebhookUrl.substring(0, 30) + "...");
+      // Log entire webhook URLs in development or when debugging
+      console.log("🚀 SENDING FINAL SUBMISSION TO ORIGINAL WEBHOOK (FULL URL):", originalWebhookUrl);
+      console.log("🚀 SENDING FINAL SUBMISSION TO NEW WEBHOOK (FULL URL):", newWebhookUrl);
       
       // Convert data to JSON string once
       const jsonData = JSON.stringify(finalSubmissionData);

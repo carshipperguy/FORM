@@ -31,7 +31,11 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
   try {
     console.log('🔍 WEBHOOK FUNCTION CALLED - Environment check...');
     
-    // 1. Enhanced environment variable validation
+    // 1. Enhanced environment variable validation with comprehensive debugging
+    console.log('🔎 ENVIRONMENT VARIABLE CHECK:');
+    console.log('- NEW_WEBHOOK_URL exists:', process.env.NEW_WEBHOOK_URL ? 'YES' : 'NO');
+    console.log('- WEBHOOK_URL exists:', process.env.WEBHOOK_URL ? 'YES' : 'NO');
+    
     // Try NEW_WEBHOOK_URL first, then fall back to WEBHOOK_URL if not available
     let webhookUrl = process.env.NEW_WEBHOOK_URL || process.env.WEBHOOK_URL;
     
@@ -42,12 +46,12 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       
       // Fall back to the hardcoded webhook URL if in production and no env var is set
       // IMPORTANT: This is a temporary measure to ensure the webhook works in production
-      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
-      console.log('⚠️ USING FALLBACK WEBHOOK URL:', webhookUrl);
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
+      console.log('⚠️ USING NEW HARDCODED FALLBACK WEBHOOK URL:', webhookUrl);
     } else {
-      // Print the first 30 characters of the webhook URL (safe to show part of it)
+      // Print the FULL webhook URL when debugging
       const sourceVar = process.env.NEW_WEBHOOK_URL ? 'NEW_WEBHOOK_URL' : 'WEBHOOK_URL';
-      console.log(`🔗 WEBHOOK URL FROM ENV (${sourceVar}):`, webhookUrl.substring(0, 30) + '...');
+      console.log(`🔗 COMPLETE WEBHOOK URL FROM ENV (${sourceVar}):`, webhookUrl);
     }
 
     // 2. Prepare the request data with more verbose logging
