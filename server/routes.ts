@@ -282,8 +282,8 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Form data is required" });
       }
       
-      // Send to the dedicated final submission webhook
-      console.log("📤 SENDING FINAL SUBMISSION TO DEDICATED WEBHOOK");
+      // Send to the dedicated final submission webhooks
+      console.log("📤 SENDING FINAL SUBMISSION TO DEDICATED WEBHOOKS");
       
       // Parse addresses to extract city, state, and zip
       const parseAddress = (address: string) => {
@@ -399,53 +399,78 @@ export function registerRoutes(app: Express): Server {
         "Transit Time": formData.transitTime || 'Not provided'
       };
       
-      // Send to the dedicated final submission webhook URL
-      // Use NEW_WEBHOOK_URL first, then fall back to the old Zapier webhook
-      const webhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      // Define both webhook URLs - original and new
+      const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
-      console.log("🚀 SENDING FINAL SUBMISSION TO:", webhookUrl.substring(0, 30) + "...");
+      console.log("🚀 SENDING FINAL SUBMISSION TO ORIGINAL WEBHOOK:", originalWebhookUrl.substring(0, 30) + "...");
+      console.log("🚀 SENDING FINAL SUBMISSION TO NEW WEBHOOK:", newWebhookUrl.substring(0, 30) + "...");
+      
+      // Convert data to JSON string once
+      const jsonData = JSON.stringify(finalSubmissionData);
+      
+      // Log the exact JSON being sent
+      console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER WEBHOOKS:");
+      console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+      
+      // Function to send data to a webhook URL
+      const sendToWebhookUrl = async (url: string, label: string) => {
+        try {
+          console.log(`📤 SENDING TO ${label} WEBHOOK: ${url.substring(0, 30)}...`);
+          
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'Amerigo-Auto-Transport/1.0',
+            },
+            body: jsonData,
+          });
+          
+          console.log(`📡 ${label} WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+          
+          const responseText = await response.text();
+          
+          if (!response.ok) {
+            console.error(`❌ ${label} WEBHOOK ERROR: ${response.status} ${response.statusText}`);
+            console.error(`❌ ${label} RESPONSE: ${responseText.substring(0, 500)}`);
+            return { success: false, error: `${response.status} ${response.statusText}` };
+          }
+          
+          // Try to parse the response if it's JSON
+          try {
+            const jsonResponse = JSON.parse(responseText);
+            console.log(`✅ ${label} WEBHOOK SUCCESS - JSON RESPONSE:`, JSON.stringify(jsonResponse, null, 2));
+          } catch (e) {
+            // Not JSON, just log the text
+            console.log(`✅ ${label} WEBHOOK SUCCESS - TEXT RESPONSE:`, responseText.substring(0, 200));
+          }
+          
+          console.log(`✅ ${label} WEBHOOK DELIVERED SUCCESSFULLY\n`);
+          return { success: true };
+        } catch (error) {
+          console.error(`❌ ${label} WEBHOOK REQUEST FAILED:`, error);
+          return { success: false, error: error instanceof Error ? error.message : String(error) };
+        }
+      };
       
       try {
-        // Convert data to JSON string
-        const jsonData = JSON.stringify(finalSubmissionData);
+        // Send to both webhooks
+        const originalWebhookResult = await sendToWebhookUrl(originalWebhookUrl, "ORIGINAL");
+        const newWebhookResult = await sendToWebhookUrl(newWebhookUrl, "NEW");
         
-        // Log the exact JSON being sent
-        console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER:");
-        console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+        // As long as one webhook succeeds, we consider the operation successful
+        const isSuccessful = originalWebhookResult.success || newWebhookResult.success;
         
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Amerigo-Auto-Transport/1.0',
-          },
-          body: jsonData,
-        });
-        
-        console.log(`📡 FINAL SUBMISSION RESPONSE STATUS: ${response.status} ${response.statusText}`);
-        
-        const responseText = await response.text();
-        
-        if (!response.ok) {
-          console.error(`❌ FINAL SUBMISSION ERROR: ${response.status} ${response.statusText}`);
-          console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
+        if (!isSuccessful) {
           return res.status(500).json({ 
             success: false, 
-            message: "Failed to send final submission to CRM" 
+            message: "Failed to send final submission to any CRM endpoint" 
           });
         }
         
-        // Try to parse the response if it's JSON
-        try {
-          const jsonResponse = JSON.parse(responseText);
-          console.log('✅ FINAL SUBMISSION SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
-        } catch (e) {
-          // Not JSON, just log the text
-          console.log('✅ FINAL SUBMISSION SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
-        }
-        
-        console.log('✅ FINAL SUBMISSION DELIVERED SUCCESSFULLY\n');
+        console.log('✅ FINAL SUBMISSION PROCESS COMPLETED\n');
         
         res.json({
           success: true,
@@ -659,51 +684,78 @@ export function registerRoutes(app: Express): Server {
         shipmentDate: formattedShipmentDate
       });
       
-      // Use NEW_WEBHOOK_URL first, then fall back to the old Zapier webhook
-      const finalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
-      console.log("🚀 USING WEBHOOK URL:", finalWebhookUrl.substring(0, 30) + "...");
+      // Define both webhook URLs for testing
+      const originalWebhookUrl = process.env.NEW_WEBHOOK_URL || "https://hooks.zapier.com/hooks/catch/18240296/20w06p8/";
+      const newWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
+      
+      console.log("🚀 TESTING ORIGINAL WEBHOOK URL:", originalWebhookUrl.substring(0, 30) + "...");
+      console.log("🚀 TESTING NEW WEBHOOK URL:", newWebhookUrl.substring(0, 30) + "...");
+      
+      // Convert data to JSON string once
+      const jsonData = JSON.stringify(enhancedTestData);
+      
+      // Log the exact JSON being sent
+      console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER WEBHOOKS:");
+      console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+      
+      // Function to send data to a webhook URL
+      const sendToWebhookUrl = async (url: string, label: string) => {
+        try {
+          console.log(`📤 SENDING TO ${label} WEBHOOK: ${url.substring(0, 30)}...`);
+          
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'Amerigo-Auto-Transport/1.0',
+            },
+            body: jsonData,
+          });
+          
+          console.log(`📡 ${label} WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+          
+          const responseText = await response.text();
+          
+          if (!response.ok) {
+            console.error(`❌ ${label} WEBHOOK ERROR: ${response.status} ${response.statusText}`);
+            console.error(`❌ ${label} RESPONSE: ${responseText.substring(0, 500)}`);
+            return { success: false, error: `${response.status} ${response.statusText}` };
+          }
+          
+          // Try to parse the response if it's JSON
+          try {
+            const jsonResponse = JSON.parse(responseText);
+            console.log(`✅ ${label} WEBHOOK SUCCESS - JSON RESPONSE:`, JSON.stringify(jsonResponse, null, 2));
+          } catch (e) {
+            // Not JSON, just log the text
+            console.log(`✅ ${label} WEBHOOK SUCCESS - TEXT RESPONSE:`, responseText.substring(0, 200));
+          }
+          
+          console.log(`✅ ${label} WEBHOOK DELIVERED SUCCESSFULLY\n`);
+          return { success: true };
+        } catch (error) {
+          console.error(`❌ ${label} WEBHOOK REQUEST FAILED:`, error);
+          return { success: false, error: error instanceof Error ? error.message : String(error) };
+        }
+      };
       
       try {
-        // Convert data to JSON string
-        const jsonData = JSON.stringify(enhancedTestData);
+        // Send test data to both webhooks
+        const originalResult = await sendToWebhookUrl(originalWebhookUrl, "ORIGINAL");
+        const newResult = await sendToWebhookUrl(newWebhookUrl, "NEW");
         
-        // Log the exact JSON being sent
-        console.log("🔍 EXACT JSON PAYLOAD BEING SENT TO ZAPIER:");
-        console.log(jsonData.substring(0, 500) + (jsonData.length > 500 ? "..." : ""));
+        // Consider the test successful if at least one webhook succeeds
+        const isSuccessful = originalResult.success || newResult.success;
         
-        const response = await fetch(finalWebhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Amerigo-Auto-Transport/1.0',
-          },
-          body: jsonData,
-        });
-        
-        console.log(`📡 FINAL WEBHOOK TEST RESPONSE STATUS: ${response.status} ${response.statusText}`);
-        
-        const responseText = await response.text();
-        
-        if (!response.ok) {
-          console.error(`❌ FINAL WEBHOOK TEST FAILED: ${response.status} ${response.statusText}`);
-          console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
+        if (!isSuccessful) {
           return res.status(500).json({ 
             success: false, 
-            message: "Final webhook test failed" 
+            message: "Both webhook tests failed" 
           });
         }
         
-        // Try to parse the response if it's JSON
-        try {
-          const jsonResponse = JSON.parse(responseText);
-          console.log('✅ FINAL WEBHOOK TEST SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
-        } catch (e) {
-          // Not JSON, just log the text
-          console.log('✅ FINAL WEBHOOK TEST SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
-        }
-        
-        console.log('✅ FINAL WEBHOOK TEST SUCCESSFUL\n');
+        console.log('✅ FINAL WEBHOOK TEST COMPLETED\n');
         
         res.json({
           success: true,
