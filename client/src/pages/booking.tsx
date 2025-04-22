@@ -237,11 +237,17 @@ export default function Booking() {
       
       try {
         // Send the complete data to our new final-submission endpoint
-        console.log("🚀 CALLING FINAL-SUBMISSION API ENDPOINT...");
-        const response = await fetch("/api/final-submission", {
+        console.log("🚀 CALLING FINAL-SUBMISSION API ENDPOINT AT: /api/final-submission");
+        // Log the exact JSON payload we're sending
+        console.log("📦 PAYLOAD BEING SENT:", JSON.stringify(updatedData).substring(0, 500));
+        
+        // Use window.fetch directly to ensure we're not hitting any caching or framework issues
+        const response = await window.fetch("/api/final-submission", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store",
+            "X-Debug-Timestamp": new Date().toISOString()
           },
           body: JSON.stringify(updatedData),
         });
