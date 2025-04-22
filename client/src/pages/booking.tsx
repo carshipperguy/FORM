@@ -691,6 +691,7 @@ export default function Booking() {
                                     I Understand
                                   </Button>
                                 </div>
+                              </div>
                             </DialogContent>
                           </Dialog>
                         </div>

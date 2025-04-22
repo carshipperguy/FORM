@@ -36,15 +36,29 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log('- NEW_WEBHOOK_URL exists:', process.env.NEW_WEBHOOK_URL ? 'YES' : 'NO');
     console.log('- WEBHOOK_URL exists:', process.env.WEBHOOK_URL ? 'YES' : 'NO');
     
-    // Try a different webhook URL format - sometimes Zapier has issues with specific formats
-    // This is a direct webhook URL format that might be more reliable
-    let webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
+    // Determine which webhook URL to use based on the event type
+    // The eventType helps us route different kinds of submissions to different Zapier zaps
+    let webhookUrl;
+    let zapierHookId;
+    
+    // Check if this is a final submission (order) or a quote submission (lead)
+    if (data.eventType === 'final_submission') {
+      // This is a final order submission - use the order webhook
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
+      zapierHookId = "2xrmfy2";
+      console.log('🔴 USING ORDER BOOKING WEBHOOK - This is a final submission');
+    } else {
+      // This is a quote submission or other type - use the lead webhook
+      webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
+      zapierHookId = "20zu8bj";
+      console.log('🔵 USING LEAD CAPTURE WEBHOOK - This is a quote submission');
+    }
     
     // Print the webhook URL we're using
     console.log('🔗 USING ZAPIER WEBHOOK URL:', webhookUrl);
     
     // Also log the specific Zapier hook ID for reference
-    console.log('📎 ZAPIER HOOK ID: 20zu8bj');
+    console.log('📎 ZAPIER HOOK ID:', zapierHookId);
 
     // 2. Prepare the request data with more verbose logging
     console.log('📋 PREPARING WEBHOOK DATA...');
