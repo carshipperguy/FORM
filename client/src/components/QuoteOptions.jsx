@@ -110,9 +110,10 @@ const QuoteOptions = ({ data }) => {
                   e.currentTarget.src = 'https://via.placeholder.com/120x45?text=Amerigo+Logo';
                 }}
               />
-              <p className="text-xs text-white font-semibold ml-2">
-                Military Owned • Family Operated • Proudly American
-              </p>
+              <div className="flex flex-col text-xs text-white font-semibold ml-2">
+                <span>Military Owned</span>
+                <span>Family Operated</span>
+              </div>
             </div>
           </div>
 
@@ -208,6 +209,10 @@ const QuoteOptions = ({ data }) => {
 
             {/* Wrapper div to maintain stable height for price display */}
             <div className="relative border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px]">
+              {/* Most Popular Tag */}
+              <div className="absolute right-0 top-0 bg-yellow-400 text-[#002868] text-xs font-bold py-1 px-2 z-10 rounded-bl-md">
+                Most Popular
+              </div>
               <div className="bg-[#BF0A30] text-white p-2">
                 <h3 className="text-sm font-medium">Express Transport</h3>
               </div>
@@ -228,18 +233,18 @@ const QuoteOptions = ({ data }) => {
                 <div className="mb-4 text-center" style={{ minHeight: '32px' }}>
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(expressPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1" style={{ minHeight: '80px' }}>
-                  <li>✓ Guaranteed pickup window</li>
-                  <li>✓ Priority dispatch</li>
-                  <li>✓ Fully insured, door-to-door</li>
-                  <li>✓ $0 due now</li>
+                <ul className="text-xs mb-3 text-gray-600 space-y-2" style={{ minHeight: '80px' }}>
+                  <li>✓ <span className="font-bold">Guaranteed Pickup Window</span></li>
+                  <li>✓ Fully Insured</li>
+                  <li>✓ Door-to-Door Service</li>
+                  <li>✓ $0 Due Now</li>
                 </ul>
                 <div className="mt-auto pt-2">
                   <button
                     onClick={() => handleReserve("express", isEnclosedExpress)}
                     className="w-full bg-[#BF0A30] hover:bg-[#a00826] text-white py-2 text-sm rounded-sm transition-colors"
                   >
-                    Reserve Now - No CC Required
+                    Submit
                   </button>
                 </div>
               </div>
