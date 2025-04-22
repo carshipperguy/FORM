@@ -2,8 +2,14 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import MobileContainer from "@/components/MobileContainer";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ThankYou() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionComplete, setSubmissionComplete] = useState(false);
+  
   const searchParams = new URLSearchParams(window.location.search);
   const data = searchParams.get("data") ? JSON.parse(decodeURIComponent(searchParams.get("data") || "{}")) : {};
 
@@ -12,6 +18,54 @@ export default function ThankYou() {
     style: 'currency',
     currency: 'USD'
   }).format(data.finalPrice || 0);
+  
+  // Send final submission to our order webhook when the component mounts
+  useEffect(() => {
+    async function sendFinalSubmission() {
+      if (!data || submissionComplete || isSubmitting) return;
+      
+      try {
+        setIsSubmitting(true);
+        console.log("🚗 ThankYou page - Sending final order submission to webhook");
+        console.log("📦 Order data:", data);
+        
+        // Add the specific event type for final submissions
+        const finalData = {
+          ...data,
+          eventType: "final_submission",
+          submissionTime: new Date().toISOString()
+        };
+        
+        // Send the complete order data to the final-submission endpoint
+        const response = await fetch("/api/final-submission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store"
+          },
+          body: JSON.stringify(finalData)
+        });
+        
+        console.log("📡 Final submission response status:", response.status);
+        
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("✅ Final submission successful:", responseData);
+          setSubmissionComplete(true);
+        } else {
+          const errorText = await response.text();
+          console.error("❌ Final submission error:", errorText);
+          console.error("❌ Error status:", response.status);
+        }
+      } catch (error) {
+        console.error("❌ Final submission request failed:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+    
+    sendFinalSubmission();
+  }, [data, submissionComplete, isSubmitting]);
 
   return (
     <MobileContainer>
