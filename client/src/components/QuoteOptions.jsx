@@ -190,18 +190,18 @@ const QuoteOptions = ({ data }) => {
                 <div className="mb-4 text-center" style={{ minHeight: '32px' }}>
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(standardPrice)}</p>
                 </div>
-                <ul className="text-xs mb-3 text-gray-600 space-y-1" style={{ minHeight: '80px' }}>
+                <ul className="text-xs mb-3 text-gray-600 space-y-2" style={{ minHeight: '80px' }}>
                   <li>✓ Pickup within 7-day window</li>
-                  <li>✓ Fully insured</li>
-                  <li>✓ Door-to-door service</li>
-                  <li>✓ $0 due now</li>
+                  <li>✓ Fully Insured</li>
+                  <li>✓ Door-to-Door Service</li>
+                  <li>✓ $0 Due Now</li>
                 </ul>
                 <div className="mt-auto pt-2">
                   <button
                     onClick={() => handleReserve("standard", isEnclosedStandard)}
                     className="w-full bg-[#002868] hover:bg-[#001a4d] text-white py-2 text-sm rounded-sm transition-colors"
                   >
-                    Reserve Now - No CC Required
+                    Submit
                   </button>
                 </div>
               </div>
