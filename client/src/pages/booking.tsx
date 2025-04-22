@@ -207,10 +207,21 @@ export default function Booking() {
         isExpeditedShipping: data.guaranteedDate
       };
       
+      console.log("🟢 FORM SUBMISSION - DEBUGGING ORDER BOOKING WEBHOOK");
       console.log("📝 SENDING COMPLETE BOOKING DATA TO FINAL SUBMISSION ENDPOINT");
+      console.log("📋 BOOKING DATA KEYS:", Object.keys(updatedData));
+      
+      // Log critical data elements needed for Zapier integration
+      console.log("🧾 CRITICAL DATA CHECK:");
+      console.log("- Name:", updatedData.name);
+      console.log("- Email:", updatedData.email);
+      console.log("- Phone:", updatedData.phone);
+      console.log("- Transport Type:", updatedData.transportType);
+      console.log("- Price:", updatedData.selectedPrice);
       
       try {
         // Send the complete data to our new final-submission endpoint
+        console.log("🚀 CALLING FINAL-SUBMISSION API ENDPOINT...");
         const response = await fetch("/api/final-submission", {
           method: "POST",
           headers: {
@@ -219,10 +230,15 @@ export default function Booking() {
           body: JSON.stringify(updatedData),
         });
         
+        console.log("📡 API RESPONSE STATUS:", response.status);
+        
         if (response.ok) {
-          console.log("✅ SUCCESSFULLY SENT COMPLETE BOOKING DATA TO ZAPIER");
+          const responseData = await response.json();
+          console.log("✅ SUCCESSFULLY SENT COMPLETE BOOKING DATA TO ZAPIER", responseData);
         } else {
-          console.error("❌ ERROR SENDING FINAL SUBMISSION:", await response.text());
+          const errorText = await response.text();
+          console.error("❌ ERROR SENDING FINAL SUBMISSION:", errorText);
+          console.error("❌ ERROR STATUS:", response.status);
         }
       } catch (webhookError) {
         console.error("❌ WEBHOOK REQUEST FAILED:", webhookError);
