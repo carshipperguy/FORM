@@ -234,7 +234,7 @@ const QuoteOptions = ({ data }) => {
                   <p className="text-2xl font-bold text-center text-[#BF0A30]">{formatUSD(expressPrice)}</p>
                 </div>
                 <ul className="text-xs mb-3 text-gray-600 space-y-2" style={{ minHeight: '80px' }}>
-                  <li>✓ <span className="font-bold">Guaranteed Pickup Window</span></li>
+                  <li>✓ <span className="font-bold text-[#002868]">Guaranteed Pickup Window</span></li>
                   <li>✓ Fully Insured</li>
                   <li>✓ Door-to-Door Service</li>
                   <li>✓ $0 Due Now</li>
