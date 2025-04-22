@@ -201,7 +201,7 @@ const QuoteOptions = ({ data }) => {
                     onClick={() => handleReserve("standard", isEnclosedStandard)}
                     className="w-full bg-[#002868] hover:bg-[#001a4d] text-white py-2 text-sm rounded-sm transition-colors"
                   >
-                    Submit
+                    Reserve Now - No CC Required
                   </button>
                 </div>
               </div>
@@ -244,7 +244,7 @@ const QuoteOptions = ({ data }) => {
                     onClick={() => handleReserve("express", isEnclosedExpress)}
                     className="w-full bg-[#BF0A30] hover:bg-[#a00826] text-white py-2 text-sm rounded-sm transition-colors"
                   >
-                    Submit
+                    Reserve Now - No CC Required
                   </button>
                 </div>
               </div>
