@@ -218,6 +218,22 @@ export default function Booking() {
       console.log("- Phone:", updatedData.phone);
       console.log("- Transport Type:", updatedData.transportType);
       console.log("- Price:", updatedData.selectedPrice);
+      console.log("- Pickup Address:", updatedData.pickupAddress);
+      console.log("- Dropoff Address:", updatedData.dropoffAddress);
+      
+      // Log important fields for address parsing
+      console.log("🏠 ADDRESS DATA CHECK:");
+      console.log("- Pickup Street:", formData.pickupStreetAddress);
+      console.log("- Pickup City:", formData.pickupCity);
+      console.log("- Pickup State:", formData.pickupState);
+      console.log("- Pickup ZIP:", formData.pickupZip);
+      console.log("- Delivery Street:", formData.deliveryStreetAddress);
+      console.log("- Delivery City:", formData.deliveryCity);
+      console.log("- Delivery State:", formData.deliveryState);
+      console.log("- Delivery ZIP:", formData.deliveryZip);
+      
+      console.log("📅 DATES:");
+      console.log("- Shipment Date:", data.shipmentDate);
       
       try {
         // Send the complete data to our new final-submission endpoint

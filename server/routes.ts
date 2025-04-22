@@ -420,6 +420,7 @@ export function registerRoutes(app: Express): Server {
       
       // IMPORTANT: For FINAL submissions, we only want to use the ORDER webhook URL
       // This webhook is specifically for completed orders with full details
+      // 🚨 CONFIRMED CORRECT URL - DO NOT CHANGE - This is the order booking webhook
       const orderWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       
       // Log the webhook URL in development or when debugging
