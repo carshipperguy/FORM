@@ -91,11 +91,23 @@ const QuoteOptions = ({ data }) => {
       <MobileContainer>
         {/* Patriotic theme with red, white, and blue colors */}
         <div className="p-4 bg-white">
-          {/* Header with text-based logo */}
-          <div className="text-center mb-4 p-3 bg-[#002868] rounded-md shadow-md">
-            <h1 className="text-white text-xl font-bold tracking-wide mb-1">AMERIGO</h1>
-            <p className="text-[#BF0A30] text-sm font-medium">AUTO TRANSPORT</p>
-            <div className="text-white text-xs font-medium mt-1">VETERAN OWNED</div>
+          {/* Header with logo image */}
+          <div className="text-center mb-4 p-2 bg-[#002868] rounded-md shadow-md">
+            <img
+              src="/form-header.png"
+              alt="Amerigo Auto Transport - Veteran Owned"
+              style={{
+                width: '280px',
+                display: 'block',
+                margin: '0 auto',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/280x100?text=Amerigo+Auto+Transport';
+              }}
+            />
           </div>
 
           {/* Route Information with cleaner layout */}
