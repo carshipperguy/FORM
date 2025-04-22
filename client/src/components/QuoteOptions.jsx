@@ -91,29 +91,26 @@ const QuoteOptions = ({ data }) => {
       <MobileContainer>
         {/* Patriotic theme with red, white, and blue colors */}
         <div className="p-4 bg-white">
-          {/* Header with blue background */}
+          {/* Header with logo and text */}
           <div className="text-center mb-4 p-3 bg-[#002868] rounded-md shadow-md">
-            <h1 className="text-xl font-bold text-white">Shipping Quote Summary</h1>
-            <div className="flex items-center justify-center mt-2">
-              <img
-                src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
-                alt="Amerigo Auto Transport Logo"
-                style={{
-                  width: '120px',
-                  display: 'block',
-                  margin: '0 auto 5px',
-                  maxWidth: '100%',
-                  height: 'auto',
-                  objectFit: 'contain'
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/120x45?text=Amerigo+Logo';
-                }}
-              />
-              <div className="flex flex-col text-xs text-white font-semibold ml-2">
-                <span>Military Owned</span>
-                <span>Family Operated</span>
-              </div>
+            <img
+              src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
+              alt="Amerigo Auto Transport Logo"
+              style={{
+                width: '180px',
+                display: 'block',
+                margin: '0 auto 10px',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/180x60?text=Amerigo+Logo';
+              }}
+            />
+            <div className="flex flex-col text-xs text-white font-semibold">
+              <span>Military Owned</span>
+              <span>Family Operated</span>
             </div>
           </div>
 
