@@ -257,10 +257,27 @@ export function registerRoutes(app: Express): Server {
   // This endpoint fires only when the final "Submit" button is clicked
   app.post("/api/final-submission", async (req, res) => {
     try {
-      console.log("\n🔔 FINAL FORM SUBMISSION - Complete booking data received");
+      console.log("\n🔴 DEBUGGING ORDER BOOKING WEBHOOK - RECEIVED REQUEST");
+      console.log("🔔 FINAL FORM SUBMISSION - Complete booking data received");
+      
+      // Check request headers
+      console.log("📋 REQUEST HEADERS:", JSON.stringify({
+        'content-type': req.headers['content-type'],
+        'user-agent': req.headers['user-agent'],
+        'content-length': req.headers['content-length']
+      }));
+      
       const formData = req.body;
       
-      // Log the incoming data for debugging
+      // Check if formData exists
+      if (!formData) {
+        console.error("❌ CRITICAL ERROR: No form data received! Request body is empty or null");
+        return res.status(400).json({ error: "Empty request body received" });
+      }
+      
+      console.log("📋 FORM DATA KEYS:", Object.keys(formData));
+      
+      // Log the incoming data for debugging (comprehensive)
       console.log("📝 FINAL FORM DATA RECEIVED:", {
         name: formData?.name || 'Not provided',
         email: formData?.email || 'Not provided',
@@ -268,6 +285,8 @@ export function registerRoutes(app: Express): Server {
         vehicle: `${formData?.year || ''} ${formData?.make || ''} ${formData?.model || ''}`,
         from: formData?.pickupLocation || 'Not provided',
         to: formData?.dropoffLocation || 'Not provided',
+        transportType: formData?.transportType || 'Not provided',
+        selectedPrice: formData?.selectedPrice || 'Not provided',
         pickupContactName: formData?.pickupContactName || 'Not provided',
         pickupContactPhone: formData?.pickupContactPhone || 'Not provided',
         pickupAddress: formData?.pickupAddress || 'Not provided',
@@ -456,20 +475,54 @@ export function registerRoutes(app: Express): Server {
       };
       
       try {
-        // Send only to the order webhook for completed orders
+        console.log("⏳ ATTEMPTING DIRECT FETCH TO ZAPIER WEBHOOK...");
+        
+        // Attempt direct fetch to Zapier without using the helper function
+        try {
+          const directResponse = await fetch(orderWebhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'Amerigo-Auto-Transport/1.0',
+            },
+            body: jsonData,
+          });
+          
+          console.log("📡 DIRECT WEBHOOK RESPONSE STATUS:", directResponse.status, directResponse.statusText);
+          const directResponseText = await directResponse.text();
+          console.log("📄 DIRECT WEBHOOK RESPONSE TEXT:", directResponseText);
+          
+          if (directResponse.ok) {
+            console.log("✅ DIRECT WEBHOOK REQUEST SUCCESSFUL");
+            return res.json({
+              success: true,
+              message: "Final submission successfully sent to CRM system",
+              webhookResponse: directResponseText
+            });
+          } else {
+            console.error("❌ DIRECT WEBHOOK REQUEST FAILED");
+          }
+        } catch (directError) {
+          console.error("❌ DIRECT WEBHOOK ERROR:", directError);
+        }
+        
+        // Fall back to original method if direct fetch fails
+        console.log("⏳ FALLBACK TO HELPER FUNCTION...");
         const orderWebhookResult = await sendToWebhookUrl(orderWebhookUrl, "ORDER");
         
         // Check if the order webhook succeeded
         const isSuccessful = orderWebhookResult.success;
         
         if (!isSuccessful) {
+          console.error("❌ BOTH WEBHOOK METHODS FAILED!");
           return res.status(500).json({ 
             success: false, 
             message: "Failed to send final submission to order system" 
           });
         }
         
-        console.log('✅ FINAL SUBMISSION PROCESS COMPLETED\n');
+        console.log('✅ FINAL SUBMISSION PROCESS COMPLETED VIA FALLBACK METHOD\n');
         
         res.json({
           success: true,
