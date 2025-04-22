@@ -110,56 +110,6 @@ const QuoteOptions = ({ data }) => {
             />
           </div>
 
-          {/* Route Information with cleaner layout */}
-          <div className="mb-4">
-            <div className="bg-white border border-[#002868] rounded-md shadow-sm mb-3 overflow-hidden">
-              <div className="bg-[#002868] text-white p-2">
-                <h2 className="text-sm font-medium">Route Information</h2>
-              </div>
-              <div className="p-3 space-y-3 text-sm">
-                {/* Vehicle info */}
-                <div className="bg-gray-50 p-2 rounded-md">
-                  <span className="font-bold text-[#002868] block mb-1">Vehicle:</span>
-                  <span className="text-gray-800">
-                    {formData.year} {formData.make} {formData.model}
-                  </span>
-                </div>
-                
-                {/* Route info with cleaner single-line format */}
-                <div className="flex flex-col space-y-2 border-b border-gray-100 pb-2">
-                  <div>
-                    <span className="font-bold text-[#002868] block mb-1">Pickup Location:</span>
-                    <span className="text-gray-800">{formData.pickupLocation}</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-[#002868] block mb-1">Delivery Location:</span>
-                    <span className="text-gray-800">{formData.dropoffLocation}</span>
-                  </div>
-                </div>
-                
-                {/* Shipment details */}
-                <div className="flex justify-between pt-1">
-                  <div className="text-center flex-1 border-r border-gray-100">
-                    <span className="font-bold text-[#002868] block mb-1">Distance</span>
-                    <span className="text-gray-800">{formData.distance} miles</span>
-                  </div>
-                  <div className="text-center flex-1 border-r border-gray-100">
-                    <span className="font-bold text-[#002868] block mb-1">Transit Time</span>
-                    <span className="text-gray-800">{formData.transitTime} days</span>
-                  </div>
-                  <div className="text-center flex-1">
-                    <span className="font-bold text-[#002868] block mb-1">Ship Date</span>
-                    <span className="text-gray-800">
-                      {formData.shipmentDate instanceof Date 
-                        ? formData.shipmentDate.toLocaleDateString() 
-                        : formData.shipmentDate}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className="space-y-4 mb-4">
             {/* Wrapper div to maintain stable height for price display */}
             <div className="relative border border-[#002868] rounded-md shadow-sm overflow-hidden min-h-[250px]">
@@ -239,6 +189,54 @@ const QuoteOptions = ({ data }) => {
                   >
                     Reserve Now - No CC Required
                   </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Route Information with cleaner layout */}
+            <div className="bg-white border border-[#002868] rounded-md shadow-sm overflow-hidden">
+              <div className="bg-[#002868] text-white p-2">
+                <h2 className="text-sm font-medium">Route Information</h2>
+              </div>
+              <div className="p-3 space-y-3 text-sm">
+                {/* Vehicle info */}
+                <div className="bg-gray-50 p-2 rounded-md">
+                  <span className="font-bold text-[#002868] block mb-1">Vehicle:</span>
+                  <span className="text-gray-800">
+                    {formData.year} {formData.make} {formData.model}
+                  </span>
+                </div>
+                
+                {/* Route info with cleaner single-line format */}
+                <div className="flex flex-col space-y-2 border-b border-gray-100 pb-2">
+                  <div>
+                    <span className="font-bold text-[#002868] block mb-1">Pickup Location:</span>
+                    <span className="text-gray-800">{formData.pickupLocation}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#002868] block mb-1">Delivery Location:</span>
+                    <span className="text-gray-800">{formData.dropoffLocation}</span>
+                  </div>
+                </div>
+                
+                {/* Shipment details */}
+                <div className="flex justify-between pt-1">
+                  <div className="text-center flex-1 border-r border-gray-100">
+                    <span className="font-bold text-[#002868] block mb-1">Distance</span>
+                    <span className="text-gray-800">{formData.distance} miles</span>
+                  </div>
+                  <div className="text-center flex-1 border-r border-gray-100">
+                    <span className="font-bold text-[#002868] block mb-1">Transit Time</span>
+                    <span className="text-gray-800">{formData.transitTime} days</span>
+                  </div>
+                  <div className="text-center flex-1">
+                    <span className="font-bold text-[#002868] block mb-1">Ship Date</span>
+                    <span className="text-gray-800">
+                      {formData.shipmentDate instanceof Date 
+                        ? formData.shipmentDate.toLocaleDateString() 
+                        : formData.shipmentDate}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
