@@ -109,7 +109,7 @@ const QuoteOptions = ({ data }) => {
               }}
             />
             <img
-              src="/veteran-owned.webp"
+              src="https://raw.githubusercontent.com/user-attachments/assets/main/c02456cc-7f9c-4ce5-986e-b9ab001adc5e"
               alt="Veteran Owned Business"
               style={{
                 width: '140px',
