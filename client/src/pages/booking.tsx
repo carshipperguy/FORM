@@ -270,6 +270,10 @@ export default function Booking() {
       // Use setTimeout to create a smooth transition
       // This helps prevent the "strange behavior" during page transitions
       setTimeout(() => {
+        console.log("🔄 Redirecting to thank-you page with complete order data");
+        console.log("🧐 NOTE: The final order webhook will be triggered from the thank-you page");
+        // Include a flag that confirms this data came from booking
+        updatedData.fromBookingForm = true;
         navigate(
           `/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`,
         );
