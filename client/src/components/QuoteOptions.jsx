@@ -91,36 +91,21 @@ const QuoteOptions = ({ data }) => {
       <MobileContainer>
         {/* Patriotic theme with red, white, and blue colors */}
         <div className="p-4 bg-white">
-          {/* Header with logo and text */}
+          {/* Header with new combined logo and veteran owned image */}
           <div className="text-center mb-4 p-3 bg-[#002868] rounded-md shadow-md">
             <img
-              src="https://amerigoautotransport.net/wp-content/uploads/2024/09/Amerigo-auto-transport-logo.png"
-              alt="Amerigo Auto Transport Logo"
+              src="/header-image-price.png"
+              alt="Amerigo Auto Transport - Veteran Owned"
               style={{
-                width: '180px',
+                width: '100%',
                 display: 'block',
-                margin: '0 auto 10px',
+                margin: '0 auto',
                 maxWidth: '100%',
                 height: 'auto',
                 objectFit: 'contain'
               }}
               onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/180x60?text=Amerigo+Logo';
-              }}
-            />
-            <img
-              src="https://raw.githubusercontent.com/user-attachments/assets/main/c02456cc-7f9c-4ce5-986e-b9ab001adc5e"
-              alt="Veteran Owned Business"
-              style={{
-                width: '140px',
-                display: 'block',
-                margin: '10px auto 0',
-                maxWidth: '100%',
-                height: 'auto',
-                objectFit: 'contain'
-              }}
-              onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/140x60?text=Veteran+Owned';
+                e.currentTarget.src = 'https://via.placeholder.com/280x120?text=Amerigo+Auto+Transport';
               }}
             />
           </div>
