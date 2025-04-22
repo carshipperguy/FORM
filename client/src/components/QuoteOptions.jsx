@@ -108,10 +108,21 @@ const QuoteOptions = ({ data }) => {
                 e.currentTarget.src = 'https://via.placeholder.com/180x60?text=Amerigo+Logo';
               }}
             />
-            <div className="flex flex-col text-xs text-white font-semibold">
-              <span>Military Owned</span>
-              <span>Family Operated</span>
-            </div>
+            <img
+              src="/veteran-owned.webp"
+              alt="Veteran Owned Business"
+              style={{
+                width: '140px',
+                display: 'block',
+                margin: '10px auto 0',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/140x60?text=Veteran+Owned';
+              }}
+            />
           </div>
 
           {/* Route Information with cleaner layout */}
