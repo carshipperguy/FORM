@@ -10,6 +10,7 @@ import Booking from "@/pages/booking-new";
 import FinalQuote from "@/pages/final-quote";
 import SimpleQuote from "@/pages/simple-quote";
 import TestMapQuest from "@/pages/test-mapquest";
+import CrossOriginTest from "@/pages/cross-origin-test";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/booking" component={Booking} />
       <Route path="/thank-you" component={ThankYou} />
       <Route path="/test-mapquest" component={TestMapQuest} />
+      <Route path="/cross-origin-test" component={CrossOriginTest} />
       <Route component={NotFound} />
     </Switch>
   );
