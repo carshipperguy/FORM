@@ -32,7 +32,10 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   const handleInputChange = (e) => {
     const input = e.target.value;
     setSearchInput(input);
-    onChange(input);
+    
+    // Don't pass a ZIP code for manually typed entries
+    // This will be caught by validation to ensure users select a valid option
+    onChange(input, null);
     setShowDropdown(true);
   };
   
@@ -65,10 +68,23 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           onChange={handleInputChange}
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-          placeholder={placeholder || "Enter city, state, or ZIP"}
+          placeholder={placeholder || "Select from dropdown for City & ZIP"}
           required={required}
           className="location-input"
         />
+        {value && !showDropdown && (
+          <div className="selection-info">
+            {value.includes(',') ? (
+              <span className="selection-status complete">
+                ✓ City selected
+              </span>
+            ) : (
+              <span className="selection-status incomplete">
+                ⚠️ Select from dropdown
+              </span>
+            )}
+          </div>
+        )}
         
         {showDropdown && filteredOptions.length > 0 && (
           <div className="location-dropdown">
@@ -154,6 +170,27 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           font-size: 12px;
           color: #718096;
           margin-top: 2px;
+        }
+        
+        .selection-info {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 12px;
+        }
+        
+        .selection-status {
+          padding: 2px 5px;
+          border-radius: 2px;
+        }
+        
+        .selection-status.complete {
+          color: #059669;
+        }
+        
+        .selection-status.incomplete {
+          color: #b91c1c;
         }
       `}</style>
     </div>
