@@ -12,7 +12,11 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Use absolute URLs for all API requests to handle iframe scenarios
+  const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+  console.log(`API Request: Using ${absoluteUrl} for ${url}`);
+  
+  const res = await fetch(absoluteUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +33,12 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Use absolute URLs for all API requests to handle iframe scenarios
+    const url = queryKey[0] as string;
+    const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+    console.log(`Query: Using ${absoluteUrl} for ${url}`);
+    
+    const res = await fetch(absoluteUrl, {
       credentials: "include",
     });
 

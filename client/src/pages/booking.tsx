@@ -250,14 +250,24 @@ export default function Booking() {
         // Log the exact JSON payload we're sending
         console.log("📦 PAYLOAD BEING SENT:", JSON.stringify(updatedData).substring(0, 500));
         
+        // Get the current domain to handle iframe scenarios
+        const currentDomain = window.location.origin;
+        console.log("Current domain for API request:", currentDomain);
+        
+        // Use the full URL to avoid issues when embedded in an iframe
+        const apiUrl = `${currentDomain}/api/final-submission`;
+        console.log("Using API URL:", apiUrl);
+        
         // Use window.fetch directly to ensure we're not hitting any caching or framework issues
-        const response = await window.fetch("/api/final-submission", {
+        const response = await window.fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Cache-Control": "no-cache, no-store",
             "X-Debug-Timestamp": new Date().toISOString()
           },
+          // Include credentials to ensure cookies are sent even for cross-origin requests
+          credentials: "include",
           body: JSON.stringify(updatedData),
         });
         

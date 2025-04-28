@@ -31,7 +31,10 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
 
   try {
     console.log('Making MapQuest request:', url.toString());
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      // Include credentials to ensure cookies are sent even for cross-origin requests
+      credentials: "include"
+    });
 
     if (!response.ok) {
       throw new Error(`Distance calculation failed: ${response.statusText}`);
@@ -138,10 +141,17 @@ export async function calculateDistance(origin: string, destination: string): Pr
     
     // First try the server endpoint with cleaned locations
     try {
-      const serverUrl = `/api/distance?origin=${encodeURIComponent(cleanOrigin)}&destination=${encodeURIComponent(cleanDestination)}`;
+      // Get the current domain to handle iframe scenarios
+      const currentDomain = window.location.origin;
+      
+      // Use the full URL to avoid issues when embedded in an iframe
+      const serverUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(cleanOrigin)}&destination=${encodeURIComponent(cleanDestination)}`;
       console.log('Making server request to:', serverUrl);
       
-      const response = await fetch(serverUrl);
+      const response = await fetch(serverUrl, {
+        // Include credentials to ensure cookies are sent even for cross-origin requests
+        credentials: "include"
+      });
       console.log('Server response status:', response.status);
       
       if (!response.ok) {
