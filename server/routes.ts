@@ -7,7 +7,6 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 import { sendToWebhook } from "./utils/webhook";
 import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
 import { runWebhookHealthChecks, getWebhookMonitorReport } from "./utils/webhook-monitor";
-import { MetaEventType, MetaEventPayload } from "./utils/types";
 
 // Use MapQuest with your API key
 // Using the new key you provided

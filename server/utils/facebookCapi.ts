@@ -1,25 +1,42 @@
 import fetch from 'node-fetch';
-import { MetaEventType, MetaEventPayload } from './types';
 
 const META_PIXEL_ID = '953087976815191';
 const ACCESS_TOKEN = 'EAAWuSmOGqPoBOx8fbl8AqrBVGmC66mZBQkb8asm0cqFvZB1kpGZBGP2e88ftskhQl3IIodoEWnyVm5ciBL22xt38t01IbqYnISwRDOsfz3YZBZAKzUoPJWxXWrYImZBW7e0hENnCOQF9ZCVLggWK2Il1sAqQjCfAbagTxhEDrJoHlwZA59z45MBrvVhZBc40iVZCMZB7wZDZD';
 const API_VERSION = 'v17.0';
 
-// Type is now imported from types.ts
-type SendMetaEventPayload = MetaEventPayload;
+type MetaEventType = 'quote_sent' | 'deal_closed';
+
+interface SendMetaEventPayload {
+  eventType: MetaEventType;
+  userData: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  };
+  eventSourceUrl: string;
+  testEventCode?: string;
+  // Add Facebook/Meta attribution parameters
+  fbc?: string; // Facebook click ID (fbclid)
+  fbp?: string; // Facebook browser ID
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+}
 
 export async function sendMetaEvent({ 
   eventType, 
   userData, 
   eventSourceUrl,
-  fbclid, // Changed from fbc to fbclid
+  fbc,
   fbp,
   utm_source,
   utm_medium,
   utm_campaign,
   utm_content,
-  utm_term,
-  testEventCode // Added test event code parameter
+  utm_term
 }: SendMetaEventPayload) {
   const url = `https://graph.facebook.com/${API_VERSION}/${META_PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`;
 
@@ -34,7 +51,7 @@ export async function sendMetaEvent({
       fn: userData.firstName ? [hash(userData.firstName)] : undefined,
       ln: userData.lastName ? [hash(userData.lastName)] : undefined,
       // Add Facebook attribution data if available
-      fbc: fbclid || undefined, // fbclid becomes fbc in Facebook API format
+      fbc: fbc || undefined,
       fbp: fbp || undefined
     },
     // Include utm parameters in custom data for attribution tracking
@@ -49,10 +66,7 @@ export async function sendMetaEvent({
 
   const payload: any = { data: [event] };
 
-  // Use test event code from parameters first, falling back to env var
-  if (testEventCode) {
-    payload.test_event_code = testEventCode;
-  } else if (process.env.META_TEST_CODE) {
+  if (process.env.META_TEST_CODE) {
     payload.test_event_code = process.env.META_TEST_CODE;
   }
 
@@ -77,19 +91,3 @@ import crypto from 'crypto';
 function hash(value: string) {
   return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
-
-/* TEST SCRIPT WITH META TEST CODE
-if (process.env.META_TEST_CODE === 'TEST7436') {
-  sendMetaEvent({
-    eventType: 'quote_sent',
-    userData: {
-      email: 'test@example.com',
-      phone: '1234567890',
-      firstName: 'Test',
-      lastName: 'User',
-    },
-    eventSourceUrl: 'https://amerigoautotransport.net',
-  });
-}
-*/
-
