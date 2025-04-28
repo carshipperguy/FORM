@@ -169,55 +169,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Quote details are required" });
       }
       
-      console.log("Preparing to send Meta event: quote_sent with data:", {
-        email: email,
-        phone: phone,
-        firstName: quoteDetails?.firstName || '',
-        lastName: quoteDetails?.lastName || ''
-      });
-
-      // Fire Meta CAPI event via server-side with attribution data
-      try {
-        if (email || phone) {
-          // Extract Facebook/Meta attribution parameters from formData
-          const fbclid = quoteDetails?.fbclid;
-          const utm_source = quoteDetails?.utm_source;
-          const utm_medium = quoteDetails?.utm_medium;
-          const utm_campaign = quoteDetails?.utm_campaign;
-          const utm_content = quoteDetails?.utm_content;
-          const utm_term = quoteDetails?.utm_term;
-          
-          console.log("📊 Including attribution data in Meta CAPI event:", {
-            fbclid,
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            utm_term
-          });
-          
-          await sendMetaEvent({
-            eventType: 'quote_sent',
-            userData: {
-              email,
-              phone,
-              firstName: quoteDetails?.firstName || '',
-              lastName: quoteDetails?.lastName || ''
-            },
-            eventSourceUrl: req.headers.referer || req.get('origin') || '',
-            // Pass attribution parameters to Meta CAPI
-            fbclid, // Facebook click ID
-            fbp: undefined, // We don't have browser ID in this context
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            utm_term
-          });
-        }
-      } catch (metaErr) {
-        console.error('❌ Failed to send quote_sent Meta event:', metaErr);
-      }
+      // Meta event sending removed as part of rollback
 
 
       // Store results of notification attempts
@@ -310,79 +262,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
-  // New endpoint for handling Meta CAPI events
-  app.post("/api/meta-event", async (req, res) => {
-    try {
-      console.log("📊 /api/meta-event triggered - sending Meta CAPI event");
-      
-      const { 
-        eventType, 
-        userData, 
-        eventSourceUrl, 
-        testEventCode,
-        // Facebook/Meta attribution parameters
-        fbclid,
-        fbp,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term
-      } = req.body;
-      
-      if (!eventType || !eventSourceUrl) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Missing required event data" 
-        });
-      }
-      
-      // Validate event type
-      if (eventType !== 'quote_sent' && eventType !== 'deal_closed') {
-        return res.status(400).json({ 
-          success: false, 
-          error: `Invalid event type: ${eventType}` 
-        });
-      }
-      
-      console.log(`📊 Sending Meta event: ${eventType}`, {
-        userData,
-        attributionData: {
-          fbclid,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term
-        }
-      });
-      
-      const result = await sendMetaEvent({
-        eventType,
-        userData,
-        eventSourceUrl,
-        fbclid,
-        fbp,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term,
-        testEventCode
-      });
-      
-      res.json({ 
-        success: !!result,
-        eventType 
-      });
-    } catch (error) {
-      console.error("Error sending Meta event:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: "Failed to send Meta event" 
-      });
-    }
-  });
+
 
   // New endpoint specifically for final form submissions
   // This endpoint fires only when the final "Submit" button is clicked
@@ -457,56 +337,7 @@ export function registerRoutes(app: Express): Server {
       
       console.log("✅ FINAL SUBMISSION VALIDATION PASSED - All required fields present and valid")
       
-      // Fire Meta CAPI event for deal_closed with attribution parameters
-      if (formData.email || formData.phone) {
-        try {
-          // Extract Facebook/Meta attribution parameters from formData
-          const fbclid = formData.fbclid;
-          const utm_source = formData.utm_source;
-          const utm_medium = formData.utm_medium;
-          const utm_campaign = formData.utm_campaign;
-          const utm_content = formData.utm_content;
-          const utm_term = formData.utm_term;
-          
-          console.log("Sending Meta event: deal_closed with data:", {
-            email: formData.email || '',
-            phone: formData.phone || '',
-            firstName: formData.firstName || '',
-            lastName: formData.lastName || ''
-          });
-          
-          console.log("📊 Including attribution data in Meta CAPI deal_closed event:", {
-            fbclid,
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            utm_term
-          });
-          
-          await sendMetaEvent({
-            eventType: 'deal_closed',
-            userData: {
-              email: formData.email,
-              phone: formData.phone,
-              firstName: formData.firstName || '',
-              lastName: formData.lastName || ''
-            },
-            eventSourceUrl: req.headers.referer || req.get('origin') || '',
-            // Pass attribution parameters to Meta CAPI
-            fbclid, // Facebook click ID
-            fbp: undefined, // We don't have browser ID in this context
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            utm_term
-          });
-        } catch (metaError) {
-          console.error("Error sending Meta event:", metaError);
-          // Continue processing even if Meta event fails
-        }
-      }
+      // Meta event code removed as part of rollback
       
       // Log the incoming data for debugging (comprehensive)
       console.log("📝 FINAL FORM DATA RECEIVED:", {
