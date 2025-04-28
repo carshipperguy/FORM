@@ -1,5 +1,5 @@
 import { sendMetaEvent } from "./utils/facebookCapi";
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
@@ -7,6 +7,7 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 import { sendToWebhook } from "./utils/webhook";
 import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
 import { runWebhookHealthChecks, getWebhookMonitorReport } from "./utils/webhook-monitor";
+import { MetaEventType, MetaEventPayload } from "./utils/types";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -310,6 +311,80 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // New endpoint for handling Meta CAPI events
+  app.post("/api/meta-event", async (req, res) => {
+    try {
+      console.log("📊 /api/meta-event triggered - sending Meta CAPI event");
+      
+      const { 
+        eventType, 
+        userData, 
+        eventSourceUrl, 
+        testEventCode,
+        // Facebook/Meta attribution parameters
+        fbclid,
+        fbp,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_content,
+        utm_term
+      } = req.body;
+      
+      if (!eventType || !eventSourceUrl) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Missing required event data" 
+        });
+      }
+      
+      // Validate event type
+      if (eventType !== 'quote_sent' && eventType !== 'deal_closed') {
+        return res.status(400).json({ 
+          success: false, 
+          error: `Invalid event type: ${eventType}` 
+        });
+      }
+      
+      console.log(`📊 Sending Meta event: ${eventType}`, {
+        userData,
+        attributionData: {
+          fbclid,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term
+        }
+      });
+      
+      const result = await sendMetaEvent({
+        eventType,
+        userData,
+        eventSourceUrl,
+        fbclid,
+        fbp,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_content,
+        utm_term,
+        testEventCode
+      });
+      
+      res.json({ 
+        success: !!result,
+        eventType 
+      });
+    } catch (error) {
+      console.error("Error sending Meta event:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to send Meta event" 
+      });
+    }
+  });
+
   // New endpoint specifically for final form submissions
   // This endpoint fires only when the final "Submit" button is clicked
   app.post("/api/final-submission", async (req, res) => {
