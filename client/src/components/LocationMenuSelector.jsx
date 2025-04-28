@@ -33,12 +33,8 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
     const input = e.target.value;
     setSearchInput(input);
     
-    // Allow manually entered values to pass through
-    // Extract zip code if user enters one in the format "City, ST 12345"
-    const zipMatch = input.match(/(\d{5})$/);
-    const extractedZip = zipMatch ? zipMatch[1] : null;
-    
-    onChange(input, extractedZip);
+    // Track the input but don't save it as a valid selection
+    // User must select from dropdown to get a valid city/zip pair
     setShowDropdown(true);
   };
   
@@ -71,7 +67,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           onChange={handleInputChange}
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-          placeholder={placeholder || "Enter city or select from dropdown"}
+          placeholder={placeholder || "Search and select from dropdown (required)"}
           required={required}
           className="location-input"
         />

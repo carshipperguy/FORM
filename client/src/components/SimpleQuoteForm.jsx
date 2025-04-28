@@ -96,18 +96,83 @@ const SimpleQuoteForm = () => {
   
   // Client-side validation before submission
   const validateForm = () => {
-    // Import validation from the shared module
-    const { validateFormData } = require('../../shared/validation');
+    // Simplified validation of only required fields
+    const errors = [];
     
-    // Create full form data including ZIP codes for validation
-    const fullFormData = {
-      ...formData,
-      pickupZip: pickupZip || '',
-      dropoffZip: dropoffZip || ''
-    };
+    // Validate pickup location (must come from dropdown to have ZIP)
+    if (!formData.pickupLocation || !pickupZip) {
+      errors.push({
+        field: 'pickupLocation',
+        message: 'Please select a pickup location from the dropdown menu'
+      });
+    }
     
-    // Run validation on the form data as specified in the requirements
-    const errors = validateFormData(fullFormData, 'quote');
+    // Validate dropoff location (must come from dropdown to have ZIP)
+    if (!formData.dropoffLocation || !dropoffZip) {
+      errors.push({
+        field: 'dropoffLocation',
+        message: 'Please select a delivery location from the dropdown menu'
+      });
+    }
+    
+    // Vehicle information validation
+    if (!formData.vehicleType) {
+      errors.push({
+        field: 'vehicleType',
+        message: 'Please select a vehicle type'
+      });
+    }
+    
+    if (!formData.year) {
+      errors.push({
+        field: 'year',
+        message: 'Please enter the vehicle year'
+      });
+    }
+    
+    if (!formData.make) {
+      errors.push({
+        field: 'make',
+        message: 'Please enter the vehicle make'
+      });
+    }
+    
+    if (!formData.model) {
+      errors.push({
+        field: 'model',
+        message: 'Please enter the vehicle model'
+      });
+    }
+    
+    // Shipment date validation
+    if (!formData.shipmentDate) {
+      errors.push({
+        field: 'shipmentDate',
+        message: 'Please select a shipment date'
+      });
+    }
+    
+    // Contact information validation
+    if (!formData.name) {
+      errors.push({
+        field: 'name',
+        message: 'Please enter your name'
+      });
+    }
+    
+    if (!formData.phone) {
+      errors.push({
+        field: 'phone',
+        message: 'Please enter your phone number'
+      });
+    }
+    
+    if (!formData.email) {
+      errors.push({
+        field: 'email',
+        message: 'Please enter your email address'
+      });
+    }
     
     // Update state with any validation errors
     setValidationErrors(errors);
