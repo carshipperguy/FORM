@@ -290,9 +290,9 @@ export function registerRoutes(app: Express): Server {
       console.log("👉 /api/final-submission triggered!");
       console.log("\n🔴 DEBUGGING ORDER BOOKING WEBHOOK - RECEIVED REQUEST");
       console.log("🔔 FINAL FORM SUBMISSION - Complete booking data received");
-      console.log("👉 /api/final-submission triggered!");
-      console.log("👉 FORM DATA:", formData);
-      console.log("👉 FORM DATA KEYS:", Object.keys(formData));
+      
+      // Get the form data from the request body
+      const formData = req.body;
       
       // Check request headers
       console.log("📋 REQUEST HEADERS:", JSON.stringify({
@@ -301,70 +301,58 @@ export function registerRoutes(app: Express): Server {
         'content-length': req.headers['content-length']
       }));
       
-      const formData = req.body;
-
-      console.log("Preparing to send Meta event: deal_closed with data:", {
-        email: email,
-        phone: phone,
-        firstName: quoteDetails?.firstName || '',
-        lastName: quoteDetails?.lastName || ''
-      });
+      // Log form data for debugging
+      console.log("📋 FORM DATA KEYS:", Object.keys(formData || {}));
       
-      } catch (error) {
-        console.error("❌ FINAL SUBMISSION ENDPOINT ERROR:", error);
-      console.error("❌ Error stack:", error.stack);
-        res.status(500).json({
-          success: false,
-          message: "Internal server error while sending final submission to CRM",
-          error: error instanceof Error ? error.message : "Unknown error"
-        });
-      }
-    
-      // Fire Meta CAPI event for deal_closed
-      if (formData?.email || formData?.phone) {
-        await sendMetaEvent({
-          eventType: 'deal_closed',
-          userData: {
-            email: formData.email,
-            phone: formData.phone,
-            firstName: formData.firstName || '',
-            lastName: formData.lastName || ''
-          },
-          eventSourceUrl: req.headers.referer || req.get('origin') || ''
-        });
-      }
-
       // Check if formData exists
       if (!formData) {
         console.error("❌ CRITICAL ERROR: No form data received! Request body is empty or null");
         return res.status(400).json({ error: "Empty request body received" });
       }
       
-      console.log("📋 FORM DATA KEYS:", Object.keys(formData));
+      // Fire Meta CAPI event for deal_closed
+      if (formData.email || formData.phone) {
+        try {
+          console.log("Sending Meta event: deal_closed with data:", {
+            email: formData.email || '',
+            phone: formData.phone || '',
+            firstName: formData.firstName || '',
+            lastName: formData.lastName || ''
+          });
+          
+          await sendMetaEvent({
+            eventType: 'deal_closed',
+            userData: {
+              email: formData.email,
+              phone: formData.phone,
+              firstName: formData.firstName || '',
+              lastName: formData.lastName || ''
+            },
+            eventSourceUrl: req.headers.referer || req.get('origin') || ''
+          });
+        } catch (metaError) {
+          console.error("Error sending Meta event:", metaError);
+          // Continue processing even if Meta event fails
+        }
+      }
       
       // Log the incoming data for debugging (comprehensive)
       console.log("📝 FINAL FORM DATA RECEIVED:", {
-        name: formData?.name || 'Not provided',
-        email: formData?.email || 'Not provided',
-        phone: formData?.phone || 'Not provided',
-        vehicle: `${formData?.year || ''} ${formData?.make || ''} ${formData?.model || ''}`,
-        from: formData?.pickupLocation || 'Not provided',
-        to: formData?.dropoffLocation || 'Not provided',
-        transportType: formData?.transportType || 'Not provided',
-        selectedPrice: formData?.selectedPrice || 'Not provided',
-        pickupContactName: formData?.pickupContactName || 'Not provided',
-        pickupContactPhone: formData?.pickupContactPhone || 'Not provided',
-        pickupAddress: formData?.pickupAddress || 'Not provided',
-        dropoffContactName: formData?.dropoffContactName || 'Not provided',
-        dropoffContactPhone: formData?.dropoffContactPhone || 'Not provided',
-        dropoffAddress: formData?.dropoffAddress || 'Not provided'
+        name: formData.name || 'Not provided',
+        email: formData.email || 'Not provided',
+        phone: formData.phone || 'Not provided',
+        vehicle: `${formData.year || ''} ${formData.make || ''} ${formData.model || ''}`,
+        from: formData.pickupLocation || 'Not provided',
+        to: formData.dropoffLocation || 'Not provided',
+        transportType: formData.transportType || 'Not provided',
+        selectedPrice: formData.selectedPrice || 'Not provided',
+        pickupContactName: formData.pickupContactName || 'Not provided',
+        pickupContactPhone: formData.pickupContactPhone || 'Not provided',
+        pickupAddress: formData.pickupAddress || 'Not provided',
+        dropoffContactName: formData.dropoffContactName || 'Not provided',
+        dropoffContactPhone: formData.dropoffContactPhone || 'Not provided',
+        dropoffAddress: formData.dropoffAddress || 'Not provided'
       });
-      
-      // Validate minimal required data
-      if (!formData) {
-        console.error("❌ FINAL SUBMISSION ERROR: No form data provided");
-        return res.status(400).json({ error: "Form data is required" });
-      }
       
       // Send to the dedicated final submission webhooks
       console.log("📤 SENDING FINAL SUBMISSION TO DEDICATED WEBHOOKS");
@@ -426,8 +414,8 @@ export function registerRoutes(app: Express): Server {
       };
       
       // Parse the pickup and dropoff addresses
-      const pickupAddressParsed = parseAddress(formData.pickupAddress);
-      const dropoffAddressParsed = parseAddress(formData.dropoffAddress);
+      const pickupAddressParsed = parseAddress(formData.pickupAddress || '');
+      const dropoffAddressParsed = parseAddress(formData.dropoffAddress || '');
       
       // Format the shipment date properly if it exists
       let formattedShipmentDate = 'Not provided';
@@ -540,6 +528,7 @@ export function registerRoutes(app: Express): Server {
         }
       };
       
+      // Try the direct and fallback webhook methods
       try {
         console.log("⏳ ATTEMPTING DIRECT FETCH TO ZAPIER WEBHOOK...");
         
@@ -594,16 +583,17 @@ export function registerRoutes(app: Express): Server {
           success: true,
           message: "Final submission successfully sent to CRM system"
         });
-      } catch (fetchError) {
-        console.error('❌ FINAL SUBMISSION REQUEST FAILED:', fetchError);
+      } catch (webhookError) {
+        console.error('❌ FINAL SUBMISSION WEBHOOK ERROR:', webhookError);
         res.status(500).json({ 
           success: false, 
-          message: `Network error while sending final submission: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` 
+          message: `Error while sending final submission: ${webhookError instanceof Error ? webhookError.message : String(webhookError)}` 
         });
-
-        } catch (error) {
+      }
+    } catch (error) {
       console.error("❌ FINAL SUBMISSION ENDPOINT ERROR:", error);
-      res.status(500).json({ 
+      console.error("❌ Error stack:", error instanceof Error ? error.stack : 'No stack trace available');
+      res.status(500).json({
         success: false,
         message: "Internal server error while sending final submission to CRM",
         error: error instanceof Error ? error.message : "Unknown error"
