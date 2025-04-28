@@ -16,6 +16,14 @@ interface SendMetaEventPayload {
   };
   eventSourceUrl: string;
   testEventCode?: string;
+  // Add Facebook/Meta attribution parameters
+  fbc?: string; // Facebook click ID (fbclid)
+  fbp?: string; // Facebook browser ID
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
 }
 
 export async function sendMetaEvent({ eventType, userData, eventSourceUrl }: SendMetaEventPayload) {

@@ -192,6 +192,15 @@ export default function Booking() {
         ...formData,
         submissionDate: new Date().toISOString(),
         
+        // Preserve Facebook/Meta attribution parameters from the original data
+        fbclid: data.fbclid || null,
+        utm_source: data.utm_source || null,
+        utm_medium: data.utm_medium || null,
+        utm_campaign: data.utm_campaign || null,
+        utm_term: data.utm_term || null,
+        utm_content: data.utm_content || null,
+        referrer: data.referrer || null,
+        
         // Add properly formatted address fields for webhook integration
         pickupContactName: formData.pickupContactName,
         pickupContactPhone: formData.pickupContactPhone,

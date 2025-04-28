@@ -29,11 +29,19 @@ export default function ThankYou() {
         console.log("🚗 ThankYou page - Sending final order submission to webhook");
         console.log("📦 Order data:", data);
         
-        // Add the specific event type for final submissions
+        // Add the specific event type for final submissions and ensure Facebook/Meta attribution data is preserved
         const finalData = {
           ...data,
           eventType: "final_submission",
-          submissionTime: new Date().toISOString()
+          submissionTime: new Date().toISOString(),
+          // Explicitly ensure Facebook/Meta attribution parameters are included
+          fbclid: data.fbclid || null,
+          utm_source: data.utm_source || null,
+          utm_medium: data.utm_medium || null,
+          utm_campaign: data.utm_campaign || null,
+          utm_term: data.utm_term || null,
+          utm_content: data.utm_content || null,
+          referrer: data.referrer || null
         };
         
         // Send the complete order data to the final-submission endpoint
