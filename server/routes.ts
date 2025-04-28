@@ -305,8 +305,19 @@ export function registerRoutes(app: Express): Server {
         'pickupLocation', 'pickupZip',
         'dropoffLocation', 'dropoffZip',
         'vehicleType', 'year', 'make', 'model',
-        'shipmentDate', 'transportType', 'selectedPrice'
+        'shipmentDate'
       ];
+      
+      // Add compatibility for different field naming patterns
+      // Check for either transportType OR selectedTransport
+      if (!formData.transportType && formData.selectedTransport) {
+        formData.transportType = formData.selectedTransport;
+      }
+      
+      // Check for either selectedPrice OR finalPrice
+      if (!formData.selectedPrice && formData.finalPrice) {
+        formData.selectedPrice = formData.finalPrice;
+      }
       
       // Simple validation for required fields
       const validationErrors = [];
