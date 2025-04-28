@@ -277,17 +277,18 @@ const SimpleQuoteForm = () => {
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
       try {
         // Add Facebook/Meta attribution parameters to the webhook data
+        // Ensure we use null as fallback for undefined attribution parameters
         const webhookData = {
           ...quoteData,
           eventType: "quote_submission",
           eventDate: new Date().toISOString(),
-          // Add Facebook/Meta attribution parameters
-          fbclid,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_term,
-          utm_content,
+          // Add Facebook/Meta attribution parameters with null fallbacks
+          fbclid: fbclid || null,
+          utm_source: utm_source || null,
+          utm_medium: utm_medium || null,
+          utm_campaign: utm_campaign || null,
+          utm_term: utm_term || null,
+          utm_content: utm_content || null,
           referrer: window.parent?.document?.referrer || document.referrer || ""
         };
         
@@ -328,14 +329,15 @@ const SimpleQuoteForm = () => {
       }
   
       // Add Facebook/Meta attribution parameters to the URL-encoded data for the next page
+      // Using null fallbacks for all parameters to prevent undefined values
       const quoteDataWithAttribution = {
         ...quoteData,
-        fbclid,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_term,
-        utm_content,
+        fbclid: fbclid || null,
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_term: utm_term || null,
+        utm_content: utm_content || null,
         referrer: window.parent?.document?.referrer || document.referrer || ""
       };
       
