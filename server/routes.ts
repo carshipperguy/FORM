@@ -6,6 +6,7 @@ import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notification
 import { sendToWebhook } from "./utils/webhook";
 import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
 import { runWebhookHealthChecks, getWebhookMonitorReport } from "./utils/webhook-monitor";
+import { validateFormData, formatValidationErrors } from "../shared/validation";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -293,8 +294,7 @@ export function registerRoutes(app: Express): Server {
         });
       }
       
-      // Import validation functions
-      const { validateFormData, formatValidationErrors } = require('../shared/validation');
+      // We've already imported validation functions at the top of the file
       
       // For final submissions, we need to set the proper form type and eventType
       formData.eventType = 'final_submission';
