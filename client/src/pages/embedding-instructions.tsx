@@ -14,7 +14,7 @@ export default function EmbeddingInstructions() {
     setTimeout(() => setCopied(false), 2000);
   };
   
-  // HTML code for the parent page to embed the iframe with attribution passing
+  // Simple HTML code for the parent page to embed the iframe
   const iframeEmbedCode = `<iframe 
   src="https://your-form-app.replit.app" 
   id="form-iframe"
@@ -23,59 +23,13 @@ export default function EmbeddingInstructions() {
   frameborder="0"
   sandbox="allow-scripts allow-same-origin allow-forms"
   allow="geolocation"
-></iframe>
-
-<script>
-  // Function to send Facebook/Meta attribution parameters to the iframe
-  function sendAttributionToIframe() {
-    // Get reference to the iframe
-    const iframe = document.getElementById('form-iframe');
-    
-    // Wait for iframe to load
-    iframe.addEventListener('load', function() {
-      // Get current URL parameters
-      const url = new URL(window.location.href);
-      const params = url.searchParams;
-      
-      // Prepare attribution data
-      const attributionData = {
-        type: 'attribution-data',
-        data: {
-          fbclid: params.get('fbclid') || null,
-          utm_source: params.get('utm_source') || null,
-          utm_medium: params.get('utm_medium') || null,
-          utm_campaign: params.get('utm_campaign') || null,
-          utm_term: params.get('utm_term') || null,
-          utm_content: params.get('utm_content') || null
-        }
-      };
-      
-      // Listen for the "form-ready" message from the iframe
-      window.addEventListener('message', function handleMessage(event) {
-        // Verify the message is from our form
-        if (event.source === iframe.contentWindow && 
-            event.data && 
-            event.data.type === 'form-ready') {
-          
-          // Send attribution data to the iframe
-          iframe.contentWindow.postMessage(attributionData, '*');
-          
-          // Remove this event listener once handled
-          window.removeEventListener('message', handleMessage);
-        }
-      });
-    });
-  }
-  
-  // Initialize attribution passing
-  sendAttributionToIframe();
-</script>`;
+></iframe>`;
 
   const wordpressInstructions = `
 1. Go to the WordPress page where you want to embed the form
 2. Switch to the "Text" (HTML) editor mode
-3. Paste the iframe and script code at the desired location
-4. Make sure your WordPress theme allows custom HTML and JavaScript
+3. Paste the iframe code at the desired location
+4. Make sure your WordPress theme allows iframes
 5. Save the page and test that the form loads correctly
 `;
 
@@ -89,8 +43,8 @@ export default function EmbeddingInstructions() {
         <Alert className="bg-blue-50 border-blue-200">
           <AlertTitle className="text-blue-800">Important Information</AlertTitle>
           <AlertDescription className="text-blue-700">
-            These instructions explain how to embed the auto transport form with proper 
-            Facebook/Meta attribution parameter passing.
+            These instructions explain how to embed the auto transport form on your website.
+            Simply copy the iframe code and paste it into your page's HTML.
           </AlertDescription>
         </Alert>
         
@@ -125,11 +79,10 @@ export default function EmbeddingInstructions() {
               <div className="mt-4 text-sm space-y-2">
                 <h3 className="font-medium">How This Works:</h3>
                 <ol className="list-decimal ml-5 space-y-1">
-                  <li>The script captures Facebook/Meta parameters from the parent URL</li>
-                  <li>Waits for our form iframe to load completely</li>
-                  <li>Listens for a ready signal from our form</li>
-                  <li>Securely sends attribution data via postMessage API</li>
-                  <li>Our form receives these parameters and includes them in all submissions</li>
+                  <li>Add this iframe code to your landing page</li>
+                  <li>The form will display within the iframe</li>
+                  <li>The form automatically captures basic URL parameters</li>
+                  <li>All submissions include the source page's URL for reference</li>
                 </ol>
               </div>
             </div>
@@ -158,29 +111,32 @@ export default function EmbeddingInstructions() {
         <div className="mt-6 border-t pt-4">
           <h2 className="text-lg font-semibold mb-2">Testing Your Implementation</h2>
           <p className="text-sm text-gray-700 mb-3">
-            After embedding the form, you can test that attribution parameters are being passed correctly:
+            After embedding the form, you should test that it works correctly:
           </p>
           
           <ol className="list-decimal ml-5 text-sm space-y-2">
             <li>
-              <span className="font-medium">Create a test URL with parameters:</span>
-              <div className="bg-gray-100 p-2 mt-1 rounded text-xs break-all">
-                https://your-landing-page.com/?fbclid=test123&utm_source=test&utm_medium=email
+              <span className="font-medium">Visit your page with the embedded form</span>
+              <div className="text-xs text-gray-600 mt-1">
+                Make sure the form loads properly and displays correctly
               </div>
             </li>
             <li>
-              <span className="font-medium">Visit the test URL and watch browser console</span>
+              <span className="font-medium">Fill out the form completely</span>
               <div className="text-xs text-gray-600 mt-1">
-                (Right-click → Inspect → Console tab)
+                Enter all required information to test submission
               </div>
             </li>
             <li>
-              <span className="font-medium">Complete a quote form submission</span>
+              <span className="font-medium">Complete the form submission</span>
+              <div className="text-xs text-gray-600 mt-1">
+                Verify you're redirected to the quote results page
+              </div>
             </li>
             <li>
-              <span className="font-medium">Verify parameters in webhook</span>
+              <span className="font-medium">Check webhook delivery</span>
               <div className="text-xs text-gray-600 mt-1">
-                The webhook data should include the attribution parameters
+                Contact our team to confirm your test submission was received
               </div>
             </li>
           </ol>
