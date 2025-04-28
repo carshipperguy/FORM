@@ -953,6 +953,16 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/webhook", async (req, res) => {
     try {
       console.log("\n🔔 /api/webhook ENDPOINT CALLED - Lead submission to CRM system");
+      
+      // Log request headers to help debug cross-origin issues
+      console.log("📋 REQUEST HEADERS:", JSON.stringify({
+        'origin': req.headers.origin,
+        'content-type': req.headers['content-type'],
+        'user-agent': req.headers['user-agent'],
+        'content-length': req.headers['content-length'],
+        'referer': req.headers.referer
+      }));
+      
       const formData = req.body;
       
       // Log the incoming data for debugging

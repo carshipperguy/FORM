@@ -293,12 +293,22 @@ const SimpleQuoteForm = () => {
         };
         
         // Use await to ensure we catch any errors properly
-        const webhookResponse = await fetch("/api/webhook", {
+        // Get the current domain to handle iframe scenarios
+        const currentDomain = window.location.origin;
+        console.log("Current domain for API request:", currentDomain);
+        
+        // Use the full URL to avoid issues when embedded in an iframe
+        const apiUrl = `${currentDomain}/api/webhook`;
+        console.log("Using webhook API URL:", apiUrl);
+        
+        const webhookResponse = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"
           },
+          // Include credentials to ensure cookies are sent even for cross-origin requests
+          credentials: "include",
           body: JSON.stringify(webhookData),
         });
         
