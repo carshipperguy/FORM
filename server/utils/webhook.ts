@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import { recordWebhookStart, recordWebhookCompletion } from './webhook-diagnostics';
+import { recordWebhookAttempt } from './webhook-monitor';
 
 // Helper functions to parse location data
 const extractCity = (location?: string): string => {
@@ -249,6 +251,22 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     
     console.log(`🔍 WEBHOOK REQUEST ID: ${diagnosticData.requestId}`);
     console.log('📤 STARTING FETCH REQUEST...');
+    
+    // Record webhook request start in the diagnostic system
+    recordWebhookStart({
+      url: webhookUrl,
+      payload: formattedData,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'Amerigo-Auto-Transport/1.0',
+        'X-Request-ID': diagnosticData.requestId
+      },
+      startTime: requestStartTime,
+      requestId: diagnosticData.requestId,
+      eventType: eventType
+    });
+    
     let response;
     
     try {
@@ -303,6 +321,40 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       } else {
         console.error('❌ WEBHOOK REQUEST FAILED:', fetchError);
       }
+      
+      // Record webhook failure in the diagnostic system
+      recordWebhookCompletion(
+        {
+          url: webhookUrl,
+          payload: formattedData,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'Amerigo-Auto-Transport/1.0',
+            'X-Request-ID': diagnosticData.requestId
+          },
+          startTime: requestStartTime,
+          requestId: diagnosticData.requestId,
+          eventType: eventType
+        },
+        {
+          status: 0, // No status code for network errors
+          responseTime: failureDuration,
+          responseText: String(fetchError),
+          success: false,
+          error: fetchError instanceof Error ? fetchError.message : String(fetchError)
+        }
+      );
+      
+      // Record in the monitor system
+      recordWebhookAttempt(
+        webhookUrl,
+        false,
+        failureDuration,
+        payloadSizeBytes,
+        0,
+        fetchError instanceof Error ? fetchError.message : String(fetchError)
+      );
       
       return { 
         success: false, 
@@ -487,6 +539,38 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     diagnosticData.totalDuration = diagnosticData.requestEndTime - diagnosticData.requestStartTime;
     
     console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY in', diagnosticData.totalDuration, 'ms\n');
+    
+    // Record webhook completion in the diagnostic system
+    recordWebhookCompletion(
+      {
+        url: webhookUrl,
+        payload: formattedData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'Amerigo-Auto-Transport/1.0',
+          'X-Request-ID': diagnosticData.requestId
+        },
+        startTime: requestStartTime,
+        requestId: diagnosticData.requestId,
+        eventType: eventType
+      },
+      {
+        status: response.status,
+        responseTime: diagnosticData.totalDuration,
+        responseText: responseText.substring(0, 500),
+        success: true
+      }
+    );
+    
+    // Record in the monitor system
+    recordWebhookAttempt(
+      webhookUrl,
+      true,
+      diagnosticData.totalDuration,
+      payloadSizeBytes,
+      response.status
+    );
     
     // Return success with complete diagnostics
     return { 
