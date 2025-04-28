@@ -11,6 +11,13 @@ import {
   hasWebhookHealthIssues,
   initWebhookMonitor
 } from './webhook-monitor';
+import {
+  getAllSubmissions,
+  getSubmissionById,
+  getSubmissionsByType,
+  getSubmissionStats,
+  clearSubmissions
+} from './webhook-monitor-queue';
 
 /**
  * Register webhook diagnostic API endpoints
@@ -122,6 +129,123 @@ export function registerWebhookDiagnosticEndpoints(app: Express): void {
   
   initWebhookMonitor(webhookUrls);
   
+  /**
+   * GET /api/webhook-submissions
+   * Get all recent webhook submissions with field diagnostics
+   */
+  app.get('/api/webhook-submissions', (req, res) => {
+    try {
+      console.log('\n📋 WEBHOOK SUBMISSIONS API CALLED');
+      
+      // Get all submissions
+      const submissions = getAllSubmissions();
+      const stats = getSubmissionStats();
+      
+      res.json({
+        success: true,
+        stats,
+        submissions
+      });
+    } catch (error) {
+      console.error('❌ ERROR IN WEBHOOK SUBMISSIONS API:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  /**
+   * GET /api/webhook-submission/:id
+   * Get a specific webhook submission by ID
+   */
+  app.get('/api/webhook-submission/:id', (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`\n📋 WEBHOOK SUBMISSION DETAIL API CALLED FOR ID: ${id}`);
+      
+      // Get the specific submission
+      const submission = getSubmissionById(id);
+      
+      if (!submission) {
+        return res.status(404).json({
+          success: false,
+          error: 'Submission not found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        submission
+      });
+    } catch (error) {
+      console.error('❌ ERROR IN WEBHOOK SUBMISSION DETAIL API:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  /**
+   * GET /api/webhook-submissions/:type
+   * Get all submissions of a specific type (quote or final)
+   */
+  app.get('/api/webhook-submissions/:type', (req, res) => {
+    try {
+      const { type } = req.params;
+      
+      if (type !== 'quote' && type !== 'final') {
+        return res.status(400).json({
+          success: false,
+          error: 'Type must be either "quote" or "final"'
+        });
+      }
+      
+      console.log(`\n📋 WEBHOOK SUBMISSIONS BY TYPE API CALLED FOR TYPE: ${type}`);
+      
+      // Get submissions of the specified type
+      const submissions = getSubmissionsByType(type as 'quote' | 'final');
+      
+      res.json({
+        success: true,
+        type,
+        count: submissions.length,
+        submissions
+      });
+    } catch (error) {
+      console.error('❌ ERROR IN WEBHOOK SUBMISSIONS BY TYPE API:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  /**
+   * POST /api/webhook-submissions/clear
+   * Clear all stored webhook submissions
+   */
+  app.post('/api/webhook-submissions/clear', (req, res) => {
+    try {
+      console.log('\n🧹 CLEARING ALL WEBHOOK SUBMISSIONS');
+      
+      // Clear all submissions
+      clearSubmissions();
+      
+      res.json({
+        success: true,
+        message: 'All webhook submissions cleared'
+      });
+    } catch (error) {
+      console.error('❌ ERROR CLEARING WEBHOOK SUBMISSIONS:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
   console.log('✅ Webhook diagnostic API endpoints registered');
 }
 
@@ -136,7 +260,11 @@ export function webhookDiagnosticMiddleware(req: Request, res: Response, next: F
   const originalEnd = res.end;
   
   // Override the end method to capture response time
-  res.end = function(...args: any[]) {
+  res.end = function(
+    chunk: any, 
+    encoding?: BufferEncoding, 
+    callback?: () => void
+  ): Response<any, Record<string, any>> {
     // Calculate response time
     const responseTime = Date.now() - (req as any).webhookStartTime;
     
@@ -145,9 +273,15 @@ export function webhookDiagnosticMiddleware(req: Request, res: Response, next: F
       console.log(`📊 WEBHOOK RESPONSE TIME: ${responseTime}ms for ${req.method} ${req.path}`);
     }
     
-    // Call the original end method with original arguments
-    return originalEnd.apply(this, args);
-  } as typeof res.end;
+    // Call the original end method with appropriate arguments
+    if (callback !== undefined) {
+      return originalEnd.call(this, chunk, encoding, callback);
+    } else if (encoding !== undefined) {
+      return originalEnd.call(this, chunk, encoding);
+    } else {
+      return originalEnd.call(this, chunk);
+    }
+  };
   
   next();
 }
