@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { recordWebhookStart, recordWebhookCompletion } from './webhook-diagnostics';
 import { recordWebhookAttempt } from './webhook-monitor';
 import { createFieldDiagnosticLog } from './webhook-field-diagnostics';
+import { recordSubmission } from './webhook-monitor-queue';
 
 // Helper functions to parse location data
 const extractCity = (location?: string): string => {
@@ -576,6 +577,22 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       diagnosticData.totalDuration,
       payloadSizeBytes,
       response.status
+    );
+    
+    // Record the submission in the submission monitor queue for field mapping analysis
+    const logLines = fieldDiagnosticLog.split('\n');
+    
+    // Add the submission to our monitoring queue
+    recordSubmission(
+      eventType === 'final_submission' ? 'final' : 'quote', // Determine form type directly
+      data,
+      formattedData,
+      logLines,
+      true,
+      {
+        status: response.status,
+        body: responseText.substring(0, 1000) // Limit response body size
+      }
     );
     
     // Return success with complete diagnostics

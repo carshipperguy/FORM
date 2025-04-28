@@ -995,6 +995,186 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Field mapping diagnostic endpoint
+  app.get("/api/webhook-field-diagnostic", async (req, res) => {
+    try {
+      console.log("\n🔍 RUNNING WEBHOOK FIELD MAPPING DIAGNOSTIC");
+      
+      // Import test data
+      const { 
+        VALID_QUOTE_SUBMISSION,
+        INCOMPLETE_QUOTE_SUBMISSION, 
+        INVALID_FORMAT_SUBMISSION, 
+        VALID_FINAL_SUBMISSION,
+        SPECIAL_CHARACTERS_SUBMISSION
+      } = require('./utils/webhook-test-data');
+      
+      const { createFieldDiagnosticLog } = require('./utils/webhook-field-diagnostics');
+      
+      // Test which data variant to use based on query parameter
+      const testType = (req.query.type as string) || 'valid';
+      
+      let testData;
+      let formType: 'quote' | 'final' = 'quote';
+      
+      switch(testType) {
+        case 'valid':
+          testData = VALID_QUOTE_SUBMISSION;
+          break;
+        case 'incomplete':
+          testData = INCOMPLETE_QUOTE_SUBMISSION;
+          break;
+        case 'invalid':
+          testData = INVALID_FORMAT_SUBMISSION;
+          break;
+        case 'final':
+          testData = VALID_FINAL_SUBMISSION;
+          formType = 'final';
+          break;
+        case 'special':
+          testData = SPECIAL_CHARACTERS_SUBMISSION;
+          break;
+        default:
+          testData = VALID_QUOTE_SUBMISSION;
+      }
+      
+      // Prepare webhook payload using the same logic as the actual webhook
+      const submissionId = `TEST-${Date.now()}`;
+      const submissionDate = new Date().toISOString();
+      const eventType = formType === 'final' ? 'final_submission' : 'quote_submission';
+      
+      // Format shipment date if present
+      let formattedShipmentDate = 'Not provided';
+      if (testData.shipmentDate) {
+        try {
+          const date = new Date(testData.shipmentDate);
+          if (!isNaN(date.getTime())) {
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const year = date.getFullYear();
+            formattedShipmentDate = `${month}/${day}/${year}`;
+          }
+        } catch (e) {
+          console.error("Error formatting test shipment date:", e);
+          formattedShipmentDate = testData.shipmentDate; 
+        }
+      }
+      
+      // Helper functions to extract location components
+      const extractCity = (location?: string): string => {
+        if (!location) return 'Not provided';
+        const match = location.match(/^([^,]+)/);
+        return match ? match[1].trim() : 'Not provided';
+      };
+      
+      const extractState = (location?: string): string => {
+        if (!location) return 'Not provided';
+        const match = location.match(/,\s*([A-Z]{2})/);
+        return match ? match[1].trim() : 'Not provided';
+      };
+      
+      const extractZip = (location?: string): string => {
+        if (!location) return 'Not provided';
+        const match = location.match(/(\d{5})(?:\s*$|-\d{4}\s*$)/);
+        return match ? match[1].trim() : 'Not provided';
+      };
+      
+      // Prepare simplified data format (first format used in the webhook)
+      const simplifiedData = {
+        name: testData.name || 'Not provided',
+        email: testData.email || 'Not provided',
+        phone: testData.phone || 'Not provided',
+        
+        pickup_city: extractCity(testData.pickupLocation),
+        pickup_state: extractState(testData.pickupLocation),
+        pickup_zip: testData.pickupZip || extractZip(testData.pickupLocation) || 'Not provided',
+        dropoff_city: extractCity(testData.dropoffLocation),
+        dropoff_state: extractState(testData.dropoffLocation),
+        dropoff_zip: testData.dropoffZip || extractZip(testData.dropoffLocation) || 'Not provided',
+        
+        distance: testData.distance || 0,
+        transit_time: testData.transitTime || 0,
+        
+        open_transport_price: testData.openTransportPrice || 'Not provided',
+        enclosed_transport_price: testData.enclosedTransportPrice || 'Not provided',
+        
+        vehicle_year: testData.year || 'Not provided',
+        vehicle_make: testData.make || 'Not provided',
+        vehicle_model: testData.model || 'Not provided',
+        vehicle_type: testData.vehicleType || 'Not provided',
+        
+        shipment_date: formattedShipmentDate,
+        submission_date: submissionDate,
+        
+        submission_id: submissionId,
+        event_type: eventType
+      };
+      
+      // Prepare original format (second format used in the webhook)
+      const originalFormat = {
+        submissionId,
+        submissionDate,
+        eventType,
+        
+        "Contact Info Name": testData.name || 'Not provided',
+        "Contact Info Email": testData.email || 'Not provided',
+        "Contact Info Phone (required)": testData.phone || 'Not provided',
+        
+        "Route Details Pickup City": extractCity(testData.pickupLocation),
+        "Route Details Pickup State": extractState(testData.pickupLocation),
+        "Route Details Pickup Zip": testData.pickupZip || extractZip(testData.pickupLocation) || 'Not provided',
+        "Route Details Dropoff City": extractCity(testData.dropoffLocation),
+        "Route Details Dropoff State": extractState(testData.dropoffLocation),
+        "Route Details Dropoff Zip": testData.dropoffZip || extractZip(testData.dropoffLocation) || 'Not provided',
+        "Route Details Distance (in miles)": testData.distance || 0,
+        "Route Details Estimated Transit Time": testData.transitTime || 0,
+        
+        "Price Details Total Price (Open Transport Only)": testData.openTransportPrice || 'Not provided',
+        
+        "Vehicle Details Year": testData.year || 'Not provided',
+        "Vehicle Details Make": testData.make || 'Not provided',
+        "Vehicle Details Model": testData.model || 'Not provided',
+        
+        "Route Details Shipment Date": formattedShipmentDate,
+        
+        pickupLocation: testData.pickupLocation || 'Not provided',
+        dropoffLocation: testData.dropoffLocation || 'Not provided',
+        vehicleType: testData.vehicleType || 'Not provided',
+        shipmentDate: formattedShipmentDate,
+        enclosedTransportPrice: testData.enclosedTransportPrice || 'Not provided',
+      };
+      
+      // Combine formats like in the real webhook
+      const formattedData = {
+        ...simplifiedData,
+        ...originalFormat
+      };
+      
+      // Generate the diagnostic log
+      const fieldDiagnosticLog = createFieldDiagnosticLog(testData, formattedData, formType);
+      
+      // Split the log into lines for better readability in the response
+      const logLines = fieldDiagnosticLog.split('\n');
+      
+      res.status(200).json({
+        success: true,
+        message: "Webhook field mapping diagnostic completed",
+        testType,
+        formType,
+        originalData: testData,
+        webhookPayload: formattedData,
+        diagnosticLog: logLines
+      });
+    } catch (error) {
+      console.error("Error running webhook field diagnostic:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error running webhook field diagnostic",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
   // Register webhook diagnostics middleware and API endpoints
   app.use(webhookDiagnosticMiddleware);
   registerWebhookDiagnosticEndpoints(app);
