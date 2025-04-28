@@ -1,0 +1,60 @@
+This is a critical issue involving webhook delivery failures between two Replit applications and a Zapier endpoint.
+
+🚨 Situation Summary
+A customer submits a form on our landing page.
+
+The form app (hosted on Replit) collects customer, vehicle, and route information.
+
+The form app sends an HTTP POST request (application/json) to a Zapier webhook:
+https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/
+
+Zapier is supposed to receive the payload and push it into our second Replit CRM app.
+
+Recently, webhook transmissions are intermittently failing. Symptoms:
+
+502 Bad Gateway errors from Zapier.
+
+503 Service Unavailable errors from Zapier.
+
+Some leads missing in CRM.
+
+Some form submissions succeed normally.
+
+📋 Required from Replit Diagnostic
+Log every outbound webhook POST request payload and associated HTTP response code + response body from Zapier.
+
+Confirm that the form app's fetch call:
+
+Properly uses await.
+
+Waits for Zapier's full response before completing.
+
+Measure and log the payload size in bytes before transmission.
+
+Capture any timeout, connection reset, or transmission error logs at the application layer.
+
+Analyze if the Replit app’s outbound traffic or server response times are causing webhook instability.
+
+🛠️ Specific Areas Replit Must Investigate
+Confirm that webhook POSTs are not dropped, half-sent, or timing out inside the Replit app.
+
+Confirm that large payloads are not exceeding Replit execution limits.
+
+Confirm that the app is properly handling slow or failed responses from Zapier without prematurely closing or crashing requests.
+
+Confirm that Zapier 502/503 errors are not correlated to Replit server-side network congestion or downtime.
+
+🔒 Constraints
+Do not modify the database models, form field structure, or CRM receiving app.
+
+Do not modify the Zapier Zap.
+
+Only investigate and confirm transmission integrity from the sending Replit app to Zapier endpoint.
+
+📈 Deliverables Requested
+Logs of at least 10 webhook attempts (both successful and failed).
+
+Confirmation whether transmission failures originate inside the Replit app, in transit, or after handoff to Zapier.
+
+Diagnostic timeline for resolution if issues are found at the Replit layer.
+

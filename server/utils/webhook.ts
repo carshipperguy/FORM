@@ -23,11 +23,11 @@ const extractZip = (location?: string): string => {
 };
 
 /**
- * Send data to a webhook URL
+ * Send data to a webhook URL with enhanced diagnostics
  * @param data The data to send to the webhook
  * @returns A promise that resolves when the webhook has been sent
  */
-export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string }> {
+export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string; diagnostics?: any }> {
   try {
     console.log('🔍 WEBHOOK FUNCTION CALLED - Environment check...');
     
@@ -203,31 +203,111 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log(`🕒 Event: ${eventType} at ${new Date().toISOString()}`);
     console.log('======================================\n');
 
-    // 5. Send the webhook request - with enhanced error handling
+    // 5. Send the webhook request - with enhanced diagnostics for monitoring
     console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl}`);
     
-    // Attempt to make the request with extensive error handling and logging
+    // Measure payload size in bytes for diagnostic purposes
+    const jsonPayload = JSON.stringify(formattedData);
+    const payloadSizeBytes = new TextEncoder().encode(jsonPayload).length;
+    
+    console.log(`📏 WEBHOOK PAYLOAD SIZE: ${payloadSizeBytes} bytes (${(payloadSizeBytes / 1024).toFixed(2)} KB)`);
+    
+    // Record timestamps for latency measurement
+    const requestStartTime = Date.now();
+    
+    // Define diagnostic data with proper types
+    const diagnosticData: {
+      requestStartTime: number;
+      payloadSizeBytes: number;
+      webhookUrl: string;
+      requestId: string;
+      responseStatus: number | null;
+      responseTime: number | null;
+      responseSize: number | null;
+      retryAttempted: boolean;
+      retrySuccessful?: boolean;
+      retryResponseTime?: number;
+      retryResponseStatus?: number;
+      retryError?: any;
+      error: any | null;
+      success?: boolean;
+      requestEndTime?: number;
+      totalDuration?: number;
+      jsonResponse?: any;
+      textResponse?: string;
+    } = {
+      requestStartTime,
+      payloadSizeBytes,
+      webhookUrl,
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`,
+      responseStatus: null,
+      responseTime: null,
+      responseSize: null,
+      retryAttempted: false,
+      error: null
+    };
+    
+    console.log(`🔍 WEBHOOK REQUEST ID: ${diagnosticData.requestId}`);
     console.log('📤 STARTING FETCH REQUEST...');
     let response;
     
     try {
+      // Use a timeout to automatically fail if request takes too long
+      const timeoutController = new AbortController();
+      const timeoutId = setTimeout(() => timeoutController.abort(), 15000); // 15 second timeout
+      
       response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'User-Agent': 'Amerigo-Auto-Transport/1.0',
+          'X-Request-ID': diagnosticData.requestId,
+          'X-Payload-Size': payloadSizeBytes.toString()
         },
-        body: JSON.stringify(formattedData),
+        body: jsonPayload,
+        signal: timeoutController.signal
       });
       
-      console.log('📡 FETCH COMPLETED, PROCESSING RESPONSE...');
+      // Clear the timeout since request completed
+      clearTimeout(timeoutId);
+      
+      // Calculate request duration
+      const requestEndTime = Date.now();
+      const requestDuration = requestEndTime - requestStartTime;
+      
+      // Update diagnostic data
+      diagnosticData.responseTime = requestDuration;
+      diagnosticData.responseStatus = response.status;
+      
+      console.log(`📡 FETCH COMPLETED IN ${requestDuration}ms`);
       console.log(`📡 WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
     } catch (fetchError) {
-      console.error('❌ FETCH REQUEST FAILED:', fetchError);
+      // Calculate failure time for diagnostics
+      const failureTime = Date.now();
+      const failureDuration = failureTime - requestStartTime;
+      
+      // Update diagnostic data for error case
+      diagnosticData.responseTime = failureDuration;
+      diagnosticData.error = fetchError instanceof Error ? 
+        { name: fetchError.name, message: fetchError.message } : 
+        String(fetchError);
+      
+      // Check if this was a timeout
+      const isTimeout = fetchError instanceof Error && 
+        (fetchError.name === 'AbortError' || fetchError.message.includes('timeout'));
+      
+      if (isTimeout) {
+        console.error(`⏱️ WEBHOOK REQUEST TIMED OUT AFTER ${failureDuration}ms`);
+        diagnosticData.error = { name: 'TimeoutError', message: `Request timed out after ${failureDuration}ms` };
+      } else {
+        console.error('❌ WEBHOOK REQUEST FAILED:', fetchError);
+      }
+      
       return { 
         success: false, 
-        message: `Network error while sending webhook: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` 
+        message: `Network error while sending webhook: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
+        diagnostics: diagnosticData
       };
     }
     
@@ -244,14 +324,24 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       };
     }
     
-    // Special handling for 503 Service Unavailable from Zapier
-    if (response.status === 503) {
-      console.warn(`⚠️ ZAPIER 503 SERVICE UNAVAILABLE - This is a Zapier-side issue`);
+    // Update diagnostic data with response size
+    diagnosticData.responseSize = responseText.length;
+    
+    // Special handling for 502 and 503 errors from Zapier
+    if (response.status === 502 || response.status === 503) {
+      console.warn(`⚠️ ZAPIER ${response.status} ERROR - This is a Zapier-side issue`);
       console.warn(`⚠️ The webhook data was received by Zapier but their service might be experiencing issues`);
       console.warn(`⚠️ This is NOT an error with our application - the data was successfully sent`);
       
-      // Implement retry logic for 503 errors
-      console.log('🔄 RETRYING WEBHOOK DELIVERY AFTER 503 ERROR...');
+      // Update diagnostic data with error info
+      diagnosticData.error = {
+        type: `Zapier${response.status}Error`,
+        message: response.statusText,
+        responseText: responseText.substring(0, 500)
+      };
+      
+      // Implement retry logic for server errors
+      console.log(`🔄 RETRYING WEBHOOK DELIVERY AFTER ${response.status} ERROR...`);
       
       // Wait 2 seconds before retry to give Zapier time to recover
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -261,61 +351,121 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       const alternateWebhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj";
       
       console.log('🔄 RETRY ATTEMPT WITH ALTERNATE URL:', alternateWebhookUrl);
+      diagnosticData.retryAttempted = true;
       
       try {
-        // Make the retry request
+        // Record retry start time for diagnostics
+        const retryStartTime = Date.now();
+        
+        // Make the retry request with timeout
+        const retryController = new AbortController();
+        const retryTimeoutId = setTimeout(() => retryController.abort(), 15000);
+        
         const retryResponse = await fetch(alternateWebhookUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'Amerigo-Auto-Transport/1.0',
+            'X-Request-ID': `${diagnosticData.requestId}_retry`,
+            'X-Payload-Size': payloadSizeBytes.toString(),
+            'X-Retry': 'true'
           },
-          body: JSON.stringify(formattedData),
+          body: jsonPayload,
+          signal: retryController.signal
         });
         
+        // Clear the timeout
+        clearTimeout(retryTimeoutId);
+        
+        // Calculate retry duration
+        const retryEndTime = Date.now();
+        const retryDuration = retryEndTime - retryStartTime;
+        
+        // Update diagnostic data with retry info
+        diagnosticData.retryResponseTime = retryDuration;
+        diagnosticData.retryResponseStatus = retryResponse.status;
+        
         if (retryResponse.ok) {
-          console.log('✅ RETRY SUCCESSFUL! Zapier accepted the data on second attempt');
+          console.log(`✅ RETRY SUCCESSFUL in ${retryDuration}ms! Zapier accepted the data on second attempt`);
+          
+          // Add retry success to diagnostics
+          diagnosticData.retrySuccessful = true;
+          
           return { 
             success: true, 
-            message: 'Webhook data successfully delivered to Zapier (after retry)' 
+            message: 'Webhook data successfully delivered to Zapier (after retry)',
+            diagnostics: diagnosticData
           };
         } else {
-          console.warn(`⚠️ RETRY FAILED WITH STATUS: ${retryResponse.status}`);
+          console.warn(`⚠️ RETRY FAILED WITH STATUS: ${retryResponse.status} in ${retryDuration}ms`);
+          
+          // Add retry failure to diagnostics
+          diagnosticData.retrySuccessful = false;
+          diagnosticData.retryError = {
+            status: retryResponse.status,
+            statusText: retryResponse.statusText
+          };
+          
           // Even though both attempts failed, we'll consider this a partial success since the data was sent
           console.log('⚠️ WEBHOOK DATA DELIVERY ATTEMPTED TWICE - continuing despite errors');
           return { 
             success: true, 
-            message: 'Webhook data delivery attempted but Zapier returned errors' 
+            message: 'Webhook data delivery attempted but Zapier returned errors',
+            diagnostics: diagnosticData 
           };
         }
       } catch (retryError) {
         console.error('❌ RETRY ATTEMPT FAILED:', retryError);
-        // Even though Zapier returned 503, we'll consider this a partial success
+        
+        // Update retry diagnostics
+        diagnosticData.retrySuccessful = false;
+        diagnosticData.retryError = retryError instanceof Error ? 
+          { name: retryError.name, message: retryError.message } : 
+          String(retryError);
+        
+        // Even though Zapier returned error, we'll consider this a partial success
         // as we made a best effort to deliver the data
         console.log('✅ WEBHOOK DATA DELIVERY ATTEMPTED - continuing despite errors');
         return { 
           success: true, 
-          message: 'Webhook data delivery attempted but Zapier was unavailable' 
+          message: 'Webhook data delivery attempted but Zapier was unavailable',
+          diagnostics: diagnosticData
         };
       }
     }
     else if (!response.ok) {
       console.error(`❌ WEBHOOK ERROR: ${response.status} ${response.statusText}`);
       console.error(`❌ RESPONSE: ${responseText.substring(0, 500)}`);
+      
+      // Update diagnostic data with error details
+      diagnosticData.error = {
+        status: response.status,
+        statusText: response.statusText,
+        responseText: responseText.substring(0, 500)
+      };
+      
       return { 
         success: false, 
-        message: `Webhook error (${response.status}): ${response.statusText}` 
+        message: `Webhook error (${response.status}): ${response.statusText}`,
+        diagnostics: diagnosticData
       };
     }
 
     // Try to parse the response if it's JSON
+    let parsedResponse = null;
     try {
-      const jsonResponse = JSON.parse(responseText);
-      console.log('✅ WEBHOOK SUCCESS - JSON RESPONSE:', JSON.stringify(jsonResponse, null, 2));
+      parsedResponse = JSON.parse(responseText);
+      console.log('✅ WEBHOOK SUCCESS - JSON RESPONSE:', JSON.stringify(parsedResponse, null, 2));
+      
+      // Add JSON response to diagnostics
+      diagnosticData.jsonResponse = parsedResponse;
     } catch (e) {
       // Not JSON, just log the text
       console.log('✅ WEBHOOK SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
+      
+      // Add text response to diagnostics (truncated)
+      diagnosticData.textResponse = responseText.substring(0, 500);
     }
     
     // Log the actual data we sent for debugging
@@ -331,8 +481,19 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log('- Route Details Dropoff Zip:', formattedData["Route Details Dropoff Zip"]);
     console.log('- Route Details Shipment Date:', formattedData["Route Details Shipment Date"]);
 
-    console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY\n');
-    return { success: true, message: 'Webhook sent successfully' };
+    // Mark success in diagnostics
+    diagnosticData.success = true;
+    diagnosticData.requestEndTime = Date.now();
+    diagnosticData.totalDuration = diagnosticData.requestEndTime - diagnosticData.requestStartTime;
+    
+    console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY in', diagnosticData.totalDuration, 'ms\n');
+    
+    // Return success with complete diagnostics
+    return { 
+      success: true, 
+      message: 'Webhook sent successfully',
+      diagnostics: diagnosticData
+    };
   } catch (error) {
     console.error('❌ WEBHOOK FATAL ERROR:', error);
     return { 
