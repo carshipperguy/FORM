@@ -1,0 +1,74 @@
+Implementation Scope for Form App: Capture Facebook/Meta Attribution from Parent Page (iframe)
+📋 Situation
+The Form App is embedded inside an iframe on the landing page.
+
+The landing page URL contains important tracking parameters (fbclid, utm_source, utm_medium, utm_campaign, etc.) from Facebook/Meta ads.
+
+The Form App does not currently capture these parameters.
+
+This is causing Meta server events (CAPI quote_sent) to lose attribution and break ad tracking.
+
+📋 Actions Required
+✅ 1. In the Form App frontend (e.g., in QuoteOptions.jsx or wherever form submission is handled):
+
+Safely read the parent page URL:
+
+javascript
+Copy
+Edit
+const parentUrl = window.parent?.location?.href || "";
+✅ 2. Extract tracking parameters from the parent URL:
+
+javascript
+Copy
+Edit
+function getQueryParam(name, url) {
+  const match = url.match(new RegExp('[?&]' + name + '=([^&]+)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+const fbclid = getQueryParam('fbclid', parentUrl);
+const utm_source = getQueryParam('utm_source', parentUrl);
+const utm_medium = getQueryParam('utm_medium', parentUrl);
+const utm_campaign = getQueryParam('utm_campaign', parentUrl);
+const utm_term = getQueryParam('utm_term', parentUrl);
+const utm_content = getQueryParam('utm_content', parentUrl);
+✅ 3. Extend the existing formData that is submitted with these parameters:
+
+javascript
+Copy
+Edit
+const formData = {
+  ...existingFormData,
+  fbclid,
+  utm_source,
+  utm_medium,
+  utm_campaign,
+  utm_term,
+  utm_content
+};
+✅ 4. Submit this enriched formData to the backend /api/send-quote-notification as part of the existing quote creation flow.
+
+✅ 5. Do not change any existing fields, validations, webhook structures, or database mappings.
+
+✅ 6. Ensure that if the attribution parameters are missing from the parent URL:
+
+The form still submits normally without errors.
+
+No impact on the customer experience.
+
+🔒 CRITICAL NON-NEGOTIABLE CONDITIONS
+⚠️ Do not modify or restructure database schemas, CRM mappings, webhook endpoints, or stored quote fields.
+
+⚠️ Only capture attribution parameters from the parent page and enrich the frontend form submission.
+
+⚠️ No structural changes to backend quote models, CRM tables, or live production data.
+
+🎯 Goal
+Capture Facebook/Meta tracking parameters reliably inside the iframe environment.
+
+Pass these parameters along with quote submissions to the backend.
+
+Allow Meta CAPI server events to receive proper attribution for accurate ad tracking.
+
+Ensure no impact or disruption to existing customer flow or production stability.

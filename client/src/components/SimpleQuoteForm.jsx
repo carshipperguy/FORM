@@ -246,13 +246,49 @@ const SimpleQuoteForm = () => {
       
       console.log("Final quote data with real distance:", quoteData);
       
+      // Extract Facebook/Meta tracking parameters from parent page URL
+      const parentUrl = window.parent?.location?.href || "";
+      console.log("📊 Parent URL for attribution:", parentUrl);
+      
+      // Function to extract query parameters from URL
+      function getQueryParam(name, url) {
+        const match = url.match(new RegExp('[?&]' + name + '=([^&]+)'));
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+      
+      // Extract Facebook and UTM tracking parameters
+      const fbclid = getQueryParam('fbclid', parentUrl);
+      const utm_source = getQueryParam('utm_source', parentUrl);
+      const utm_medium = getQueryParam('utm_medium', parentUrl);
+      const utm_campaign = getQueryParam('utm_campaign', parentUrl);
+      const utm_term = getQueryParam('utm_term', parentUrl);
+      const utm_content = getQueryParam('utm_content', parentUrl);
+      
+      console.log("📊 Facebook/Meta attribution parameters:", {
+        fbclid,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_term,
+        utm_content
+      });
+      
       // Send data to webhook when "Get Quote" is clicked
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
       try {
+        // Add Facebook/Meta attribution parameters to the webhook data
         const webhookData = {
           ...quoteData,
           eventType: "quote_submission",
-          eventDate: new Date().toISOString()
+          eventDate: new Date().toISOString(),
+          // Add Facebook/Meta attribution parameters
+          fbclid,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_term,
+          utm_content,
+          referrer: window.parent?.document?.referrer || document.referrer || ""
         };
         
         // Use await to ensure we catch any errors properly
@@ -291,8 +327,20 @@ const SimpleQuoteForm = () => {
         // Continue with navigation even if webhook fails
       }
   
+      // Add Facebook/Meta attribution parameters to the URL-encoded data for the next page
+      const quoteDataWithAttribution = {
+        ...quoteData,
+        fbclid,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_term,
+        utm_content,
+        referrer: window.parent?.document?.referrer || document.referrer || ""
+      };
+      
       const params = new URLSearchParams({
-        data: encodeURIComponent(JSON.stringify(quoteData))
+        data: encodeURIComponent(JSON.stringify(quoteDataWithAttribution))
       });
   
       // Reset submission state before navigating
