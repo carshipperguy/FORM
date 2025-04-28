@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 import { sendToWebhook } from "./utils/webhook";
+import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -943,6 +944,10 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Register webhook diagnostics middleware and API endpoints
+  app.use(webhookDiagnosticMiddleware);
+  registerWebhookDiagnosticEndpoints(app);
+  
   const httpServer = createServer(app);
   return httpServer;
 }
