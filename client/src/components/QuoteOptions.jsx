@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 
+const searchParams = new URLSearchParams(window.location.search);
+const testEventCode = searchParams.get("test_event_code") || "";
+
+
 const QuoteOptions = ({ data }) => {
   const [isEnclosedStandard, setIsEnclosedStandard] = useState(false);
   const [isEnclosedExpress, setIsEnclosedExpress] = useState(false);
@@ -57,7 +61,10 @@ const QuoteOptions = ({ data }) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(price);
-  
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const testEventCode = searchParams.get("test_event_code") || "";
+
   const handleReserve = (transport, isEnclosed) => {
     const transportType = transport === "standard" ? (isEnclosed ? "enclosed" : "open") : (isEnclosed ? "enclosed-express" : "open-express");
     const price = transport === "standard" ? standardPrice : expressPrice;
@@ -70,8 +77,32 @@ const QuoteOptions = ({ data }) => {
       finalPrice: price,
       quoteSelectedAt: new Date().toISOString()
     };
+
+    // Use Promise-based approach instead of await
+    if (testEventCode) {
+      // Using Promise syntax instead of await
+      sendMetaEvent({
+        eventType: 'quote_sent',
+        userData: {
+          email: finalData.email,
+          phone: finalData.phone,
+          firstName: finalData.firstName,
+          lastName: finalData.lastName
+        },
+        eventSourceUrl: window.location.href, // Current page URL
+        testEventCode: testEventCode // Include the test code if available
+      })
+      .catch(metaErr => {
+        console.error('❌ Failed to send quote_sent Meta event:', metaErr);
+      });
+    }
     
     // We're not sending a webhook here - only at initial form submission and final booking
+
+    if (testEventCode) {
+      finalData.test_event_code = testEventCode;
+    }
+    
     console.log("Proceeding to booking with transport option:", finalData.selectedTransport);
     
     // Skip checkout and go directly to booking page

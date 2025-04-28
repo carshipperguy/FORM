@@ -1,3 +1,4 @@
+import { sendMetaEvent } from "./utils/facebookCapi";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -152,6 +153,9 @@ export function registerRoutes(app: Express): Server {
 
   // Endpoint for instant quote notifications (email and SMS)
   app.post("/api/send-quote-notification", async (req, res) => {
+    console.log("🚀 /api/send-quote-notification triggered!");
+    console.log("📦 Payload received:", req.body);
+
     try {
       const { email, phone, quoteDetails } = req.body;
       
@@ -162,6 +166,32 @@ export function registerRoutes(app: Express): Server {
       if (!quoteDetails) {
         return res.status(400).json({ error: "Quote details are required" });
       }
+      
+      console.log("Preparing to send Meta event: quote_sent with data:", {
+        email: email,
+        phone: phone,
+        firstName: quoteDetails?.firstName || '',
+        lastName: quoteDetails?.lastName || ''
+      });
+
+      // Fire Meta CAPI event via server-side
+      try {
+        if (email || phone) {
+          await sendMetaEvent({
+            eventType: 'quote_sent',
+            userData: {
+              email,
+              phone,
+              firstName: quoteDetails?.firstName || '',
+              lastName: quoteDetails?.lastName || ''
+            },
+            eventSourceUrl: req.headers.referer || req.get('origin') || '',
+          });
+        }
+      } catch (metaErr) {
+        console.error('❌ Failed to send quote_sent Meta event:', metaErr);
+      }
+
 
       // Store results of notification attempts
       const results = {
@@ -268,7 +298,28 @@ export function registerRoutes(app: Express): Server {
       }));
       
       const formData = req.body;
+
+      console.log("Preparing to send Meta event: deal_closed with data:", {
+        email: email,
+        phone: phone,
+        firstName: quoteDetails?.firstName || '',
+        lastName: quoteDetails?.lastName || ''
+      });
       
+      // Fire Meta CAPI event for deal_closed
+      if (formData?.email || formData?.phone) {
+        await sendMetaEvent({
+          eventType: 'deal_closed',
+          userData: {
+            email: formData.email,
+            phone: formData.phone,
+            firstName: formData.firstName || '',
+            lastName: formData.lastName || ''
+          },
+          eventSourceUrl: req.headers.referer || req.get('origin') || ''
+        });
+      }
+
       // Check if formData exists
       if (!formData) {
         console.error("❌ CRITICAL ERROR: No form data received! Request body is empty or null");
