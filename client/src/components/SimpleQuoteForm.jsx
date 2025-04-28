@@ -247,9 +247,9 @@ const SimpleQuoteForm = () => {
       
       console.log("Final quote data with real distance:", quoteData);
       
-      // Extract Facebook/Meta tracking parameters from parent page URL
-      const parentUrl = window.parent?.location?.href || "";
-      console.log("📊 Parent URL for attribution:", parentUrl);
+      // Extract Facebook/Meta tracking parameters from the current URL only
+      const currentUrl = window.location.href;
+      console.log("📊 Current URL for attribution:", currentUrl);
       
       // Function to extract query parameters from URL
       function getQueryParam(name, url) {
@@ -257,13 +257,13 @@ const SimpleQuoteForm = () => {
         return match ? decodeURIComponent(match[1]) : null;
       }
       
-      // Extract Facebook and UTM tracking parameters
-      const fbclid = getQueryParam('fbclid', parentUrl);
-      const utm_source = getQueryParam('utm_source', parentUrl);
-      const utm_medium = getQueryParam('utm_medium', parentUrl);
-      const utm_campaign = getQueryParam('utm_campaign', parentUrl);
-      const utm_term = getQueryParam('utm_term', parentUrl);
-      const utm_content = getQueryParam('utm_content', parentUrl);
+      // Extract Facebook and UTM tracking parameters from current URL
+      const fbclid = getQueryParam('fbclid', currentUrl);
+      const utm_source = getQueryParam('utm_source', currentUrl);
+      const utm_medium = getQueryParam('utm_medium', currentUrl);
+      const utm_campaign = getQueryParam('utm_campaign', currentUrl);
+      const utm_term = getQueryParam('utm_term', currentUrl);
+      const utm_content = getQueryParam('utm_content', currentUrl);
       
       console.log("📊 Facebook/Meta attribution parameters:", {
         fbclid,
@@ -289,7 +289,7 @@ const SimpleQuoteForm = () => {
           utm_campaign: utm_campaign || null,
           utm_term: utm_term || null,
           utm_content: utm_content || null,
-          referrer: window.parent?.document?.referrer || document.referrer || ""
+          referrer: document.referrer || ""
         };
         
         // Use await to ensure we catch any errors properly
@@ -348,7 +348,7 @@ const SimpleQuoteForm = () => {
         utm_campaign: utm_campaign || null,
         utm_term: utm_term || null,
         utm_content: utm_content || null,
-        referrer: window.parent?.document?.referrer || document.referrer || ""
+        referrer: document.referrer || ""
       };
       
       const params = new URLSearchParams({
