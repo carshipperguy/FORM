@@ -144,21 +144,103 @@ export default function Booking() {
     },
   });
 
+  // Helper function to send Meta events to server
+  const sendServerMetaEvent = async (eventData: any) => {
+    try {
+      console.log("📊 Sending Meta event to server:", eventData.eventType);
+      
+      const response = await fetch("/api/meta-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(eventData)
+      });
+      
+      if (response.ok) {
+        console.log(`✅ ${eventData.eventType} Meta event sent successfully`);
+        return await response.json();
+      } else {
+        console.error(`❌ Failed to send ${eventData.eventType} Meta event:`, response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error(`❌ Error sending ${eventData.eventType} Meta event:`, error);
+      return null;
+    }
+  };
+
   const onSubmit = async (formData: any) => {
     try {
       const updatedData = {
         ...data,
         ...formData,
+        // Add timestamp for when the booking was finalized
+        bookingCompletedAt: new Date().toISOString()
       };
-      navigate(
-        `/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`,
-      );
+
+      // Get search params for test_event_code
+      const searchParams = new URLSearchParams(window.location.search);
+      const testEventCode = searchParams.get("test_event_code") || data.test_event_code || "";
+      
+      // Send Meta CAPI event for deal_closed (second Meta event)
+      try {
+        console.log("📊 Sending deal_closed Meta event for completed booking");
+        
+        // Send the Meta event to our server endpoint
+        await sendServerMetaEvent({
+          eventType: 'deal_closed',
+          userData: {
+            email: data.email || '',
+            phone: data.phone || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || ''
+          },
+          // Include all attribution parameters that were passed from the prior steps
+          fbclid: data.fbclid || null,
+          utm_source: data.utm_source || null,
+          utm_medium: data.utm_medium || null, 
+          utm_campaign: data.utm_campaign || null,
+          utm_term: data.utm_term || null,
+          utm_content: data.utm_content || null,
+          // Other required fields
+          eventSourceUrl: window.location.href,
+          testEventCode: testEventCode || null
+        });
+      } catch (error) {
+        console.error('❌ Error sending deal_closed Meta event:', error);
+        // Continue even if Meta event fails - don't block user flow
+      }
+
+      // Submit the final data to our backend endpoint
+      console.log("🚀 Submitting final order data to API");
+      try {
+        const apiResponse = await fetch("/api/final-submission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(updatedData)
+        });
+        
+        if (!apiResponse.ok) {
+          console.error("❌ API submission error:", apiResponse.status);
+          throw new Error("Failed to submit order to API");
+        }
+        
+        console.log("✅ Final submission API call successful");
+      } catch (apiError) {
+        console.error("❌ API submission error:", apiError);
+        // Continue with thank you page even if API fails
+      }
+      
+      // Navigate to thank you page
+      navigate(`/thank-you?data=${encodeURIComponent(JSON.stringify(updatedData))}`);
     } catch (error) {
       console.error("Form submission error:", error);
       toast({
         title: "Error",
-        description:
-          "There was a problem submitting the form. Please try again.",
+        description: "There was a problem submitting the form. Please try again.",
         variant: "destructive",
       });
     }
