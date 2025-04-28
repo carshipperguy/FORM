@@ -26,7 +26,18 @@ interface SendMetaEventPayload {
   utm_term?: string;
 }
 
-export async function sendMetaEvent({ eventType, userData, eventSourceUrl }: SendMetaEventPayload) {
+export async function sendMetaEvent({ 
+  eventType, 
+  userData, 
+  eventSourceUrl,
+  fbc,
+  fbp,
+  utm_source,
+  utm_medium,
+  utm_campaign,
+  utm_content,
+  utm_term
+}: SendMetaEventPayload) {
   const url = `https://graph.facebook.com/${API_VERSION}/${META_PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`;
 
   const event = {
@@ -38,7 +49,18 @@ export async function sendMetaEvent({ eventType, userData, eventSourceUrl }: Sen
       em: userData.email ? [hash(userData.email)] : undefined,
       ph: userData.phone ? [hash(userData.phone)] : undefined,
       fn: userData.firstName ? [hash(userData.firstName)] : undefined,
-      ln: userData.lastName ? [hash(userData.lastName)] : undefined
+      ln: userData.lastName ? [hash(userData.lastName)] : undefined,
+      // Add Facebook attribution data if available
+      fbc: fbc || undefined,
+      fbp: fbp || undefined
+    },
+    // Include utm parameters in custom data for attribution tracking
+    custom_data: {
+      utm_source: utm_source || undefined,
+      utm_medium: utm_medium || undefined,
+      utm_campaign: utm_campaign || undefined,
+      utm_content: utm_content || undefined,
+      utm_term: utm_term || undefined
     }
   };
 

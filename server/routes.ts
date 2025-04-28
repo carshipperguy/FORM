@@ -176,9 +176,26 @@ export function registerRoutes(app: Express): Server {
         lastName: quoteDetails?.lastName || ''
       });
 
-      // Fire Meta CAPI event via server-side
+      // Fire Meta CAPI event via server-side with attribution data
       try {
         if (email || phone) {
+          // Extract Facebook/Meta attribution parameters from formData
+          const fbclid = quoteDetails?.fbclid;
+          const utm_source = quoteDetails?.utm_source;
+          const utm_medium = quoteDetails?.utm_medium;
+          const utm_campaign = quoteDetails?.utm_campaign;
+          const utm_content = quoteDetails?.utm_content;
+          const utm_term = quoteDetails?.utm_term;
+          
+          console.log("📊 Including attribution data in Meta CAPI event:", {
+            fbclid,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term
+          });
+          
           await sendMetaEvent({
             eventType: 'quote_sent',
             userData: {
@@ -188,6 +205,14 @@ export function registerRoutes(app: Express): Server {
               lastName: quoteDetails?.lastName || ''
             },
             eventSourceUrl: req.headers.referer || req.get('origin') || '',
+            // Pass attribution parameters to Meta CAPI
+            fbc: fbclid, // Use fbclid as Facebook click ID
+            fbp: undefined, // We don't have browser ID in this context
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term
           });
         }
       } catch (metaErr) {
@@ -358,14 +383,31 @@ export function registerRoutes(app: Express): Server {
       
       console.log("✅ FINAL SUBMISSION VALIDATION PASSED - All required fields present and valid")
       
-      // Fire Meta CAPI event for deal_closed
+      // Fire Meta CAPI event for deal_closed with attribution parameters
       if (formData.email || formData.phone) {
         try {
+          // Extract Facebook/Meta attribution parameters from formData
+          const fbclid = formData.fbclid;
+          const utm_source = formData.utm_source;
+          const utm_medium = formData.utm_medium;
+          const utm_campaign = formData.utm_campaign;
+          const utm_content = formData.utm_content;
+          const utm_term = formData.utm_term;
+          
           console.log("Sending Meta event: deal_closed with data:", {
             email: formData.email || '',
             phone: formData.phone || '',
             firstName: formData.firstName || '',
             lastName: formData.lastName || ''
+          });
+          
+          console.log("📊 Including attribution data in Meta CAPI deal_closed event:", {
+            fbclid,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term
           });
           
           await sendMetaEvent({
@@ -376,7 +418,15 @@ export function registerRoutes(app: Express): Server {
               firstName: formData.firstName || '',
               lastName: formData.lastName || ''
             },
-            eventSourceUrl: req.headers.referer || req.get('origin') || ''
+            eventSourceUrl: req.headers.referer || req.get('origin') || '',
+            // Pass attribution parameters to Meta CAPI
+            fbc: fbclid, // Use fbclid as Facebook click ID
+            fbp: undefined, // We don't have browser ID in this context
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term
           });
         } catch (metaError) {
           console.error("Error sending Meta event:", metaError);
