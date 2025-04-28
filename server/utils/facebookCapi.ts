@@ -1,42 +1,25 @@
 import fetch from 'node-fetch';
+import { MetaEventType, MetaEventPayload } from './types';
 
 const META_PIXEL_ID = '953087976815191';
 const ACCESS_TOKEN = 'EAAWuSmOGqPoBOx8fbl8AqrBVGmC66mZBQkb8asm0cqFvZB1kpGZBGP2e88ftskhQl3IIodoEWnyVm5ciBL22xt38t01IbqYnISwRDOsfz3YZBZAKzUoPJWxXWrYImZBW7e0hENnCOQF9ZCVLggWK2Il1sAqQjCfAbagTxhEDrJoHlwZA59z45MBrvVhZBc40iVZCMZB7wZDZD';
 const API_VERSION = 'v17.0';
 
-type MetaEventType = 'quote_sent' | 'deal_closed';
-
-interface SendMetaEventPayload {
-  eventType: MetaEventType;
-  userData: {
-    email?: string;
-    phone?: string;
-    firstName?: string;
-    lastName?: string;
-  };
-  eventSourceUrl: string;
-  testEventCode?: string;
-  // Add Facebook/Meta attribution parameters
-  fbc?: string; // Facebook click ID (fbclid)
-  fbp?: string; // Facebook browser ID
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  utm_content?: string;
-  utm_term?: string;
-}
+// Type is now imported from types.ts
+type SendMetaEventPayload = MetaEventPayload;
 
 export async function sendMetaEvent({ 
   eventType, 
   userData, 
   eventSourceUrl,
-  fbc,
+  fbclid, // Changed from fbc to fbclid
   fbp,
   utm_source,
   utm_medium,
   utm_campaign,
   utm_content,
-  utm_term
+  utm_term,
+  testEventCode // Added test event code parameter
 }: SendMetaEventPayload) {
   const url = `https://graph.facebook.com/${API_VERSION}/${META_PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`;
 
@@ -51,7 +34,7 @@ export async function sendMetaEvent({
       fn: userData.firstName ? [hash(userData.firstName)] : undefined,
       ln: userData.lastName ? [hash(userData.lastName)] : undefined,
       // Add Facebook attribution data if available
-      fbc: fbc || undefined,
+      fbc: fbclid || undefined, // fbclid becomes fbc in Facebook API format
       fbp: fbp || undefined
     },
     // Include utm parameters in custom data for attribution tracking
@@ -66,7 +49,10 @@ export async function sendMetaEvent({
 
   const payload: any = { data: [event] };
 
-  if (process.env.META_TEST_CODE) {
+  // Use test event code from parameters first, falling back to env var
+  if (testEventCode) {
+    payload.test_event_code = testEventCode;
+  } else if (process.env.META_TEST_CODE) {
     payload.test_event_code = process.env.META_TEST_CODE;
   }
 
