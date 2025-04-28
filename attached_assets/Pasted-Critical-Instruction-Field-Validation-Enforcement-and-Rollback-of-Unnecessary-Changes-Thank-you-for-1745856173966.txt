@@ -1,0 +1,68 @@
+Critical Instruction: Field Validation Enforcement and Rollback of Unnecessary Changes
+Thank you for setting up the diagnostics system.
+Please now update the validation system according to the following corrected and final requirements:
+
+📋 Actions Required
+✅ 1. Enforce Validation for These New Required Fields (previously missing validation):
+
+Pickup City
+
+Pickup State
+
+Pickup Zip
+
+Dropoff City
+
+Dropoff State
+
+Dropoff Zip
+
+✅ 2. Continue Enforcing Validation for These Existing Fields (already validated previously):
+
+Contact Info Name (must be non-empty)
+
+Contact Info Email (must be valid email format)
+
+Contact Info Phone (must be valid phone number format)
+
+Vehicle Year (must be a valid 4-digit year)
+
+Vehicle Make (must be non-empty)
+
+Vehicle Model (must be non-empty)
+
+Shipment Date (must be a valid date format)
+
+✅ 3. ROLL BACK and REMOVE any additional, recently added validation that was not approved:
+
+Remove any validation rules that block or reject submissions beyond the above listed fields.
+
+Erase any validation for optional fields or new rules that were not explicitly requested.
+
+Erase any newly introduced over-aggressive validation that caused good submissions to fail.
+
+Restore validation behavior strictly to what is listed above — nothing more.
+
+✅ 4. Validation Behavior Required:
+
+Block the form submission if any required fields are missing or invalid.
+
+Display a clear, user-friendly error message indicating exactly which field must be corrected.
+
+Only allow webhook transmission to Zapier after 100% of required fields pass validation.
+
+Allow all otherwise valid submissions to proceed without interference.
+
+🔒 CRITICAL DISCLAIMER
+⚠️ Do not modify webhook structure, database schema, CRM mappings, or production data.
+
+⚠️ Do not restructure form fields or backend models.
+
+⚠️ Only correct the form submission validation logic exactly as described above.
+
+🎯 Final Goal
+Guarantee that every customer submission includes complete and properly validated required fields.
+
+Prevent accidental rejection of good submissions.
+
+Protect customer experience and data flow to Zapier and CRM without over-blocking.
