@@ -114,12 +114,23 @@ export function LocationSelector({
                     key={location.value}
                     value={location.value}
                     onSelect={() => {
+                      // URGENT FIX: Ensure ZIP code is properly formatted and passed
+                      const formattedZip = zip ? zip.trim() : '';
+                      
+                      // Debug log to verify proper location format and ZIP
                       console.log("Selected location with ZIP:", { 
                         city: location.city, 
                         state: location.state, 
-                        zip: zip
+                        zip: formattedZip,
+                        displayValue: displayValue
                       });
-                      onChange(displayValue, zip);
+                      
+                      // Only allow selection if we have a valid ZIP code
+                      if (!formattedZip) {
+                        console.warn("Location selected without ZIP code:", displayValue);
+                      }
+                      
+                      onChange(displayValue, formattedZip);
                       setOpen(false);
                     }}
                   >

@@ -30,50 +30,77 @@ export default function Home() {
       console.log("Home handleCalculate - Form Data:", JSON.stringify(data, null, 2));
       console.log("Home handleCalculate - Using ZIP codes:", { pickupZip, dropoffZip });
       
-      // Format locations in a simpler format that's guaranteed to work with MapQuest API
-      // MapQuest prefers "City, State ZIP" format or "City, State" without commas in the city name
-      let pickupLocation = data.pickupLocation.trim();
-      let dropoffLocation = data.dropoffLocation.trim();
+      // URGENT FIX: Ensure proper location format for MapQuest API
+      // Strictly enforce "City, State ZIP" format (with comma between city and state)
       
-      // Make sure pickup location has a state code (2-letter)
-      if (!/,\s*[A-Z]{2}/i.test(pickupLocation)) {
-        console.log("Pickup location missing state code, cannot proceed with MapQuest API");
+      // Validate pickup location and format
+      if (!data.pickupLocation || !pickupZip) {
+        console.error("Missing pickup location or ZIP code");
         toast({
-          title: "Invalid Pickup Location",
-          description: "Please select a location with city and state (e.g., 'Los Angeles, CA')",
+          title: "Missing Pickup Information",
+          description: "Please select a valid pickup location with city, state and ZIP code",
           variant: "destructive",
         });
+        setIsCalculating(false);
         return;
       }
       
-      // Make sure dropoff location has a state code (2-letter)
-      if (!/,\s*[A-Z]{2}/i.test(dropoffLocation)) {
-        console.log("Dropoff location missing state code, cannot proceed with MapQuest API");
+      // Validate dropoff location and format
+      if (!data.dropoffLocation || !dropoffZip) {
+        console.error("Missing dropoff location or ZIP code");
         toast({
-          title: "Invalid Dropoff Location",
-          description: "Please select a location with city and state (e.g., 'Los Angeles, CA')",
+          title: "Missing Delivery Information",
+          description: "Please select a valid delivery location with city, state and ZIP code",
           variant: "destructive",
         });
+        setIsCalculating(false);
         return;
       }
       
-      console.log("Using simplified location format for MapQuest API:", {
-        pickup: pickupLocation,
-        dropoff: dropoffLocation
+      // Extract city and state from the location strings
+      const pickupMatch = data.pickupLocation.match(/^([^,]+),\s*([A-Z]{2})/i);
+      const dropoffMatch = data.dropoffLocation.match(/^([^,]+),\s*([A-Z]{2})/i);
+      
+      if (!pickupMatch || pickupMatch.length < 3) {
+        console.error("Invalid pickup location format:", data.pickupLocation);
+        toast({
+          title: "Invalid Pickup Format",
+          description: "Pickup location must be in 'City, State' format",
+          variant: "destructive",
+        });
+        setIsCalculating(false);
+        return;
+      }
+      
+      if (!dropoffMatch || dropoffMatch.length < 3) {
+        console.error("Invalid dropoff location format:", data.dropoffLocation);
+        toast({
+          title: "Invalid Delivery Format",
+          description: "Delivery location must be in 'City, State' format",
+          variant: "destructive",
+        });
+        setIsCalculating(false);
+        return;
+      }
+      
+      // Format locations in the exact format MapQuest expects: "City, State ZIP"
+      const pickupCity = pickupMatch[1].trim();
+      const pickupState = pickupMatch[2].trim().toUpperCase();
+      const dropoffCity = dropoffMatch[1].trim();
+      const dropoffState = dropoffMatch[2].trim().toUpperCase();
+      
+      // Create properly formatted location strings
+      const formattedPickupLocation = `${pickupCity}, ${pickupState} ${pickupZip}`;
+      const formattedDropoffLocation = `${dropoffCity}, ${dropoffState} ${dropoffZip}`;
+      
+      console.log("FIXED: Using properly formatted locations for MapQuest API:", {
+        pickup: formattedPickupLocation,
+        dropoff: formattedDropoffLocation
       });
       
-      // Calculate real distance using MapQuest API
-      console.log("Calling MapQuest API with locations:", { 
-        pickup: pickupLocation, 
-        dropoff: dropoffLocation 
-      });
-      
-      // Use the API to calculate distance correctly
-      // Use our server-side API to calculate distance
-      console.log("UPDATED APPROACH: Using server-side distance calculation directly");
-      
-      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(pickupLocation)}&destination=${encodeURIComponent(dropoffLocation)}`;
-      console.log("UPDATED APPROACH: Calling server API:", serverDistanceUrl);
+      // Use our server-side API to calculate distance with properly formatted locations
+      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(formattedPickupLocation)}&destination=${encodeURIComponent(formattedDropoffLocation)}`;
+      console.log("FIXED: Calling server API with exact format:", serverDistanceUrl);
       
       const serverDistanceResponse = await fetch(serverDistanceUrl);
       const serverDistanceData = await serverDistanceResponse.json();
@@ -91,11 +118,13 @@ export default function Home() {
         const errorMessage = 'error' in distanceResult ? distanceResult.error : "Could not calculate distance between locations";
         console.error("Distance calculation failed:", errorMessage);
         
+        // URGENT FIX: Provide more actionable error message with clear instructions
         toast({
-          title: "Location Error",
-          description: "Please verify both pickup and delivery locations are valid cities with state codes (e.g., 'Los Angeles, CA'). Try entering just the city and state without ZIP codes.",
+          title: "Unable to Calculate Distance",
+          description: "Please select valid locations from the dropdown menu. Both origin and destination must have city, state and ZIP code information.",
           variant: "destructive",
         });
+        setIsCalculating(false);
         return;
       }
 
@@ -241,11 +270,14 @@ export default function Home() {
       navigate(`/final-quote?${params.toString()}`);
     } catch (error) {
       console.error("Calculation error:", error);
+      
+      // URGENT FIX: More detailed error message for general calculation failures
       toast({
-        title: "Error",
-        description: "Failed to calculate the quote. Please check your location inputs and try again.",
+        title: "Quote Calculation Error",
+        description: "We couldn't calculate your shipping quote. Please ensure both locations include city, state (like 'New York, NY') and ZIP code. Try selecting from the dropdown menu.",
         variant: "destructive",
       });
+      setIsCalculating(false);
     } finally {
       setIsCalculating(false);
     }
