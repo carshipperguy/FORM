@@ -199,10 +199,17 @@ const SimpleQuoteForm = () => {
       }
       
       // Calculate real distance using the server API
-      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
-      console.log("Calculating real distance using server API");
+      // Get the current domain to handle iframe scenarios
+      const currentDomain = window.location.origin;
       
-      const distanceResponse = await fetch(serverDistanceUrl);
+      // Use the full URL to avoid issues when embedded in an iframe
+      const serverDistanceUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
+      console.log("Calculating real distance using server API:", serverDistanceUrl);
+      
+      const distanceResponse = await fetch(serverDistanceUrl, {
+        // Include credentials to ensure cookies are sent even for cross-origin requests
+        credentials: "include"
+      });
       const distanceData = await distanceResponse.json();
       
       if (distanceData.error) {
