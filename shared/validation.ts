@@ -65,6 +65,33 @@ export function validateFormData(
     }
   }
   
+  // Special validation for City/Zip Code pairs
+  // Ensure that both pickup city and pickup zip must be present together
+  if (formData.pickupLocation && !formData.pickupZip) {
+    errors.push({
+      field: 'pickupZip',
+      message: 'Please select a complete Pickup City/Zip Code combination'
+    });
+  } else if (!formData.pickupLocation && formData.pickupZip) {
+    errors.push({
+      field: 'pickupLocation',
+      message: 'Please select a complete Pickup City/Zip Code combination'
+    });
+  }
+  
+  // Ensure that both dropoff city and dropoff zip must be present together
+  if (formData.dropoffLocation && !formData.dropoffZip) {
+    errors.push({
+      field: 'dropoffZip',
+      message: 'Please select a complete Dropoff City/Zip Code combination'
+    });
+  } else if (!formData.dropoffLocation && formData.dropoffZip) {
+    errors.push({
+      field: 'dropoffLocation',
+      message: 'Please select a complete Dropoff City/Zip Code combination'
+    });
+  }
+  
   return errors;
 }
 

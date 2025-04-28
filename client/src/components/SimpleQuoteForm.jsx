@@ -99,14 +99,39 @@ const SimpleQuoteForm = () => {
     // Import validation from the shared module
     const { validateFormData } = require('../../shared/validation');
     
-    // Run validation on the form data
-    const errors = validateFormData(formData, 'quote');
+    // Special handling for city/zip pairs before standard validation
+    const errors = [];
+    
+    // Check pickup location and zip code pair
+    if (!formData.pickupLocation || !pickupZip) {
+      errors.push({
+        field: 'pickupLocation',
+        message: 'Please select a complete Pickup City/Zip Code combination from the dropdown'
+      });
+    }
+    
+    // Check dropoff location and zip code pair
+    if (!formData.dropoffLocation || !dropoffZip) {
+      errors.push({
+        field: 'dropoffLocation',
+        message: 'Please select a complete Dropoff City/Zip Code combination from the dropdown'
+      });
+    }
+    
+    // If we already have city/zip errors, show them first
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return false;
+    }
+    
+    // Otherwise, run standard validation on all form data
+    const standardErrors = validateFormData(formData, 'quote');
     
     // Update state with any validation errors
-    setValidationErrors(errors);
+    setValidationErrors(standardErrors);
     
     // Return true if there are no errors
-    return errors.length === 0;
+    return standardErrors.length === 0;
   };
   
   const handleSubmit = async (e) => {
