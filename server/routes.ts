@@ -6,6 +6,7 @@ import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 import { sendToWebhook } from "./utils/webhook";
 import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
+import { runWebhookHealthChecks, getWebhookMonitorReport } from "./utils/webhook-monitor";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -882,6 +883,56 @@ export function registerRoutes(app: Express): Server {
         success: false,
         message: "Error testing final webhook",
         error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+  
+  // Webhook diagnostic endpoints
+  
+  // Endpoint to test both webhooks and perform a comprehensive diagnostic check
+  app.get("/api/webhook-diagnostic-test", async (req, res) => {
+    try {
+      console.log("\n🔍 RUNNING COMPREHENSIVE WEBHOOK DIAGNOSTIC TEST");
+      
+      // We don't need to import here since we already imported at the top
+      
+      // Run health checks on both webhooks
+      const healthCheckResults = await runWebhookHealthChecks();
+      
+      // Get detailed webhook monitoring data
+      const monitorReport = getWebhookMonitorReport();
+      
+      // Prepare comprehensive report
+      const diagnosticReport = {
+        healthStatus: healthCheckResults.overallHealth,
+        healthChecks: healthCheckResults.results,
+        monitoringStats: {
+          totalAttempts: monitorReport.monitorData.transmissionStats.totalAttempts,
+          successRate: monitorReport.successRate.toFixed(2) + '%',
+          averageResponseTime: monitorReport.monitorData.transmissionStats.averageResponseTime.toFixed(2) + 'ms',
+          consecutiveSuccesses: monitorReport.monitorData.transmissionStats.consecutiveSuccesses,
+          consecutiveFailures: monitorReport.monitorData.transmissionStats.consecutiveFailures
+        },
+        lastWebhookAttempt: monitorReport.monitorData.lastWebhookAttempt,
+        lastWebhookSuccess: monitorReport.monitorData.lastWebhookSuccess,
+        lastWebhookFailure: monitorReport.monitorData.lastWebhookFailure,
+        webhookUrls: monitorReport.monitorData.webhookUrls,
+        timestamp: Date.now(),
+        timeSinceLastAttempt: monitorReport.timeSinceLastAttempt ? 
+          (monitorReport.timeSinceLastAttempt / 1000).toFixed(1) + 's' : 'N/A'
+      };
+      
+      res.status(200).json({
+        success: true,
+        message: "Webhook diagnostic test completed successfully",
+        diagnosticReport
+      });
+    } catch (error) {
+      console.error("Error running webhook diagnostic test:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error running webhook diagnostic test",
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });

@@ -145,9 +145,9 @@ export function webhookDiagnosticMiddleware(req: Request, res: Response, next: F
       console.log(`📊 WEBHOOK RESPONSE TIME: ${responseTime}ms for ${req.method} ${req.path}`);
     }
     
-    // Call the original end method
+    // Call the original end method with original arguments
     return originalEnd.apply(this, args);
-  };
+  } as typeof res.end;
   
   next();
 }
