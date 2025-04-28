@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { recordWebhookStart, recordWebhookCompletion } from './webhook-diagnostics';
 import { recordWebhookAttempt } from './webhook-monitor';
+import { createFieldDiagnosticLog } from './webhook-field-diagnostics';
 
 // Helper functions to parse location data
 const extractCity = (location?: string): string => {
@@ -204,6 +205,11 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     console.log(`💰 Quote: $${data.openTransportPrice || 'N/A'} (Open) / $${data.enclosedTransportPrice || 'N/A'} (Enclosed)`);
     console.log(`🕒 Event: ${eventType} at ${new Date().toISOString()}`);
     console.log('======================================\n');
+    
+    // Generate detailed field mapping diagnostic log
+    const formType = eventType === 'final_submission' ? 'final' : 'quote';
+    const fieldDiagnosticLog = createFieldDiagnosticLog(data, formattedData, formType);
+    console.log(fieldDiagnosticLog);
 
     // 5. Send the webhook request - with enhanced diagnostics for monitoring
     console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl}`);
