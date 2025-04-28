@@ -1,34 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 
-const searchParams = new URLSearchParams(window.location.search);
-const testEventCode = searchParams.get("test_event_code") || "";
-
-// Helper function to send Meta CAPI events to server endpoint 
-// (rather than calling Meta directly from client)
-async function sendServerMetaEvent(eventData) {
-  try {
-    const response = await fetch("/api/meta-event", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(eventData)
-    });
-    
-    if (response.ok) {
-      console.log(`✅ ${eventData.eventType} Meta event request sent to server`);
-      return await response.json();
-    } else {
-      console.error(`❌ Failed to send ${eventData.eventType} Meta event:`, response.status);
-      return null;
-    }
-  } catch (error) {
-    console.error(`❌ Error sending ${eventData.eventType} Meta event:`, error);
-    return null;
-  }
-}
-
 
 const QuoteOptions = ({ data }) => {
   const [isEnclosedStandard, setIsEnclosedStandard] = useState(false);
@@ -103,37 +75,8 @@ const QuoteOptions = ({ data }) => {
       quoteSelectedAt: new Date().toISOString()
     };
 
-    // Send Meta CAPI server event for quote_sent
-    // This fires when the user selects a transport option (first Meta event)
-    try {
-      console.log("📊 Sending quote_sent Meta event with attribution data");
-      
-      // Send the Meta event to our server endpoint which will call the Meta API
-      sendServerMetaEvent({
-        eventType: 'quote_sent',
-        userData: {
-          email: finalData.email || '',
-          phone: finalData.phone || '',
-          firstName: finalData.firstName || '',
-          lastName: finalData.lastName || ''
-        },
-        // Include all attribution parameters
-        fbclid: finalData.fbclid || null,
-        utm_source: finalData.utm_source || null,
-        utm_medium: finalData.utm_medium || null, 
-        utm_campaign: finalData.utm_campaign || null,
-        utm_term: finalData.utm_term || null,
-        utm_content: finalData.utm_content || null,
-        // Other required fields
-        eventSourceUrl: window.location.href,
-        testEventCode: testEventCode || null
-      }).catch(metaErr => {
-        console.error('❌ Failed to send quote_sent Meta event:', metaErr);
-      });
-    } catch (error) {
-      console.error('❌ Error preparing quote_sent Meta event:', error);
-      // Continue even if Meta event fails - don't block user flow
-    }
+    // Meta CAPI event sending removed as part of rollback
+    console.log("⚠️ Meta CAPI tracking disabled - continuing with normal flow");
     
     // We're not sending a webhook here - only at initial form submission and final booking
 
