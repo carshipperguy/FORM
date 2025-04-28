@@ -309,8 +309,37 @@ export function registerRoutes(app: Express): Server {
       // Check if formData exists
       if (!formData) {
         console.error("❌ CRITICAL ERROR: No form data received! Request body is empty or null");
-        return res.status(400).json({ error: "Empty request body received" });
+        return res.status(400).json({ 
+          success: false, 
+          error: "Empty request body received" 
+        });
       }
+      
+      // Import validation functions
+      const { validateFormData, formatValidationErrors } = require('../shared/validation');
+      
+      // For final submissions, we need to set the proper form type and eventType
+      formData.eventType = 'final_submission';
+      
+      // Validate the form data against required fields and formats for final submissions
+      const validationErrors = validateFormData(formData, 'final');
+      
+      // If validation fails, return error with details
+      if (validationErrors.length > 0) {
+        console.error(`❌ FINAL SUBMISSION VALIDATION FAILED: ${validationErrors.length} errors found:`);
+        validationErrors.forEach(error => {
+          console.error(`- ${error.field}: ${error.message}`);
+        });
+        
+        return res.status(400).json({
+          success: false,
+          error: "Form validation failed",
+          validationErrors,
+          message: formatValidationErrors(validationErrors)
+        });
+      }
+      
+      console.log("✅ FINAL SUBMISSION VALIDATION PASSED - All required fields present and valid")
       
       // Fire Meta CAPI event for deal_closed
       if (formData.email || formData.phone) {
@@ -958,8 +987,35 @@ export function registerRoutes(app: Express): Server {
       // Validate minimal required data
       if (!formData) {
         console.error("❌ WEBHOOK ERROR: No form data provided");
-        return res.status(400).json({ error: "Form data is required" });
+        return res.status(400).json({ 
+          success: false,
+          error: "Form data is required" 
+        });
       }
+      
+      // Import validation functions
+      const { validateFormData, formatValidationErrors } = require('../shared/validation');
+      
+      // Validate the form data against required fields and formats
+      const formType = formData?.eventType === 'final_submission' ? 'final' : 'quote';
+      const validationErrors = validateFormData(formData, formType);
+      
+      // If validation fails, return error with details
+      if (validationErrors.length > 0) {
+        console.error(`❌ WEBHOOK VALIDATION FAILED: ${validationErrors.length} errors found:`);
+        validationErrors.forEach(error => {
+          console.error(`- ${error.field}: ${error.message}`);
+        });
+        
+        return res.status(400).json({
+          success: false,
+          error: "Form validation failed",
+          validationErrors,
+          message: formatValidationErrors(validationErrors)
+        });
+      }
+      
+      console.log("✅ WEBHOOK DATA VALIDATION PASSED - All required fields present and valid")
       
       // We'll continue even if WEBHOOK_URL isn't set, as we now have a fallback in the webhook.ts file
       if (!process.env.WEBHOOK_URL) {

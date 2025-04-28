@@ -91,10 +91,40 @@ const SimpleQuoteForm = () => {
     }
   };
 
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Client-side validation before submission
+  const validateForm = () => {
+    // Import validation from the shared module
+    const { validateFormData } = require('../../shared/validation');
+    
+    // Run validation on the form data
+    const errors = validateFormData(formData, 'quote');
+    
+    // Update state with any validation errors
+    setValidationErrors(errors);
+    
+    // Return true if there are no errors
+    return errors.length === 0;
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Set submitting state to prevent multiple submissions
+    setIsSubmitting(true);
+    
     try {
+      // Validate the form before proceeding
+      const isValid = validateForm();
+      
+      if (!isValid) {
+        console.error("Form validation failed:", validationErrors);
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Calculate real distance using the server API
       const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
       console.log("Calculating real distance using server API");
@@ -105,6 +135,7 @@ const SimpleQuoteForm = () => {
       if (distanceData.error) {
         console.error("Error calculating distance:", distanceData.error);
         alert("There was an error calculating the distance. Please check your locations and try again.");
+        setIsSubmitting(false);
         return;
       }
       
@@ -162,8 +193,24 @@ const SimpleQuoteForm = () => {
           body: JSON.stringify(webhookData),
         });
         
+        // Handle webhook response
         if (!webhookResponse.ok) {
           console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
+          
+          // Try to parse the error response for validation errors
+          try {
+            const errorResponse = await webhookResponse.json();
+            
+            // If server validation found errors we didn't catch client-side
+            if (errorResponse.validationErrors) {
+              console.error("Server validation failed:", errorResponse.validationErrors);
+              setValidationErrors(errorResponse.validationErrors);
+              setIsSubmitting(false);
+              return; // Prevent navigation to next screen
+            }
+          } catch (parseError) {
+            console.error("Could not parse webhook error response:", parseError);
+          }
         } else {
           console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
         }
@@ -176,9 +223,14 @@ const SimpleQuoteForm = () => {
         data: encodeURIComponent(JSON.stringify(quoteData))
       });
   
+      // Reset submission state before navigating
+      setIsSubmitting(false);
+      
+      // Navigate to the final quote page
       navigate(`/final-quote?${params.toString()}`);
     } catch (error) {
       console.error("Error in form submission:", error);
+      setIsSubmitting(false);
       alert("There was an error processing your request. Please try again.");
     }
   };
@@ -379,10 +431,56 @@ const SimpleQuoteForm = () => {
           </div>
         </div>
 
-        <button type="submit" className="submit-btn">Get Quote</button>
+        {validationErrors.length > 0 && (
+          <div className="validation-errors">
+            <div className="error-header">Please fix the following errors:</div>
+            <ul>
+              {validationErrors.map((error, index) => (
+                <li key={index}>{error.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        <button 
+          type="submit" 
+          className="submit-btn" 
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Calculating Quote...' : 'Get Quote'}
+        </button>
       </form>
 
       <style>{`
+        .validation-errors {
+          margin: 10px 0;
+          padding: 10px;
+          background-color: #fee2e2;
+          border: 1px solid #ef4444;
+          border-radius: 2px;
+          color: #b91c1c;
+        }
+        
+        .error-header {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        
+        .validation-errors ul {
+          margin: 0;
+          padding-left: 20px;
+        }
+        
+        .validation-errors li {
+          margin: 2px 0;
+          font-size: 13px;
+        }
+        
+        .submit-btn:disabled {
+          background-color: #9ca3af;
+          cursor: not-allowed;
+        }
+      
         .simple-form-container {
           width: 100%;
           max-width: 100%;
