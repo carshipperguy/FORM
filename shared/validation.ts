@@ -41,55 +41,118 @@ export function validateFormData(
 ): ValidationError[] {
   const errors: ValidationError[] = [];
   
-  // Determine which fields are required based on form type
-  const requiredFields = formType === 'quote'
-    ? REQUIRED_QUOTE_FIELDS
-    : REQUIRED_FINAL_SUBMISSION_FIELDS;
+  // Validate required fields according to the critical instruction document
   
-  // Check for missing required fields
-  for (const field of requiredFields) {
-    const value = formData[field];
-    
-    // Check if field is missing or empty
-    if (value === undefined || value === null || value === '') {
-      errors.push({
-        field,
-        message: `${formatFieldName(field)} is required`
-      });
-    } else {
-      // Field exists, check format validity
-      const formatError = validateFieldFormat(field, value);
-      if (formatError) {
-        errors.push(formatError);
-      }
+  // Contact information validation
+  if (!formData.name) {
+    errors.push({
+      field: 'name',
+      message: 'Contact name is required'
+    });
+  }
+  
+  if (!formData.email) {
+    errors.push({
+      field: 'email',
+      message: 'Email address is required'
+    });
+  } else {
+    const emailError = validateFieldFormat('email', formData.email);
+    if (emailError) {
+      errors.push(emailError);
     }
   }
   
-  // Special validation for City/Zip Code pairs
-  // Ensure that both pickup city and pickup zip must be present together
-  if (formData.pickupLocation && !formData.pickupZip) {
+  if (!formData.phone) {
     errors.push({
-      field: 'pickupZip',
-      message: 'Please select a complete Pickup City/Zip Code combination'
+      field: 'phone',
+      message: 'Phone number is required'
     });
-  } else if (!formData.pickupLocation && formData.pickupZip) {
+  } else {
+    const phoneError = validateFieldFormat('phone', formData.phone);
+    if (phoneError) {
+      errors.push(phoneError);
+    }
+  }
+  
+  // Location validation - pickup
+  if (!formData.pickupLocation) {
     errors.push({
       field: 'pickupLocation',
-      message: 'Please select a complete Pickup City/Zip Code combination'
+      message: 'Pickup city and state are required'
+    });
+  } else {
+    const pickupLocationError = validateFieldFormat('pickupLocation', formData.pickupLocation);
+    if (pickupLocationError) {
+      errors.push(pickupLocationError);
+    }
+  }
+  
+  if (!formData.pickupZip) {
+    errors.push({
+      field: 'pickupZip',
+      message: 'Pickup ZIP code is required'
     });
   }
   
-  // Ensure that both dropoff city and dropoff zip must be present together
-  if (formData.dropoffLocation && !formData.dropoffZip) {
-    errors.push({
-      field: 'dropoffZip',
-      message: 'Please select a complete Dropoff City/Zip Code combination'
-    });
-  } else if (!formData.dropoffLocation && formData.dropoffZip) {
+  // Location validation - dropoff
+  if (!formData.dropoffLocation) {
     errors.push({
       field: 'dropoffLocation',
-      message: 'Please select a complete Dropoff City/Zip Code combination'
+      message: 'Delivery city and state are required'
     });
+  } else {
+    const dropoffLocationError = validateFieldFormat('dropoffLocation', formData.dropoffLocation);
+    if (dropoffLocationError) {
+      errors.push(dropoffLocationError);
+    }
+  }
+  
+  if (!formData.dropoffZip) {
+    errors.push({
+      field: 'dropoffZip',
+      message: 'Delivery ZIP code is required'
+    });
+  }
+  
+  // Vehicle information validation
+  if (!formData.year) {
+    errors.push({
+      field: 'year',
+      message: 'Vehicle year is required'
+    });
+  } else {
+    const yearError = validateFieldFormat('year', formData.year);
+    if (yearError) {
+      errors.push(yearError);
+    }
+  }
+  
+  if (!formData.make) {
+    errors.push({
+      field: 'make',
+      message: 'Vehicle make is required'
+    });
+  }
+  
+  if (!formData.model) {
+    errors.push({
+      field: 'model',
+      message: 'Vehicle model is required'
+    });
+  }
+  
+  // Shipment date validation
+  if (!formData.shipmentDate) {
+    errors.push({
+      field: 'shipmentDate',
+      message: 'Shipment date is required'
+    });
+  } else {
+    const shipmentDateError = validateFieldFormat('shipmentDate', formData.shipmentDate);
+    if (shipmentDateError) {
+      errors.push(shipmentDateError);
+    }
   }
   
   return errors;
@@ -148,44 +211,13 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
     }
   }
   
-  // Shipment date validation (should be a valid date not in the past)
+  // Shipment date validation (should be a valid date)
   if (field === 'shipmentDate') {
     const shipmentDate = new Date(value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to beginning of day
-    
     if (isNaN(shipmentDate.getTime())) {
       return {
         field,
         message: 'Please enter a valid shipment date'
-      };
-    }
-    
-    if (shipmentDate < today) {
-      return {
-        field,
-        message: 'Shipment date cannot be in the past'
-      };
-    }
-  }
-  
-  // Address validation for final submissions
-  if (field.includes('Address')) {
-    if (String(value).length < 5) {
-      return {
-        field,
-        message: 'Please enter a complete address'
-      };
-    }
-  }
-  
-  // Price validation
-  if (field === 'selectedPrice' || field === 'openTransportPrice' || field === 'enclosedTransportPrice') {
-    const price = parseFloat(String(value));
-    if (isNaN(price) || price <= 0) {
-      return {
-        field,
-        message: 'Please enter a valid price'
       };
     }
   }
