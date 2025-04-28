@@ -287,8 +287,12 @@ export function registerRoutes(app: Express): Server {
   // This endpoint fires only when the final "Submit" button is clicked
   app.post("/api/final-submission", async (req, res) => {
     try {
+      console.log("👉 /api/final-submission triggered!");
       console.log("\n🔴 DEBUGGING ORDER BOOKING WEBHOOK - RECEIVED REQUEST");
       console.log("🔔 FINAL FORM SUBMISSION - Complete booking data received");
+      console.log("👉 /api/final-submission triggered!");
+      console.log("👉 FORM DATA:", formData);
+      console.log("👉 FORM DATA KEYS:", Object.keys(formData));
       
       // Check request headers
       console.log("📋 REQUEST HEADERS:", JSON.stringify({
@@ -306,6 +310,16 @@ export function registerRoutes(app: Express): Server {
         lastName: quoteDetails?.lastName || ''
       });
       
+      } catch (error) {
+        console.error("❌ FINAL SUBMISSION ENDPOINT ERROR:", error);
+      console.error("❌ Error stack:", error.stack);
+        res.status(500).json({
+          success: false,
+          message: "Internal server error while sending final submission to CRM",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    
       // Fire Meta CAPI event for deal_closed
       if (formData?.email || formData?.phone) {
         await sendMetaEvent({
@@ -586,8 +600,8 @@ export function registerRoutes(app: Express): Server {
           success: false, 
           message: `Network error while sending final submission: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` 
         });
-      }
-    } catch (error) {
+
+        } catch (error) {
       console.error("❌ FINAL SUBMISSION ENDPOINT ERROR:", error);
       res.status(500).json({ 
         success: false,
