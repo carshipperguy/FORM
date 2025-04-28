@@ -10,7 +10,6 @@ import Booking from "@/pages/booking-new";
 import FinalQuote from "@/pages/final-quote";
 import SimpleQuote from "@/pages/simple-quote";
 import TestMapQuest from "@/pages/test-mapquest";
-import CrossOriginTest from "@/pages/cross-origin-test";
 import EmbeddingInstructions from "@/pages/embedding-instructions";
 
 function Router() {
@@ -23,7 +22,6 @@ function Router() {
       <Route path="/booking" component={Booking} />
       <Route path="/thank-you" component={ThankYou} />
       <Route path="/test-mapquest" component={TestMapQuest} />
-      <Route path="/cross-origin-test" component={CrossOriginTest} />
       <Route path="/embedding-instructions" component={EmbeddingInstructions} />
       <Route component={NotFound} />
     </Switch>

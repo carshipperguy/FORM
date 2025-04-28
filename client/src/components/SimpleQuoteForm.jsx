@@ -6,65 +6,6 @@ import LocationMenuSelector from "./LocationMenuSelector";
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
   
-  // Store attribution data received via postMessage from parent page
-  const [attributionData, setAttributionData] = useState({
-    fbclid: null,
-    utm_source: null,
-    utm_medium: null,
-    utm_campaign: null,
-    utm_term: null,
-    utm_content: null
-  });
-
-  // Listen for postMessage events from the parent page
-  useEffect(() => {
-    // Function to handle postMessage events
-    function handlePostMessage(event) {
-      // For security, we should verify the origin in production
-      // if (event.origin !== 'https://your-landing-page.com') return;
-      
-      console.log("📡 Received postMessage:", event.data);
-      
-      // Check if it's our expected message type
-      if (event.data && event.data.type === 'attribution-data') {
-        console.log("📊 Received attribution data via postMessage:", event.data.data);
-        
-        // Store the attribution data for form submission
-        setAttributionData({
-          fbclid: event.data.data.fbclid || null,
-          utm_source: event.data.data.utm_source || null,
-          utm_medium: event.data.data.utm_medium || null,
-          utm_campaign: event.data.data.utm_campaign || null,
-          utm_term: event.data.data.utm_term || null,
-          utm_content: event.data.data.utm_content || null
-        });
-      }
-    }
-    
-    // Add event listener for postMessage
-    window.addEventListener('message', handlePostMessage, false);
-    
-    // For testing in standalone mode, send a test message after 1 second
-    if (window === window.parent) {
-      console.log("📝 Running in standalone mode, will use fallback attribution method");
-      // Will still try to use the direct method as fallback in standalone mode
-    } else {
-      console.log("📝 Running in iframe mode, waiting for attribution data via postMessage");
-      // Send ready message to parent to trigger attribution data sending
-      try {
-        window.parent.postMessage({ type: 'form-ready' }, '*');
-        console.log("📤 Sent form-ready message to parent");
-      } catch (e) {
-        console.log("📤 Could not send message to parent:", e);
-      }
-    }
-    
-    // Cleanup event listener
-    return () => {
-      window.removeEventListener('message', handlePostMessage, false);
-    };
-  }, []); // Empty dependency array means this runs once on mount
-  
   const [formData, setFormData] = useState({
     pickupLocation: "",
     dropoffLocation: "",
@@ -336,23 +277,18 @@ const SimpleQuoteForm = () => {
       // Send data to webhook when "Get Quote" is clicked
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
       try {
-        // Combine direct URL parameters with postMessage attribution data
-        // Priority: use postMessage data first, fallback to direct URL extraction
-        console.log("📊 Using attribution data from postMessage:", attributionData);
-        
-        // Add Facebook/Meta attribution parameters to the webhook data
-        // Use a combined approach with prioritized sources and null fallbacks
+        // Add basic data to the webhook payload
         const webhookData = {
           ...quoteData,
           eventType: "quote_submission",
           eventDate: new Date().toISOString(),
-          // Add Facebook/Meta attribution parameters with priority and fallbacks
-          fbclid: attributionData.fbclid || fbclid || null,
-          utm_source: attributionData.utm_source || utm_source || null,
-          utm_medium: attributionData.utm_medium || utm_medium || null,
-          utm_campaign: attributionData.utm_campaign || utm_campaign || null,
-          utm_term: attributionData.utm_term || utm_term || null,
-          utm_content: attributionData.utm_content || utm_content || null,
+          // Basic URL attribution - no Meta CAPI integration
+          fbclid: fbclid || null,
+          utm_source: utm_source || null,
+          utm_medium: utm_medium || null,
+          utm_campaign: utm_campaign || null,
+          utm_term: utm_term || null,
+          utm_content: utm_content || null,
           referrer: window.parent?.document?.referrer || document.referrer || ""
         };
         
@@ -392,17 +328,16 @@ const SimpleQuoteForm = () => {
         // Continue with navigation even if webhook fails
       }
   
-      // Add Facebook/Meta attribution parameters to the URL-encoded data for the next page
-      // Using prioritized sources with null fallbacks for all parameters
+      // Add basic URL parameters to the URL-encoded data for the next page
       const quoteDataWithAttribution = {
         ...quoteData,
-        // Prioritize postMessage attribution data, fallback to direct URL params
-        fbclid: attributionData.fbclid || fbclid || null,
-        utm_source: attributionData.utm_source || utm_source || null,
-        utm_medium: attributionData.utm_medium || utm_medium || null,
-        utm_campaign: attributionData.utm_campaign || utm_campaign || null,
-        utm_term: attributionData.utm_term || utm_term || null,
-        utm_content: attributionData.utm_content || utm_content || null,
+        // Basic attribution data from URL only
+        fbclid: fbclid || null,
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_term: utm_term || null,
+        utm_content: utm_content || null,
         referrer: window.parent?.document?.referrer || document.referrer || ""
       };
       
