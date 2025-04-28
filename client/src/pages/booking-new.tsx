@@ -161,11 +161,21 @@ export default function Booking() {
       // Submit the final data to our backend endpoint
       console.log("🚀 Submitting final order data to API");
       try {
-        const apiResponse = await fetch("/api/final-submission", {
+        // Get the current domain to handle iframe scenarios
+        const currentDomain = window.location.origin;
+        console.log("Current domain for API request:", currentDomain);
+        
+        // Use the full URL to avoid issues when embedded in an iframe
+        const apiUrl = `${currentDomain}/api/final-submission`;
+        console.log("Using API URL:", apiUrl);
+        
+        const apiResponse = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
+          // Include credentials to ensure cookies are sent even for cross-origin requests
+          credentials: "include",
           body: JSON.stringify(updatedData)
         });
         
