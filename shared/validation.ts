@@ -51,28 +51,20 @@ export function validateFormData(
     });
   }
   
+  // Email - Only check if it exists, no format validation
   if (!formData.email) {
     errors.push({
       field: 'email',
       message: 'Email address is required'
     });
-  } else {
-    const emailError = validateFieldFormat('email', formData.email);
-    if (emailError) {
-      errors.push(emailError);
-    }
   }
   
+  // Phone - Only check if it exists, no format validation
   if (!formData.phone) {
     errors.push({
       field: 'phone',
       message: 'Phone number is required'
     });
-  } else {
-    const phoneError = validateFieldFormat('phone', formData.phone);
-    if (phoneError) {
-      errors.push(phoneError);
-    }
   }
   
   // Location validation - pickup
@@ -81,11 +73,6 @@ export function validateFormData(
       field: 'pickupLocation',
       message: 'Pickup city and state are required'
     });
-  } else {
-    const pickupLocationError = validateFieldFormat('pickupLocation', formData.pickupLocation);
-    if (pickupLocationError) {
-      errors.push(pickupLocationError);
-    }
   }
   
   if (!formData.pickupZip) {
@@ -101,11 +88,6 @@ export function validateFormData(
       field: 'dropoffLocation',
       message: 'Delivery city and state are required'
     });
-  } else {
-    const dropoffLocationError = validateFieldFormat('dropoffLocation', formData.dropoffLocation);
-    if (dropoffLocationError) {
-      errors.push(dropoffLocationError);
-    }
   }
   
   if (!formData.dropoffZip) {
@@ -115,17 +97,12 @@ export function validateFormData(
     });
   }
   
-  // Vehicle information validation
+  // Vehicle information validation - only check for presence, not format
   if (!formData.year) {
     errors.push({
       field: 'year',
       message: 'Vehicle year is required'
     });
-  } else {
-    const yearError = validateFieldFormat('year', formData.year);
-    if (yearError) {
-      errors.push(yearError);
-    }
   }
   
   if (!formData.make) {
@@ -142,17 +119,12 @@ export function validateFormData(
     });
   }
   
-  // Shipment date validation
+  // Shipment date validation - only check for presence, not format
   if (!formData.shipmentDate) {
     errors.push({
       field: 'shipmentDate',
       message: 'Shipment date is required'
     });
-  } else {
-    const shipmentDateError = validateFieldFormat('shipmentDate', formData.shipmentDate);
-    if (shipmentDateError) {
-      errors.push(shipmentDateError);
-    }
   }
   
   return errors;

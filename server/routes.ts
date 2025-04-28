@@ -321,8 +321,26 @@ export function registerRoutes(app: Express): Server {
       // For final submissions, we need to set the proper form type and eventType
       formData.eventType = 'final_submission';
       
-      // Validate the form data against required fields and formats for final submissions
-      const validationErrors = validateFormData(formData, 'final');
+      // Simplified minimal validation for final submissions
+      const requiredFields = [
+        'name', 'email', 'phone', 
+        'pickupLocation', 'pickupZip',
+        'dropoffLocation', 'dropoffZip',
+        'vehicleType', 'year', 'make', 'model',
+        'shipmentDate', 'transportType', 'selectedPrice'
+      ];
+      
+      // Simple validation for required fields
+      const validationErrors = [];
+      
+      for (const field of requiredFields) {
+        if (!formData[field]) {
+          validationErrors.push({
+            field,
+            message: `${field} is required`
+          });
+        }
+      }
       
       // If validation fails, return error with details
       if (validationErrors.length > 0) {
@@ -334,8 +352,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({
           success: false,
           error: "Form validation failed",
-          validationErrors,
-          message: formatValidationErrors(validationErrors)
+          validationErrors
         });
       }
       
@@ -993,12 +1010,29 @@ export function registerRoutes(app: Express): Server {
         });
       }
       
-      // Import validation functions
-      const { validateFormData, formatValidationErrors } = require('../shared/validation');
+      // Simplified validation: only check if required fields are present
+      // And ensure pickup and dropoff ZIPs are captured
       
-      // Validate the form data against required fields and formats
-      const formType = formData?.eventType === 'final_submission' ? 'final' : 'quote';
-      const validationErrors = validateFormData(formData, formType);
+      // List of required fields
+      const requiredFields = [
+        'name', 'email', 'phone', 
+        'pickupLocation', 'pickupZip',
+        'dropoffLocation', 'dropoffZip',
+        'vehicleType', 'year', 'make', 'model',
+        'shipmentDate'
+      ];
+      
+      // Simple validation for required fields
+      const validationErrors = [];
+      
+      for (const field of requiredFields) {
+        if (!formData[field]) {
+          validationErrors.push({
+            field,
+            message: `${field} is required`
+          });
+        }
+      }
       
       // If validation fails, return error with details
       if (validationErrors.length > 0) {
@@ -1010,8 +1044,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({
           success: false,
           error: "Form validation failed",
-          validationErrors,
-          message: formatValidationErrors(validationErrors)
+          validationErrors
         });
       }
       
