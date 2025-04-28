@@ -207,7 +207,7 @@ export function registerRoutes(app: Express): Server {
             },
             eventSourceUrl: req.headers.referer || req.get('origin') || '',
             // Pass attribution parameters to Meta CAPI
-            fbc: fbclid, // Use fbclid as Facebook click ID
+            fbclid, // Facebook click ID
             fbp: undefined, // We don't have browser ID in this context
             utm_source,
             utm_medium,
@@ -495,7 +495,7 @@ export function registerRoutes(app: Express): Server {
             },
             eventSourceUrl: req.headers.referer || req.get('origin') || '',
             // Pass attribution parameters to Meta CAPI
-            fbc: fbclid, // Use fbclid as Facebook click ID
+            fbclid, // Facebook click ID
             fbp: undefined, // We don't have browser ID in this context
             utm_source,
             utm_medium,
