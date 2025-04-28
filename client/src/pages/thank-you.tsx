@@ -29,12 +29,12 @@ export default function ThankYou() {
         console.log("🚗 ThankYou page - Sending final order submission to webhook");
         console.log("📦 Order data:", data);
         
-        // Add the specific event type for final submissions and ensure Facebook/Meta attribution data is preserved
+        // Add the specific event type for final submissions and preserve attribution data for CRM tracking
         const finalData = {
           ...data,
           eventType: "final_submission",
           submissionTime: new Date().toISOString(),
-          // Explicitly ensure Facebook/Meta attribution parameters are included
+          // Preserve attribution parameters for CRM/lead source tracking (not for Meta CAPI)
           fbclid: data.fbclid || null,
           utm_source: data.utm_source || null,
           utm_medium: data.utm_medium || null,
