@@ -8,8 +8,15 @@ app.use(express.urlencoded({ extended: false }));
 
 // Add CORS headers to allow the form to be used in an iframe
 app.use((req, res, next) => {
-  // Allow requests from any origin
-  res.header('Access-Control-Allow-Origin', '*');
+  // Get the request origin (or use a default value)
+  const origin = req.headers.origin || "";
+  
+  // Allow the specific origin that sent the request
+  // This is required for credentials to work - we can't use wildcard '*' with credentials
+  res.header('Access-Control-Allow-Origin', origin);
+  
+  // Allow credentials (cookies, authorization headers, etc.)
+  res.header('Access-Control-Allow-Credentials', 'true');
   
   // Allow these HTTP methods
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
