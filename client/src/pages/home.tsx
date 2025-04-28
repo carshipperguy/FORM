@@ -99,10 +99,17 @@ export default function Home() {
       });
       
       // Use our server-side API to calculate distance with properly formatted locations
-      const serverDistanceUrl = `/api/distance?origin=${encodeURIComponent(formattedPickupLocation)}&destination=${encodeURIComponent(formattedDropoffLocation)}`;
+      // Get the current domain to handle iframe scenarios
+      const currentDomain = window.location.origin;
+      
+      // Use the full URL to avoid issues when embedded in an iframe
+      const serverDistanceUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(formattedPickupLocation)}&destination=${encodeURIComponent(formattedDropoffLocation)}`;
       console.log("FIXED: Calling server API with exact format:", serverDistanceUrl);
       
-      const serverDistanceResponse = await fetch(serverDistanceUrl);
+      const serverDistanceResponse = await fetch(serverDistanceUrl, {
+        // Include credentials to ensure cookies are sent even for cross-origin requests
+        credentials: "include"
+      });
       const serverDistanceData = await serverDistanceResponse.json();
       
       console.log("UPDATED APPROACH: Server API response:", serverDistanceData);
