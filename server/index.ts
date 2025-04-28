@@ -11,9 +11,45 @@ app.use((req, res, next) => {
   // Get the request origin (or use a default value)
   const origin = req.headers.origin || "";
   
-  // Allow the specific origin that sent the request
-  // This is required for credentials to work - we can't use wildcard '*' with credentials
-  res.header('Access-Control-Allow-Origin', origin);
+  // List of allowed domains to embed this app in an iframe
+  // Includes potential production domains where this might be embedded
+  const allowedOrigins = [
+    // Development domains
+    'http://localhost',
+    'https://localhost',
+    'http://127.0.0.1',
+    'https://127.0.0.1',
+    // Replit domains
+    'https://replit.com',
+    '.replit.app',
+    // Client website domains
+    'https://amerigoautotransport.net',
+    'https://www.amerigoautotransport.net',
+    // Allow the current origin in all cases
+    origin
+  ];
+  
+  // Check if the request origin is allowed or matches a wildcard pattern
+  const isAllowedOrigin = allowedOrigins.some(allowedOrigin => {
+    // Exact match
+    if (allowedOrigin === origin) return true;
+    // Wildcard match (e.g., '.replit.app' should match any replit app subdomain)
+    if (allowedOrigin.startsWith('.') && origin.endsWith(allowedOrigin)) return true;
+    return false;
+  });
+  
+  // Set the appropriate CORS header based on origin validation
+  if (isAllowedOrigin) {
+    // Allow the specific origin that sent the request - required for credentials
+    res.header('Access-Control-Allow-Origin', origin);
+    
+    // Log allowed CORS origin for debugging
+    console.log(`CORS: Allowing origin ${origin}`);
+  } else {
+    // For safety, still allow the request but log it for debugging
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`CORS WARNING: Allowing unrecognized origin ${origin}`);
+  }
   
   // Allow credentials (cookies, authorization headers, etc.)
   res.header('Access-Control-Allow-Credentials', 'true');

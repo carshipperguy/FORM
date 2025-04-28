@@ -11,6 +11,8 @@ import FinalQuote from "@/pages/final-quote";
 import SimpleQuote from "@/pages/simple-quote";
 import TestMapQuest from "@/pages/test-mapquest";
 import EmbeddingInstructions from "@/pages/embedding-instructions";
+import { logIframeDebugInfo, isRunningInIframe } from "./lib/iframe-utils";
+import { useEffect } from "react";
 
 function Router() {
   return (
@@ -29,6 +31,37 @@ function Router() {
 }
 
 function App() {
+  // Log iframe debug info on component mount
+  useEffect(() => {
+    // Check if running in iframe and log environment information
+    logIframeDebugInfo();
+    
+    // Log that the app is iframe-ready
+    console.log('🚀 App initialized with iframe compatibility');
+    
+    // Add listener for messages from parent frame (if in iframe)
+    if (isRunningInIframe()) {
+      const handleMessage = (event: MessageEvent) => {
+        // Only process messages we expect
+        if (event.data && typeof event.data === 'object' && event.data.type === 'FROM_PARENT') {
+          console.log('📨 Received message from parent frame:', event.data);
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      return () => window.removeEventListener('message', handleMessage);
+    }
+  }, []);
+
+  // Add a class to the body if running in iframe
+  useEffect(() => {
+    if (isRunningInIframe()) {
+      document.body.classList.add('in-iframe');
+    } else {
+      document.body.classList.add('standalone-app');
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="mx-auto">
