@@ -33,15 +33,7 @@ const extractZip = (location?: string): string => {
  */
 export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string; diagnostics?: any }> {
   try {
-    console.log('🔍 WEBHOOK FUNCTION CALLED - Environment check...');
-    
-    // 1. Enhanced environment variable validation with comprehensive debugging
-    console.log('🔎 ENVIRONMENT VARIABLE CHECK:');
-    console.log('- NEW_WEBHOOK_URL exists:', process.env.NEW_WEBHOOK_URL ? 'YES' : 'NO');
-    console.log('- WEBHOOK_URL exists:', process.env.WEBHOOK_URL ? 'YES' : 'NO');
-    
     // Determine which webhook URL to use based on the event type
-    // The eventType helps us route different kinds of submissions to different Zapier zaps
     let webhookUrl;
     let zapierHookId;
     
@@ -50,22 +42,13 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       // This is a final order submission - use the order webhook
       webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/2xrmfy2/";
       zapierHookId = "2xrmfy2";
-      console.log('🔴 USING ORDER BOOKING WEBHOOK - This is a final submission');
     } else {
       // This is a quote submission or other type - use the lead webhook
       webhookUrl = "https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/";
       zapierHookId = "20zu8bj";
-      console.log('🔵 USING LEAD CAPTURE WEBHOOK - This is a quote submission');
     }
-    
-    // Print the webhook URL we're using
-    console.log('🔗 USING ZAPIER WEBHOOK URL:', webhookUrl);
-    
-    // Also log the specific Zapier hook ID for reference
-    console.log('📎 ZAPIER HOOK ID:', zapierHookId);
 
-    // 2. Prepare the request data with more verbose logging
-    console.log('📋 PREPARING WEBHOOK DATA...');
+    // Prepare the request data
     const submissionId = data.submissionId || `AUTO-${Date.now()}`;
     const submissionDate = data.submissionDate || new Date().toISOString();
     const eventType = data.eventType || "form_submission";
@@ -84,29 +67,9 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
           formattedShipmentDate = `${month}/${day}/${year}`;
         }
       } catch (e) {
-        console.error('⚠️ Error formatting date:', e);
         formattedShipmentDate = data.shipmentDate; // fallback to original
       }
     }
-    
-    // Log the Zapier field mapping to help debug integration
-    console.log('📋 ZAPIER FIELD MAPPING KEYS:');
-    console.log('- Contact Info Name');
-    console.log('- Contact Info Email');
-    console.log('- Contact Info Phone (required)');
-    console.log('- Route Details Pickup City');
-    console.log('- Route Details Pickup State');
-    console.log('- Route Details Pickup Zip');
-    console.log('- Route Details Dropoff City');
-    console.log('- Route Details Dropoff State');
-    console.log('- Route Details Dropoff Zip');
-    console.log('- Route Details Distance (in miles)');
-    console.log('- Route Details Estimated Transit Time');
-    console.log('- Route Details Shipment Date');
-    console.log('- Price Details Total Price (Open Transport Only)');
-    console.log('- Vehicle Details Year');
-    console.log('- Vehicle Details Make');
-    console.log('- Vehicle Details Model');
 
     // 3. Format the data in two different ways to increase chances of success
     
@@ -196,30 +159,13 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       ...originalFormat
     };
 
-    // 4. Log webhook event details
-    console.log('\n======================================');
-    console.log(`🔔 WEBHOOK: SENDING LEAD TO CRM SYSTEM`);
-    console.log(`📧 Email: ${data.email || 'Not provided'}`);
-    console.log(`☎️ Phone: ${data.phone || 'Not provided'}`);
-    console.log(`🚗 Vehicle: ${data.year || ''} ${data.make || ''} ${data.model || ''}`);
-    console.log(`📍 Route: ${data.pickupLocation || ''} → ${data.dropoffLocation || ''}`);
-    console.log(`💰 Quote: $${data.openTransportPrice || 'N/A'} (Open) / $${data.enclosedTransportPrice || 'N/A'} (Enclosed)`);
-    console.log(`🕒 Event: ${eventType} at ${new Date().toISOString()}`);
-    console.log('======================================\n');
-    
-    // Generate detailed field mapping diagnostic log
+    // Generate diagnostic information
     const formType = eventType === 'final_submission' ? 'final' : 'quote';
     const fieldDiagnosticLog = createFieldDiagnosticLog(data, formattedData, formType);
-    console.log(fieldDiagnosticLog);
-
-    // 5. Send the webhook request - with enhanced diagnostics for monitoring
-    console.log(`🚀 SENDING WEBHOOK REQUEST TO: ${webhookUrl}`);
     
-    // Measure payload size in bytes for diagnostic purposes
+    // Prepare the payload
     const jsonPayload = JSON.stringify(formattedData);
     const payloadSizeBytes = new TextEncoder().encode(jsonPayload).length;
-    
-    console.log(`📏 WEBHOOK PAYLOAD SIZE: ${payloadSizeBytes} bytes (${(payloadSizeBytes / 1024).toFixed(2)} KB)`);
     
     // Record timestamps for latency measurement
     const requestStartTime = Date.now();
@@ -255,9 +201,6 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       retryAttempted: false,
       error: null
     };
-    
-    console.log(`🔍 WEBHOOK REQUEST ID: ${diagnosticData.requestId}`);
-    console.log('📤 STARTING FETCH REQUEST...');
     
     // Record webhook request start in the diagnostic system
     recordWebhookStart({
@@ -305,8 +248,7 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       diagnosticData.responseTime = requestDuration;
       diagnosticData.responseStatus = response.status;
       
-      console.log(`📡 FETCH COMPLETED IN ${requestDuration}ms`);
-      console.log(`📡 WEBHOOK RESPONSE STATUS: ${response.status} ${response.statusText}`);
+      // Response received successfully
     } catch (fetchError) {
       // Calculate failure time for diagnostics
       const failureTime = Date.now();
@@ -370,13 +312,11 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       };
     }
     
-    // 6. Process the response with enhanced error handling
+    // Process the response
     let responseText;
     try {
       responseText = await response.text();
-      console.log('📝 RECEIVED RESPONSE TEXT LENGTH:', responseText.length);
     } catch (textError) {
-      console.error('❌ FAILED TO READ RESPONSE TEXT:', textError);
       return { 
         success: false, 
         message: `Failed to read response from webhook: ${textError instanceof Error ? textError.message : String(textError)}` 
@@ -515,37 +455,16 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
     let parsedResponse = null;
     try {
       parsedResponse = JSON.parse(responseText);
-      console.log('✅ WEBHOOK SUCCESS - JSON RESPONSE:', JSON.stringify(parsedResponse, null, 2));
-      
-      // Add JSON response to diagnostics
       diagnosticData.jsonResponse = parsedResponse;
     } catch (e) {
-      // Not JSON, just log the text
-      console.log('✅ WEBHOOK SUCCESS - TEXT RESPONSE:', responseText.substring(0, 200));
-      
-      // Add text response to diagnostics (truncated)
+      // Not JSON, store as text
       diagnosticData.textResponse = responseText.substring(0, 500);
     }
-    
-    // Log the actual data we sent for debugging
-    console.log('📦 WEBHOOK DATA SENT TO ZAPIER:');
-    console.log('- Contact Info Name:', formattedData["Contact Info Name"]);
-    console.log('- Contact Info Email:', formattedData["Contact Info Email"]);
-    console.log('- Contact Info Phone:', formattedData["Contact Info Phone (required)"]);
-    console.log('- Route Details Pickup City:', formattedData["Route Details Pickup City"]);
-    console.log('- Route Details Pickup State:', formattedData["Route Details Pickup State"]);
-    console.log('- Route Details Pickup Zip:', formattedData["Route Details Pickup Zip"]);
-    console.log('- Route Details Dropoff City:', formattedData["Route Details Dropoff City"]);
-    console.log('- Route Details Dropoff State:', formattedData["Route Details Dropoff State"]);
-    console.log('- Route Details Dropoff Zip:', formattedData["Route Details Dropoff Zip"]);
-    console.log('- Route Details Shipment Date:', formattedData["Route Details Shipment Date"]);
 
     // Mark success in diagnostics
     diagnosticData.success = true;
     diagnosticData.requestEndTime = Date.now();
     diagnosticData.totalDuration = diagnosticData.requestEndTime - diagnosticData.requestStartTime;
-    
-    console.log('✅ WEBHOOK DELIVERED SUCCESSFULLY in', diagnosticData.totalDuration, 'ms\n');
     
     // Record webhook completion in the diagnostic system
     recordWebhookCompletion(
