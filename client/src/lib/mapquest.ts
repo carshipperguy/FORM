@@ -10,15 +10,10 @@ const addressSchema = z.object({
 export type Address = z.infer<typeof addressSchema>;
 
 async function makeMapQuestRequest(endpoint: string, params: Record<string, any>) {
-  // Using http instead of https
   const baseUrl = 'http://www.mapquestapi.com';
-  // Always use the specific key directly
   const apiKey = 'YDMaftbjplfYTcQ129jOTQEkt37kNXy9';
-  
-  console.log('Using MapQuest API key directly');
 
   if (!apiKey) {
-    console.error('MapQuest API key is missing');
     throw new Error('Distance calculation is currently unavailable. Please try again later.');
   }
 
@@ -30,9 +25,7 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
   }
 
   try {
-    console.log('Making MapQuest request:', url.toString());
     const response = await fetch(url.toString(), {
-      // Include credentials to ensure cookies are sent even for cross-origin requests
       credentials: "include"
     });
 
@@ -49,7 +42,6 @@ async function makeMapQuestRequest(endpoint: string, params: Record<string, any>
 
     return data;
   } catch (error) {
-    console.error('MapQuest API error:', error);
     throw error;
   }
 }
@@ -77,7 +69,6 @@ export async function validateAddress(address: Address) {
       }
     };
   } catch (error) {
-    console.error('Address validation error:', error);
     return { isValid: false, error: 'Failed to validate address' };
   }
 }
@@ -97,13 +88,7 @@ type ErrorDistanceResult = {
 type DistanceResult = SuccessDistanceResult | ErrorDistanceResult;
 
 export async function calculateDistance(origin: string, destination: string): Promise<DistanceResult> {
-  console.log('MAPQUEST calculateDistance CALLED WITH:', { origin, destination });
-  
-  // Always hard-return 1200 miles for testing
-  console.log('DEBUG CHECK: Are we returning hardcoded 1200 miles?', false);
-  
   if (!origin || !destination) {
-    console.error('Missing origin or destination:', { origin, destination });
     return {
       success: false,
       error: 'Please enter both pickup and delivery locations'
@@ -111,15 +96,6 @@ export async function calculateDistance(origin: string, destination: string): Pr
   }
 
   try {
-    console.log('Trying server-side distance calculation first:', { origin, destination });
-    console.log('Origin type:', typeof origin, 'Value:', origin);
-    console.log('Destination type:', typeof destination, 'Value:', destination);
-    
-    // Check if locations look like they contain ZIP codes
-    const originHasZip = /\d{5}/.test(origin);
-    const destHasZip = /\d{5}/.test(destination);
-    console.log('Location ZIP check:', { originHasZip, destHasZip });
-    
     // Clean the location formats for better compatibility
     let cleanOrigin = origin.trim();
     let cleanDestination = destination.trim();
@@ -131,74 +107,47 @@ export async function calculateDistance(origin: string, destination: string): Pr
     
     if (originMatch && originMatch[1]) {
       cleanOrigin = originMatch[1].trim();
-      console.log('Simplified origin to:', cleanOrigin);
     }
     
     if (destMatch && destMatch[1]) {
       cleanDestination = destMatch[1].trim();
-      console.log('Simplified destination to:', cleanDestination);
     }
     
     // First try the server endpoint with cleaned locations
     try {
-      // Get the current domain to handle iframe scenarios
-      const currentDomain = window.location.origin;
-      
-      // Use the full URL to avoid issues when embedded in an iframe
-      const serverUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(cleanOrigin)}&destination=${encodeURIComponent(cleanDestination)}`;
-      console.log('Making server request to:', serverUrl);
+      const serverUrl = `/api/distance?origin=${encodeURIComponent(cleanOrigin)}&destination=${encodeURIComponent(cleanDestination)}`;
       
       const response = await fetch(serverUrl, {
-        // Include credentials to ensure cookies are sent even for cross-origin requests
         credentials: "include"
       });
-      console.log('Server response status:', response.status);
       
       if (!response.ok) {
-        console.error('Server returned error status:', response.status);
         throw new Error(`Server returned status ${response.status}`);
       }
       
       const serverData = await response.json();
       
-      console.log('Server distance response full data:', serverData);
-      
       if (serverData.distance) {
-        const result: SuccessDistanceResult = {
+        return {
           success: true,
           distance: Math.round(serverData.distance),
-          time: serverData.time || "Unknown" // The server might not return time
+          time: serverData.time || "Unknown"
         };
-        console.log('Server distance calculation successful:', result);
-        return result;
       } else if (serverData.error) {
-        console.error('Server returned error:', serverData.error);
         throw new Error(serverData.error);
       }
     } catch (serverError) {
-      console.warn('Server distance calculation failed, trying client-side:', serverError);
+      // Server-side calculation failed, fallback to client-side
     }
     
     // If server fails, try client-side as fallback with the simplified locations
-    console.log('Making MapQuest API distance request (client-side) for:', { 
-      cleanOrigin, 
-      cleanDestination 
-    });
     const data = await makeMapQuestRequest('/directions/v2/route', {
       from: cleanOrigin,
       to: cleanDestination,
-      unit: 'm' // Use lowercase to ensure better compatibility
-    });
-
-    console.log('MapQuest API response:', { 
-      statuscode: data.info?.statuscode,
-      distance: data.route?.distance,
-      formattedTime: data.route?.formattedTime,
-      hasErrors: data.info?.messages?.length > 0
+      unit: 'm'
     });
 
     if (data.info?.statuscode === 402) {
-      console.error('Invalid locations provided:', { origin, destination });
       return {
         success: false,
         error: 'Please check your location entries and try again'
@@ -206,23 +155,19 @@ export async function calculateDistance(origin: string, destination: string): Pr
     }
 
     if (data.route?.distance) {
-      const result: SuccessDistanceResult = {
+      return {
         success: true,
         distance: Math.round(data.route.distance),
         time: data.route.formattedTime
       };
-      console.log('Distance calculation successful:', result);
-      return result;
     }
 
-    // MapQuest API should always work with correct locations
+    // If we get here, no valid distance could be calculated
     return {
       success: false,
       error: 'Could not calculate distance between these locations. Please check your entries.'
     };
   } catch (error) {
-    console.error('Distance calculation error:', error);
-    
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to calculate distance'
