@@ -6,58 +6,29 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add CORS headers to allow the form to be used in an iframe
+// Add CORS headers to allow cross-origin requests
 app.use((req, res, next) => {
-  // Get the request origin (or use a default value)
   const origin = req.headers.origin || "";
   
-  // List of allowed domains to embed this app in an iframe
-  // Includes potential production domains where this might be embedded
+  // Only allow specific production domains and development environments
   const allowedOrigins = [
-    // Development domains
-    'http://localhost',
-    'https://localhost',
-    'http://127.0.0.1',
-    'https://127.0.0.1',
-    // Replit domains
-    'https://replit.com',
-    '.replit.app',
-    // Client website domains
+    // Client production domains
     'https://amerigoautotransport.net',
     'https://www.amerigoautotransport.net',
-    // Allow the current origin in all cases
-    origin
+    // Development environments
+    'https://replit.com',
+    'http://localhost:3000',
+    'http://localhost:5173',
   ];
   
-  // Check if the request origin is allowed or matches a wildcard pattern
-  const isAllowedOrigin = allowedOrigins.some(allowedOrigin => {
-    // Exact match
-    if (allowedOrigin === origin) return true;
-    // Wildcard match (e.g., '.replit.app' should match any replit app subdomain)
-    if (allowedOrigin.startsWith('.') && origin.endsWith(allowedOrigin)) return true;
-    return false;
-  });
-  
-  // Set the appropriate CORS header based on origin validation
-  if (isAllowedOrigin) {
-    // Allow the specific origin that sent the request - required for credentials
+  // Check if origin is allowed
+  if (allowedOrigins.includes(origin) || origin.includes('.replit.app')) {
     res.header('Access-Control-Allow-Origin', origin);
-    
-    // Log allowed CORS origin for debugging
-    console.log(`CORS: Allowing origin ${origin}`);
-  } else {
-    // For safety, still allow the request but log it for debugging
-    res.header('Access-Control-Allow-Origin', origin);
-    console.log(`CORS WARNING: Allowing unrecognized origin ${origin}`);
   }
   
   // Allow credentials (cookies, authorization headers, etc.)
   res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Allow these HTTP methods
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  
-  // Allow these headers
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
   // Handle preflight requests

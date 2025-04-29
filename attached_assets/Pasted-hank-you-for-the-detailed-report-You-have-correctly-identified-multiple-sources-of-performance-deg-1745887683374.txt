@@ -1,0 +1,54 @@
+hank you for the detailed report.
+
+You have correctly identified multiple sources of performance degradation:
+
+Excessive iframe environment processing
+
+Verbose debug logging still active
+
+URL rewriting on every API call
+
+Cross-origin/CORS overhead
+
+Residual Meta Ads tracking code
+
+Constant message event listeners
+
+Node.js loading unused server-side modules (e.g., Facebook CAPI)
+
+🔥 FINAL IMMEDIATE DIRECTIVE
+You are now authorized to proceed with the following clean-up, and only the following:
+
+✅ 1. Remove the entire iframe-utils.ts file and all references to it.
+✅ 2. Remove iframe detection logic from App.tsx, including event listeners and debug logging.
+✅ 3. Remove iframe-test.html completely.
+✅ 4. Remove facebookCapi.ts and any associated server utilities or imports.
+✅ 5. Remove any code in the frontend related to extracting UTM or fbclid parameters unless actively used for a live critical system (not tracking).
+✅ 6. Delete all Meta tracking rollback comments and disabled code blocks (do not leave commented remnants).
+✅ 7. Simplify CORS settings: only allow the necessary production domain(s), remove verbose logging and wildcard logic.
+✅ 8. Remove any absolute URL rewriting logic where not critically necessary. Default to normal relative requests unless iframe is truly required.
+✅ 9. Remove all verbose console.log statements in production code, both frontend and backend.
+
+⚠️ STERN MANDATORY DISCLAIMER
+❗ You are NOT authorized to restructure the database, change schemas, rename API routes, or create new architectural layers.
+
+❗ You are NOT authorized to modify app layouts, navigation, forms, or user-facing UI.
+
+❗ You are NOT authorized to introduce new libraries, dependencies, or frameworks.
+
+❗ You are NOT authorized to alter core API endpoints or distance calculation functions.
+
+❗ You are NOT authorized to create new iframe-specific behaviors unless explicitly requested.
+
+Only the clean-up operations listed above are permitted.
+
+All work must be staged, and a final clean-up report must be submitted for approval before pushing live.
+
+Any deviation will be considered a breach of project scope.
+
+📋 Immediate Response Required:
+Reply "Confirmed — proceeding exactly as instructed",
+then begin clean-up immediately.
+
+✅
+This will lock them in tight — they can only clean what you explicitly approved — no database changes, no surprise redesigns.
