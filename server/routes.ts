@@ -21,24 +21,7 @@ if (MAPQUEST_API_KEY) {
 }
 
 async function getDistance(origin: string, destination: string): Promise<{distance: number, time?: string}> {
-  // Log detailed information about the inputs
-  console.log("Server: getDistance called with:", {
-    origin: {
-      value: origin,
-      type: typeof origin,
-      length: origin.length,
-      hasZip: /\d{5}/.test(origin)
-    },
-    destination: {
-      value: destination,
-      type: typeof destination,
-      length: destination.length,
-      hasZip: /\d{5}/.test(destination)
-    }
-  });
-
   // Simplify location format to ensure MapQuest API compatibility
-  // Extract just the city and state for better compatibility
   let originFormatted = origin;
   let destinationFormatted = destination;
   
@@ -51,56 +34,34 @@ async function getDistance(origin: string, destination: string): Promise<{distan
   
   if (originMatch && originMatch[1]) {
     originFormatted = originMatch[1].trim();
-    console.log("Simplified origin to:", originFormatted);
   }
   
   if (destMatch && destMatch[1]) {
     destinationFormatted = destMatch[1].trim();
-    console.log("Simplified destination to:", destinationFormatted);
   }
 
-  // Use MapQuest API to get distance - ensure we have the correct format
+  // Use MapQuest API to get distance
   const url = `http://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(
     originFormatted
   )}&to=${encodeURIComponent(destinationFormatted)}&unit=m`;
-  
-  // Note: Changed https to http, and unit=M to unit=m as the API may be case-sensitive
 
   try {
-    console.log("Server: Making MapQuest request:", url);
-    console.log("Server: Using MapQuest API key:", MAPQUEST_API_KEY ? "Key exists" : "No key found!");
-    
     const response = await fetch(url);
     const data = await response.json();
-    
-    console.log("Server: MapQuest API response status:", response.status);
-    console.log("Server: MapQuest API response data:", {
-      statuscode: data.info?.statuscode,
-      hasRoute: !!data.route,
-      distance: data.route?.distance,
-      formattedTime: data.route?.formattedTime,
-      hasErrors: data.info?.messages?.length > 0,
-      messages: data.info?.messages
-    });
 
     if (data.route && typeof data.route.distance === 'number') {
-      const result = {
+      return {
         distance: Math.round(data.route.distance), // Already in miles
         time: data.route.formattedTime
       };
-      console.log("Server: Distance calculation successful:", result);
-      return result;
     } else {
-      console.error("Server: No route data or distance in response");
       if (data.info?.messages?.length > 0) {
-        console.error("Server: MapQuest API error messages:", data.info.messages);
         throw new Error(`MapQuest API error: ${data.info.messages.join(", ")}`);
       } else {
         throw new Error("Distance calculation failed - no distance in response");
       }
     }
   } catch (error) {
-    console.error("Server: MapQuest API Error:", error);
     throw error;
   }
 }
@@ -108,24 +69,19 @@ async function getDistance(origin: string, destination: string): Promise<{distan
 export function registerRoutes(app: Express): Server {
   app.get("/api/distance", async (req, res) => {
     const { origin, destination } = req.query;
-    
-    console.log("Server: Distance API called with:", { origin, destination });
 
     if (!origin || !destination) {
-      console.log("Server: Missing origin or destination");
       return res.status(400).json({ error: "Origin and destination are required" });
     }
 
     try {
       const result = await getDistance(origin as string, destination as string);
-      console.log("Server: Distance calculation successful:", result);
       res.json({ 
         distance: result.distance,
         time: result.time || undefined
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      console.error("Server: Distance calculation failed:", errorMessage);
       res.status(500).json({ error: errorMessage });
     }
   });
