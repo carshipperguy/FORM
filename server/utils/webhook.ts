@@ -71,14 +71,16 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       }
     }
 
-    // 3. Format the data in two different ways to increase chances of success
+    // 3. Format the data with structured fields including nested contactInfo
     
-    // First format: Simpler flat format that many Zapier integrations prefer
-    const simplifiedData = {
-      // Simple fields with straightforward names
-      name: data.name || 'Not provided',
-      email: data.email || 'Not provided',
-      phone: data.phone || 'Not provided',
+    // Create nested structure with contactInfo - This is what Zapier expects
+    const structuredData = {
+      // Contact information in nested format
+      contactInfo: {
+        name: data.name || 'Not provided',
+        email: data.email || 'Not provided',
+        phone: data.phone || 'Not provided'
+      },
       
       // Location information
       pickup_city: extractCity(data.pickupLocation),
@@ -152,10 +154,10 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
     };
     
-    // Combine both formats into a single object
-    // This increases our chances that Zapier will find fields it can map
+    // Use only the nested contactInfo format for Zapier compatibility
+    // This ensures consistent field mapping in Zapier
     const formattedData = {
-      ...simplifiedData,
+      ...structuredData,
       ...originalFormat
     };
 
