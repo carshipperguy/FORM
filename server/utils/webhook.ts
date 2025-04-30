@@ -73,44 +73,74 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
 
     // 3. Format the data with structured fields including nested contactInfo
     
-    // Create nested structure with contactInfo - This is what Zapier expects
+    // Create structured data with both nested contactInfo and original fields
+    // This ensures Zapier can map fields in either format
     const structuredData = {
-      // Contact information in nested format
+      // Contact information in nested format for Zapier compatibility
       contactInfo: {
         name: data.name || 'Not provided',
         email: data.email || 'Not provided',
         phone: data.phone || 'Not provided'
       },
       
+      // Original contact fields (also include these for backward compatibility)
+      name: data.name || 'Not provided',
+      email: data.email || 'Not provided',
+      phone: data.phone || 'Not provided',
+      
       // Location information
+      pickupLocation: data.pickupLocation || 'Not provided',
+      dropoffLocation: data.dropoffLocation || 'Not provided',
       pickup_city: extractCity(data.pickupLocation),
       pickup_state: extractState(data.pickupLocation),
       pickup_zip: data.pickupZip || extractZip(data.pickupLocation) || 'Not provided',
+      pickupZip: data.pickupZip || extractZip(data.pickupLocation) || 'Not provided',
       dropoff_city: extractCity(data.dropoffLocation),
       dropoff_state: extractState(data.dropoffLocation),
       dropoff_zip: data.dropoffZip || extractZip(data.dropoffLocation) || 'Not provided',
+      dropoffZip: data.dropoffZip || extractZip(data.dropoffLocation) || 'Not provided',
       
       // Route information
       distance: data.distance || 0,
       transit_time: data.transitTime || 0,
+      transitTime: data.transitTime || 0,
       
       // Pricing information
       open_transport_price: data.openTransportPrice || 'Not provided',
       enclosed_transport_price: data.enclosedTransportPrice || 'Not provided',
+      openTransportPrice: data.openTransportPrice || 'Not provided',
+      enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
       
       // Vehicle information
       vehicle_year: data.year || 'Not provided',
       vehicle_make: data.make || 'Not provided',
       vehicle_model: data.model || 'Not provided',
       vehicle_type: data.vehicleType || 'Not provided',
+      year: data.year || 'Not provided',
+      make: data.make || 'Not provided',
+      model: data.model || 'Not provided',
+      vehicleType: data.vehicleType || 'Not provided',
       
       // Dates
       shipment_date: formattedShipmentDate,
       submission_date: submissionDate,
+      shipmentDate: data.shipmentDate || 'Not provided',
+      submissionDate: submissionDate,
       
       // Metadata
       submission_id: submissionId,
-      event_type: eventType
+      event_type: eventType,
+      submissionId: submissionId,
+      eventType: eventType,
+      
+      // Attribution tracking fields (if present)
+      fbclid: data.fbclid || null,
+      utm_source: data.utm_source || null,
+      utm_medium: data.utm_medium || null,
+      utm_campaign: data.utm_campaign || null,
+      utm_term: data.utm_term || null,
+      utm_content: data.utm_content || null,
+      referrer: data.referrer || ""
     };
     
     // Second format: Our original format with specific field names for Zapier mapping
