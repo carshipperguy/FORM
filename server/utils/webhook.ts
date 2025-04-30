@@ -154,12 +154,13 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       enclosedTransportPrice: data.enclosedTransportPrice || 'Not provided',
     };
     
-    // Use only the nested contactInfo format for Zapier compatibility
-    // This ensures consistent field mapping in Zapier
-    const formattedData = {
+    // Prepare the final formatted data with only contactInfo nested fields
+    // Removes any flat contact fields like 'name', 'email', 'phone'
+    // This ensures Zapier consistently uses contactInfo.name, contactInfo.email, contactInfo.phone
+    const formattedData = originalFormat ? {
       ...structuredData,
       ...originalFormat
-    };
+    } : structuredData;
 
     // Generate diagnostic information
     const formType = eventType === 'final_submission' ? 'final' : 'quote';
