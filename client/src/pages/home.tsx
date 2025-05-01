@@ -228,53 +228,97 @@ export default function Home() {
         
         // Use await to ensure we catch any errors properly but don't block the UI
         (async () => {
-          try {
-            console.log("⚡ SENDING WEBHOOK DATA:", JSON.stringify(webhookData, null, 2));
-            
-            // Get the current domain to handle iframe scenarios
-            const currentDomain = window.location.origin;
-            console.log("Current domain for API request:", currentDomain);
-            
-            // Use the full URL to avoid issues when embedded in an iframe
-            const apiUrl = `${currentDomain}/api/webhook`;
-            console.log("Using webhook API URL:", apiUrl);
-            
-            const webhookResponse = await fetch(apiUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-              },
-              // Include credentials to ensure cookies are sent even for cross-origin requests
-              credentials: "include",
-              body: JSON.stringify(webhookData),
-            });
-            
+          // Flag to track if retry has been attempted
+          let retryAttempted = false;
+          
+          // Function to handle sending webhook data with retry capability
+          const sendWebhookData = async (isRetry = false) => {
             try {
-              // Try to parse the response JSON
-              const responseData = await webhookResponse.json();
+              if (isRetry) {
+                console.log("⚡ RETRY: SENDING WEBHOOK DATA (COLD START RECOVERY)");
+              } else {
+                console.log("⚡ SENDING WEBHOOK DATA:", JSON.stringify(webhookData, null, 2));
+              }
               
-              if (webhookResponse.ok || responseData.success) {
-                console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
-                console.log("⚡ WEBHOOK RESPONSE:", responseData);
-              } else {
-                console.warn("⚡ WEBHOOK RETURNED ERROR:", responseData);
-                // Even if we get an error, continue with the quote process
-                // The server is handling any Zapier-side errors (e.g. 503s)
+              // Get the current domain to handle iframe scenarios
+              const currentDomain = window.location.origin;
+              
+              // Use the full URL to avoid issues when embedded in an iframe
+              const apiUrl = `${currentDomain}/api/webhook`;
+              console.log(`Using webhook API URL${isRetry ? " (retry)" : ""}:`, apiUrl);
+              
+              // Add a unique timestamp to prevent caching issues during retry
+              const uniqueWebhookData = isRetry ? {
+                ...webhookData,
+                retryTimestamp: Date.now(),
+                isRetry: true
+              } : webhookData;
+              
+              // Set a timeout to prevent hanging request
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+              
+              const webhookResponse = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+                },
+                // Include credentials to ensure cookies are sent even for cross-origin requests
+                credentials: "include",
+                body: JSON.stringify(uniqueWebhookData),
+                signal: controller.signal
+              });
+              
+              clearTimeout(timeoutId);
+              
+              try {
+                // Try to parse the response JSON
+                const responseData = await webhookResponse.json();
+                
+                if (webhookResponse.ok || responseData.success) {
+                  console.log(`⚡ WEBHOOK ${isRetry ? "RETRY " : ""}SENT SUCCESSFULLY`);
+                  if (isRetry) {
+                    console.log("⚡ COLD START RECOVERY SUCCESSFUL");
+                  }
+                  return true; // Success
+                } else {
+                  console.warn(`⚡ WEBHOOK ${isRetry ? "RETRY " : ""}RETURNED ERROR:`, responseData);
+                  return false; // Failed but got a response
+                }
+              } catch (jsonError) {
+                // If we can't parse JSON, just check the response status
+                if (webhookResponse.ok) {
+                  console.log(`⚡ WEBHOOK ${isRetry ? "RETRY " : ""}SENT SUCCESSFULLY (no JSON response)`);
+                  return true; // Success
+                } else {
+                  console.error(`⚡ WEBHOOK ${isRetry ? "RETRY " : ""}ERROR:`, webhookResponse.status, webhookResponse.statusText);
+                  return false; // Failed
+                }
               }
-            } catch (jsonError) {
-              // If we can't parse JSON, just check the response status
-              if (webhookResponse.ok) {
-                console.log("⚡ WEBHOOK SENT SUCCESSFULLY (no JSON response)");
-              } else {
-                console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
-              }
+            } catch (webhookError) {
+              console.error(`⚡ ERROR ${isRetry ? "RETRYING" : "SENDING"} DATA TO WEBHOOK:`, webhookError);
+              return false; // Failed
             }
-          } catch (webhookError) {
-            console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
-            // Continue with the quote process even if the webhook fails
-            // This ensures users can still get quotes even if CRM integration has issues
+          };
+          
+          // First attempt
+          const initialResult = await sendWebhookData();
+          
+          // If first attempt fails or times out, retry once after delay
+          if (!initialResult && !retryAttempted) {
+            console.log("⚡ WEBHOOK FAILED - SCHEDULING RETRY IN 2 SECONDS");
+            retryAttempted = true;
+            
+            // Wait 2 seconds before retrying to allow cold start completion
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Retry the webhook submission
+            await sendWebhookData(true);
           }
+          
+          // Continue with the quote process regardless of webhook success
+          // This ensures users can still get quotes even if CRM integration has issues
         })();
       } catch (error) {
         console.error("⚡ ERROR PREPARING WEBHOOK DATA:", error);
