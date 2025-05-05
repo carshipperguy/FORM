@@ -33,12 +33,15 @@ export async function checkWebhookHealth(webhookUrl: string): Promise<HealthChec
   console.log(`\n🔍 WEBHOOK HEALTH CHECK #${healthCheckCount} STARTING...`);
   console.log(`🌐 Testing webhook URL: ${webhookUrl}`);
   
-  // Create minimal test payload
+  // Create minimal test payload with clear DO_NOT_PROCESS flag for Zapier
   const testPayload = {
     type: 'health_check',
     timestamp: new Date().toISOString(),
     test_id: `health_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`,
-    source: 'auto_diagnostic_system'
+    source: 'auto_diagnostic_system',
+    DO_NOT_PROCESS: true,
+    ZAPIER_FILTER_FLAG: 'DIAGNOSTIC_TEST_ONLY',
+    IS_DIAGNOSTIC_PING: true
   };
   
   try {
@@ -46,13 +49,16 @@ export async function checkWebhookHealth(webhookUrl: string): Promise<HealthChec
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     
-    // Send a test request to the webhook
+    // Send a test request to the webhook with clear diagnostic headers
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'Amerigo-Auto-Transport-Diagnostics/1.0',
-        'X-Diagnostic-ID': testPayload.test_id
+        'X-Diagnostic-ID': testPayload.test_id,
+        'X-Zapier-Filter': 'DIAGNOSTIC_TEST_ONLY',
+        'X-Do-Not-Process': 'true',
+        'X-Is-Health-Check': 'true'
       },
       body: JSON.stringify(testPayload),
       signal: controller.signal
