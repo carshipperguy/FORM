@@ -923,13 +923,35 @@ export function registerRoutes(app: Express): Server {
       
       // SAFEGUARD: Check for empty or diagnostic pings
       // This prevents Replit health checks from triggering Zapier
-      if (!formData || 
+      // CRITICAL SAFETY CHECK: Only filter out obvious non-customer submissions
+      if (
+          // Case 1: Completely empty request body  
+          !formData || 
+          
+          // Case 2: Missing BOTH name AND phone (customer forms always have these)
           (!formData.phone && !formData.name) || 
+          
+          // Case 3: Explicitly marked as system health check
           formData.type === 'health_check' || 
-          formData.source === 'auto_diagnostic_system') {
-        console.log("⚠️ Empty or diagnostic ping detected - returning 200 OK without processing");
+          
+          // Case 4: Explicitly from diagnostic system 
+          formData.source === 'auto_diagnostic_system'
+      ) {
+        // Log detailed info about what triggered the filter
+        console.log("⚠️ DIAGNOSTIC PING DETECTED - NOT A CUSTOMER SUBMISSION");
+        console.log("⚠️ Filter triggered because:", {
+          emptyBody: !formData,
+          missingRequiredFields: formData && (!formData.phone && !formData.name),
+          isHealthCheck: formData && formData.type === 'health_check',
+          isDiagnostic: formData && formData.source === 'auto_diagnostic_system'
+        });
+        
+        // Return 200 OK to avoid system retries
         return res.status(200).send("noop - ignored diagnostic ping");
       }
+      
+      // SAFETY CONFIRMATION: If we got here, this is a legitimate submission
+      console.log("✅ SUBMISSION HAS CUSTOMER DATA - Processing normally");
       
       // Log the incoming data for debugging
       console.log("📝 WEBHOOK DATA RECEIVED:", {
