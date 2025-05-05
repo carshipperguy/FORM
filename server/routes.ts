@@ -921,6 +921,16 @@ export function registerRoutes(app: Express): Server {
       
       const formData = req.body;
       
+      // SAFEGUARD: Check for empty or diagnostic pings
+      // This prevents Replit health checks from triggering Zapier
+      if (!formData || 
+          (!formData.phone && !formData.name) || 
+          formData.type === 'health_check' || 
+          formData.source === 'auto_diagnostic_system') {
+        console.log("⚠️ Empty or diagnostic ping detected - returning 200 OK without processing");
+        return res.status(200).send("noop - ignored diagnostic ping");
+      }
+      
       // Log the incoming data for debugging
       console.log("📝 WEBHOOK DATA RECEIVED:", {
         name: formData?.name || 'Not provided',
