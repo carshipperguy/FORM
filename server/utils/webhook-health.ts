@@ -145,25 +145,27 @@ export function setupPeriodicHealthChecks(
   // Convert minutes to milliseconds
   const interval = intervalMinutes * 60 * 1000;
   
-  console.log(`🔄 Setting up periodic webhook health checks every ${intervalMinutes} minutes`);
+  console.log(`🔄 Periodic webhook health checks disabled as requested by user`);
   
-  // Run health checks periodically
-  setInterval(async () => {
-    console.log(`\n⏰ PERIODIC WEBHOOK HEALTH CHECK TRIGGERED`);
-    console.log(`⏱️ Time since last health check: ${formatTimeDifference(Date.now() - lastHealthCheckTime)}`);
-    
-    for (const url of webhookUrls) {
-      await checkWebhookHealth(url);
-    }
-  }, interval);
+  // Periodic health checks disabled as requested
+  // setInterval(async () => {
+  //   console.log(`\n⏰ PERIODIC WEBHOOK HEALTH CHECK TRIGGERED`);
+  //   console.log(`⏱️ Time since last health check: ${formatTimeDifference(Date.now() - lastHealthCheckTime)}`);
+  //   
+  //   for (const url of webhookUrls) {
+  //     await checkWebhookHealth(url);
+  //   }
+  // }, interval);
   
-  // Run an initial health check
-  setTimeout(async () => {
-    console.log(`\n🚀 INITIAL WEBHOOK HEALTH CHECK`);
-    for (const url of webhookUrls) {
-      await checkWebhookHealth(url);
-    }
-  }, 5000); // Wait 5 seconds after setup to run initial check
+  // Initial health check disabled as requested by user
+  // setTimeout(async () => {
+  //   console.log(`\n🚀 INITIAL WEBHOOK HEALTH CHECK`);
+  //   for (const url of webhookUrls) {
+  //     await checkWebhookHealth(url);
+  //   }
+  // }, 5000); // Wait 5 seconds after setup to run initial check
+  
+  console.log(`\n✓ Webhook health checks disabled as requested`);
 }
 
 /**

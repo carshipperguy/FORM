@@ -77,10 +77,10 @@ export function initWebhookMonitor(webhookUrls: string[]): void {
   // Store webhook URLs
   monitorData.webhookUrls = webhookUrls;
   
-  // Setup periodic health checks every 30 minutes
-  setupPeriodicHealthChecks(webhookUrls, 30);
+  // Health checks disabled as requested by user
+  // setupPeriodicHealthChecks(webhookUrls, 30);
   
-  console.log('✅ Webhook monitoring system initialized');
+  console.log('✅ Webhook monitoring system initialized (health checks disabled)');
 }
 
 /**
