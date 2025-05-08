@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { vehicleTypes, years, makes, modelsByMake } from "@/lib/vehicle-data";
+import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
 import LocationMenuSelector from "./LocationMenuSelector";
 
 const SimpleQuoteForm = () => {
@@ -455,20 +455,33 @@ const SimpleQuoteForm = () => {
                   </select>
                 </div>
                 <div className="form-field">
-                  <select
-                    name="model"
-                    value={formData.model}
-                    onChange={handleChange}
-                    required
-                    disabled={!formData.make}
-                  >
-                    <option value="">Model</option>
-                    {availableModels.map((model) => (
-                      <option key={model} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                  </select>
+                  {formData.make && newMakesWithFreeTextModels.includes(formData.make) ? (
+                    // Free text input for new makes
+                    <input
+                      type="text"
+                      name="model"
+                      value={formData.model}
+                      onChange={handleChange}
+                      placeholder="Model"
+                      required
+                    />
+                  ) : (
+                    // Dropdown for original makes
+                    <select
+                      name="model"
+                      value={formData.model}
+                      onChange={handleChange}
+                      required
+                      disabled={!formData.make}
+                    >
+                      <option value="">Model</option>
+                      {availableModels.map((model) => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </>
             ) : (
