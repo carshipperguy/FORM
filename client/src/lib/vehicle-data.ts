@@ -16,10 +16,25 @@ export const years = Array.from(
   (_, i) => (1990 + i).toString()
 ).reverse();
 
+// New makes to be added that should use free-text input for models
+export const newMakesWithFreeTextModels = [
+  "Acura", "Alfa Romeo", "Aston Martin", "Bentley", "Bugatti", "Buick",
+  "Cadillac", "Chrysler", "Citroën", "Dacia", "Daewoo", "Daihatsu", "Eagle",
+  "Ferrari", "Fiat", "Fisker", "Genesis", "Geo", "Hummer", "Infiniti",
+  "International", "Isuzu", "Jaguar", "Karma", "Koenigsegg", "Lamborghini",
+  "Lancia", "Land Rover", "Lincoln", "Lotus", "Lucid", "Maserati", "Maybach",
+  "Mazda", "McLaren", "Mercedes-Benz", "Mercury", "Mini", "Mitsubishi", "Oldsmobile",
+  "Opel", "Peugeot", "Plymouth", "Polestar", "Pontiac", "Porsche", "Renault",
+  "Rivian", "Rolls-Royce", "Saab", "Saleen", "Saturn", "Scion", "Seat", "Skoda",
+  "Smart", "Spyker", "Suzuki", "Tata", "VinFast", "Volvo", "Yugo"
+];
+
+// Original makes with dropdowns + new makes with free text
 export const makes = [
   "Toyota", "Honda", "Ford", "Chevrolet", "BMW", "Mercedes", 
   "Audi", "Tesla", "RAM", "GMC", "Nissan", "Jeep", "Hyundai", 
-  "Kia", "Volkswagen", "Subaru", "Lexus", "Dodge"
+  "Kia", "Volkswagen", "Subaru", "Lexus", "Dodge",
+  ...newMakesWithFreeTextModels
 ];
 
 export const modelsByMake: Record<string, string[]> = {
