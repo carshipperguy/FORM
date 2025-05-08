@@ -10,10 +10,10 @@ export const vehicleTypes = [
   "other"
 ] as const;
 
-// Sample years (1990 to current year)
+// Years (1940 to current year)
 export const years = Array.from(
-  { length: new Date().getFullYear() - 1990 + 1 },
-  (_, i) => (1990 + i).toString()
+  { length: new Date().getFullYear() - 1940 + 1 },
+  (_, i) => (1940 + i).toString()
 ).reverse();
 
 // New makes to be added that should use free-text input for models
@@ -29,13 +29,13 @@ export const newMakesWithFreeTextModels = [
   "Smart", "Spyker", "Suzuki", "Tata", "VinFast", "Volvo", "Yugo"
 ];
 
-// Original makes with dropdowns + new makes with free text
+// Combine all makes and sort alphabetically
 export const makes = [
   "Toyota", "Honda", "Ford", "Chevrolet", "BMW", "Mercedes", 
   "Audi", "Tesla", "RAM", "GMC", "Nissan", "Jeep", "Hyundai", 
   "Kia", "Volkswagen", "Subaru", "Lexus", "Dodge",
   ...newMakesWithFreeTextModels
-];
+].sort();
 
 export const modelsByMake: Record<string, string[]> = {
   Toyota: ["Camry", "Corolla", "RAV4", "Highlander", "4Runner", "Tundra", "Tacoma", "Sienna"],

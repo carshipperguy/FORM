@@ -50,6 +50,9 @@ const SimpleQuoteForm = () => {
       setAvailableModels([]);
     }
   }, [formData.make, isStandardVehicle]);
+  
+  // Check if vehicle year is pre-1990 for free-text model input
+  const isVehiclePre1990 = formData.year && parseInt(formData.year) < 1990;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -455,8 +458,8 @@ const SimpleQuoteForm = () => {
                   </select>
                 </div>
                 <div className="form-field">
-                  {formData.make && newMakesWithFreeTextModels.includes(formData.make) ? (
-                    // Free text input for new makes
+                  {(formData.make && newMakesWithFreeTextModels.includes(formData.make)) || isVehiclePre1990 ? (
+                    // Free text input for new makes or pre-1990 vehicles
                     <input
                       type="text"
                       name="model"
@@ -466,7 +469,7 @@ const SimpleQuoteForm = () => {
                       required
                     />
                   ) : (
-                    // Dropdown for original makes
+                    // Dropdown for original makes of 1990+ vehicles
                     <select
                       name="model"
                       value={formData.model}

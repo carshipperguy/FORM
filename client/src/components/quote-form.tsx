@@ -43,7 +43,11 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
 
   const vehicleType = form.watch("vehicleType");
   const make = form.watch("make");
+  const year = form.watch("year");
   const shipmentDate = form.watch("shipmentDate");
+  
+  // Check if vehicle year is pre-1990 for free-text model input
+  const isVehiclePre1990 = year && parseInt(year) < 1990;
 
   useEffect(() => {
     if (shipmentDate && !showContactFields) {
@@ -242,13 +246,13 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   render={({ field }) => (
                     <FormItem className="space-y-0">
                       {isCarTruckSuv ? (
-                        make && newMakesWithFreeTextModels.includes(make) ? (
-                          // Free text input for new vehicle makes
+                        (make && newMakesWithFreeTextModels.includes(make)) || isVehiclePre1990 ? (
+                          // Free text input for new vehicle makes or pre-1990 vehicles
                           <FormControl>
                             <Input className="h-8 text-xs" placeholder="Model" {...field} />
                           </FormControl>
                         ) : (
-                          // Select dropdown for original vehicle makes
+                          // Select dropdown for original makes of 1990+ vehicles
                           <Select onValueChange={field.onChange} disabled={!make}>
                             <FormControl>
                               <SelectTrigger className="h-8 text-xs">
