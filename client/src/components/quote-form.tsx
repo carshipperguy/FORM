@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { quoteFormSchema, type QuoteFormData } from "@shared/schema";
-import { vehicleTypes, years, makes, modelsByMake } from "@/lib/vehicle-data";
+import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
 import { LocationSelector } from "@/components/location-selector";
 
 type QuoteFormProps = {
@@ -242,21 +242,30 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
                   render={({ field }) => (
                     <FormItem className="space-y-0">
                       {isCarTruckSuv ? (
-                        <Select onValueChange={field.onChange} disabled={!make}>
+                        make && newMakesWithFreeTextModels.includes(make) ? (
+                          // Free text input for new vehicle makes
                           <FormControl>
-                            <SelectTrigger className="h-8 text-xs">
-                              <SelectValue placeholder="Model" />
-                            </SelectTrigger>
+                            <Input className="h-8 text-xs" placeholder="Model" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            {make && modelsByMake[make]?.map((model) => (
-                              <SelectItem key={model} value={model}>
-                                {model}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        ) : (
+                          // Select dropdown for original vehicle makes
+                          <Select onValueChange={field.onChange} disabled={!make}>
+                            <FormControl>
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue placeholder="Model" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {make && modelsByMake[make]?.map((model) => (
+                                <SelectItem key={model} value={model}>
+                                  {model}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )
                       ) : (
+                        // Free text input for non-car/truck/SUV vehicles
                         <FormControl>
                           <Input className="h-8 text-xs" placeholder="Model" {...field} />
                         </FormControl>
