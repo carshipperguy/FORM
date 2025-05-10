@@ -181,9 +181,21 @@ export default function Home() {
       if (isSpecialVehicle) {
         console.log("🚨 HOME COMPONENT EMERGENCY OVERRIDE - Using flat rate pricing for special vehicle:", normalizedVehicleType);
         const flatRatePrice = distance * 2.50;
+        
+        // Apply minimum price of $650 for RVs specifically
+        const isRV = normalizedVehicleType === 'rv' || 
+                    normalizedVehicleType.includes('rv') || 
+                    normalizedVehicleType.includes('5th wheel');
+                    
+        const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
+        
+        if (isRV && finalPrice > flatRatePrice) {
+          console.log(`RV price adjusted to minimum in home.tsx: $${flatRatePrice.toFixed(2)} → $650 (minimum price for RVs)`);
+        }
+        
         pricing = {
-          openTransport: Math.round(flatRatePrice),
-          enclosedTransport: Math.round(flatRatePrice * 1.40),
+          openTransport: Math.round(finalPrice),
+          enclosedTransport: Math.round(finalPrice * 1.40),
           transitTime: Math.ceil(distance / 400) + 1
         };
       } else {

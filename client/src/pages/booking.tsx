@@ -124,13 +124,24 @@ export default function Booking() {
   
   if (isSpecialVehicle && data.distance) {
     console.log("🚨 BOOKING PAGE EMERGENCY OVERRIDE - Applying $2.50/mile for", vehicleType);
-    const flatRatePrice = Math.round(data.distance * 2.50);
+    const flatRatePrice = data.distance * 2.50;
+    
+    // Apply minimum price of $650 for RVs specifically
+    const isRV = vehicleType === 'rv' || 
+                vehicleType.includes('rv') || 
+                vehicleType.includes('5th wheel');
+                
+    const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
+    
+    if (isRV && finalPrice > flatRatePrice) {
+      console.log(`RV price adjusted to minimum in booking.tsx: $${flatRatePrice.toFixed(2)} → $650 (minimum price for RVs)`);
+    }
     
     // Determine which price to update based on selected transport type
     if (data.selectedTransport === 'enclosed') {
-      data.finalPrice = Math.round(flatRatePrice * 1.40); // 40% more for enclosed
+      data.finalPrice = Math.round(finalPrice * 1.40); // 40% more for enclosed
     } else {
-      data.finalPrice = flatRatePrice;
+      data.finalPrice = Math.round(finalPrice);
     }
     
     console.log("FIXED FINAL PRICE:", {

@@ -57,10 +57,22 @@ export function calculatePricing(
   
   if (isSpecialVehicleForced && distance) {
     console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.50/mile pricing for special vehicle:", vehicleType);
+    // Calculate flat rate price but ensure minimum of $650 for RVs
     const flatRatePrice = distance * FLAT_RATE_PER_MILE;
+    // Check if this is an RV vehicle type to apply minimum
+    const isRV = typeof vehicleType === 'string' && 
+                (vehicleType.toLowerCase() === 'rv' || 
+                 vehicleType.toLowerCase().includes('rv') || 
+                 vehicleType.toLowerCase().includes('5th wheel'));
+    
+    // Apply minimum price of $650 for RVs
+    const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
+    
+    console.log(`Special vehicle pricing: $${flatRatePrice.toFixed(2)} ${isRV ? `(applying $650 minimum for RV: ${finalPrice})` : ''}`);
+    
     return {
-      openTransport: Math.round(flatRatePrice),
-      enclosedTransport: Math.round(flatRatePrice * ENCLOSED_MULTIPLIER),
+      openTransport: Math.round(finalPrice),
+      enclosedTransport: Math.round(finalPrice * ENCLOSED_MULTIPLIER),
       transitTime: Math.ceil(distance / 400) + 1
     };
   }
@@ -127,10 +139,27 @@ export function calculatePricing(
     // Simple flat rate calculation
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
     
+    // Check if this is an RV vehicle type to apply minimum of $650
+    const isRV = typeof vehicleType === 'string' && 
+                (vehicleType.toLowerCase() === 'rv' || 
+                 vehicleType.toLowerCase().includes('rv') || 
+                 vehicleType.toLowerCase().includes('5th wheel'));
+    
+    // Apply minimum price of $650 for RVs
+    if (isRV) {
+      const priceBeforeMinimum = openTransportPrice;
+      openTransportPrice = Math.max(openTransportPrice, 650);
+      if (openTransportPrice > priceBeforeMinimum) {
+        console.log(`RV price adjusted to minimum: $${priceBeforeMinimum.toFixed(2)} → $650 (minimum price for RVs)`);
+      }
+    }
+    
     console.log('Flat rate calculation:', {
       distance,
       flatRatePerMile: FLAT_RATE_PER_MILE,
-      formula: `${distance} miles × $${FLAT_RATE_PER_MILE}/mile = $${openTransportPrice.toFixed(2)}`
+      formula: `${distance} miles × $${FLAT_RATE_PER_MILE}/mile = $${openTransportPrice.toFixed(2)}`,
+      isRV: isRV,
+      hasMinimumApplied: isRV && openTransportPrice === 650
     });
     
     enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
