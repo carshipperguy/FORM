@@ -224,13 +224,16 @@ const SimpleQuoteForm = () => {
       
       console.log("Distance calculation result:", distanceData);
       
-      // Calculate transit time based on distance (average 400 miles per day plus 1 day for pickup/delivery)
-      const transitTime = Math.ceil(distanceData.distance / 400) + 1;
+      // Import the pricing calculation function
+      const { calculatePricing } = await import('../lib/pricing.ts');
       
-      // Calculate pricing based on distance
-      const basePrice = Math.max(distanceData.distance * 0.65, 650); // 65 cents per mile with $650 minimum
-      const openTransportPrice = Math.round(basePrice);
-      const enclosedTransportPrice = Math.round(basePrice * 1.4); // 40% premium for enclosed
+      // Use the proper pricing calculation function from pricing.ts
+      const pricingResult = calculatePricing(distanceData.distance, formData.vehicleType);
+      
+      // Extract the calculated values
+      const transitTime = pricingResult.transitTime;
+      const openTransportPrice = pricingResult.openTransport;
+      const enclosedTransportPrice = pricingResult.enclosedTransport;
       
       console.log("Calculated pricing:", {
         distance: distanceData.distance,
