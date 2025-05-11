@@ -78,8 +78,10 @@ export function calculatePricing(
     console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.50/mile pricing for special vehicle:", vehicleType);
     // Calculate flat rate price but ensure minimum of $650 for RVs
     const flatRatePrice = distance * FLAT_RATE_PER_MILE;
-    // Check if this is an RV vehicle type to apply minimum (exact match for "rv/5th wheel")
-    const isRV = typeof vehicleType === 'string' && vehicleType.toLowerCase() === 'rv/5th wheel';
+    // Check if this is an RV vehicle type to apply minimum
+    const isRV = typeof vehicleType === 'string' && 
+                (vehicleType.toLowerCase() === 'rv' || 
+                 vehicleType.toLowerCase() === 'rv/5th wheel');
     
     // Apply minimum price of $650 for RVs
     const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
@@ -155,8 +157,10 @@ export function calculatePricing(
     // Simple flat rate calculation
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
     
-    // Check if this is an RV vehicle type to apply minimum of $650 (exact match for "rv/5th wheel")
-    const isRV = typeof vehicleType === 'string' && vehicleType.toLowerCase() === 'rv/5th wheel';
+    // Check if this is an RV vehicle type to apply minimum of $650
+    const isRV = typeof vehicleType === 'string' && 
+                (vehicleType.toLowerCase() === 'rv' || 
+                 vehicleType.toLowerCase() === 'rv/5th wheel');
     
     // Apply minimum price of $650 for RVs
     if (isRV) {

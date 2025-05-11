@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -115,38 +115,45 @@ export default function Booking() {
   }
   
   // Use the pricing library directly for consistent pricing across all pages
-  if (data.vehicleType && data.distance) {
-    try {
-      // Import the pricing calculation function
-      const { calculatePricing } = await import('../lib/pricing');
+  useEffect(() => {
+    async function recalculatePricing() {
+      if (!data?.vehicleType || !data?.distance) return;
       
-      // Re-calculate pricing using the pricing library
-      const pricing = calculatePricing(
-        data.distance,
-        data.vehicleType,
-        new Date(),
-        data.pickupLocation,
-        data.dropoffLocation
-      );
-      
-      console.log("Recalculated pricing:", pricing);
-      
-      // Set the correct price based on transport type
-      if (data.selectedTransport === 'enclosed') {
-        data.finalPrice = pricing.enclosedTransport;
-      } else {
-        data.finalPrice = pricing.openTransport;
+      try {
+        // Import the pricing calculation function
+        const { calculatePricing } = await import('../lib/pricing');
+        
+        // Re-calculate pricing using the pricing library
+        const pricing = calculatePricing(
+          data.distance,
+          data.vehicleType,
+          new Date(),
+          data.pickupLocation,
+          data.dropoffLocation
+        );
+        
+        console.log("Recalculated pricing:", pricing);
+        
+        // Set the correct price based on transport type
+        if (data.selectedTransport === 'enclosed') {
+          data.finalPrice = pricing.enclosedTransport;
+        } else {
+          data.finalPrice = pricing.openTransport;
+        }
+        
+        console.log("Final price set to:", data.finalPrice);
+      } catch (error) {
+        console.error("Error recalculating price:", error);
+        // Keep the existing price if there's an error
       }
-      
-      console.log("Final price set to:", data.finalPrice);
-    } catch (error) {
-      console.error("Error recalculating price:", error);
-      // Keep the existing price if there's an error
     }
     
-    console.log("FIXED FINAL PRICE:", {
-      distance: data.distance,
-      ratePerMile: "$2.50",
+    recalculatePricing();
+  }, [data]);
+  
+  console.log("FINAL PRICE:", {
+    distance: data?.distance,
+    finalPrice: data?.finalPrice,
       transportType: data.selectedTransport,
       finalPrice: data.finalPrice
     });
