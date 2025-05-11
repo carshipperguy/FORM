@@ -1,7 +1,7 @@
 // Pricing constants
 const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile (for long distances)
 const MINIMUM_PRICE = 450;         // Minimum charge for short routes
-const FLAT_RATE_PER_MILE = 2.50;   // $2.50 per mile for special vehicle types (boats, RVs, trailers, heavy equipment)
+const FLAT_RATE_PER_MILE = 2.00;   // $2.00 per mile for special vehicle types (boats, RVs, trailers, heavy equipment)
 
 // Vehicle type multipliers for standard vehicles
 const VEHICLE_MULTIPLIERS: Record<string, number> = {
@@ -75,7 +75,7 @@ export function calculatePricing(
   const isSpecialVehicleForced = forceSpecialVehicleCheck(vehicleType);
   
   if (isSpecialVehicleForced && distance) {
-    console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.50/mile pricing for special vehicle:", vehicleType);
+    console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.00/mile pricing for special vehicle:", vehicleType);
     // Calculate flat rate price but ensure minimum of $650 for RVs
     const flatRatePrice = distance * FLAT_RATE_PER_MILE;
     // Check if this is an RV vehicle type to apply minimum
