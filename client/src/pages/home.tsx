@@ -171,37 +171,20 @@ export default function Home() {
       // CALCULATE PRICE BASED ON VEHICLE TYPE
       let pricing;
       
-      // EMERGENCY OVERRIDE - Force flat rate pricing for special vehicle types directly in the component
-      const isSpecialVehicle = normalizedVehicleType === 'boat' || 
-                              normalizedVehicleType === 'rv' || 
-                              normalizedVehicleType.includes('rv') ||
-                              normalizedVehicleType.includes('trailer') || 
-                              normalizedVehicleType.includes('equipment');
+      // Let the pricing library handle all cases, passing locations for Snowbird route detection
+      console.log("Calling pricing function with locations:", {
+        pickupLocation: data.pickupLocation,
+        dropoffLocation: data.dropoffLocation
+      });
       
-      if (isSpecialVehicle) {
-        console.log("🚨 HOME COMPONENT EMERGENCY OVERRIDE - Using flat rate pricing for special vehicle:", normalizedVehicleType);
-        const flatRatePrice = distance * 2.50;
-        
-        // Apply minimum price of $650 for RVs specifically
-        const isRV = normalizedVehicleType === 'rv' || 
-                    normalizedVehicleType.includes('rv') || 
-                    normalizedVehicleType.includes('5th wheel');
-                    
-        const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
-        
-        if (isRV && finalPrice > flatRatePrice) {
-          console.log(`RV price adjusted to minimum in home.tsx: $${flatRatePrice.toFixed(2)} → $650 (minimum price for RVs)`);
-        }
-        
-        pricing = {
-          openTransport: Math.round(finalPrice),
-          enclosedTransport: Math.round(finalPrice * 1.40),
-          transitTime: Math.ceil(distance / 400) + 1
-        };
-      } else {
-        // Use normal pricing for standard vehicles
-        pricing = calculatePricing(distance, normalizedVehicleType);
-      }
+      // Use the pricing library for all vehicle types
+      pricing = calculatePricing(
+        distance, 
+        normalizedVehicleType, 
+        new Date(), 
+        data.pickupLocation, 
+        data.dropoffLocation
+      );
       
       console.log("Pricing calculation result:", pricing);
 
