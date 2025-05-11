@@ -192,6 +192,8 @@ export function calculatePricing(
     
     // Check for Snowbird Route: Florida to Northeast states (only for car/truck/suv)
     let isSnowbirdRoute = false;
+    let isNCGAtoNYRoute = false;
+    
     if (
       vehicleType === 'car/truck/suv' && 
       pickupLocation && 
@@ -207,6 +209,16 @@ export function calculatePricing(
       ) {
         isSnowbirdRoute = true;
         console.log(`*** SNOWBIRD ROUTE DETECTED: FL to ${dropoffState} ***`);
+      }
+      
+      // Check for NC/GA to NY route (only for car/truck/suv)
+      if (
+        vehicleType === 'car/truck/suv' &&
+        (pickupState === 'NC' || pickupState === 'GA') &&
+        dropoffState === 'NY'
+      ) {
+        isNCGAtoNYRoute = true;
+        console.log(`*** NC/GA TO NY ROUTE DETECTED: ${pickupState} to NY ***`);
       }
     }
     
@@ -225,13 +237,28 @@ export function calculatePricing(
       }
     }
     
+    // Apply NC/GA to NY Route minimum if applicable
+    if (isNCGAtoNYRoute) {
+      const priceBeforeAdjustment = basePrice;
+      basePrice = Math.max(basePrice, 1050); // $1,050 minimum for NC/GA to NY routes
+      
+      if (basePrice > priceBeforeAdjustment) {
+        console.log(`NC/GA to NY route price adjusted to minimum: $${priceBeforeAdjustment.toFixed(2)} → $1,050 (minimum price for NC/GA to NY)`);
+      }
+    }
+    
     console.log('Base price calculation:', { 
       distance,
       ratePerMile: BASE_RATE_PER_MILE,
       midRangeMultiplier: distance <= 800 ? 1.10 : 1,
       formula: distance <= 800 
         ? `${distance} miles × $${BASE_RATE_PER_MILE}/mile × 1.10 = $${basePrice.toFixed(2)}`
-        : `${distance} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`
+        : `${distance} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`,
+      specialRoutes: {
+        isSnowbirdRoute,
+        isNCGAtoNYRoute,
+        appliedMinimumPrice: isSnowbirdRoute ? 1150 : (isNCGAtoNYRoute ? 1050 : null)
+      }
     });
 
     // Ensure minimum price
