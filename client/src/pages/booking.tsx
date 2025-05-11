@@ -114,34 +114,34 @@ export default function Booking() {
     return null;
   }
   
-  // EMERGENCY OVERRIDE: Double-check for special vehicle types and apply $2.50/mile pricing
-  // This ensures consistent pricing between pages
-  const vehicleType = (data.vehicleType || '').toLowerCase();
-  const isSpecialVehicle = vehicleType === 'boat' || 
-                           vehicleType.includes('rv') || 
-                           vehicleType.includes('trailer') || 
-                           vehicleType.includes('equipment');
-  
-  if (isSpecialVehicle && data.distance) {
-    console.log("🚨 BOOKING PAGE EMERGENCY OVERRIDE - Applying $2.50/mile for", vehicleType);
-    const flatRatePrice = data.distance * 2.50;
-    
-    // Apply minimum price of $650 for RVs specifically
-    const isRV = vehicleType === 'rv' || 
-                vehicleType.includes('rv') || 
-                vehicleType.includes('5th wheel');
-                
-    const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
-    
-    if (isRV && finalPrice > flatRatePrice) {
-      console.log(`RV price adjusted to minimum in booking.tsx: $${flatRatePrice.toFixed(2)} → $650 (minimum price for RVs)`);
-    }
-    
-    // Determine which price to update based on selected transport type
-    if (data.selectedTransport === 'enclosed') {
-      data.finalPrice = Math.round(finalPrice * 1.40); // 40% more for enclosed
-    } else {
-      data.finalPrice = Math.round(finalPrice);
+  // Use the pricing library directly for consistent pricing across all pages
+  if (data.vehicleType && data.distance) {
+    try {
+      // Import the pricing calculation function
+      const { calculatePricing } = await import('../lib/pricing');
+      
+      // Re-calculate pricing using the pricing library
+      const pricing = calculatePricing(
+        data.distance,
+        data.vehicleType,
+        new Date(),
+        data.pickupLocation,
+        data.dropoffLocation
+      );
+      
+      console.log("Recalculated pricing:", pricing);
+      
+      // Set the correct price based on transport type
+      if (data.selectedTransport === 'enclosed') {
+        data.finalPrice = pricing.enclosedTransport;
+      } else {
+        data.finalPrice = pricing.openTransport;
+      }
+      
+      console.log("Final price set to:", data.finalPrice);
+    } catch (error) {
+      console.error("Error recalculating price:", error);
+      // Keep the existing price if there's an error
     }
     
     console.log("FIXED FINAL PRICE:", {

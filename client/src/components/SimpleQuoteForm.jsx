@@ -227,8 +227,14 @@ const SimpleQuoteForm = () => {
       // Import the pricing calculation function
       const { calculatePricing } = await import('../lib/pricing.ts');
       
-      // Use the proper pricing calculation function from pricing.ts
-      const pricingResult = calculatePricing(distanceData.distance, formData.vehicleType);
+      // Use the proper pricing calculation function from pricing.ts and pass locations for Snowbird rule
+      const pricingResult = calculatePricing(
+        distanceData.distance, 
+        formData.vehicleType,
+        new Date(),  // Current date
+        formData.pickupLocation,
+        formData.dropoffLocation
+      );
       
       // Extract the calculated values
       const transitTime = pricingResult.transitTime;

@@ -37,10 +37,29 @@ interface PricingResult {
   message?: string;
 }
 
+// Extract state from a location string (e.g., "Miami, FL 33101" => "FL")
+function extractState(location: string): string | null {
+  if (!location) return null;
+  
+  // Try to match "XX" or "XX " pattern where X is uppercase letter
+  const stateMatch = location.match(/\b([A-Z]{2})\b/);
+  if (stateMatch && stateMatch[1]) {
+    return stateMatch[1];
+  }
+  return null;
+}
+
+// Northeastern states for Snowbird route rule
+const NORTHEAST_STATES = [
+  'NY', 'NJ', 'PA', 'CT', 'MA', 'RI', 'VT', 'NH', 'ME', 'DE', 'MD'
+];
+
 export function calculatePricing(
   distance: number | undefined,
   vehicleType: VehicleType,
-  date: Date = new Date()
+  date: Date = new Date(),
+  pickupLocation?: string,
+  dropoffLocation?: string
 ): PricingResult {
   // EMERGENCY OVERRIDE: Force flat rate pricing for special vehicles
   const forceSpecialVehicleCheck = (vehicleType: VehicleType): boolean => {
@@ -59,11 +78,8 @@ export function calculatePricing(
     console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.50/mile pricing for special vehicle:", vehicleType);
     // Calculate flat rate price but ensure minimum of $650 for RVs
     const flatRatePrice = distance * FLAT_RATE_PER_MILE;
-    // Check if this is an RV vehicle type to apply minimum
-    const isRV = typeof vehicleType === 'string' && 
-                (vehicleType.toLowerCase() === 'rv' || 
-                 vehicleType.toLowerCase().includes('rv') || 
-                 vehicleType.toLowerCase().includes('5th wheel'));
+    // Check if this is an RV vehicle type to apply minimum (exact match for "rv/5th wheel")
+    const isRV = typeof vehicleType === 'string' && vehicleType.toLowerCase() === 'rv/5th wheel';
     
     // Apply minimum price of $650 for RVs
     const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
@@ -139,11 +155,8 @@ export function calculatePricing(
     // Simple flat rate calculation
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
     
-    // Check if this is an RV vehicle type to apply minimum of $650
-    const isRV = typeof vehicleType === 'string' && 
-                (vehicleType.toLowerCase() === 'rv' || 
-                 vehicleType.toLowerCase().includes('rv') || 
-                 vehicleType.toLowerCase().includes('5th wheel'));
+    // Check if this is an RV vehicle type to apply minimum of $650 (exact match for "rv/5th wheel")
+    const isRV = typeof vehicleType === 'string' && vehicleType.toLowerCase() === 'rv/5th wheel';
     
     // Apply minimum price of $650 for RVs
     if (isRV) {
@@ -173,10 +186,40 @@ export function calculatePricing(
     // STANDARD VEHICLE TYPE - USE PROGRESSIVE MODEL
     console.log('*** USING STANDARD VEHICLE PRICING MODEL ***');
     
+    // Check for Snowbird Route: Florida to Northeast states (only for car/truck/suv)
+    let isSnowbirdRoute = false;
+    if (
+      vehicleType === 'car/truck/suv' && 
+      pickupLocation && 
+      dropoffLocation
+    ) {
+      const pickupState = extractState(pickupLocation);
+      const dropoffState = extractState(dropoffLocation);
+      
+      if (
+        pickupState === 'FL' && 
+        dropoffState && 
+        NORTHEAST_STATES.includes(dropoffState)
+      ) {
+        isSnowbirdRoute = true;
+        console.log(`*** SNOWBIRD ROUTE DETECTED: FL to ${dropoffState} ***`);
+      }
+    }
+    
     // Calculate base price with distance multiplier
     let basePrice = distance <= 800
       ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
       : distance * BASE_RATE_PER_MILE;
+      
+    // Apply Snowbird Route minimum if applicable
+    if (isSnowbirdRoute) {
+      const priceBeforeSnowbird = basePrice;
+      basePrice = Math.max(basePrice, 1150); // $1,150 minimum for Snowbird routes
+      
+      if (basePrice > priceBeforeSnowbird) {
+        console.log(`Snowbird route price adjusted to minimum: $${priceBeforeSnowbird.toFixed(2)} → $1,150 (minimum price for FL to Northeast)`);
+      }
+    }
     
     console.log('Base price calculation:', { 
       distance,
