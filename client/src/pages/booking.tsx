@@ -153,11 +153,9 @@ export default function Booking() {
   
   console.log("FINAL PRICE:", {
     distance: data?.distance,
-    finalPrice: data?.finalPrice,
-      transportType: data.selectedTransport,
-      finalPrice: data.finalPrice
-    });
-  }
+    transportType: data?.selectedTransport,
+    finalPrice: data?.finalPrice
+  });
 
   // Get location data - preferably use the explicit ZIP codes if available
   const pickupLocation = {
