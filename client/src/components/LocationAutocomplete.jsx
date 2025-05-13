@@ -1,28 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { locationOptions } from '../lib/location-data';
+import { searchLocations, getPopularLocations } from '../lib/api';
 
 const LocationAutocomplete = ({ value, onChange, placeholder, required }) => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [searchInput, setSearchInput] = useState(value || '');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Load popular cities initially
+  useEffect(() => {
+    async function loadInitialOptions() {
+      setIsLoading(true);
+      try {
+        const data = await getPopularLocations(200);
+        setFilteredOptions(data);
+      } catch (error) {
+        console.error('Error loading popular cities:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    loadInitialOptions();
+  }, []);
   
   // Update filtered options when search input changes
   useEffect(() => {
-    if (searchInput.length >= 2) {
-      const lowerInput = searchInput.toLowerCase();
-      const results = locationOptions
-        .filter(option => 
-          option.city.toLowerCase().includes(lowerInput) || 
-          option.state.toLowerCase().includes(lowerInput) ||
-          (option.zips && option.zips.some(zip => zip.includes(lowerInput)))
-        )
-        .slice(0, 200); // Limit for performance
-      
-      setFilteredOptions(results);
-    } else {
-      // Show most populated cities by default
-      setFilteredOptions(locationOptions.slice(0, 200));
-    }
+    const debounceTimeout = setTimeout(async () => {
+      if (searchInput.length >= 2) {
+        setIsLoading(true);
+        try {
+          const results = await searchLocations(searchInput, 200);
+          setFilteredOptions(results);
+        } catch (error) {
+          console.error('Error searching locations:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    }, 300); // 300ms debounce
+    
+    return () => clearTimeout(debounceTimeout);
   }, [searchInput]);
   
   // Update the input value when the value prop changes
@@ -57,26 +75,36 @@ const LocationAutocomplete = ({ value, onChange, placeholder, required }) => {
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
         />
         
-        {showDropdown && filteredOptions.length > 0 && (
+        {showDropdown && (
           <div className="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
-            {filteredOptions.map((option, index) => (
-              <div 
-                key={index} 
-                className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
-                onClick={() => handleOptionSelect(option)}
-              >
-                <div className="flex items-center">
-                  <span className="font-normal block truncate">
-                    {option.city}, {option.state}
-                  </span>
-                </div>
-                {option.zips && option.zips.length > 0 && (
-                  <span className="text-gray-500 text-xs block ml-2">
-                    ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}
-                  </span>
-                )}
+            {isLoading ? (
+              <div className="py-3 px-3 text-gray-500 text-center text-sm">
+                Loading locations...
               </div>
-            ))}
+            ) : filteredOptions.length > 0 ? (
+              filteredOptions.map((option, index) => (
+                <div 
+                  key={index} 
+                  className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
+                  onClick={() => handleOptionSelect(option)}
+                >
+                  <div className="flex items-center">
+                    <span className="font-normal block truncate">
+                      {option.city}, {option.state}
+                    </span>
+                  </div>
+                  {option.zips && option.zips.length > 0 && (
+                    <span className="text-gray-500 text-xs block ml-2">
+                      ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="py-3 px-3 text-gray-500 text-center text-sm">
+                No matching locations found
+              </div>
+            )}
           </div>
         )}
       </div>
