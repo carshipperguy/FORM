@@ -17,7 +17,9 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   // Load popular cities on initial render
   useEffect(() => {
     async function loadPopularCities() {
-      setIsLoading(true);
+      // Only show loading indicator after a delay to avoid flicker for fast responses
+      const loadingDelay = setTimeout(() => setIsLoading(true), 150);
+      
       try {
         // Use our API client which handles development vs production environments
         const data = await getPopularLocations(200);
@@ -25,6 +27,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
       } catch (error) {
         console.error('Error loading popular cities:', error);
       } finally {
+        clearTimeout(loadingDelay);
         setIsLoading(false);
       }
     }
@@ -37,7 +40,9 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
     // Use debounce to avoid too many API calls
     const debounceTimeout = setTimeout(async () => {
       if (searchInput.length >= 2) {
-        setIsLoading(true);
+        // Only show loading indicator after a delay to avoid flicker for fast responses
+        const loadingDelay = setTimeout(() => setIsLoading(true), 150);
+        
         try {
           // Use our API client which handles development vs production environments
           const data = await searchLocations(searchInput, 200);
@@ -45,6 +50,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         } catch (error) {
           console.error('Error searching locations:', error);
         } finally {
+          clearTimeout(loadingDelay);
           setIsLoading(false);
         }
       }
