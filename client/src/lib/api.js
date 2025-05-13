@@ -9,11 +9,9 @@
  * 4. Performance is optimized by caching frequently accessed data
  */
 
-// In development, the Vite server runs on a different port than the Express server
-// Use the appropriate base URL for API requests
-const API_BASE_URL = import.meta.env.DEV 
-  ? 'http://localhost:5000/api'
-  : '/api';
+// Get the current base URL to handle all environments (development, iframe, etc.)
+// This ensures API calls work in all contexts including when embedded
+const API_BASE_URL = '/api';
 
 // Cache for popular locations to avoid unnecessary API calls
 const API_CACHE = {
@@ -101,17 +99,8 @@ export async function searchLocations(query, limit = 200) {
   
   // Otherwise fetch from API
   try {
-    // Use direct fetch in development to bypass browser CORS issues
-    let results;
-    if (import.meta.env.DEV) {
-      const response = await fetch(`http://localhost:5000/api/location-search?query=${encodeURIComponent(normalizedQuery)}&limit=${limit}`);
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
-      results = await response.json();
-    } else {
-      results = await apiGet('/location-search', { query: normalizedQuery, limit });
-    }
+    // Use consistent API path for all environments
+    const results = await apiGet('/location-search', { query: normalizedQuery, limit });
     
     // Cache the results
     SEARCH_CACHE.set(cacheKey, {
@@ -158,17 +147,8 @@ export async function getPopularLocations(limit = 200, bypassCache = false) {
   
   // Otherwise fetch from API
   try {
-    // Use direct fetch in development to bypass browser CORS issues
-    let results;
-    if (import.meta.env.DEV) {
-      const response = await fetch(`http://localhost:5000/api/location-search/popular?limit=${limit}`);
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
-      results = await response.json();
-    } else {
-      results = await apiGet('/location-search/popular', { limit });
-    }
+    // Use consistent API path for all environments
+    const results = await apiGet('/location-search/popular', { limit });
     
     // Update cache
     API_CACHE.popularLocations = results;
