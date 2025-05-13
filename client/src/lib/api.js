@@ -9,6 +9,8 @@ const API_BASE_URL = import.meta.env.DEV
   ? 'http://localhost:5000/api'
   : '/api';
 
+console.log('API_BASE_URL:', API_BASE_URL, 'DEV:', import.meta.env.DEV);
+
 /**
  * Make a GET request to the API
  * @param {string} endpoint - The API endpoint (without /api prefix)
@@ -71,7 +73,21 @@ export async function apiPost(endpoint, data = {}) {
 export async function searchLocations(query, limit = 200) {
   if (!query || query.length < 2) return [];
   
-  return apiGet('/location-search', { query, limit });
+  // Use direct fetch in development to bypass browser CORS issues
+  if (import.meta.env.DEV) {
+    try {
+      const response = await fetch(`http://localhost:5000/api/location-search?query=${encodeURIComponent(query)}&limit=${limit}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error searching locations:', error);
+      return [];
+    }
+  } else {
+    return apiGet('/location-search', { query, limit });
+  }
 }
 
 /**
@@ -80,5 +96,19 @@ export async function searchLocations(query, limit = 200) {
  * @returns {Promise<Array>} - Array of location objects
  */
 export async function getPopularLocations(limit = 200) {
-  return apiGet('/location-search/popular', { limit });
+  // Use direct fetch in development to bypass browser CORS issues
+  if (import.meta.env.DEV) {
+    try {
+      const response = await fetch(`http://localhost:5000/api/location-search/popular?limit=${limit}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching popular locations:', error);
+      return [];
+    }
+  } else {
+    return apiGet('/location-search/popular', { limit });
+  }
 }

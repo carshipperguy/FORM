@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// Remove the import of the large city-data.json file
-// import { locationOptions } from '../lib/location-data';
+// Use our API client instead of direct imports or fetch calls
+import { searchLocations, getPopularLocations } from '../lib/api';
 
 /**
  * A dropdown menu selector for locations that includes all cities and zip codes
@@ -17,18 +17,9 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
     async function loadPopularCities() {
       setIsLoading(true);
       try {
-        // In development, use port 5000 directly to bypass Vite proxy issues
-        const apiUrl = import.meta.env.DEV 
-          ? 'http://localhost:5000/api/location-search/popular'
-          : '/api/location-search/popular';
-        
-        const response = await fetch(apiUrl);
-        if (response.ok) {
-          const data = await response.json();
-          setFilteredOptions(data);
-        } else {
-          console.error('Failed to load popular cities:', response.statusText);
-        }
+        // Use our API client which handles development vs production environments
+        const data = await getPopularLocations(200);
+        setFilteredOptions(data);
       } catch (error) {
         console.error('Error loading popular cities:', error);
       } finally {
@@ -46,18 +37,9 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
       if (searchInput.length >= 2) {
         setIsLoading(true);
         try {
-          // In development, use port 5000 directly to bypass Vite proxy issues
-          const apiUrl = import.meta.env.DEV
-            ? `http://localhost:5000/api/location-search?query=${encodeURIComponent(searchInput)}`
-            : `/api/location-search?query=${encodeURIComponent(searchInput)}`;
-            
-          const response = await fetch(apiUrl);
-          if (response.ok) {
-            const data = await response.json();
-            setFilteredOptions(data);
-          } else {
-            console.error('Failed to search locations:', response.statusText);
-          }
+          // Use our API client which handles development vs production environments
+          const data = await searchLocations(searchInput, 200);
+          setFilteredOptions(data);
         } catch (error) {
           console.error('Error searching locations:', error);
         } finally {
