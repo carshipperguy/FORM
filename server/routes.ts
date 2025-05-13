@@ -73,15 +73,14 @@ export function registerRoutes(app: Express): Server {
   initLocationService();
   
   // Enable CORS for development environment only - never in production
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧪 Development environment detected - enabling CORS for local development only');
-    app.use(cors({
-      origin: ['http://localhost:5173', 'http://localhost:3000'], // Vite's default dev server ports
-      methods: ['GET', 'POST'],
-      // Don't modify credential behavior to ensure tracking works properly
-      credentials: false 
-    }));
-  }
+  console.log('🧪 Enabling CORS for development only');
+  app.use(cors({
+    // In production, this will restrict to same origin which preserves tracking
+    origin: true, 
+    methods: ['GET', 'POST'],
+    // Don't modify credential behavior to ensure tracking works properly
+    credentials: false 
+  }));
   app.get("/api/distance", async (req, res) => {
     const { origin, destination } = req.query;
 
