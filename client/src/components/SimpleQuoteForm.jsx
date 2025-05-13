@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
 import LocationMenuSelector from "./LocationMenuSelector";
+import styles from './SimpleQuoteForm.module.css';
 
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 // Use our API client instead of direct imports or fetch calls
 import { searchLocations, getPopularLocations } from '../lib/api';
+// Import CSS module instead of using inline styles
+import styles from './LocationMenuSelector.module.css';
 
 /**
  * A dropdown menu selector for locations that includes all cities and zip codes
@@ -79,10 +81,10 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   };
   
   return (
-    <div className="location-menu-container">
-      {label && <label className="location-label">{label}</label>}
+    <div className={styles['location-menu-container']}>
+      {label && <label className={styles['location-label']}>{label}</label>}
       
-      <div className="location-input-container">
+      <div className={styles['location-input-container']}>
         <input
           type="text"
           value={searchInput}
@@ -91,136 +93,32 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
           placeholder={placeholder || "Search and select from dropdown (required)"}
           required={required}
-          className="location-input"
+          className={styles['location-input']}
         />
         
         {showDropdown && (
-          <div className="location-dropdown">
+          <div className={styles['location-dropdown']}>
             {isLoading ? (
-              <div className="loading-indicator">Loading locations...</div>
+              <div className={styles['loading-indicator']}>Loading locations...</div>
             ) : filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div 
                   key={index} 
-                  className="location-option"
+                  className={styles['location-option']}
                   onClick={() => handleOptionSelect(option)}
                 >
-                  <div className="location-option-city">{option.city}, {option.state}</div>
+                  <div className={styles['location-option-city']}>{option.city}, {option.state}</div>
                   {option.zips && option.zips.length > 0 && (
-                    <div className="location-option-zip">ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}</div>
+                    <div className={styles['location-option-zip']}>ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}</div>
                   )}
                 </div>
               ))
             ) : (
-              <div className="no-results">No matching locations found</div>
+              <div className={styles['no-results']}>No matching locations found</div>
             )}
           </div>
         )}
       </div>
-      
-      <style>{`
-        .location-menu-container {
-          position: relative;
-          width: 100%;
-        }
-        
-        .location-label {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 14px;
-          font-weight: 500;
-        }
-        
-        .location-input-container {
-          position: relative;
-        }
-        
-        .location-input {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #E5E7EB;
-          border-radius: 0;
-          font-size: 14px;
-          color: #718096;
-          box-shadow: none;
-          height: 40px;
-          box-sizing: border-box;
-        }
-        
-        .location-dropdown {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          max-height: 300px;
-          overflow-y: auto;
-          background-color: white;
-          border: 1px solid #E5E7EB;
-          border-top: none;
-          border-radius: 0;
-          z-index: 1000;
-          box-shadow: none;
-        }
-        
-        .location-option {
-          padding: 8px 10px;
-          cursor: pointer;
-          border-bottom: 1px solid #E5E7EB;
-        }
-        
-        .location-option:last-child {
-          border-bottom: none;
-        }
-        
-        .location-option:hover {
-          background-color: #f9fafb;
-        }
-        
-        .location-option-city {
-          font-size: 14px;
-        }
-        
-        .location-option-zip {
-          font-size: 12px;
-          color: #718096;
-          margin-top: 2px;
-        }
-        
-        .selection-info {
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 12px;
-        }
-        
-        .selection-status {
-          padding: 2px 5px;
-          border-radius: 2px;
-        }
-        
-        .selection-status.complete {
-          color: #059669;
-        }
-        
-        .selection-status.incomplete {
-          color: #b91c1c;
-        }
-        
-        .loading-indicator {
-          padding: 12px;
-          text-align: center;
-          color: #718096;
-          font-size: 14px;
-        }
-        
-        .no-results {
-          padding: 12px;
-          text-align: center;
-          color: #718096;
-          font-size: 14px;
-        }
-      `}</style>
     </div>
   );
 };
