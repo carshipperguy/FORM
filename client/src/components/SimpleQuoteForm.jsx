@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
 import LocationMenuSelector from "./LocationMenuSelector";
-import styles from './SimpleQuoteForm.module.css';
+// CSS module import removed - reverting to inline styles
 
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
@@ -388,10 +388,10 @@ const SimpleQuoteForm = () => {
   };
 
   return (
-    <div className={styles['simple-form-container']}>
+    <div className="simple-form-container">
       <form onSubmit={handleSubmit}>
-        <div className={styles['form-section']}>
-          <div className={styles['form-header']}>
+        <div className="form-section">
+          <div className="form-header">
             <h2>Origin & Destination</h2>
           </div>
           <div className="form-fields">
@@ -597,11 +597,11 @@ const SimpleQuoteForm = () => {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className={styles['validation-errors']}>
-            <div className={styles['error-header']}>Please fix the following errors:</div>
-            <ul className={styles['error-list']}>
+          <div className="validation-errors">
+            <div className="error-header">Please fix the following errors:</div>
+            <ul>
               {validationErrors.map((error, index) => (
-                <li key={index} className={styles['error-item']}>{error.message}</li>
+                <li key={index}>{error.message}</li>
               ))}
             </ul>
           </div>
@@ -609,14 +609,10 @@ const SimpleQuoteForm = () => {
         
         <button 
           type="submit" 
-          className={styles['submit-button']} 
+          className="submit-btn" 
           disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <span className={styles['loading-indicator']}>
-              <span className={styles['loading-spinner']}>⟳</span> Calculating Quote...
-            </span>
-          ) : 'Get Quote'}
+          {isSubmitting ? 'Calculating Quote...' : 'Get Quote'}
         </button>
       </form>
 
