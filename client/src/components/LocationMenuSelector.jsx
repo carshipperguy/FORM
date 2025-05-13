@@ -105,7 +105,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         {showDropdown && (
           <div className={styles['location-dropdown']}>
             {isLoading ? (
-              <div className={styles['loading-indicator']}>Loading locations...</div>
+              <div className={styles['loading-indicator']}>Searching for locations...</div>
             ) : filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div 
@@ -120,7 +120,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
                 </div>
               ))
             ) : (
-              <div className={styles['no-results']}>No matching locations found</div>
+              <div className={styles['no-results']}>No matching locations found. Try a different city name or ZIP code.</div>
             )}
           </div>
         )}
