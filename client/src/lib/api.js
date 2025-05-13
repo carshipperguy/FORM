@@ -1,6 +1,12 @@
 /**
  * API client for making requests to the server
  * Handles the different environments (development vs production)
+ * 
+ * This client ensures that:
+ * 1. In development, direct API calls to port 5000 are used for testing
+ * 2. In production, relative paths are used to maintain proper tracking
+ * 3. All API requests include proper error handling
+ * 4. Performance is optimized by caching frequently accessed data
  */
 
 // In development, the Vite server runs on a different port than the Express server
@@ -9,7 +15,12 @@ const API_BASE_URL = import.meta.env.DEV
   ? 'http://localhost:5000/api'
   : '/api';
 
-console.log('API_BASE_URL:', API_BASE_URL, 'DEV:', import.meta.env.DEV);
+// Cache for popular locations to avoid unnecessary API calls
+const API_CACHE = {
+  popularLocations: null,
+  lastFetched: 0,
+  cacheDuration: 5 * 60 * 1000 // 5 minutes in milliseconds
+};
 
 /**
  * Make a GET request to the API
@@ -64,6 +75,10 @@ export async function apiPost(endpoint, data = {}) {
   }
 }
 
+// Cache for location search queries to avoid unnecessary API calls
+const SEARCH_CACHE = new Map();
+const SEARCH_CACHE_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+
 /**
  * Search for locations by query
  * @param {string} query - The search query (city, state, or zip)
@@ -73,42 +88,100 @@ export async function apiPost(endpoint, data = {}) {
 export async function searchLocations(query, limit = 200) {
   if (!query || query.length < 2) return [];
   
-  // Use direct fetch in development to bypass browser CORS issues
-  if (import.meta.env.DEV) {
-    try {
-      const response = await fetch(`http://localhost:5000/api/location-search?query=${encodeURIComponent(query)}&limit=${limit}`);
+  // Normalize the query for consistent caching
+  const normalizedQuery = query.trim().toLowerCase();
+  const cacheKey = `${normalizedQuery}:${limit}`;
+  
+  // Check if we have a cached result for this query
+  const now = Date.now();
+  const cachedResult = SEARCH_CACHE.get(cacheKey);
+  if (cachedResult && (now - cachedResult.timestamp < SEARCH_CACHE_DURATION)) {
+    return cachedResult.data;
+  }
+  
+  // Otherwise fetch from API
+  try {
+    // Use direct fetch in development to bypass browser CORS issues
+    let results;
+    if (import.meta.env.DEV) {
+      const response = await fetch(`http://localhost:5000/api/location-search?query=${encodeURIComponent(normalizedQuery)}&limit=${limit}`);
       if (!response.ok) {
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
-      return await response.json();
-    } catch (error) {
-      console.error('Error searching locations:', error);
-      return [];
+      results = await response.json();
+    } else {
+      results = await apiGet('/location-search', { query: normalizedQuery, limit });
     }
-  } else {
-    return apiGet('/location-search', { query, limit });
+    
+    // Cache the results
+    SEARCH_CACHE.set(cacheKey, {
+      data: results,
+      timestamp: now
+    });
+    
+    // Clean up old cache entries to prevent memory leaks
+    if (SEARCH_CACHE.size > 100) {
+      const expiredTime = now - SEARCH_CACHE_DURATION;
+      for (const [key, value] of SEARCH_CACHE.entries()) {
+        if (value.timestamp < expiredTime) {
+          SEARCH_CACHE.delete(key);
+        }
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    console.error('Error searching locations:', error);
+    // If we have a cached result, return it even if expired as a fallback
+    if (cachedResult) {
+      console.log('Using expired cache as fallback for location search');
+      return cachedResult.data;
+    }
+    return [];
   }
 }
 
 /**
  * Get popular locations
  * @param {number} limit - Maximum number of results to return
+ * @param {boolean} bypassCache - Whether to bypass the cache
  * @returns {Promise<Array>} - Array of location objects
  */
-export async function getPopularLocations(limit = 200) {
-  // Use direct fetch in development to bypass browser CORS issues
-  if (import.meta.env.DEV) {
-    try {
+export async function getPopularLocations(limit = 200, bypassCache = false) {
+  // Check if we have a valid cache and not bypassing
+  const now = Date.now();
+  if (!bypassCache && API_CACHE.popularLocations && 
+      (now - API_CACHE.lastFetched < API_CACHE.cacheDuration)) {
+    // Return cached data if available and not expired
+    return API_CACHE.popularLocations.slice(0, limit);
+  }
+  
+  // Otherwise fetch from API
+  try {
+    // Use direct fetch in development to bypass browser CORS issues
+    let results;
+    if (import.meta.env.DEV) {
       const response = await fetch(`http://localhost:5000/api/location-search/popular?limit=${limit}`);
       if (!response.ok) {
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching popular locations:', error);
-      return [];
+      results = await response.json();
+    } else {
+      results = await apiGet('/location-search/popular', { limit });
     }
-  } else {
-    return apiGet('/location-search/popular', { limit });
+    
+    // Update cache
+    API_CACHE.popularLocations = results;
+    API_CACHE.lastFetched = now;
+    
+    return results;
+  } catch (error) {
+    console.error('Error fetching popular locations:', error);
+    // If we have cached data, return it even if expired as a fallback
+    if (API_CACHE.popularLocations) {
+      console.log('Using expired cache as fallback for popular locations');
+      return API_CACHE.popularLocations.slice(0, limit);
+    }
+    return [];
   }
 }

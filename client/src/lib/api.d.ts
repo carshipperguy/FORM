@@ -24,10 +24,16 @@ export function apiPost(endpoint: string, data?: Record<string, any>): Promise<a
 
 /**
  * Search for locations by query
+ * @param query The search query string (city, state, or ZIP)
+ * @param limit Maximum number of results to return
+ * @returns Promise resolving to an array of location options
  */
 export function searchLocations(query: string, limit?: number): Promise<LocationOption[]>;
 
 /**
  * Get popular locations
+ * @param limit Maximum number of results to return
+ * @param bypassCache Whether to bypass the cache
+ * @returns Promise resolving to an array of location options
  */
-export function getPopularLocations(limit?: number): Promise<LocationOption[]>;
+export function getPopularLocations(limit?: number, bypassCache?: boolean): Promise<LocationOption[]>;
