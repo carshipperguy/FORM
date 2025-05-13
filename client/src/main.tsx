@@ -12,9 +12,6 @@ const preloadModules = async () => {
     
     // Preload API client
     await import('./lib/api');
-    
-    // Preload validation logic
-    await import('../shared/validation');
   } catch (err) {
     // Silent fail - preloading is an optimization, not a requirement
     console.warn('Module preloading encountered an issue:', err);
