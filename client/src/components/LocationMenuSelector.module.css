@@ -24,6 +24,17 @@
   box-shadow: none;
   height: 40px;
   box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: #0055FF;
+  box-shadow: 0 0 0 1px rgba(0, 85, 255, 0.2);
+}
+
+.location-input:hover:not(:focus) {
+  border-color: #D1D5DB;
 }
 
 .location-dropdown {
@@ -36,15 +47,16 @@
   background-color: white;
   border: 1px solid #E5E7EB;
   border-top: none;
-  border-radius: 0;
+  border-radius: 0 0 3px 3px;
   z-index: 1000;
-  box-shadow: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .location-option {
   padding: 8px 10px;
   cursor: pointer;
   border-bottom: 1px solid #E5E7EB;
+  transition: background-color 0.1s ease-in-out;
 }
 
 .location-option:last-child {
@@ -52,7 +64,11 @@
 }
 
 .location-option:hover {
-  background-color: #f9fafb;
+  background-color: #EFF6FF;
+}
+
+.location-option:active {
+  background-color: #DBEAFE;
 }
 
 .location-option-city {

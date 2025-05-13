@@ -98,6 +98,22 @@ const SimpleQuoteForm = () => {
 
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pricingModule, setPricingModule] = useState(null);
+  
+  // Preload pricing calculation module
+  useEffect(() => {
+    // Preload pricing module after initial render
+    const timer = setTimeout(() => {
+      import('../lib/pricing.ts').then((module) => {
+        setPricingModule(module);
+        console.log("Pricing module preloaded successfully");
+      }).catch(err => {
+        console.error("Error preloading pricing module:", err);
+      });
+    }, 1000); // Delay load for 1 second after component mounts
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Client-side validation before submission
   const validateForm = () => {
@@ -225,10 +241,10 @@ const SimpleQuoteForm = () => {
       
       console.log("Distance calculation result:", distanceData);
       
-      // Import the pricing calculation function
-      const { calculatePricing } = await import('../lib/pricing.ts');
+      // Use the preloaded pricing module if available, or import it if not
+      const { calculatePricing } = pricingModule || await import('../lib/pricing.ts');
       
-      // Use the proper pricing calculation function from pricing.ts and pass locations for Snowbird rule
+      // Use the pricing calculation function with locations for Snowbird rule detection
       const pricingResult = calculatePricing(
         distanceData.distance, 
         formData.vehicleType,
