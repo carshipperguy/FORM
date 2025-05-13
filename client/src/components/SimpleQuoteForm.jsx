@@ -620,62 +620,7 @@ const SimpleQuoteForm = () => {
         </button>
       </form>
 
-      <style>{`
-        .validation-errors {
-          margin: 10px 0;
-          padding: 10px;
-          background-color: #fee2e2;
-          border: 1px solid #ef4444;
-          border-radius: 2px;
-          color: #b91c1c;
-        }
-        
-        .error-header {
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-        
-        .validation-errors ul {
-          margin: 0;
-          padding-left: 20px;
-        }
-        
-        .validation-errors li {
-          margin: 2px 0;
-          font-size: 13px;
-        }
-        
-        .submit-btn:disabled {
-          background-color: #9ca3af;
-          cursor: not-allowed;
-        }
-      
-        .simple-form-container {
-          width: 100%;
-          max-width: 100%;
-          margin: 0 auto;
-          font-family: Arial, sans-serif;
-          background-color: #F9FAFB;
-          padding: 0;
-        }
-
-        .form-section {
-          margin-bottom: 2px;
-          border: 1px solid #E5E7EB;
-          border-bottom: none;
-        }
-        
-        .form-section:last-of-type {
-          margin-bottom: 0;
-          border-bottom: 1px solid #E5E7EB;
-        }
-
-        .form-header {
-          background-color: #002C42;
-          color: white;
-          padding: 10px 10px;
-          font-weight: 500;
-        }
+      {/* Styles moved to SimpleQuoteForm.module.css */}
 
         .form-header h2 {
           margin: 0;
