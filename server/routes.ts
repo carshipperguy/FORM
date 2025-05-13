@@ -68,6 +68,8 @@ async function getDistance(origin: string, destination: string): Promise<{distan
 }
 
 export function registerRoutes(app: Express): Server {
+  // Initialize the location service at startup
+  initLocationService();
   app.get("/api/distance", async (req, res) => {
     const { origin, destination } = req.query;
 
@@ -1228,6 +1230,41 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // Add location search API endpoints
+  app.get("/api/location-search", (req, res) => {
+    try {
+      const query = req.query.query as string || '';
+      const limit = parseInt(req.query.limit as string || '200', 10);
+      
+      if (query.length < 2) {
+        return res.json([]);
+      }
+      
+      const results = searchLocations(query, limit);
+      res.json(results);
+    } catch (error) {
+      console.error("Error in location search:", error);
+      res.status(500).json({ 
+        error: "Failed to search locations",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  app.get("/api/location-search/popular", (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string || '200', 10);
+      const results = getPopularLocations(limit);
+      res.json(results);
+    } catch (error) {
+      console.error("Error getting popular locations:", error);
+      res.status(500).json({ 
+        error: "Failed to get popular locations",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Register webhook diagnostics middleware and API endpoints
   app.use(webhookDiagnosticMiddleware);
   registerWebhookDiagnosticEndpoints(app);
