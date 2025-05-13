@@ -157,6 +157,13 @@ export function calculatePricing(
     // Simple flat rate calculation
     openTransportPrice = distance * FLAT_RATE_PER_MILE;
     
+    // Apply 40% markup for all routes under 1,500 miles
+    if (distance < 1500) {
+      const priceBeforeMarkup = openTransportPrice;
+      openTransportPrice = openTransportPrice * 1.40; // 40% markup for all routes under 1,500 miles
+      console.log(`Applied 40% markup for special vehicle route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${openTransportPrice.toFixed(2)}`);
+    }
+    
     // Check if this is an RV vehicle type to apply minimum of $650
     const isRV = typeof vehicleType === 'string' && 
                 (vehicleType.toLowerCase() === 'rv' || 
@@ -174,7 +181,8 @@ export function calculatePricing(
     console.log('Flat rate calculation:', {
       distance,
       flatRatePerMile: FLAT_RATE_PER_MILE,
-      formula: `${distance} miles × $${FLAT_RATE_PER_MILE}/mile = $${openTransportPrice.toFixed(2)}`,
+      under1500MileMarkup: distance < 1500 ? 1.40 : 1,
+      formula: `${distance} miles × $${FLAT_RATE_PER_MILE}/mile ${distance < 1500 ? '× 1.40 (markup)' : ''} = $${openTransportPrice.toFixed(2)}`,
       isRV: isRV,
       hasMinimumApplied: isRV && openTransportPrice === 650
     });
@@ -222,10 +230,17 @@ export function calculatePricing(
       }
     }
     
-    // Calculate base price with distance multiplier
+    // Calculate initial base price with distance multiplier
     let basePrice = distance <= 800
       ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
       : distance * BASE_RATE_PER_MILE;
+    
+    // Apply 40% markup for all routes under 1,500 miles
+    if (distance < 1500) {
+      const priceBeforeMarkup = basePrice;
+      basePrice = basePrice * 1.40; // 40% markup for all routes under 1,500 miles
+      console.log(`Applied 40% markup for route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
+    }
       
     // Apply Snowbird Route minimum if applicable
     if (isSnowbirdRoute) {
@@ -251,9 +266,8 @@ export function calculatePricing(
       distance,
       ratePerMile: BASE_RATE_PER_MILE,
       midRangeMultiplier: distance <= 800 ? 1.10 : 1,
-      formula: distance <= 800 
-        ? `${distance} miles × $${BASE_RATE_PER_MILE}/mile × 1.10 = $${basePrice.toFixed(2)}`
-        : `${distance} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`,
+      under1500MileMarkup: distance < 1500 ? 1.40 : 1,
+      formula: `${distance} miles × $${BASE_RATE_PER_MILE}/mile ${distance <= 800 ? '× 1.10' : ''} ${distance < 1500 ? '× 1.40 (markup)' : ''} = $${basePrice.toFixed(2)}`,
       specialRoutes: {
         isSnowbirdRoute,
         isNCGAtoNYRoute,
