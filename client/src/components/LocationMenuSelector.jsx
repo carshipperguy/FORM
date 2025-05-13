@@ -1,32 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { locationOptions } from '../lib/location-data';
+// Remove the import of the large city-data.json file
+// import { locationOptions } from '../lib/location-data';
 
 /**
  * A dropdown menu selector for locations that includes all cities and zip codes
- * from the US cities database.
+ * from the US cities database. Uses server-side API for location search to optimize performance.
  */
 const LocationMenuSelector = ({ value, onChange, placeholder, required, label }) => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Update filtered options when search input changes
+  // Load popular cities on initial render
   useEffect(() => {
-    if (searchInput.length >= 2) {
-      const lowerInput = searchInput.toLowerCase();
-      const results = locationOptions
-        .filter(option => 
-          option.city.toLowerCase().includes(lowerInput) || 
-          option.state.toLowerCase().includes(lowerInput) ||
-          (option.zips && option.zips.some(zip => zip.includes(lowerInput)))
-        )
-        .slice(0, 200); // Limit for performance
-      
-      setFilteredOptions(results);
-    } else {
-      // Show most populated cities by default
-      setFilteredOptions(locationOptions.slice(0, 200));
+    async function loadPopularCities() {
+      setIsLoading(true);
+      try {
+        // In development, use port 5000 directly to bypass Vite proxy issues
+        const apiUrl = import.meta.env.DEV 
+          ? 'http://localhost:5000/api/location-search/popular'
+          : '/api/location-search/popular';
+        
+        const response = await fetch(apiUrl);
+        if (response.ok) {
+          const data = await response.json();
+          setFilteredOptions(data);
+        } else {
+          console.error('Failed to load popular cities:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error loading popular cities:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
+    
+    loadPopularCities();
+  }, []);
+  
+  // Update filtered options when search input changes using API
+  useEffect(() => {
+    // Use debounce to avoid too many API calls
+    const debounceTimeout = setTimeout(async () => {
+      if (searchInput.length >= 2) {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`/api/location-search?query=${encodeURIComponent(searchInput)}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFilteredOptions(data);
+          } else {
+            console.error('Failed to search locations:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error searching locations:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    }, 300); // 300ms debounce
+    
+    return () => clearTimeout(debounceTimeout);
   }, [searchInput]);
   
   const handleInputChange = (e) => {
@@ -72,20 +107,26 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           className="location-input"
         />
         
-        {showDropdown && filteredOptions.length > 0 && (
+        {showDropdown && (
           <div className="location-dropdown">
-            {filteredOptions.map((option, index) => (
-              <div 
-                key={index} 
-                className="location-option"
-                onClick={() => handleOptionSelect(option)}
-              >
-                <div className="location-option-city">{option.city}, {option.state}</div>
-                {option.zips && option.zips.length > 0 && (
-                  <div className="location-option-zip">ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}</div>
-                )}
-              </div>
-            ))}
+            {isLoading ? (
+              <div className="loading-indicator">Loading locations...</div>
+            ) : filteredOptions.length > 0 ? (
+              filteredOptions.map((option, index) => (
+                <div 
+                  key={index} 
+                  className="location-option"
+                  onClick={() => handleOptionSelect(option)}
+                >
+                  <div className="location-option-city">{option.city}, {option.state}</div>
+                  {option.zips && option.zips.length > 0 && (
+                    <div className="location-option-zip">ZIP: {option.zips.slice(0, 3).join(', ')}{option.zips.length > 3 ? '...' : ''}</div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="no-results">No matching locations found</div>
+            )}
           </div>
         )}
       </div>
@@ -177,6 +218,20 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
         
         .selection-status.incomplete {
           color: #b91c1c;
+        }
+        
+        .loading-indicator {
+          padding: 12px;
+          text-align: center;
+          color: #718096;
+          font-size: 14px;
+        }
+        
+        .no-results {
+          padding: 12px;
+          text-align: center;
+          color: #718096;
+          font-size: 14px;
         }
       `}</style>
     </div>
