@@ -46,7 +46,12 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
       if (searchInput.length >= 2) {
         setIsLoading(true);
         try {
-          const response = await fetch(`/api/location-search?query=${encodeURIComponent(searchInput)}`);
+          // In development, use port 5000 directly to bypass Vite proxy issues
+          const apiUrl = import.meta.env.DEV
+            ? `http://localhost:5000/api/location-search?query=${encodeURIComponent(searchInput)}`
+            : `/api/location-search?query=${encodeURIComponent(searchInput)}`;
+            
+          const response = await fetch(apiUrl);
           if (response.ok) {
             const data = await response.json();
             setFilteredOptions(data);

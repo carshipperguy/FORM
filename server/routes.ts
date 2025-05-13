@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import cors from "cors";
 import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
@@ -70,6 +71,17 @@ async function getDistance(origin: string, destination: string): Promise<{distan
 export function registerRoutes(app: Express): Server {
   // Initialize the location service at startup
   initLocationService();
+  
+  // Enable CORS for development environment only - never in production
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🧪 Development environment detected - enabling CORS for local development only');
+    app.use(cors({
+      origin: ['http://localhost:5173', 'http://localhost:3000'], // Vite's default dev server ports
+      methods: ['GET', 'POST'],
+      // Don't modify credential behavior to ensure tracking works properly
+      credentials: false 
+    }));
+  }
   app.get("/api/distance", async (req, res) => {
     const { origin, destination } = req.query;
 
