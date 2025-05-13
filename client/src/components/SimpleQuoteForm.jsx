@@ -405,7 +405,7 @@ const SimpleQuoteForm = () => {
 
   return (
     <div className="simple-form-container">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="fade-in">
         <div className="form-section">
           <div className="form-header">
             <h2>Origin & Destination</h2>
@@ -635,17 +635,38 @@ const SimpleQuoteForm = () => {
 
       <style>{`
         .validation-errors {
-          margin: 10px 0;
-          padding: 10px;
+          margin: 15px 0;
+          padding: 12px;
           background-color: #fee2e2;
-          border: 1px solid #ef4444;
-          border-radius: 2px;
+          border-left: 4px solid #ef4444;
+          border-radius: 0 3px 3px 0;
           color: #b91c1c;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          animation: fadeInError 0.3s ease;
+        }
+        
+        @keyframes fadeInError {
+          from { 
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .error-header {
           font-weight: bold;
           margin-bottom: 5px;
+          display: flex;
+          align-items: center;
+        }
+        
+        .error-header::before {
+          content: "⚠️";
+          margin-right: 6px;
+          font-size: 14px;
         }
         
         .validation-errors ul {
@@ -654,8 +675,9 @@ const SimpleQuoteForm = () => {
         }
         
         .validation-errors li {
-          margin: 2px 0;
+          margin: 3px 0;
           font-size: 13px;
+          line-height: 1.4;
         }
         
         .submit-btn:disabled {
@@ -691,6 +713,23 @@ const SimpleQuoteForm = () => {
           }
         }
       
+        .fade-in {
+          opacity: 0;
+          transform: translateY(10px);
+          animation: fadeInForm 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInForm {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         .simple-form-container {
           width: 100%;
           max-width: 100%;
@@ -736,6 +775,10 @@ const SimpleQuoteForm = () => {
         
         .form-field:last-child {
           margin-bottom: 0;
+        }
+        
+        .form-field {
+          transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease, margin 0.3s ease;
         }
         
         .form-field.hidden {
