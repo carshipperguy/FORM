@@ -627,6 +627,7 @@ const SimpleQuoteForm = () => {
           type="submit" 
           className="submit-btn" 
           disabled={isSubmitting}
+          aria-busy={isSubmitting}
         >
           {isSubmitting ? 'Calculating Quote...' : 'Get Quote'}
         </button>
@@ -660,6 +661,34 @@ const SimpleQuoteForm = () => {
         .submit-btn:disabled {
           background-color: #9ca3af;
           cursor: not-allowed;
+          position: relative;
+        }
+        
+        .submit-btn[aria-busy="true"] {
+          padding-left: 35px;
+        }
+        
+        .submit-btn[aria-busy="true"]::before {
+          content: "";
+          position: absolute;
+          left: 15px;
+          top: 50%;
+          width: 16px;
+          height: 16px;
+          margin-top: -8px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.5);
+          border-top-color: white;
+          animation: button-loading-spinner 0.6s linear infinite;
+        }
+        
+        @keyframes button-loading-spinner {
+          from {
+            transform: rotate(0turn);
+          }
+          to {
+            transform: rotate(1turn);
+          }
         }
       
         .simple-form-container {
@@ -729,6 +758,19 @@ const SimpleQuoteForm = () => {
           height: 40px;
           box-sizing: border-box;
           -webkit-appearance: none;
+          transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-field input:focus,
+        .form-field select:focus {
+          outline: none;
+          border-color: #0055FF;
+          box-shadow: 0 0 0 1px rgba(0, 85, 255, 0.2);
+        }
+        
+        .form-field input:hover:not(:focus),
+        .form-field select:hover:not(:focus) {
+          border-color: #D1D5DB;
         }
         
         .form-field select {
@@ -737,6 +779,7 @@ const SimpleQuoteForm = () => {
           background-repeat: no-repeat;
           background-size: 20px 20px;
           padding-right: 30px;
+          cursor: pointer;
         }
         
         .location-field [role="combobox"] {
@@ -759,15 +802,26 @@ const SimpleQuoteForm = () => {
           background-color: #002C42;
           color: white;
           border: none;
+          border-radius: 3px;
           font-weight: 500;
           cursor: pointer;
           font-size: 16px;
           margin-top: 10px;
           height: 44px;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
         }
 
         .submit-btn:hover {
           background-color: #003b59;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .submit-btn:active {
+          transform: translateY(0);
+          box-shadow: none;
         }
 
         /* Always use mobile styling regardless of device (for iframe) */
