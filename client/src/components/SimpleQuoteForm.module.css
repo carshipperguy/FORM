@@ -19,36 +19,66 @@
 
 .error-item {
   margin-bottom: 2px;
+  font-size: 13px;
+}
+
+/* Form Structure */
+.simple-form-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: #F9FAFB;
+  padding: 0;
 }
 
 .form-section {
-  margin-bottom: 20px;
+  margin-bottom: 2px;
+  border: 1px solid #E5E7EB;
+  border-bottom: none;
 }
 
-.form-row {
-  margin-bottom: 12px;
+.form-section:last-of-type {
+  margin-bottom: 0;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .form-header {
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-
-.fieldset {
-  border: none;
-  padding: 0;
-  margin: 0 0 20px 0;
-}
-
-.fieldset-header {
+  background-color: #002C42;
+  color: white;
+  padding: 10px 10px;
   font-weight: 500;
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #2c3e50;
 }
 
+.form-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.form-fields {
+  padding: 8px;
+  background-color: white;
+}
+
+.form-field {
+  margin-bottom: 8px;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.form-field.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  transform: translateY(-10px);
+}
+
+/* Submit Button */
 .submit-button {
   background-color: #0055FF;
   color: white;
@@ -60,6 +90,7 @@
   font-size: 16px;
   width: 100%;
   transition: background-color 0.2s;
+  margin-top: 10px;
 }
 
 .submit-button:hover {
@@ -67,8 +98,33 @@
 }
 
 .submit-button:disabled {
-  background-color: #cccccc;
+  background-color: #9ca3af;
   cursor: not-allowed;
+}
+
+/* Form Controls */
+.form-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
+  background-color: white;
+  font-size: 14px;
+  color: #262626;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
+  font-size: 14px;
+  color: #262626;
 }
 
 .required-marker {
@@ -76,6 +132,7 @@
   margin-left: 3px;
 }
 
+/* Loading Indicators */
 .loading-indicator {
   display: flex;
   align-items: center;
@@ -94,4 +151,67 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Other Elements */
+.radio-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+
+.fieldset-legend {
+  font-weight: 500;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+/* Vehicle Type Images */
+.vehicle-type-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.vehicle-option {
+  flex: 1 0 calc(33.333% - 5px);
+  min-width: 90px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vehicle-option:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.vehicle-option.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.vehicle-icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 5px;
+}
+
+.vehicle-label {
+  font-size: 12px;
+  display: block;
 }

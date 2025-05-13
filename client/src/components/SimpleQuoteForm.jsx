@@ -388,10 +388,10 @@ const SimpleQuoteForm = () => {
   };
 
   return (
-    <div className="simple-form-container">
+    <div className={styles['simple-form-container']}>
       <form onSubmit={handleSubmit}>
-        <div className="form-section">
-          <div className="form-header">
+        <div className={styles['form-section']}>
+          <div className={styles['form-header']}>
             <h2>Origin & Destination</h2>
           </div>
           <div className="form-fields">
@@ -597,11 +597,11 @@ const SimpleQuoteForm = () => {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="validation-errors">
-            <div className="error-header">Please fix the following errors:</div>
-            <ul>
+          <div className={styles['validation-errors']}>
+            <div className={styles['error-header']}>Please fix the following errors:</div>
+            <ul className={styles['error-list']}>
               {validationErrors.map((error, index) => (
-                <li key={index}>{error.message}</li>
+                <li key={index} className={styles['error-item']}>{error.message}</li>
               ))}
             </ul>
           </div>
@@ -609,10 +609,14 @@ const SimpleQuoteForm = () => {
         
         <button 
           type="submit" 
-          className="submit-btn" 
+          className={styles['submit-button']} 
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Calculating Quote...' : 'Get Quote'}
+          {isSubmitting ? (
+            <span className={styles['loading-indicator']}>
+              <span className={styles['loading-spinner']}>⟳</span> Calculating Quote...
+            </span>
+          ) : 'Get Quote'}
         </button>
       </form>
 
