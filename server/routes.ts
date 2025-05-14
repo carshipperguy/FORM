@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertQuoteSchema } from "@shared/schema";
 import { sendConfirmationEmail, sendConfirmationSMS } from "./utils/notifications";
 import { sendToWebhook } from "./utils/webhook";
+import { sendAttributionToCRM } from "./utils/attribution-webhook";
 import { registerWebhookDiagnosticEndpoints, webhookDiagnosticMiddleware } from "./utils/webhook-api";
 import { runWebhookHealthChecks, getWebhookMonitorReport } from "./utils/webhook-monitor";
 import { validateFormData, formatValidationErrors } from "../shared/validation";
@@ -218,6 +219,12 @@ export function registerRoutes(app: Express): Server {
       
       if (!webhookResult.success) {
         console.warn("Webhook delivery warning:", webhookResult.message);
+      } else {
+        // Send attribution data to CRM separately in a non-blocking way
+        // Adding a slight delay to ensure main webhook completes first
+        setTimeout(() => {
+          sendAttributionToCRM(bookingDetails);
+        }, 250);
       }
       
       res.json({
@@ -611,6 +618,12 @@ export function registerRoutes(app: Express): Server {
       
       if (webhookResult.success) {
         console.log("✅ WEBHOOK TEST SUCCESSFUL");
+        
+        // Send attribution data to CRM separately for test data as well
+        setTimeout(() => {
+          sendAttributionToCRM(testData);
+        }, 250);
+        
         res.json({
           success: true,
           message: "Webhook test successful - check your Zapier dashboard for a test lead"
@@ -1039,6 +1052,13 @@ export function registerRoutes(app: Express): Server {
       
       if (webhookResult.success) {
         console.log("🎉 WEBHOOK SUCCESSFULLY DELIVERED TO CRM");
+        
+        // Send attribution data to CRM separately in a non-blocking way
+        // Adding a slight delay to ensure main webhook completes first
+        setTimeout(() => {
+          sendAttributionToCRM(formData);
+        }, 250);
+        
         res.json({ 
           success: true, 
           message: "Lead successfully sent to CRM system"
