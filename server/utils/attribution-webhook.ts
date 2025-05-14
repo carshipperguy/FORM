@@ -70,11 +70,14 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
       return;
     }
     
+    // Format the URL with https:// if not already included
+    const crmUrl = crmDomain.startsWith('http') ? crmDomain : `https://${crmDomain}`;
+    
     // Log what we're sending (but never log the actual payload to avoid exposing PII)
-    console.log(`🔄 Sending attribution data to CRM (${crmDomain}) - non-blocking`);
+    console.log(`🔄 Sending attribution data to CRM (${crmUrl}) - non-blocking`);
     
     // Send to CRM endpoint - non-blocking
-    fetch(`https://${crmDomain}/api/crm/track-lead-source`, {
+    fetch(`${crmUrl}/api/crm/track-lead-source`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
