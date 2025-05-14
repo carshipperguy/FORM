@@ -1047,6 +1047,11 @@ export function registerRoutes(app: Express): Server {
       
       console.log("✅ WEBHOOK DATA VALIDATION PASSED - Sending to external system");
       
+      // Fire attribution webhook independently and immediately
+      // Completely isolated from Zapier and main form flow
+      console.log("🎯 Attribution webhook fired");
+      sendAttributionToCRM(formData);
+      
       // DIAGNOSTIC: Add timestamp and unique ID to track this submission
       const diagnosticId = `diag_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
       console.log(`📊 [${diagnosticId}] ATTEMPTING MAIN WEBHOOK - ${new Date().toISOString()}`);
@@ -1058,13 +1063,7 @@ export function registerRoutes(app: Express): Server {
       console.log(`📊 [${diagnosticId}] WEBHOOK RESULT: ${webhookResult.success ? 'SUCCESS' : 'FAILURE'} - ${new Date().toISOString()}`);
       
       if (webhookResult.success) {
-        console.log(`🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM - Will attempt attribution webhook in 250ms`);
-        
-        // Send attribution data to CRM separately in a non-blocking way
-        // Adding a slight delay to ensure main webhook completes first
-        setTimeout(() => {
-          sendAttributionToCRM(formData);
-        }, 250);
+        console.log(`🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM`);
         
         res.json({ 
           success: true, 
