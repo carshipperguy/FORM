@@ -1047,11 +1047,18 @@ export function registerRoutes(app: Express): Server {
       
       console.log("✅ WEBHOOK DATA VALIDATION PASSED - Sending to external system");
       
+      // DIAGNOSTIC: Add timestamp and unique ID to track this submission
+      const diagnosticId = `diag_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+      console.log(`📊 [${diagnosticId}] ATTEMPTING MAIN WEBHOOK - ${new Date().toISOString()}`);
+      
       // Send the webhook - this is the actual CRM integration
       const webhookResult = await sendToWebhook(formData);
       
+      // DIAGNOSTIC: Log webhook result with the same ID for correlation
+      console.log(`📊 [${diagnosticId}] WEBHOOK RESULT: ${webhookResult.success ? 'SUCCESS' : 'FAILURE'} - ${new Date().toISOString()}`);
+      
       if (webhookResult.success) {
-        console.log("🎉 WEBHOOK SUCCESSFULLY DELIVERED TO CRM");
+        console.log(`🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM - Will attempt attribution webhook in 250ms`);
         
         // Send attribution data to CRM separately in a non-blocking way
         // Adding a slight delay to ensure main webhook completes first
