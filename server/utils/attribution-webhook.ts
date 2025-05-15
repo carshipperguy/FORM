@@ -6,6 +6,7 @@
  * 
  * This is an additive-only implementation that preserves all existing functionality.
  */
+import * as https from 'https';
 
 /**
  * Interface for the attribution data payload
@@ -148,8 +149,7 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
       // Try a fallback with Node.js built-in https module - no external dependencies
       console.log('🔄 ATTEMPTING EMERGENCY FALLBACK DIRECT HTTPS REQUEST');
       
-      // Import https directly - this is guaranteed to work in Node
-      const https = require('https');
+      // Already imported https at the top of the file - no need to require it here
       
       // Create the request options with explicit parameters
       const requestOptions = {
@@ -164,12 +164,12 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
         }
       };
       
-      // Create the actual request
-      const fallbackReq = https.request(requestOptions, (res) => {
+      // Create the actual request with type annotations
+      const fallbackReq = https.request(requestOptions, (res: any) => {
         console.log(`🔄 FALLBACK ATTRIBUTION WEBHOOK RESPONSE - Status: ${res.statusCode}`);
         
         let responseData = '';
-        res.on('data', (chunk) => {
+        res.on('data', (chunk: any) => {
           responseData += chunk;
         });
         
@@ -182,9 +182,9 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
         });
       });
       
-      // Handle request errors
-      fallbackReq.on('error', (err) => {
-        console.error(`❌❌ CRITICAL: Both primary and fallback attribution webhook methods failed`, err);
+      // Handle request errors with type annotation
+      fallbackReq.on('error', (err: any) => {
+        console.error(`❌❌ CRITICAL: Both primary and fallback attribution webhook methods failed: ${err.message}`);
       });
       
       // Write the payload to the request
