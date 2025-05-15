@@ -110,33 +110,87 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
       referrer: payload.referrer
     })}`);
     
-    // Send to CRM endpoint - explicitly await to get full error details
-    console.log(`🔄 SENDING ATTRIBUTION DATA TO CRM: ${webhookUrl}`);
+    // Direct fetch implementation with explicit HTTPS url and maximum error handling
+    // No environment variables, no try/catch swallowing errors
+    console.log(`🚨 CRITICAL: SENDING ATTRIBUTION DATA TO CRM: https://amerigoautotransport.replit.app/api/crm/track-lead-source`);
     
-    try {
-      const response = await fetch(webhookUrl, {
+    // No more async/await pattern - use direct promise with explicit error handling
+    // Log entire process for debugging
+    console.log(`📦 ATTRIBUTION PAYLOAD BEING SENT: ${JSON.stringify(payload)}`);
+    
+    // Direct fetch to explicit domain - no variables, no conditions
+    fetch('https://amerigoautotransport.replit.app/api/crm/track-lead-source', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Attribution-Source': 'quote-calculator',
+        'User-Agent': 'Amerigo-Quote-Form/1.0'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => {
+      console.log(`🔄 ATTRIBUTION WEBHOOK RESPONSE RECEIVED - Status: ${response.status}`);
+      return response.text().then(text => ({ status: response.status, text }));
+    })
+    .then(({ status, text }) => {
+      if (status >= 200 && status < 300) {
+        console.log(`✅ ATTRIBUTION WEBHOOK SUCCESS - Status: ${status}, Response: ${text || 'Empty response'}`);
+      } else {
+        console.error(`❌ ATTRIBUTION WEBHOOK ERROR - Status: ${status}, Response: ${text || 'No error details'}`);
+      }
+    })
+    .catch(error => {
+      // Log absolutely everything about this error
+      console.error(`❌ CRITICAL WEBHOOK FAILURE: ${error.message}`);
+      console.error(`Stack: ${error.stack || 'No stack trace'}`);
+      console.error(`Full error details: ${JSON.stringify(error)}`);
+      
+      // Try a fallback with Node.js built-in https module - no external dependencies
+      console.log('🔄 ATTEMPTING EMERGENCY FALLBACK DIRECT HTTPS REQUEST');
+      
+      // Import https directly - this is guaranteed to work in Node
+      const https = require('https');
+      
+      // Create the request options with explicit parameters
+      const requestOptions = {
+        hostname: 'amerigoautotransport.replit.app',
+        port: 443,
+        path: '/api/crm/track-lead-source',
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'X-Attribution-Source': 'quote-calculator'
-        },
-        body: JSON.stringify(payload)
+          'X-Attribution-Source': 'quote-calculator-fallback',
+          'User-Agent': 'Amerigo-Quote-Form-Fallback/1.0'
+        }
+      };
+      
+      // Create the actual request
+      const fallbackReq = https.request(requestOptions, (res) => {
+        console.log(`🔄 FALLBACK ATTRIBUTION WEBHOOK RESPONSE - Status: ${res.statusCode}`);
+        
+        let responseData = '';
+        res.on('data', (chunk) => {
+          responseData += chunk;
+        });
+        
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            console.log(`✅ FALLBACK ATTRIBUTION WEBHOOK SUCCESS - Response: ${responseData || 'Empty response'}`);
+          } else {
+            console.error(`❌ FALLBACK ATTRIBUTION WEBHOOK ERROR - Status: ${res.statusCode}, Response: ${responseData || 'No error details'}`);
+          }
+        });
       });
       
-      // Check response status
-      if (response.ok) {
-        const responseText = await response.text();
-        console.log(`✅ ATTRIBUTION WEBHOOK SUCCESS - Status: ${response.status}, Response: ${responseText || 'Empty response'}`);
-      } else {
-        const errorText = await response.text();
-        console.error(`❌ ATTRIBUTION WEBHOOK ERROR - Status: ${response.status}, Response: ${errorText || 'No error details'}`);
-      }
-    } catch (fetchError) {
-      // Detailed error logging
-      console.error(`❌ ATTRIBUTION WEBHOOK NETWORK ERROR:`, 
-        fetchError instanceof Error ? fetchError.message : String(fetchError),
-        fetchError instanceof Error && fetchError.stack ? `\nStack: ${fetchError.stack}` : '');
-    }
+      // Handle request errors
+      fallbackReq.on('error', (err) => {
+        console.error(`❌❌ CRITICAL: Both primary and fallback attribution webhook methods failed`, err);
+      });
+      
+      // Write the payload to the request
+      fallbackReq.write(JSON.stringify(payload));
+      fallbackReq.end();
+    });
   } catch (error) {
     // Log error but don't disrupt main flow
     console.error(`❌ ATTRIBUTION WEBHOOK FAILED (Processing Error):`,
