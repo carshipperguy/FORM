@@ -77,12 +77,14 @@ export async function sendAttributionToCRM(leadData: any): Promise<void> {
     }
     
     // Use environment variable for CRM domain if available
-    const crmDomain = process.env.CRM_DOMAIN || '<YOUR_CRM_DOMAIN>';
-    console.log(`🔍 CRM_DOMAIN from env: "${crmDomain}"`);
+    // HOTFIX: Hardcode the domain since environment variable access is failing
+    const crmDomain = 'amerigoautotransport.replit.app';
+    console.log(`🔍 CRM_DOMAIN: "${crmDomain}"`);
     
-    // Skip if no domain is configured (prevents errors in development)
-    if (crmDomain === '<YOUR_CRM_DOMAIN>') {
-      console.warn('❌ ATTRIBUTION WEBHOOK SKIPPED - CRM_DOMAIN environment variable not configured');
+    // No longer need this check since we're hardcoding the domain
+    // Keeping the check for any future environment variable usage
+    if (!crmDomain) {
+      console.warn('❌ ATTRIBUTION WEBHOOK SKIPPED - CRM domain not configured');
       return;
     }
     
