@@ -23,7 +23,7 @@ export const newMakesWithFreeTextModels = [
   "Ferrari", "Fiat", "Fisker", "Genesis", "Geo", "Hummer", "Infiniti",
   "International", "Isuzu", "Jaguar", "Karma", "Koenigsegg", "Lamborghini",
   "Lancia", "Land Rover", "Lincoln", "Lotus", "Lucid", "Maserati", "Maybach",
-  "Mazda", "McLaren", "Mercury", "Mini", "Mitsubishi", "Oldsmobile",
+  "Mazda", "McLaren", "Mercedes", "Mercedes-Benz", "Mercury", "Mini", "Mitsubishi", "Oldsmobile",
   "Opel", "Peugeot", "Plymouth", "Polestar", "Pontiac", "Porsche", "Renault",
   "Rivian", "Rolls-Royce", "Saab", "Saleen", "Saturn", "Scion", "Seat", "Skoda",
   "Smart", "Spyker", "Suzuki", "Tata", "VinFast", "Volvo", "Yugo"
@@ -31,7 +31,7 @@ export const newMakesWithFreeTextModels = [
 
 // Combine all makes and sort alphabetically
 export const makes = [
-  "Toyota", "Honda", "Ford", "Chevrolet", "BMW", "Mercedes", 
+  "Toyota", "Honda", "Ford", "Chevrolet", "BMW", 
   "Audi", "Tesla", "RAM", "Ram", "GMC", "Nissan", "Jeep", "Hyundai", 
   "Kia", "Volkswagen", "Subaru", "Lexus", "Dodge",
   ...newMakesWithFreeTextModels
@@ -62,11 +62,6 @@ export const modelsByMake: Record<string, string[]> = {
     "Traverse", "Uplander", "Vega", "Venture", "Volt"
   ].sort(),
   BMW: ["3 Series", "5 Series", "7 Series", "M3", "M5", "X3", "X5", "X7"].sort(),
-  Mercedes: ["A-Class", "C-Class", "E-Class", "G-Class", "GLC", "GLE", "S-Class"].sort(),
-  "Mercedes-Benz": [
-    "Metris Cargo Van", "Sprinter 1500", "Sprinter 2500", "Sprinter 3500", "Sprinter 4500",
-    "Sprinter Cab Chassis", "Sprinter Cargo Van", "Sprinter Crew Van", "Sprinter Passenger Van"
-  ].sort(),
   Audi: ["A3", "A4", "A6", "e-tron", "Q5", "Q7", "RS5", "RS7"].sort(),
   Tesla: ["Cybertruck", "Model 3", "Model S", "Model X", "Model Y"].sort(),
   RAM: ["1500", "2500", "3500", "ProMaster"].sort(),
