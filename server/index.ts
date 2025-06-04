@@ -12,7 +12,6 @@ app.use((req, res, next) => {
   
   // In development, allow all origins for local development
   if (app.get("env") === "development") {
-    console.log('🧪 Enabling CORS for development only');
     res.header('Access-Control-Allow-Origin', '*');
   } else {
     // Only allow specific production domains in production
