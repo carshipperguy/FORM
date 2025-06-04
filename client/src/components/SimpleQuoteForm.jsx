@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
+import { calculatePricing } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
 // CSS module import removed - reverting to inline styles
 
@@ -98,22 +99,6 @@ const SimpleQuoteForm = () => {
 
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pricingModule, setPricingModule] = useState(null);
-  
-  // Preload pricing calculation module
-  useEffect(() => {
-    // Preload pricing module after initial render
-    const timer = setTimeout(() => {
-      import('../lib/pricing.ts').then((module) => {
-        setPricingModule(module);
-        console.log("Pricing module preloaded successfully");
-      }).catch(err => {
-        console.error("Error preloading pricing module:", err);
-      });
-    }, 1000); // Delay load for 1 second after component mounts
-    
-    return () => clearTimeout(timer);
-  }, []);
   
   // Client-side validation before submission
   const validateForm = () => {
@@ -241,8 +226,7 @@ const SimpleQuoteForm = () => {
       
       console.log("Distance calculation result:", distanceData);
       
-      // Use the preloaded pricing module if available, or import it if not
-      const { calculatePricing } = pricingModule || await import('../lib/pricing.ts');
+      // Use the imported pricing calculation function
       
       // Use the pricing calculation function with locations for Snowbird rule detection
       const pricingResult = calculatePricing(
