@@ -1,0 +1,73 @@
+DO NOT IMPLEMENT — REQUESTING CONFIRMATION ONLY
+This is a critical pricing rules update. I am not asking for any implementation yet.
+First, I need Replit to explicitly confirm that it fully understands the logic, order of operations, and scope before any changes are made.
+
+MASTER PRICING RULE LOGIC (CONFIRMATION REQUIRED)
+
+Please confirm that the following 4 logic rules can be implemented strictly inside the quote calculator pricing logic, with no impact to:
+
+UI rendering
+
+Form validation
+
+Database schema
+
+Webhook logic
+
+Submission/posting behavior
+
+Dispatch or carrier modules
+
+RULE 1: Cars/Trucks/SUVs Minimum Price Floor
+No quote for a car, truck, or SUV should ever be below $695.
+
+js
+Copy
+Edit
+if (['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) && basePrice < 695) {
+  basePrice = 695;
+}
+RULE 2: Midrange Uplift for Cars/Trucks/SUVs
+If price falls between $696 and $1070 after applying the floor, increase it by 20%.
+
+js
+Copy
+Edit
+if (['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) && basePrice >= 696 && basePrice <= 1070) {
+  basePrice = Math.round(basePrice * 1.2);
+}
+RULE 3: RV Minimum Price Floor
+No RV quote should ever be less than $750.
+
+js
+Copy
+Edit
+if (vehicleType.toLowerCase() === 'rv' && basePrice < 750) {
+  basePrice = 750;
+}
+RULE 4: RV Short-Distance Uplift
+If vehicleType is rv and routeDistance < 1500, increase price by 30%.
+
+js
+Copy
+Edit
+if (vehicleType.toLowerCase() === 'rv' && routeDistance < 1500) {
+  basePrice = Math.round(basePrice * 1.3);
+}
+✅ ORDER OF EXECUTION (MUST BE RESPECTED)
+Apply price floor (Cars/SUVs/Trucks → $695, RVs → $750)
+
+If vehicle is Car/Truck/SUV and in $696–$1070 range → apply 20%
+
+If vehicle is RV and under 1500 miles → apply 30%
+
+REPLIT CONFIRMATION NEEDED:
+Before anything is implemented, I need Replit to confirm:
+
+That the above logic is fully understood
+
+That implementation can be safely scoped only to the quote pricing logic
+
+That no other system will be affected
+
+Only after confirmation will I authorize implementation.
