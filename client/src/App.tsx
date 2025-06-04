@@ -12,52 +12,33 @@ import SimpleQuote from "@/pages/simple-quote";
 import TestMapQuest from "@/pages/test-mapquest";
 import EmbeddingInstructions from "@/pages/embedding-instructions";
 
-console.log('App.tsx loaded');
-
 function Router() {
-  console.log('Router component rendering');
-  try {
-    return (
-      <Switch>
-        <Route path="/" component={SimpleQuote} />
-        <Route path="/home" component={Home} />
-        <Route path="/final-quote" component={FinalQuote} />
-        <Route path="/checkout" component={Checkout} />
-        <Route path="/booking" component={Booking} />
-        <Route path="/thank-you" component={ThankYou} />
-        <Route path="/test-mapquest" component={TestMapQuest} />
-        <Route path="/embedding-instructions" component={EmbeddingInstructions} />
-        <Route component={NotFound} />
-      </Switch>
-    );
-  } catch (error) {
-    console.error('Router error:', error);
-    return <div>Router Error: {error.message}</div>;
-  }
+  return (
+    <Switch>
+      <Route path="/" component={SimpleQuote} />
+      <Route path="/home" component={Home} />
+      <Route path="/final-quote" component={FinalQuote} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/booking" component={Booking} />
+      <Route path="/thank-you" component={ThankYou} />
+      <Route path="/test-mapquest" component={TestMapQuest} />
+      <Route path="/embedding-instructions" component={EmbeddingInstructions} />
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
 
 function App() {
-  console.log('App component rendering');
-  try {
-    return (
-      <QueryClientProvider client={queryClient}>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="mx-auto">
         <div className="mx-auto">
-          <div className="mx-auto">
-            <Router />
-          </div>
+          <Router />
         </div>
-        <Toaster />
-      </QueryClientProvider>
-    );
-  } catch (error) {
-    console.error('App component error:', error);
-    return (
-      <div style={{ padding: '20px', color: 'red' }}>
-        <h2>Application Error</h2>
-        <p>Error in App component: {error.message}</p>
       </div>
-    );
-  }
+      <Toaster />
+    </QueryClientProvider>
+  );
 }
 
 export default App;
