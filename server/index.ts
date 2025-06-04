@@ -10,20 +10,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   const origin = req.headers.origin || "";
   
-  // Only allow specific production domains and development environments
-  const allowedOrigins = [
-    // Client production domains
-    'https://amerigoautotransport.net',
-    'https://www.amerigoautotransport.net',
-    // Development environments
-    'https://replit.com',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
-  
-  // Check if origin is allowed
-  if (allowedOrigins.includes(origin) || origin.includes('.replit.app')) {
-    res.header('Access-Control-Allow-Origin', origin);
+  // In development, allow all origins for local development
+  if (app.get("env") === "development") {
+    console.log('🧪 Enabling CORS for development only');
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    // Only allow specific production domains in production
+    const allowedOrigins = [
+      'https://amerigoautotransport.net',
+      'https://www.amerigoautotransport.net',
+    ];
+    
+    if (allowedOrigins.includes(origin) || origin.includes('.replit.app')) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
   }
   
   // Allow credentials (cookies, authorization headers, etc.)
