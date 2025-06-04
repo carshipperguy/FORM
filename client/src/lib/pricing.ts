@@ -294,7 +294,7 @@ export function calculatePricing(
         basePrice = Math.round(basePrice * 1.2);
         console.log(`Car/Truck/SUV middle-range uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+20%)`);
       }
-    } else if (vehicleType.toLowerCase() === 'rv' || vehicleType.toLowerCase() === 'rv/5th wheel') {
+    } else if (vehicleType.toLowerCase() === 'rv' || vehicleType.toLowerCase() === 'rv/5th wheel' || vehicleType.toLowerCase().includes('rv')) {
       // RULE 3 & 4: RV-specific logic
       if (basePrice < 750) {
         // RULE 3: RV Minimum Floor - $750
