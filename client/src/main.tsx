@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import EmergencyApp from "./emergency-app";
-import "./index.css";
+import MinimalApp from "./minimal-app";
 
-createRoot(document.getElementById("root")!).render(<EmergencyApp />);
+createRoot(document.getElementById("root")!).render(<MinimalApp />);
