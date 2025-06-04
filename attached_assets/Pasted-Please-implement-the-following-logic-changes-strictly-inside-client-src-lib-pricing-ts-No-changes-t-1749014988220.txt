@@ -1,0 +1,81 @@
+Please implement the following logic changes strictly inside client/src/lib/pricing.ts.
+No changes to UI rendering, webhook logic, form behavior, submission flow, or database schema.
+
+All logic must be isolated to pricing calculations only.
+
+✅ VEHICLE TYPE RULES
+1. Car/Truck/SUV Minimum Floor
+No car, truck, or SUV should ever be priced below $695.
+
+ts
+Copy
+Edit
+if (['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) && basePrice < 695) {
+  basePrice = 695;
+}
+2. Car/Truck/SUV Middle-Range Uplift
+If the final price (after applying the $695 floor) is between $696 and $1070, increase it by 20%.
+
+ts
+Copy
+Edit
+if (
+  ['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) &&
+  basePrice >= 696 &&
+  basePrice <= 1070
+) {
+  basePrice = Math.round(basePrice * 1.2);
+}
+✅ RV-SPECIFIC LOGIC (IMPORTANT)
+3. RV Minimum Price Rule
+No RV move should ever be priced under $750. This is a hard minimum.
+
+ts
+Copy
+Edit
+if (vehicleType.toLowerCase() === 'rv' && basePrice < 750) {
+  basePrice = 750;
+}
+4. RV Short-Distance Adjustment
+If the route is under 1,500 miles, and the original base price is already ≥ $750, increase the price by 30%.
+
+✅ IMPORTANT: Do NOT apply 30% on top of the $750 minimum. The 30% uplift is only for RV quotes that were already ≥ $750 before applying the floor.
+
+ts
+Copy
+Edit
+if (vehicleType.toLowerCase() === 'rv') {
+  if (basePrice < 750) {
+    basePrice = 750;
+  } else if (routeDistance < 1500) {
+    basePrice = Math.round(basePrice * 1.3);
+  }
+}
+🧩 ORDER OF OPERATIONS (DO NOT CHANGE):
+Apply minimums first:
+
+Cars/Trucks/SUVs: $695
+
+RVs: $750
+
+Then apply conditional uplifts:
+
+Car/Truck/SUV: +20% for $696–$1070
+
+RVs: +30% only if already ≥ $750 and under 1,500 miles
+
+✅ Scope & Safety Disclaimer:
+
+This logic must not touch any webhook, database field, or CRM-side module.
+
+No changes should occur outside of pricing.ts
+
+Vehicle type detection uses vehicleType as-is.
+
+Route distance uses routeDistance as-is.
+
+No backend or UI impact allowed.
+
+Confirm complete understanding before implementing.
+
+☑ Please confirm full comprehension of the above and do not proceed with implementation unless every condition and rule is understood exactly.

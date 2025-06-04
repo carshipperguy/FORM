@@ -273,13 +273,54 @@ export function calculatePricing(
       }
     });
 
-    // Ensure minimum price
-    const priceBeforeMinimum = basePrice;
-    basePrice = Math.max(basePrice, MINIMUM_PRICE);
+    // MASTER PRICING RULES - Apply vehicle-specific minimums and uplifts
+    console.log('*** APPLYING MASTER PRICING RULES ***');
+    const priceBeforeRules = basePrice;
     
-    if (basePrice > priceBeforeMinimum) {
-      console.log(`Base price adjusted to minimum: $${priceBeforeMinimum.toFixed(2)} → $${MINIMUM_PRICE} (minimum price)`);
+    // Check if this is a car/truck/suv type
+    const isCarTruckSUV = ['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) || 
+                         vehicleType.toLowerCase() === 'car/truck/suv';
+    
+    if (isCarTruckSUV) {
+      // RULE 1: Car/Truck/SUV Minimum Floor - $695
+      if (basePrice < 695) {
+        basePrice = 695;
+        console.log(`Car/Truck/SUV minimum floor applied: $${priceBeforeRules.toFixed(2)} → $695`);
+      }
+      
+      // RULE 2: Car/Truck/SUV Middle-Range Uplift - 20% for $696-$1070 range
+      if (basePrice >= 696 && basePrice <= 1070) {
+        const priceBeforeUplift = basePrice;
+        basePrice = Math.round(basePrice * 1.2);
+        console.log(`Car/Truck/SUV middle-range uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+20%)`);
+      }
+    } else if (vehicleType.toLowerCase() === 'rv' || vehicleType.toLowerCase() === 'rv/5th wheel') {
+      // RULE 3 & 4: RV-specific logic
+      if (basePrice < 750) {
+        // RULE 3: RV Minimum Floor - $750
+        basePrice = 750;
+        console.log(`RV minimum floor applied: $${priceBeforeRules.toFixed(2)} → $750`);
+      } else if (distance < 1500) {
+        // RULE 4: RV Short-Distance Uplift - 30% for routes under 1500 miles (only if already ≥$750)
+        const priceBeforeUplift = basePrice;
+        basePrice = Math.round(basePrice * 1.3);
+        console.log(`RV short-distance uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+30% for route under 1500 miles)`);
+      }
+    } else {
+      // For other vehicle types, apply the old minimum price logic as fallback
+      basePrice = Math.max(basePrice, MINIMUM_PRICE);
+      if (basePrice > priceBeforeRules) {
+        console.log(`Other vehicle type minimum applied: $${priceBeforeRules.toFixed(2)} → $${MINIMUM_PRICE}`);
+      }
     }
+    
+    console.log('Master pricing rules applied:', {
+      vehicleType,
+      isCarTruckSUV,
+      distance,
+      priceBeforeRules: priceBeforeRules.toFixed(2),
+      priceAfterRules: basePrice.toFixed(2)
+    });
 
     // Apply vehicle type multiplier - default to 1.0 if not found
     let vehicleMultiplier = 1.0;
