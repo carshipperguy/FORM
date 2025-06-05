@@ -314,12 +314,21 @@ export function calculatePricing(
       }
     }
     
+    // CRITICAL: ABSOLUTE MINIMUM FLOOR - $695 FOR ALL VEHICLE TYPES
+    const priceBeforeAbsoluteMinimum = basePrice;
+    basePrice = Math.max(basePrice, 695);
+    
+    if (basePrice > priceBeforeAbsoluteMinimum) {
+      console.log(`ABSOLUTE MINIMUM ENFORCED: $${priceBeforeAbsoluteMinimum.toFixed(2)} → $695 (no price can be below $695)`);
+    }
+    
     console.log('Master pricing rules applied:', {
       vehicleType,
       isCarTruckSUV,
       distance,
       priceBeforeRules: priceBeforeRules.toFixed(2),
-      priceAfterRules: basePrice.toFixed(2)
+      priceAfterRules: basePrice.toFixed(2),
+      absoluteMinimumEnforced: basePrice === 695 && priceBeforeAbsoluteMinimum < 695
     });
 
     // Apply vehicle type multiplier - default to 1.0 if not found
