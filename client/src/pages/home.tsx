@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { QuoteForm } from "@/components/quote-form";
 import { TrustBadges } from "@/components/trust-badges";
-import { calculatePricing } from "@/lib/pricing";
+import { calculatePrice } from "@/lib/pricing";
 import { calculateDistance } from "@/lib/mapquest";
 import { type QuoteFormData } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -162,7 +162,7 @@ export default function Home() {
       
       // DEBUG: Force a known vehicle type for testing
       console.log("*** TESTING DIRECT HARD-CODED VALUES ***");
-      const flatRateTest = calculatePricing(distance, "boat");
+      const flatRateTest = calculatePrice(distance, "boat");
       console.log("Flat rate test (should be $2.50/mile):", {
         boatPrice: flatRateTest,
         expectedFlatRate: Math.round(distance * 2.5)
@@ -178,7 +178,7 @@ export default function Home() {
       });
       
       // Use the pricing library for all vehicle types
-      pricing = calculatePricing(
+      pricing = calculatePrice(
         distance, 
         normalizedVehicleType, 
         new Date(), 

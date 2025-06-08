@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
-import { calculatePricing } from "@/lib/pricing";
+import { calculatePrice } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
 // CSS module import removed - reverting to inline styles
 
@@ -229,7 +229,7 @@ const SimpleQuoteForm = () => {
       // Use the imported pricing calculation function
       
       // Use the pricing calculation function with locations for Snowbird rule detection
-      const pricingResult = calculatePricing(
+      const pricingResult = calculatePrice(
         distanceData.distance, 
         formData.vehicleType,
         new Date(),  // Current date

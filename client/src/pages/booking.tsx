@@ -121,10 +121,10 @@ export default function Booking() {
       
       try {
         // Import the pricing calculation function
-        const { calculatePricing } = await import('../lib/pricing');
+        const { calculatePrice } = await import('../lib/pricing');
         
         // Re-calculate pricing using the pricing library
-        const pricing = calculatePricing(
+        const pricing = calculatePrice(
           data.distance,
           data.vehicleType,
           new Date(),
