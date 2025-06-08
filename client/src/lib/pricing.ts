@@ -60,39 +60,7 @@ export function calculatePricing(
   pickupLocation?: string,
   dropoffLocation?: string
 ): PricingResult {
-  // EMERGENCY OVERRIDE: Force flat rate pricing for special vehicles
-  const forceSpecialVehicleCheck = (vehicleType: VehicleType): boolean => {
-    if (!vehicleType || typeof vehicleType !== 'string') return false;
-    
-    const lowerType = vehicleType.toLowerCase();
-    return lowerType === 'boat' || 
-           lowerType === 'rv' || 
-           lowerType.includes('trailer') || 
-           lowerType.includes('equipment');
-  };
-  
-  const isSpecialVehicleForced = forceSpecialVehicleCheck(vehicleType);
-  
-  if (isSpecialVehicleForced && distance) {
-    console.log("🛑 EMERGENCY OVERRIDE ACTIVATED - Using flat rate $2.00/mile pricing for special vehicle:", vehicleType);
-    // Calculate flat rate price but ensure minimum of $650 for RVs
-    const flatRatePrice = distance * FLAT_RATE_PER_MILE;
-    // Check if this is an RV vehicle type to apply minimum
-    const isRV = typeof vehicleType === 'string' && 
-                (vehicleType.toLowerCase() === 'rv' || 
-                 vehicleType.toLowerCase() === 'rv/5th wheel');
-    
-    // Apply minimum price of $650 for RVs
-    const finalPrice = isRV ? Math.max(flatRatePrice, 650) : flatRatePrice;
-    
-    console.log(`Special vehicle pricing: $${flatRatePrice.toFixed(2)} ${isRV ? `(applying $650 minimum for RV: ${finalPrice})` : ''}`);
-    
-    return {
-      openTransport: Math.round(finalPrice),
-      enclosedTransport: Math.round(finalPrice * ENCLOSED_MULTIPLIER),
-      transitTime: Math.ceil(distance / 400) + 1
-    };
-  }
+  // REMOVED EMERGENCY OVERRIDE - All vehicles must go through proper pricing logic with correct minimums
   console.log('--------------------------------');
   console.log('PRICING CALCULATION FUNCTION CALLED');
   console.log('Input parameters:', { distance, vehicleType, date });
