@@ -17,10 +17,9 @@ const VEHICLE_MULTIPLIERS: Record<string, number> = {
 };
 
 // Special vehicle types that should use flat rate pricing
+// Note: RV/5th wheel removed to use standard pricing path with master pricing rules
 const SPECIAL_VEHICLE_KEYWORDS = [
   'boat',
-  'rv',
-  '5th wheel',
   'trailer',
   'heavy',
   'equipment'
@@ -349,6 +348,20 @@ export function calculatePricing(
       enclosedMultiplier: ENCLOSED_MULTIPLIER,
       formula: `$${openTransportPrice.toFixed(2)} × ${ENCLOSED_MULTIPLIER} = $${enclosedTransportPrice.toFixed(2)}`
     });
+  }
+
+  // ABSOLUTE MINIMUM ENFORCEMENT - NO QUOTE BELOW $695 EVER
+  const openTransportBeforeMin = openTransportPrice;
+  const enclosedTransportBeforeMin = enclosedTransportPrice;
+  
+  openTransportPrice = Math.max(openTransportPrice, 695);
+  enclosedTransportPrice = Math.max(enclosedTransportPrice, 695);
+  
+  if (openTransportPrice > openTransportBeforeMin) {
+    console.log(`🚨 ABSOLUTE MINIMUM ENFORCED: Open transport $${openTransportBeforeMin.toFixed(2)} → $695`);
+  }
+  if (enclosedTransportPrice > enclosedTransportBeforeMin) {
+    console.log(`🚨 ABSOLUTE MINIMUM ENFORCED: Enclosed transport $${enclosedTransportBeforeMin.toFixed(2)} → $695`);
   }
 
   // Round prices to nearest whole dollar
