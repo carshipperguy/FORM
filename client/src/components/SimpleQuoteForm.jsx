@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { vehicleTypes, years, makes, modelsByMake, newMakesWithFreeTextModels } from "@/lib/vehicle-data";
+import {
+  vehicleTypes,
+  years,
+  makes,
+  modelsByMake,
+  newMakesWithFreeTextModels,
+} from "@/lib/vehicle-data";
 import { calculatePrice } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
 // CSS module import removed - reverting to inline styles
 
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
-  
+
   const [formData, setFormData] = useState({
     pickupLocation: "",
     dropoffLocation: "",
@@ -18,9 +24,9 @@ const SimpleQuoteForm = () => {
     shipmentDate: "",
     name: "",
     phone: "",
-    email: ""
+    email: "",
   });
-  
+
   const [showContactFields, setShowContactFields] = useState(false);
   const [availableModels, setAvailableModels] = useState([]);
   const [isStandardVehicle, setIsStandardVehicle] = useState(false);
@@ -30,7 +36,7 @@ const SimpleQuoteForm = () => {
     // Only the "car/truck/suv" type should use dropdown menus
     const standardType = formData.vehicleType === "car/truck/suv";
     setIsStandardVehicle(standardType);
-    
+
     console.log("Vehicle type changed:", formData.vehicleType);
     console.log("Is standard vehicle:", standardType);
   }, [formData.vehicleType]);
@@ -52,43 +58,45 @@ const SimpleQuoteForm = () => {
       setAvailableModels([]);
     }
   }, [formData.make, isStandardVehicle]);
-  
+
   // Check if vehicle year is pre-1990 for free-text model input
   const isVehiclePre1990 = formData.year && parseInt(formData.year) < 1990;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // When vehicle type changes, reset the year, make, and model fields
     if (name === "vehicleType") {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
         year: "",
         make: "",
-        model: ""
+        model: "",
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
-  
+
   // Track ZIP codes separately for each location
   const [pickupZip, setPickupZip] = useState(null);
   const [dropoffZip, setDropoffZip] = useState(null);
-  
+
   const handleLocationChange = (field, value, zipCode) => {
-    console.log(`Location changed - Field: ${field}, Value: ${value}, ZIP: ${zipCode}`);
-    
+    console.log(
+      `Location changed - Field: ${field}, Value: ${value}, ZIP: ${zipCode}`,
+    );
+
     // Update the form data with the location string
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Store the ZIP code separately
     if (field === "pickupLocation" && zipCode) {
       setPickupZip(zipCode);
@@ -99,156 +107,161 @@ const SimpleQuoteForm = () => {
 
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Client-side validation before submission
   const validateForm = () => {
     // Simplified validation of only required fields
     const errors = [];
-    
+
     // Validate pickup location (must come from dropdown to have ZIP)
     if (!formData.pickupLocation || !pickupZip) {
       errors.push({
-        field: 'pickupLocation',
-        message: 'Please select a pickup location from the dropdown menu'
+        field: "pickupLocation",
+        message: "Please select a pickup location from the dropdown menu",
       });
     }
-    
+
     // Validate dropoff location (must come from dropdown to have ZIP)
     if (!formData.dropoffLocation || !dropoffZip) {
       errors.push({
-        field: 'dropoffLocation',
-        message: 'Please select a delivery location from the dropdown menu'
+        field: "dropoffLocation",
+        message: "Please select a delivery location from the dropdown menu",
       });
     }
-    
+
     // Vehicle information validation
     if (!formData.vehicleType) {
       errors.push({
-        field: 'vehicleType',
-        message: 'Please select a vehicle type'
+        field: "vehicleType",
+        message: "Please select a vehicle type",
       });
     }
-    
+
     if (!formData.year) {
       errors.push({
-        field: 'year',
-        message: 'Please enter the vehicle year'
+        field: "year",
+        message: "Please enter the vehicle year",
       });
     }
-    
+
     if (!formData.make) {
       errors.push({
-        field: 'make',
-        message: 'Please enter the vehicle make'
+        field: "make",
+        message: "Please enter the vehicle make",
       });
     }
-    
+
     if (!formData.model) {
       errors.push({
-        field: 'model',
-        message: 'Please enter the vehicle model'
+        field: "model",
+        message: "Please enter the vehicle model",
       });
     }
-    
+
     // Shipment date validation
     if (!formData.shipmentDate) {
       errors.push({
-        field: 'shipmentDate',
-        message: 'Please select a shipment date'
+        field: "shipmentDate",
+        message: "Please select a shipment date",
       });
     }
-    
+
     // Contact information validation
     if (!formData.name) {
       errors.push({
-        field: 'name',
-        message: 'Please enter your name'
+        field: "name",
+        message: "Please enter your name",
       });
     }
-    
+
     if (!formData.phone) {
       errors.push({
-        field: 'phone',
-        message: 'Please enter your phone number'
+        field: "phone",
+        message: "Please enter your phone number",
       });
     }
-    
+
     if (!formData.email) {
       errors.push({
-        field: 'email',
-        message: 'Please enter your email address'
+        field: "email",
+        message: "Please enter your email address",
       });
     }
-    
+
     // Update state with any validation errors
     setValidationErrors(errors);
-    
+
     // Return true if there are no errors
     return errors.length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Set submitting state to prevent multiple submissions
     setIsSubmitting(true);
-    
+
     try {
       // Validate the form before proceeding
       const isValid = validateForm();
-      
+
       if (!isValid) {
         console.error("Form validation failed:", validationErrors);
         setIsSubmitting(false);
         return;
       }
-      
+
       // Calculate real distance using the server API
       // Get the current domain to handle iframe scenarios
       const currentDomain = window.location.origin;
-      
+
       // Use the full URL to avoid issues when embedded in an iframe
       const serverDistanceUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
-      console.log("Calculating real distance using server API:", serverDistanceUrl);
-      
+      console.log(
+        "Calculating real distance using server API:",
+        serverDistanceUrl,
+      );
+
       const distanceResponse = await fetch(serverDistanceUrl, {
         // Include credentials to ensure cookies are sent even for cross-origin requests
-        credentials: "include"
+        credentials: "include",
       });
       const distanceData = await distanceResponse.json();
-      
+
       if (distanceData.error) {
         console.error("Error calculating distance:", distanceData.error);
-        alert("There was an error calculating the distance. Please check your locations and try again.");
+        alert(
+          "There was an error calculating the distance. Please check your locations and try again.",
+        );
         setIsSubmitting(false);
         return;
       }
-      
+
       console.log("Distance calculation result:", distanceData);
-      
+
       // Use the imported pricing calculation function
-      
+
       // Use the pricing calculation function with locations for Snowbird rule detection
       const pricingResult = calculatePrice(
-        distanceData.distance, 
+        distanceData.distance,
         formData.vehicleType,
-        new Date(),  // Current date
+        new Date(), // Current date
         formData.pickupLocation,
-        formData.dropoffLocation
+        formData.dropoffLocation,
       );
-      
+
       // Extract the calculated values
       const transitTime = pricingResult.transitTime;
       const openTransportPrice = pricingResult.openTransport;
       const enclosedTransportPrice = pricingResult.enclosedTransport;
-      
+
       console.log("Calculated pricing:", {
         distance: distanceData.distance,
         transitTime,
         openTransportPrice,
-        enclosedTransportPrice
+        enclosedTransportPrice,
       });
-      
+
       // Create the complete quote data with real calculated values and ZIP codes
       const quoteData = {
         ...formData,
@@ -257,43 +270,43 @@ const SimpleQuoteForm = () => {
         openTransportPrice: openTransportPrice,
         enclosedTransportPrice: enclosedTransportPrice,
         transitTime: transitTime,
-        distance: distanceData.distance
+        distance: distanceData.distance,
       };
-      
+
       console.log("Added ZIP codes to quote data:", {
         pickupZip,
-        dropoffZip
+        dropoffZip,
       });
-      
+
       console.log("Final quote data with real distance:", quoteData);
-      
+
       // Extract Facebook/Meta tracking parameters from the current URL only
       const currentUrl = window.location.href;
       console.log("📊 Current URL for attribution:", currentUrl);
-      
+
       // Function to extract query parameters from URL
       function getQueryParam(name, url) {
-        const match = url.match(new RegExp('[?&]' + name + '=([^&]+)'));
+        const match = url.match(new RegExp("[?&]" + name + "=([^&]+)"));
         return match ? decodeURIComponent(match[1]) : null;
       }
-      
+
       // Extract Facebook and UTM tracking parameters from current URL
-      const fbclid = getQueryParam('fbclid', currentUrl);
-      const utm_source = getQueryParam('utm_source', currentUrl);
-      const utm_medium = getQueryParam('utm_medium', currentUrl);
-      const utm_campaign = getQueryParam('utm_campaign', currentUrl);
-      const utm_term = getQueryParam('utm_term', currentUrl);
-      const utm_content = getQueryParam('utm_content', currentUrl);
-      
+      const fbclid = getQueryParam("fbclid", currentUrl);
+      const utm_source = getQueryParam("utm_source", currentUrl);
+      const utm_medium = getQueryParam("utm_medium", currentUrl);
+      const utm_campaign = getQueryParam("utm_campaign", currentUrl);
+      const utm_term = getQueryParam("utm_term", currentUrl);
+      const utm_content = getQueryParam("utm_content", currentUrl);
+
       console.log("📊 Facebook/Meta attribution parameters:", {
         fbclid,
         utm_source,
         utm_medium,
         utm_campaign,
         utm_term,
-        utm_content
+        utm_content,
       });
-      
+
       // Send data to webhook when "Get Quote" is clicked
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
       try {
@@ -309,46 +322,60 @@ const SimpleQuoteForm = () => {
           utm_campaign: utm_campaign || null,
           utm_term: utm_term || null,
           utm_content: utm_content || null,
-          referrer: document.referrer || ""
+          referrer: document.referrer || "",
         };
-        
+
         // Use await to ensure we catch any errors properly
         // Get the current domain to handle iframe scenarios
         const currentDomain = window.location.origin;
         console.log("Current domain for API request:", currentDomain);
-        
+
         // Use the full URL to avoid issues when embedded in an iframe
         const apiUrl = `${currentDomain}/api/webhook`;
         console.log("Using webhook API URL:", apiUrl);
-        
+
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            Accept: "application/json",
           },
           // Include credentials to ensure cookies are sent even for cross-origin requests
           credentials: "include",
           body: JSON.stringify(webhookData),
         });
-        
+
+        console.log({
+          webhookResponse,
+        });
+
         // Handle webhook response
         if (!webhookResponse.ok) {
-          console.error("⚡ WEBHOOK ERROR:", webhookResponse.status, webhookResponse.statusText);
-          
+          console.error(
+            "⚡ WEBHOOK ERROR:",
+            webhookResponse.status,
+            webhookResponse.statusText,
+          );
+
           // Try to parse the error response for validation errors
           try {
             const errorResponse = await webhookResponse.json();
-            
+
             // If server validation found errors we didn't catch client-side
             if (errorResponse.validationErrors) {
-              console.error("Server validation failed:", errorResponse.validationErrors);
+              console.error(
+                "Server validation failed:",
+                errorResponse.validationErrors,
+              );
               setValidationErrors(errorResponse.validationErrors);
               setIsSubmitting(false);
               return; // Prevent navigation to next screen
             }
           } catch (parseError) {
-            console.error("Could not parse webhook error response:", parseError);
+            console.error(
+              "Could not parse webhook error response:",
+              parseError,
+            );
           }
         } else {
           console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
@@ -357,7 +384,7 @@ const SimpleQuoteForm = () => {
         console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
         // Continue with navigation even if webhook fails
       }
-  
+
       // Add basic URL parameters to the URL-encoded data for the next page
       const quoteDataWithAttribution = {
         ...quoteData,
@@ -368,16 +395,16 @@ const SimpleQuoteForm = () => {
         utm_campaign: utm_campaign || null,
         utm_term: utm_term || null,
         utm_content: utm_content || null,
-        referrer: document.referrer || ""
+        referrer: document.referrer || "",
       };
-      
+
       const params = new URLSearchParams({
-        data: encodeURIComponent(JSON.stringify(quoteDataWithAttribution))
+        data: encodeURIComponent(JSON.stringify(quoteDataWithAttribution)),
       });
-  
+
       // Reset submission state before navigating
       setIsSubmitting(false);
-      
+
       // Navigate to the final quote page
       navigate(`/final-quote?${params.toString()}`);
     } catch (error) {
@@ -398,7 +425,9 @@ const SimpleQuoteForm = () => {
             <div className="form-field">
               <LocationMenuSelector
                 value={formData.pickupLocation}
-                onChange={(value, zipCode) => handleLocationChange("pickupLocation", value, zipCode)}
+                onChange={(value, zipCode) =>
+                  handleLocationChange("pickupLocation", value, zipCode)
+                }
                 placeholder="Ship From"
                 required
               />
@@ -406,7 +435,9 @@ const SimpleQuoteForm = () => {
             <div className="form-field">
               <LocationMenuSelector
                 value={formData.dropoffLocation}
-                onChange={(value, zipCode) => handleLocationChange("dropoffLocation", value, zipCode)}
+                onChange={(value, zipCode) =>
+                  handleLocationChange("dropoffLocation", value, zipCode)
+                }
                 placeholder="Ship To"
                 required
               />
@@ -420,10 +451,10 @@ const SimpleQuoteForm = () => {
           </div>
           <div className="form-fields">
             <div className="form-field">
-              <select 
-                name="vehicleType" 
-                value={formData.vehicleType} 
-                onChange={handleChange} 
+              <select
+                name="vehicleType"
+                value={formData.vehicleType}
+                onChange={handleChange}
                 required
               >
                 <option value="">What Would You Like To Ship?</option>
@@ -434,7 +465,7 @@ const SimpleQuoteForm = () => {
                 ))}
               </select>
             </div>
-{isStandardVehicle ? (
+            {isStandardVehicle ? (
               // Dropdown menus for standard vehicles (car/truck/SUV)
               <>
                 <div className="form-field">
@@ -468,7 +499,9 @@ const SimpleQuoteForm = () => {
                   </select>
                 </div>
                 <div className="form-field">
-                  {(formData.make && newMakesWithFreeTextModels.includes(formData.make)) || isVehiclePre1990 ? (
+                  {(formData.make &&
+                    newMakesWithFreeTextModels.includes(formData.make)) ||
+                  isVehiclePre1990 ? (
                     // Free text input for new makes or pre-1990 vehicles
                     <input
                       type="text"
@@ -540,52 +573,52 @@ const SimpleQuoteForm = () => {
             <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
-            <div 
-              className="form-field date-field" 
+            <div
+              className="form-field date-field"
               onClick={() => {
-                const dateInput = document.getElementById('shipmentDateInput');
+                const dateInput = document.getElementById("shipmentDateInput");
                 if (dateInput) dateInput.focus();
               }}
             >
-              <input 
+              <input
                 id="shipmentDateInput"
-                type="date" 
-                name="shipmentDate" 
-                value={formData.shipmentDate} 
+                type="date"
+                name="shipmentDate"
+                value={formData.shipmentDate}
                 onChange={handleChange}
-                required 
-                min={new Date().toISOString().split('T')[0]}
+                required
+                min={new Date().toISOString().split("T")[0]}
                 placeholder="MM-DD-YY"
-                style={{ width: '100%', cursor: 'pointer' }}
+                style={{ width: "100%", cursor: "pointer" }}
               />
             </div>
             {formData.shipmentDate && (
               <>
                 <div className="form-field">
-                  <input 
+                  <input
                     type="text"
                     name="name"
-                    value={formData.name || ''}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     placeholder="Your Name"
                     required
                   />
                 </div>
                 <div className="form-field">
-                  <input 
+                  <input
                     type="tel"
                     name="phone"
-                    value={formData.phone || ''}
+                    value={formData.phone || ""}
                     onChange={handleChange}
                     placeholder="Phone Number"
                     required
                   />
                 </div>
                 <div className="form-field">
-                  <input 
+                  <input
                     type="email"
                     name="email"
-                    value={formData.email || ''}
+                    value={formData.email || ""}
                     onChange={handleChange}
                     placeholder="Email Address"
                     required
@@ -606,14 +639,14 @@ const SimpleQuoteForm = () => {
             </ul>
           </div>
         )}
-        
-        <button 
-          type="submit" 
-          className="submit-btn" 
+
+        <button
+          type="submit"
+          className="submit-btn"
           disabled={isSubmitting}
           aria-busy={isSubmitting}
         >
-          {isSubmitting ? 'Calculating Quote...' : 'Get Quote'}
+          {isSubmitting ? "Calculating Quote..." : "Get Quote"}
         </button>
       </form>
 
