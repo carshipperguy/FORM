@@ -203,6 +203,47 @@ const SimpleQuoteForm = () => {
     return errors.length === 0;
   };
 
+  // Track Meta Pixel Lead event
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.fbq) {
+      console.log("📊 Tracking Meta Pixel Lead event");
+      window.fbq('track', 'Lead');
+    }
+  }, []);
+
+  // Get attribution data from URL and current page
+  const getAttributionData = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUrl = window.location.href;
+
+    console.log("📊 Current URL for attribution:", currentUrl);
+
+    const attributionData = {
+      fbclid: urlParams.get('fbclid'),
+      utm_source: urlParams.get('utm_source'),
+      utm_medium: urlParams.get('utm_medium'),
+      utm_campaign: urlParams.get('utm_campaign'),
+      utm_term: urlParams.get('utm_term'),
+      utm_content: urlParams.get('utm_content')
+    };
+
+    console.log("📊 Facebook/Meta attribution parameters:", attributionData);
+
+    return attributionData;
+  };
+
+  // Get test event code from URL parameters
+  const getTestEventCode = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const testEventCode = urlParams.get('test_event_code');
+
+    if (testEventCode) {
+      console.log("🧪 Test event code detected:", testEventCode);
+    }
+
+    return testEventCode;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -713,7 +754,7 @@ const SimpleQuoteForm = () => {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           animation: fadeInError 0.3s ease;
         }
-        
+
         @keyframes fadeInError {
           from { 
             opacity: 0;
@@ -724,41 +765,41 @@ const SimpleQuoteForm = () => {
             transform: translateY(0);
           }
         }
-        
+
         .error-header {
           font-weight: bold;
           margin-bottom: 5px;
           display: flex;
           align-items: center;
         }
-        
+
         .error-header::before {
           content: "⚠️";
           margin-right: 6px;
           font-size: 14px;
         }
-        
+
         .validation-errors ul {
           margin: 0;
           padding-left: 20px;
         }
-        
+
         .validation-errors li {
           margin: 3px 0;
           font-size: 13px;
           line-height: 1.4;
         }
-        
+
         .submit-btn:disabled {
           background-color: #9ca3af;
           cursor: not-allowed;
           position: relative;
         }
-        
+
         .submit-btn[aria-busy="true"] {
           padding-left: 35px;
         }
-        
+
         .submit-btn[aria-busy="true"]::before {
           content: "";
           position: absolute;
@@ -772,7 +813,7 @@ const SimpleQuoteForm = () => {
           border-top-color: white;
           animation: button-loading-spinner 0.6s linear infinite;
         }
-        
+
         @keyframes button-loading-spinner {
           from {
             transform: rotate(0turn);
@@ -781,13 +822,13 @@ const SimpleQuoteForm = () => {
             transform: rotate(1turn);
           }
         }
-      
+
         .fade-in {
           opacity: 0;
           transform: translateY(10px);
           animation: fadeInForm 0.5s ease-out forwards;
         }
-        
+
         @keyframes fadeInForm {
           from {
             opacity: 0;
@@ -798,7 +839,7 @@ const SimpleQuoteForm = () => {
             transform: translateY(0);
           }
         }
-        
+
         .simple-form-container {
           width: 100%;
           max-width: 100%;
@@ -813,7 +854,7 @@ const SimpleQuoteForm = () => {
           border: 1px solid #E5E7EB;
           border-bottom: none;
         }
-        
+
         .form-section:last-of-type {
           margin-bottom: 0;
           border-bottom: 1px solid #E5E7EB;
@@ -841,15 +882,15 @@ const SimpleQuoteForm = () => {
           margin-bottom: 8px;
           transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
-        
+
         .form-field:last-child {
           margin-bottom: 0;
         }
-        
+
         .form-field {
           transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease, margin 0.3s ease;
         }
-        
+
         .form-field.hidden {
           opacity: 0;
           transform: translateY(-10px);
@@ -872,19 +913,19 @@ const SimpleQuoteForm = () => {
           -webkit-appearance: none;
           transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-        
+
         .form-field input:focus,
         .form-field select:focus {
           outline: none;
           border-color: #0055FF;
           box-shadow: 0 0 0 1px rgba(0, 85, 255, 0.2);
         }
-        
+
         .form-field input:hover:not(:focus),
         .form-field select:hover:not(:focus) {
           border-color: #D1D5DB;
         }
-        
+
         .form-field select {
           background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
           background-position: right 10px center;
@@ -893,7 +934,7 @@ const SimpleQuoteForm = () => {
           padding-right: 30px;
           cursor: pointer;
         }
-        
+
         .location-field [role="combobox"] {
           width: 100%;
           height: 40px;
@@ -930,7 +971,7 @@ const SimpleQuoteForm = () => {
           transform: translateY(-1px);
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        
+
         .submit-btn:active {
           transform: translateY(0);
           box-shadow: none;
@@ -941,18 +982,18 @@ const SimpleQuoteForm = () => {
           width: 308px !important;
           max-width: 308px !important;
         }
-        
+
         /* Override date input appearance to look like the screenshot */
         input[type="date"]::-webkit-calendar-picker-indicator {
           position: absolute;
           right: 10px;
         }
-        
+
         /* Match the exact placeholders from the screenshot */
         .form-field input::placeholder {
           color: #a0aec0;
         }
-        
+
         /* Make the date field clickable */
         .form-field.date-field {
           position: relative;
