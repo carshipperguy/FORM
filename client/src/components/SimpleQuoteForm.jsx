@@ -18,7 +18,7 @@ const SimpleQuoteForm = () => {
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
 
@@ -316,21 +316,21 @@ const SimpleQuoteForm = () => {
       });
 
       // Track Meta Pixel event for form submission
-      if (typeof window !== 'undefined' && window.fbq) {
+      if (typeof window !== "undefined" && window.fbq) {
         console.log("📊 Tracking Meta Pixel Lead event");
-        window.fbq('track', 'Lead', {
-          content_name: 'Auto Transport Quote',
-          content_category: 'Auto Transport',
+        window.fbq("track", "Lead", {
+          content_name: "Auto Transport Quote",
+          content_category: "Auto Transport",
           value: openTransportPrice,
-          currency: 'USD',
+          currency: "USD",
           custom_data: {
             pickup_location: formData.pickupLocation,
             dropoff_location: formData.dropoffLocation,
             vehicle_type: formData.vehicleType,
             vehicle_year: formData.year,
             vehicle_make: formData.make,
-            vehicle_model: formData.model
-          }
+            vehicle_model: formData.model,
+          },
         });
       }
 
@@ -352,29 +352,33 @@ const SimpleQuoteForm = () => {
           referrer: document.referrer || "",
           // Meta CAPI specific data
           meta_capi_data: {
-            event_name: 'Lead',
+            event_name: "Lead",
             event_time: Math.floor(Date.now() / 1000),
             user_data: {
-              em: quoteData.email ? btoa(quoteData.email.toLowerCase().trim()) : null,
-              ph: quoteData.phone ? btoa(quoteData.phone.replace(/\D/g, '')) : null,
+              em: quoteData.email
+                ? btoa(quoteData.email.toLowerCase().trim())
+                : null,
+              ph: quoteData.phone
+                ? btoa(quoteData.phone.replace(/\D/g, ""))
+                : null,
               client_ip_address: null, // Will be populated server-side
               client_user_agent: navigator.userAgent,
               fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
-              fbp: this.getCookie('_fbp') || null
+              fbp: this.getCookie("_fbp") || null,
             },
             custom_data: {
-              content_name: 'Auto Transport Quote',
-              content_category: 'Auto Transport',
+              content_name: "Auto Transport Quote",
+              content_category: "Auto Transport",
               value: openTransportPrice,
-              currency: 'USD',
+              currency: "USD",
               pickup_location: formData.pickupLocation,
               dropoff_location: formData.dropoffLocation,
               vehicle_type: formData.vehicleType,
               vehicle_year: formData.year,
               vehicle_make: formData.make,
-              vehicle_model: formData.model
-            }
-          }
+              vehicle_model: formData.model,
+            },
+          },
         };
 
         // Use await to ensure we catch any errors properly
