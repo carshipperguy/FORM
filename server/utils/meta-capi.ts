@@ -41,7 +41,10 @@ interface MetaCAPIPayload {
  * Hash a parameter using SHA256
  */
 function hashParam(param: string): string {
-  return crypto.createHash('sha256').update(param.toLowerCase().trim()).digest('hex');
+  return crypto
+    .createHash("sha256")
+    .update(param.toLowerCase().trim())
+    .digest("hex");
 }
 
 /**
@@ -102,7 +105,7 @@ export async function sendMetaCAPIEvent(
 
     console.log("🪖: Meta API Checkpoint", {
       url,
-      payload,
+      payload: JSON.stringify(payload),
     });
 
     if (metaEvent.custom_data) {
