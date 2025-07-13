@@ -70,6 +70,8 @@ export async function sendMetaCAPIEvent(
       return;
     }
 
+    const userData = eventData.user_data || {};
+
     // Hash email and phone if they exist
     const hashedUserData = { ...eventData.user_data };
     if (hashedUserData.em) {
@@ -105,6 +107,7 @@ export async function sendMetaCAPIEvent(
 
     console.log("🪖: Meta API Checkpoint", {
       url,
+      userData,
       payload: JSON.stringify(payload),
     });
 
