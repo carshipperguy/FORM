@@ -83,6 +83,38 @@ export async function sendMetaCAPIEvent(
 
     const url = `https://graph.facebook.com/v22.0/${pixelId}/events?access_token=${accessToken}`;
 
+    // Detailed logging of all data being sent to Meta CAPI
+    console.log("📊 META CAPI: COMPLETE PAYLOAD BEING SENT:");
+    console.log("🔗 URL:", url.replace(accessToken, '[ACCESS_TOKEN_HIDDEN]'));
+    console.log("📦 Full Payload:", JSON.stringify(payload, null, 2));
+    
+    console.log("📋 EVENT DETAILS:");
+    console.log("  Event Name:", metaEvent.event_name);
+    console.log("  Event Time:", metaEvent.event_time, `(${new Date(metaEvent.event_time * 1000).toISOString()})`);
+    console.log("  Event Source URL:", metaEvent.event_source_url);
+    console.log("  Action Source:", metaEvent.action_source);
+    
+    console.log("👤 USER DATA:");
+    console.log("  Email Hash:", metaEvent.user_data.em || 'NOT PROVIDED');
+    console.log("  Phone Hash:", metaEvent.user_data.ph || 'NOT PROVIDED');
+    console.log("  Client IP:", metaEvent.user_data.client_ip_address || 'NOT PROVIDED');
+    console.log("  User Agent:", metaEvent.user_data.client_user_agent || 'NOT PROVIDED');
+    console.log("  Facebook Click ID (fbc):", metaEvent.user_data.fbc || 'NOT PROVIDED');
+    console.log("  Facebook Browser ID (fbp):", metaEvent.user_data.fbp || 'NOT PROVIDED');
+    
+    if (metaEvent.custom_data) {
+      console.log("🏷️ CUSTOM DATA:");
+      Object.entries(metaEvent.custom_data).forEach(([key, value]) => {
+        console.log(`  ${key}:`, value || 'NOT PROVIDED');
+      });
+    } else {
+      console.log("🏷️ CUSTOM DATA: None provided");
+    }
+    
+    if (testEventCode) {
+      console.log("🧪 TEST EVENT CODE:", testEventCode);
+    }
+
     console.log("📊 META CAPI: Sending event to Facebook", {
       event_name: metaEvent.event_name,
       has_email: !!metaEvent.user_data.em,
