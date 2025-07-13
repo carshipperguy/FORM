@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import crypto from "crypto";
 
 interface MetaCAPIUserData {
   em?: string | null; // hashed email
@@ -37,6 +38,13 @@ interface MetaCAPIPayload {
 }
 
 /**
+ * Hash a parameter using SHA256
+ */
+function hashParam(param: string): string {
+  return crypto.createHash('sha256').update(param.toLowerCase().trim()).digest('hex');
+}
+
+/**
  * Send event to Meta Conversion API
  * @param eventData - The event data to send
  * @param clientIP - Client IP address for attribution
@@ -59,12 +67,21 @@ export async function sendMetaCAPIEvent(
       return;
     }
 
+    // Hash email and phone if they exist
+    const hashedUserData = { ...eventData.user_data };
+    if (hashedUserData.em) {
+      hashedUserData.em = hashParam(hashedUserData.em);
+    }
+    if (hashedUserData.ph) {
+      hashedUserData.ph = hashParam(hashedUserData.ph);
+    }
+
     // Prepare the event payload
     const metaEvent: MetaCAPIEventData = {
       event_name: eventData.event_name,
       event_time: eventData.event_time,
       user_data: {
-        ...eventData.user_data,
+        ...hashedUserData,
         client_ip_address: clientIP,
       },
       custom_data: eventData.custom_data,

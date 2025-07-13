@@ -355,12 +355,8 @@ const SimpleQuoteForm = () => {
             event_name: "Lead",
             event_time: Math.floor(Date.now() / 1000),
             user_data: {
-              em: quoteData.email
-                ? btoa(quoteData.email.toLowerCase().trim())
-                : null,
-              ph: quoteData.phone
-                ? btoa(quoteData.phone.replace(/\D/g, ""))
-                : null,
+              em: quoteData.email ? quoteData.email.toLowerCase().trim() : null,
+              ph: quoteData.phone ? quoteData.phone.replace(/\D/g, "") : null,
               client_ip_address: null, // Will be populated server-side
               client_user_agent: navigator.userAgent,
               fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
