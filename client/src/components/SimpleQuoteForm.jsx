@@ -360,7 +360,7 @@ const SimpleQuoteForm = () => {
               client_ip_address: null, // Will be populated server-side
               client_user_agent: navigator.userAgent,
               fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
-              fbp: getCookie('_fbp') || null
+              fbp: this.getCookie('_fbp') || null
             },
             custom_data: {
               content_name: 'Auto Transport Quote',
