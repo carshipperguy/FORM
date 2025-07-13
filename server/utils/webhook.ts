@@ -31,7 +31,7 @@ const extractZip = (location?: string): string => {
  * @param data The data to send to the webhook
  * @returns A promise that resolves when the webhook has been sent
  */
-export async function sendToWebhook(data: any): Promise<{ success: boolean; message: string; diagnostics?: any }> {
+export async function sendToWebhook(data: any, headers: any = {}): Promise<{ success: boolean; message: string; diagnostics?: any }> {
   try {
     // Determine which webhook URL to use based on the event type
     let webhookUrl;
@@ -547,14 +547,23 @@ export async function sendToWebhook(data: any): Promise<{ success: boolean; mess
       }
     );
 
-    // Return success with complete diagnostics
-    return { 
-      success: true, 
-      message: 'Webhook sent successfully',
-      diagnostics: diagnosticData
-    };
+    // Process Meta CAPI if data is present
+    if (data.meta_capi_data) {
+      console.log("📊 META CAPI: Processing conversion data");
+      const { sendMetaCAPIEvent } = await import('./meta-capi.js');
+
+      // Get client IP from request headers
+      const clientIP = headers['x-forwarded-for']?.split(',')[0] || 
+                      headers['x-real-ip'] || 
+                      '127.0.0.1';
+
+      await sendMetaCAPIEvent(data.meta_capi_data, clientIP);
+    } else {
+      console.log("📊 META CAPI: No conversion data found in webhook payload");
+    }
+
   } catch (error) {
-    console.error('❌ WEBHOOK FATAL ERROR:', error);
+    console.error("❌ WEBHOOK ERROR:", error);
     return { 
       success: false, 
       message: `Error sending webhook: ${error instanceof Error ? error.message : String(error)}` 
