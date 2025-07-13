@@ -1060,9 +1060,9 @@ export function registerRoutes(app: Express): Server {
       const webhookResult = await sendToWebhook(formData, req.headers);
 
       // DIAGNOSTIC: Log webhook result with the same ID for correlation
-      console.log(`📊 [${diagnosticId}] WEBHOOK RESULT: ${webhookResult.success ? 'SUCCESS' : 'FAILURE'} - ${new Date().toISOString()}`);
+      console.log(`📊 [${diagnosticId}] WEBHOOK RESULT: ${webhookResult?.success ? 'SUCCESS' : 'FAILURE'} - ${new Date().toISOString()}`);
 
-      if (webhookResult.success) {
+      if (webhookResult && webhookResult.success) {
         console.log(`🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM`);
 
         res.json({ 
@@ -1070,11 +1070,11 @@ export function registerRoutes(app: Express): Server {
           message: "Lead successfully sent to CRM system"
         });
       } else {
-        console.error("❌ WEBHOOK DELIVERY FAILED:", webhookResult.message);
+        console.error("❌ WEBHOOK DELIVERY FAILED:", webhookResult?.message || 'Unknown error - webhookResult is undefined');
         res.status(500).json({ 
           success: false, 
           message: "Failed to send lead to CRM system", 
-          error: webhookResult.message 
+          error: webhookResult?.message || 'Unknown error occurred' 
         });
       }
     } catch (error) {
