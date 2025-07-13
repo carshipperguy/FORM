@@ -155,8 +155,24 @@ export default function Booking() {
         bookingCompletedAt: new Date().toISOString()
       };
 
-      // Meta CAPI event sending removed as part of rollback
-      console.log("⚠️ Meta CAPI tracking disabled - continuing with normal flow");
+      // Track Meta Pixel Purchase event
+      if (typeof window !== 'undefined' && window.fbq) {
+        console.log("📊 Tracking Meta Pixel Purchase event");
+        window.fbq('track', 'Purchase', {
+          content_name: 'Auto Transport Booking',
+          content_category: 'Auto Transport',
+          value: finalData.finalPrice,
+          currency: 'USD',
+          content_ids: [finalData.selectedTransport],
+          custom_data: {
+            pickup_location: finalData.pickupLocation,
+            dropoff_location: finalData.dropoffLocation,
+            vehicle_type: finalData.vehicleType,
+            transport_type: finalData.selectedTransport,
+            guaranteed_date: finalData.guaranteedDate
+          }
+        });
+      }
 
       // Submit the final data to our backend endpoint
       console.log("🚀 Submitting final order data to API");

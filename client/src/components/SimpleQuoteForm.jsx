@@ -14,6 +14,14 @@ import LocationMenuSelector from "./LocationMenuSelector";
 const SimpleQuoteForm = () => {
   const [, navigate] = useLocation();
 
+  // Helper function to get cookie value
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  };
+
   const [formData, setFormData] = useState({
     pickupLocation: "",
     dropoffLocation: "",
@@ -307,15 +315,34 @@ const SimpleQuoteForm = () => {
         utm_content,
       });
 
+      // Track Meta Pixel event for form submission
+      if (typeof window !== 'undefined' && window.fbq) {
+        console.log("📊 Tracking Meta Pixel Lead event");
+        window.fbq('track', 'Lead', {
+          content_name: 'Auto Transport Quote',
+          content_category: 'Auto Transport',
+          value: openTransportPrice,
+          currency: 'USD',
+          custom_data: {
+            pickup_location: formData.pickupLocation,
+            dropoff_location: formData.dropoffLocation,
+            vehicle_type: formData.vehicleType,
+            vehicle_year: formData.year,
+            vehicle_make: formData.make,
+            vehicle_model: formData.model
+          }
+        });
+      }
+
       // Send data to webhook when "Get Quote" is clicked
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
       try {
-        // Add basic data to the webhook payload
+        // Add Meta CAPI data to the webhook payload
         const webhookData = {
           ...quoteData,
           eventType: "quote_submission",
           eventDate: new Date().toISOString(),
-          // Basic URL attribution - no Meta CAPI integration
+          // Meta CAPI attribution data
           fbclid: fbclid || null,
           utm_source: utm_source || null,
           utm_medium: utm_medium || null,
@@ -323,6 +350,31 @@ const SimpleQuoteForm = () => {
           utm_term: utm_term || null,
           utm_content: utm_content || null,
           referrer: document.referrer || "",
+          // Meta CAPI specific data
+          meta_capi_data: {
+            event_name: 'Lead',
+            event_time: Math.floor(Date.now() / 1000),
+            user_data: {
+              em: quoteData.email ? btoa(quoteData.email.toLowerCase().trim()) : null,
+              ph: quoteData.phone ? btoa(quoteData.phone.replace(/\D/g, '')) : null,
+              client_ip_address: null, // Will be populated server-side
+              client_user_agent: navigator.userAgent,
+              fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
+              fbp: this.getCookie('_fbp') || null
+            },
+            custom_data: {
+              content_name: 'Auto Transport Quote',
+              content_category: 'Auto Transport',
+              value: openTransportPrice,
+              currency: 'USD',
+              pickup_location: formData.pickupLocation,
+              dropoff_location: formData.dropoffLocation,
+              vehicle_type: formData.vehicleType,
+              vehicle_year: formData.year,
+              vehicle_make: formData.make,
+              vehicle_model: formData.model
+            }
+          }
         };
 
         // Use await to ensure we catch any errors properly

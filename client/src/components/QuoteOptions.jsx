@@ -75,8 +75,24 @@ const QuoteOptions = ({ data }) => {
       quoteSelectedAt: new Date().toISOString()
     };
 
-    // Meta CAPI event sending removed as part of rollback
-    console.log("⚠️ Meta CAPI tracking disabled - continuing with normal flow");
+    // Track Meta Pixel InitiateCheckout event
+    if (typeof window !== 'undefined' && window.fbq) {
+      console.log("📊 Tracking Meta Pixel InitiateCheckout event");
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: 'Auto Transport Quote Selection',
+        content_category: 'Auto Transport',
+        value: price,
+        currency: 'USD',
+        content_ids: [transportType],
+        custom_data: {
+          pickup_location: formData.pickupLocation,
+          dropoff_location: formData.dropoffLocation,
+          vehicle_type: formData.vehicleType,
+          transport_type: transportType,
+          guaranteed_date: transport === "express"
+        }
+      });
+    }
     
     // We're not sending a webhook here - only at initial form submission and final booking
 
