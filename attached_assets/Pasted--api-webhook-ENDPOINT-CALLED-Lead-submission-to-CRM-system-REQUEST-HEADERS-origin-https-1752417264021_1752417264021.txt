@@ -1,0 +1,50 @@
+  /api/webhook ENDPOINT CALLED - Lead submission to CRM system
+📋 REQUEST HEADERS: {"origin":"https://7f5f7bde-20d9-4674-bda7-c765a0996c30-00-1kjmqq2f9e6as.picard.replit.dev","content-type":"application/json","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0","content-length":"1300","referer":"https://7f5f7bde-20d9-4674-bda7-c765a0996c30-00-1kjmqq2f9e6as.picard.replit.dev/"}
+✅ SUBMISSION HAS CUSTOMER DATA - Processing normally
+📝 WEBHOOK DATA RECEIVED: {
+  name: 'Test Usama',
+  email: 'citexsoft@gmail.com',
+  phone: '12345678',
+  vehicle: '2025 BMW 7 Series',
+  from: 'New York, NY 11229',
+  to: 'New York, NY 10282',
+  eventType: 'quote_submission'
+}
+✅ WEBHOOK DATA VALIDATION PASSED - All required fields present and valid
+⚠️ WARNING: WEBHOOK_URL environment variable is not set - will use fallback URL
+✅ WEBHOOK DATA VALIDATION PASSED - Sending to external system
+🎯 Attribution webhook fired
+🎯 ATTRIBUTION WEBHOOK FIRED - Processing data
+📨 Attribution Webhook Data Structure: {"has_email":true,"has_phone":true,"has_utm_source":false,"has_utm_medium":false,"has_utm_campaign":false,"utm_source_value":"","utm_medium_value":"","utm_campaign_value":"","data_keys":["pickupLocation","dropoffLocation","vehicleType","year","make","model","shipmentDate","name","phone","email","pickupZip","dropoffZip","openTransportPrice","enclosedTransportPrice","transitTime","distance","eventType","eventDate","fbclid","utm_source","utm_medium","utm_campaign","utm_term","utm_content","referrer","meta_capi_data"]}
+🔍 CRM_DOMAIN: "amerigoautotransport.replit.app"
+📤 ATTRIBUTION WEBHOOK URL: https://amerigoautotransport.replit.app/api/crm/track-lead-source
+📋 ATTRIBUTION PAYLOAD: {"email_domain":"gmail.com","phone_prefix":"123***","utm_source":null,"utm_medium":null,"utm_campaign":null,"utm_term":null,"utm_content":null,"fbclid":"none","referrer":"https://7f5f7bde-20d9-4674-bda7-c765a0996c30-00-1kjmqq2f9e6as.picard.replit.dev/"}
+🚨 CRITICAL: SENDING ATTRIBUTION DATA TO CRM: https://amerigoautotransport.replit.app/api/crm/track-lead-source
+📦 ATTRIBUTION PAYLOAD BEING SENT: {"email":"citexsoft@gmail.com","phone":"12345678","utm_source":null,"utm_medium":null,"utm_campaign":null,"utm_term":null,"utm_content":null,"fbclid":null,"referrer":"https://7f5f7bde-20d9-4674-bda7-c765a0996c30-00-1kjmqq2f9e6as.picard.replit.dev/"}
+📊 [diag_1752416769977_9sqpz] ATTEMPTING MAIN WEBHOOK - 2025-07-13T14:26:09.977Z
+
+📝 WEBHOOK DIAGNOSTIC: REQUEST STARTED
+🔖 Request ID: req_1752416769979_gfnl750a
+🌐 URL: https://hooks.zapier.com/hooks/catch/18240296/20zu8bj/
+📦 Payload Size: 1887 bytes
+⏱️ Time since last webhook: First request
+📤 Event Type: quote_submission
+📋 Headers: {
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "User-Agent": "Amerigo-Auto-Transport/1.0",
+  "X-Request-ID": "req_1752416769979_gfnl750a"
+}
+
+📝 WEBHOOK DIAGNOSTIC: REQUEST COMPLETED
+🔖 Request ID: req_1752416769979_gfnl750a
+⏱️ Response Time: 144ms
+🚦 Status: 200 (Success)
+✅ Webhook delivered successfully
+
+📊 WEBHOOK HEALTH METRICS:
+📊 Total attempts: 1
+📊 Success rate: 100.0%
+📊 Average response time: 144.0ms
+📊 Time since first webhook: 0s
+📊 [diag_1752416769977_9sqpz] WEBHOOK RESULT: SUCCESS - 2025-07-13T14:26:10.124Z
