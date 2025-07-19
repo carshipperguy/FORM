@@ -562,6 +562,14 @@ export async function sendToWebhook(data: any, headers: any = {}): Promise<{ suc
       console.log("📊 META CAPI: No conversion data found in webhook payload");
     }
 
+    // Return success after all processing is complete
+    console.log("✅ WEBHOOK SENT SUCCESSFULLY");
+    return { 
+      success: true, 
+      message: "Webhook data successfully delivered to CRM system",
+      diagnostics: diagnosticData
+    };
+
   } catch (error) {
     console.error("❌ WEBHOOK ERROR:", error);
     
