@@ -564,9 +564,32 @@ export async function sendToWebhook(data: any, headers: any = {}): Promise<{ suc
 
   } catch (error) {
     console.error("❌ WEBHOOK ERROR:", error);
+    
+    // Ensure we always return a valid result object
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    // Record the failure in diagnostics if possible
+    try {
+      recordWebhookAttempt(
+        'unknown-webhook-url',
+        false,
+        0,
+        0,
+        0,
+        `Critical webhook failure: ${errorMessage}`
+      );
+    } catch (diagError) {
+      console.error("❌ Failed to record webhook failure in diagnostics:", diagError);
+    }
+    
     return { 
       success: false, 
-      message: `Error sending webhook: ${error instanceof Error ? error.message : String(error)}` 
+      message: `Critical webhook error: ${errorMessage}`,
+      diagnostics: {
+        error: errorMessage,
+        timestamp: Date.now(),
+        criticalFailure: true
+      }
     };
   }
 }

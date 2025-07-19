@@ -1070,11 +1070,18 @@ export function registerRoutes(app: Express): Server {
           message: "Lead successfully sent to CRM system"
         });
       } else {
-        console.error("❌ WEBHOOK DELIVERY FAILED:", webhookResult?.message || 'Unknown error - webhookResult is undefined');
+        // Handle case where webhookResult is undefined or null
+        const errorMessage = webhookResult?.message || 'Webhook function returned undefined - critical system error';
+        const errorDetails = webhookResult ? `Webhook failed: ${errorMessage}` : 'Webhook function failed to return a result object';
+        
+        console.error(`❌ [${diagnosticId}] WEBHOOK DELIVERY FAILED:`, errorDetails);
+        console.error(`❌ [${diagnosticId}] Full webhook result:`, webhookResult);
+        
         res.status(500).json({ 
           success: false, 
           message: "Failed to send lead to CRM system", 
-          error: webhookResult?.message || 'Unknown error occurred' 
+          error: errorMessage,
+          diagnosticId: diagnosticId
         });
       }
     } catch (error) {
