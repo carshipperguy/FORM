@@ -57,6 +57,11 @@ export async function setupVite(app: Express, server: Server) {
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      
+      // Replace environment variables in development
+      const metaPixelId = process.env.META_PIXEL_ID || '953087176815191';
+      template = template.replace(/%META_PIXEL_ID%/g, metaPixelId);
+      
       template = template.replace(
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
