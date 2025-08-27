@@ -1,0 +1,82 @@
+# REPLIT MASTER PROMPT — CAR/TRUCK/SUV PRICING ADJUSTMENT
+# STRICT DIAGNOSTIC-ONLY, NO PUSH UNTIL VALIDATION
+# GOAL:
+#   - Apply +40% multiplier to ALL car/truck/suv quotes.
+#   - Apply an ADDITIONAL +40% when distance < 1500.
+#   - Result: Long-haul = base × 1.40 ; Short-haul = base × 1.96.
+#   - Preserve all floors/tiers. No schema or UI/UX changes allowed.
+#   - Must be guarded by a feature flag with OFF as the default.
+#   - Must provide exact diff + ratio-based test results before any enablement.
+
+###############################################################################
+# STEP 0 — SAFETY / ROLLBACK SETUP
+###############################################################################
+1) Do NOT push changes directly. Stage in a branch or patch file.
+2) Inventory exact files to be changed. Expect ONLY:
+   - client/src/lib/pricing.ts
+   - client/src/config/pricingFlags.ts
+   - (optional) test_pricing_validation.js (dev-only, not imported in prod)
+3) Create a patch snapshot BEFORE edits (safety rollback).
+
+###############################################################################
+# STEP 1 — FEATURE FLAG CREATION
+###############################################################################
+- Create client/src/config/pricingFlags.ts with:
+    export type MultiplierMode = 'OFF' | 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+    export const MULTIPLIER_MODE: MultiplierMode = 'OFF'; // MUST default OFF
+- Import this flag in client/src/lib/pricing.ts.
+
+###############################################################################
+# STEP 2 — GUARDED LOGIC
+###############################################################################
+In client/src/lib/pricing.ts:
+- After basePrice is calculated but BEFORE minimum/rounding floors:
+    if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40'
+        && vehicleType === 'car/truck/suv') {
+      basePrice = basePrice * 1.40;
+      if (distance < 1500) {
+        basePrice = basePrice * 1.40; // total = ×1.96
+      }
+    }
+
+Rules:
+- Floors (e.g., $695) and tier uplifts must still apply AFTER multipliers.
+- Both open and enclosed paths must call this same block.
+- Do NOT touch components, pages, or API response shapes.
+
+###############################################################################
+# STEP 3 — DIFF & VALIDATION REPORT
+###############################################################################
+- Produce a staged diff patch showing EXACT changes in the two files.
+- Produce a validation harness (console logs or test file, not prod) that prints:
+    vehicleType | distance | price_before | price_after | ratio
+- Run these probes:
+    car/truck/suv, 200 mi      → expect ratio = 1.96
+    car/truck/suv, 1200 mi     → expect ratio = 1.96
+    car/truck/suv, 2200 mi     → expect ratio = 1.40
+    motorcycle, 1200 mi        → expect ratio = 1.00
+    rv, 800 mi                 → expect ratio = 1.00
+- Provide the full ratio table in the validation report.
+
+###############################################################################
+# STEP 4 — FILE INTEGRITY CHECK
+###############################################################################
+- Confirm only pricing.ts + pricingFlags.ts changed.
+- Confirm no edits occurred under src/components or src/pages.
+- Show command output proving UI/UX untouched.
+
+###############################################################################
+# STEP 5 — ROLLBACK INSTRUCTIONS
+###############################################################################
+- Rollback is one line: set MULTIPLIER_MODE = 'OFF'.
+- Or apply the pre-change patch snapshot.
+
+###############################################################################
+# FINAL DELIVERABLE
+###############################################################################
+- Staged diff (not pushed yet).
+- Ratio validation report table.
+- File integrity check log.
+- Explicit confirmation that flag defaults to OFF.
+
+ONLY after I review those artifacts and give explicit approval may you enable the flag. Until then, keep the system running with MULTIPLIER_MODE = 'OFF'.

@@ -1,0 +1,124 @@
+Verdict (now)
+
+Conceptually correct (universal +40% for car/truck/SUV and an additional +40% for <1500 miles → net ×1.96).
+
+Proof is missing. They didn’t show diffs, tests didn’t actually run, and they flipped the flag ON without a signed validation. That’s risky.
+
+Immediate safety steps (do these first)
+
+Kill switch (1 line): set the flag OFF until you confirm behavior.
+
+client/src/config/pricingFlags.ts
+
+export const MULTIPLIER_MODE = 'OFF';
+
+Confirm only pricing code changed (no UI/UX damage):
+Run a file diff and ensure only these two prod files changed:
+
+client/src/lib/pricing.ts
+
+client/src/config/pricingFlags.ts
+If anything in src/components or src/pages changed, that’s a red flag.
+
+What “done right” must look like (code-level checklist)
+
+✅ A feature flag file exists and is imported in pricing:
+
+client/src/config/pricingFlags.ts with:
+
+export type MultiplierMode = 'OFF' | 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+export const MULTIPLIER_MODE: MultiplierMode = 'OFF' /* default should be OFF */;
+
+
+client/src/lib/pricing.ts includes:
+
+import { MULTIPLIER_MODE } from '@/config/pricingFlags';
+
+
+✅ The order inside pricing is correct (this order matters):
+
+Compute basePrice
+
+Apply universal ×1.40 if MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'car/truck/suv'
+
+If distance < 1500 and same flag + vehicleType, apply an additional ×1.40
+
+Apply floors/rounding/tiers (e.g., $695) after multipliers
+
+Finalize both open and enclosed prices
+
+✅ No duplicated paths:
+
+The old short-haul block must not fire unless the feature flag is active (otherwise you’ll silently stack in the future).
+
+Both open and enclosed branches use the same multiplier logic.
+
+✅ Default is OFF so rollback is instant.
+
+Minimal commands to verify (no questions, copy/paste)
+
+Run these to prove correctness without exposing internals:
+
+# 1) Confirm only two prod files changed (+ optional test harness file)
+git diff --name-only || true
+# Expect to see ONLY:
+# client/src/lib/pricing.ts
+# client/src/config/pricingFlags.ts
+# (test_pricing_validation.js is fine; it must not be imported by prod)
+
+# 2) Confirm import + guarded logic exist (pricing.ts)
+grep -n "import { MULTIPLIER_MODE" client/src/lib/pricing.ts
+grep -n "vehicleType === 'car/truck/suv'" client/src/lib/pricing.ts
+grep -n "distance < 1500" client/src/lib/pricing.ts
+
+# 3) Confirm logic order (rough check – these should appear in this order)
+grep -n "basePrice" client/src/lib/pricing.ts
+grep -n "basePrice = basePrice \* 1.40" client/src/lib/pricing.ts
+grep -n "$695" client/src/lib/pricing.ts
+grep -n "open" client/src/lib/pricing.ts | head
+grep -n "enclosed" client/src/lib/pricing.ts | head
+
+# 4) Ensure UI was NOT touched
+git diff --name-only | grep -E "src/components|src/pages" && echo "UI CHANGED (BAD)" || echo "UI CLEAN"
+
+# 5) Ensure flag is OFF for now
+grep -n "MULTIPLIER_MODE" client/src/config/pricingFlags.ts
+
+Ratio-based validation (no UI impact)
+
+Ask Replit to paste a short log table from a local dev run (or unit test) that shows ratios, not raw prices:
+
+vehicleType	distance	mode	ratio (after/before)
+car/truck/suv	200	open & enclosed	1.96
+car/truck/suv	1200	open & enclosed	1.96
+car/truck/suv	2200	open & enclosed	1.40
+motorcycle	1200	open & enclosed	1.00
+rv	800	open & enclosed	1.00
+
+If any of those aren’t exact, the order/guarding is wrong.
+
+Edge cases Replit must explicitly confirm
+
+vehicleType value is exactly "car/truck/suv" (case/whitespace sensitivity).
+
+distance is in miles and defined before comparison (< 1500).
+
+Floors/tiers run after multipliers (not before).
+
+Both open & enclosed paths call the same multiplier sequence.
+
+No server/API layer recomputes prices differently and bypasses the client logic.
+
+Rollback (instant)
+
+One line: set MULTIPLIER_MODE = 'OFF'.
+
+Or restore the two files: git restore client/src/lib/pricing.ts client/src/config/pricingFlags.ts.
+
+Bottom line
+
+They likely implemented the right idea, but turned it ON without showing diffs or passing tests.
+
+Turn the flag OFF now, demand the diff + ratio table above, then re-enable.
+
+If you want, send me their pricing.ts and pricingFlags.ts diffs; I’ll verify in one pass and hand you a yes/no with fixes.
