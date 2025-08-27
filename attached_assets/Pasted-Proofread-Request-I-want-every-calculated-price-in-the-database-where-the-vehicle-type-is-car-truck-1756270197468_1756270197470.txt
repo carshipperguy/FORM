@@ -1,0 +1,35 @@
+Proofread Request
+
+I want every calculated price in the database where the vehicle type is car/truck/SUV to be automatically increased by 40%, regardless of the current pricing rules. Please assess the feasibility of this implementation, and confirm whether it can be done safely.
+
+Diagnostic Prompt for Replit
+# REPLIT QUOTE CALCULATOR – DIAGNOSTIC PROMPT
+# Objective: Assess viability of applying a universal +40% multiplier to all calculated prices 
+# in the database where vehicle_type = "car/truck/suv".
+
+Instructions:
+1. Trace where final calculated prices are stored in the database (likely in quotes or orders table).
+   - Identify the exact field name(s) (e.g., broker_fee, total_price, final_price).
+   - Confirm whether the calculation occurs at insert/update time or dynamically at read time.
+2. Verify that the vehicle_type field exists consistently in the database schema 
+   (string value “car/truck/suv”).
+3. Identify the safest location to apply a universal 1.40 multiplier:
+   a) At calculation stage (pricing service / controller).
+   b) Or at read stage (API response layer).
+   Recommend the cleaner approach that avoids duplicating logic.
+4. Confirm that applying this multiplier will not:
+   - Break existing minimum pricing floor rules ($695).
+   - Cause double-application of other markups (under 1500 miles, 17.5% tier adjustment).
+   - Affect non-car/truck/suv vehicle types.
+5. Report back with:
+   - Exact files and lines where the universal multiplier should be inserted.
+   - Whether database schema/UI changes are required (should be NONE).
+   - Potential conflicts or risks (double markups, unintended carry-over into reports).
+   - A clean path for implementation (centralized adjustment).
+
+Deliverable:
+Provide a plain-English feasibility report that tells me:
+- Where the multiplier can be applied globally and reliably.
+- Whether this will overwrite or stack with any existing adjustments.
+- Confirmation that this can be done without schema or UI changes.
+- Steps needed to avoid double application.
