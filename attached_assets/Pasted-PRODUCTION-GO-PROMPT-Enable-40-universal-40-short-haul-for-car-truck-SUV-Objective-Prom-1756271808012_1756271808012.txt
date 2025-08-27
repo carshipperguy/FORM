@@ -1,0 +1,111 @@
+PRODUCTION GO PROMPT — Enable “+40% universal” + “+40% short-haul” for car/truck/SUV
+
+Objective
+Promote the already‐validated change to production with zero UI/UX drift, no schema changes, and a one-line rollback via the existing feature flag.
+
+Do not proceed if any hard-stop fails.
+
+0) Preconditions (must confirm first)
+
+STAGED_DIFF_PATCH.txt shows changes to exactly two prod files:
+
+client/src/lib/pricing.ts
+
+client/src/config/pricingFlags.ts
+
+GO_NO_GO_PACKAGE.md includes the ratio table from staging with exact expectations:
+
+car/truck/suv @ 200 mi → 1.96
+
+car/truck/suv @ 1200 mi → 1.96
+
+car/truck/suv @ 2200 mi → 1.40
+
+motorcycle @ 1200 mi → 1.00
+
+rv @ 800 mi → 1.00
+
+Floors/tiers/rounding behavior confirmed unchanged in staging.
+
+UI/UX integrity: no changes under src/components or src/pages.
+
+If all pass, continue.
+
+1) Promote the exact two-file change
+
+Apply the staged patch to the prod branch (no other files).
+
+In client/src/config/pricingFlags.ts, set:
+
+export const MULTIPLIER_MODE: MultiplierMode = 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+
+
+Record the commit hash and attach STAGED_DIFF_PATCH.txt to the release notes.
+
+2) Deploy + immediate post-deploy validation (no UI changes)
+
+Run these checks right after deploy:
+
+A. File integrity
+
+git diff --name-only <prev_prod_commit>...HEAD | sed 's/^/- /'
+
+
+Expected output:
+
+client/src/lib/pricing.ts
+
+client/src/config/pricingFlags.ts
+
+B. Sanity routes (operator test via existing UI, no code added)
+Use the same inputs you used in staging and capture the final quoted numbers in prod for:
+
+car/truck/suv: one route < 1500 mi, one route around ~1200 mi, one > 1500 mi
+
+motorcycle: ~1200 mi
+
+RV: ~800 mi
+
+Compute ratio = prod_price / staging_baseline_price in a scratch sheet:
+
+Expect 1.96 for car/truck/suv under 1500 mi
+
+Expect 1.40 for car/truck/suv over/equal 1500 mi
+
+Expect 1.00 for motorcycle and RV
+
+Allow minor differences only from rounding. Any deviation beyond rounding = STOP & rollback.
+
+C. Floors/tiers spot check
+Verify at least one case that previously hit the $695 floor still hits the floor after multiplier logic. Verify any tier bumps still trigger exactly as before.
+
+3) Monitoring & guardrails (first session after deploy)
+
+Scan logs for errors/exceptions in pricing execution path.
+
+Confirm no changes to non-target vehicle types.
+
+Confirm identical behavior for open and enclosed calculations other than the intended multipliers.
+
+4) Rollback (one-line kill switch)
+
+If anything is off, immediately set:
+
+export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
+
+
+Redeploy the two files only. That fully restores original pricing behavior. Keep the patch and commit hash for audit.
+
+5) Final deliverables back to me
+
+Commit hash of production enablement.
+
+File integrity output (only 2 prod files changed).
+
+The prod ratio table side-by-side with staging baseline (numbers + computed ratios).
+
+Confirmation that floors/tiers/rounding are unchanged.
+
+Note confirming no src/components or src/pages diffs.
+
+Only after you return these items and they pass review is this change considered fully accepted.
