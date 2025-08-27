@@ -1,0 +1,130 @@
+MASTER PROMPT TO REPLIT — ENABLE 40% + 40% WITH BULLETPROOF GUARDS
+# REPLIT MASTER PROMPT — ENABLE "40% UNIVERSAL + 40% SHORT-HAUL" FOR car/truck/suv
+# PURPOSE: Turn the feature ON in a controlled way with strict validation, zero UI/UX drift, and instant rollback.
+# ABSOLUTE RULES:
+#   - Touch ONLY these prod files:
+#       1) client/src/lib/pricing.ts
+#       2) client/src/config/pricingFlags.ts
+#     (Optional dev-only file allowed): test_pricing_validation.js
+#   - NO schema changes. NO component/page changes. NO endpoint shape changes.
+#   - Preserve floors/tiers/rounding exactly as-is. Do not refactor unrelated logic.
+#   - Provide artifacts BEFORE enabling in prod. Do not “get creative.”
+
+###############################################################################
+# STEP 0 — SAFETY SNAPSHOT (NO LOGIC CHANGES)
+###############################################################################
+1) Create a pre-change snapshot (for instant rollback):
+   git status || true
+   git diff > SAFETY_SNAPSHOT_BEFORE.patch || true
+
+2) Inventory of files you will edit (must be exactly 2 prod files, plus optional test harness):
+   - client/src/lib/pricing.ts
+   - client/src/config/pricingFlags.ts
+   - test_pricing_validation.js (dev-only; NOT imported in production)
+
+###############################################################################
+# STEP 1 — VERIFY FLAG EXISTS & DEFAULTS OFF
+###############################################################################
+3) Confirm feature flag file content (must exist EXACTLY like below, default OFF):
+   // client/src/config/pricingFlags.ts
+   export type MultiplierMode = 'OFF' | 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+   export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
+
+4) Confirm pricing imports the flag (single import):
+   // in client/src/lib/pricing.ts
+   import { MULTIPLIER_MODE } from '@/config/pricingFlags';
+
+###############################################################################
+# STEP 2 — GUARDED PRICING ORDER (NO UI CHANGES)
+###############################################################################
+5) Confirm/ensure this exact order in pricing.ts (apply to BOTH open and enclosed flows):
+   (i)   compute basePrice
+   (ii)  if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'car/truck/suv') {
+            basePrice = basePrice * 1.40;           // universal +40%
+            if (distance < 1500) basePrice = basePrice * 1.40;  // extra +40% (short-haul)
+         }
+   (iii) apply floors/tiers/rounding (e.g., $695 floor, tier bumps)
+   (iv)  finalize open/enclosed prices
+
+   NOTE:
+   - Do NOT alter floor/tier code.
+   - Do NOT add any UI/UX logic. No component/page edits.
+
+###############################################################################
+# STEP 3 — RATIO VALIDATION (DEV-ONLY)
+###############################################################################
+6) Create a dev-only harness (test_pricing_validation.js) that logs BEFORE vs AFTER ratios (after/before).
+   Produce a single table with these probes:
+     car/truck/suv @ 200 mi (open & enclosed)      → expect ratio = 1.96
+     car/truck/suv @ 1200 mi (open & enclosed)     → expect ratio = 1.96
+     car/truck/suv @ 2200 mi (open & enclosed)     → expect ratio = 1.40
+     motorcycle @ 1200 mi                          → expect ratio = 1.00
+     rv @ 800 mi                                   → expect ratio = 1.00
+   - Floors/tiers must remain intact (they run AFTER multipliers).
+   - Do NOT import this file into production runtime.
+
+7) Run the harness locally and paste the exact ratio table (not raw prices).
+
+###############################################################################
+# STEP 4 — FILE INTEGRITY & DIFFS
+###############################################################################
+8) Show that only the two prod files were changed:
+   git diff --name-only | sed 's/^/- /'
+   EXPECTED:
+     - client/src/lib/pricing.ts
+     - client/src/config/pricingFlags.ts
+     - (optional) test_pricing_validation.js
+
+9) Produce a staged diff (not pushed yet) that shows ONLY:
+   - the import and guarded multiplier block in pricing.ts
+   - the pricingFlags.ts file with default OFF
+   Save as: STAGED_DIFF_PATCH.txt
+
+###############################################################################
+# STEP 5 — ENABLE IN DEV/STAGING (FLAG ON), RE-RUN TESTS
+###############################################################################
+10) Flip the flag ON for dev/staging ONLY:
+    // client/src/config/pricingFlags.ts
+    export const MULTIPLIER_MODE: MultiplierMode = 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+
+11) Rebuild/restart dev and re-run the ratio harness. Paste the same validation table again.
+    The ratios must EXACTLY match expectations above (1.96, 1.40, 1.00).
+
+###############################################################################
+# STEP 6 — GO/NO-GO PACKAGE (REQUIRED BEFORE PROD ENABLE)
+###############################################################################
+12) Provide a compact report with:
+    - The ratio validation table (flag OFF baseline and flag ON results).
+    - The STAGED_DIFF_PATCH.txt content.
+    - File integrity output (only two prod files changed).
+    - Confirmation floors/tiers/rounding behavior is unchanged.
+    - Screenshot or log snippet showing “MULTIPLIER_MODE = 'UNIVERSAL_40_PLUS_SHORTHAUL_40'” in dev only.
+
+###############################################################################
+# STEP 7 — PROD ENABLE (AFTER MY EXPLICIT “GO”)
+###############################################################################
+13) ONLY after my explicit “GO”:
+    - Ensure the exact same two-file change is promoted to prod.
+    - Set pricingFlags.ts to:
+        export const MULTIPLIER_MODE: MultiplierMode = 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+    - Tag release:
+        git add -A && git commit -m "Enable 40% universal + 40% short-haul for car/truck/suv behind flag"
+        git tag -a v-40plus40-ENABLE -m "Prod enablement of 1.40 + 1.40 short-haul"
+        (or equivalent deploy step)
+
+###############################################################################
+# STEP 8 — ROLLBACK (ONE-LINE KILL SWITCH)
+###############################################################################
+14) If ANY anomaly appears:
+    - Immediately set:
+        export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
+    - Rebuild/restart. Behavior returns to original logic.
+    - If needed, apply SAFETY_SNAPSHOT_BEFORE.patch to fully revert.
+
+###############################################################################
+# HARD STOP CONDITIONS (DO NOT PROCEED IF ANY FAIL)
+###############################################################################
+- Any files under src/components or src/pages show a diff → STOP and revert.
+- Ratios are not EXACT (1.96 / 1.40 / 1.00) → STOP and fix order/guards.
+- Floors/tiers changed in any way → STOP and revert.
+- Flag default is not OFF in the patch → STOP and fix.

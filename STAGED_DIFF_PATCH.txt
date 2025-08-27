@@ -1,6 +1,6 @@
-=== STAGED DIFF PATCH - CAR/TRUCK/SUV PRICING ADJUSTMENT ===
-=== FILE 1: client/src/config/pricingFlags.ts (NEW FILE) ===
+=== BULLETPROOF STAGED DIFF PATCH ===
 
+FILE 1: client/src/config/pricingFlags.ts (NEW FILE)
 +// PRICING FEATURE FLAGS - CONTROLLED ROLLBACK SYSTEM
 +// PHASE 0: Safety setup for car/truck/suv pricing adjustments
 +
@@ -10,16 +10,14 @@
 +// UNIVERSAL_40_PLUS_SHORTHAUL_40: +40% universal for car/truck/suv, +40% additional for <1500 miles
 +export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
 
-=== FILE 2: client/src/lib/pricing.ts (MODIFIED) ===
-
+FILE 2: client/src/lib/pricing.ts (MODIFIED)
 @@ line 1 @@
  // UNIFIED PRICING SYSTEM - SINGLE PATHWAY FOR ALL VEHICLES
 +import { MULTIPLIER_MODE } from '@/config/pricingFlags';
 +
- const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile for all vehicles
- const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
+ const BASE_RATE_PER_MILE = 0.614;
 
-@@ line 101-106 @@
+@@ line 106-127 @@
 -  // Apply 40% markup for car/truck/suv routes under 1,500 miles
 -  if (distance < 1500 && vehicleType === 'car/truck/suv') {
 -    const priceBeforeMarkup = basePrice;
@@ -50,8 +48,8 @@
 +    }
 +  }
 
-=== SUMMARY ===
-- Total files changed: 2 (1 new, 1 modified)
-- Lines added: ~20
-- Lines removed: 0 (original logic preserved in else clause)
-- Feature flag status: OFF (no behavior change until explicitly enabled)
+SUMMARY:
+- Files changed: 2 production files
+- Flag defaults to OFF (no behavior change)
+- Original logic preserved in else clause
+- Floors/tiers/rounding unchanged

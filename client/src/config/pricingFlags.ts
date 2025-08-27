@@ -5,4 +5,4 @@ export type MultiplierMode = 'OFF' | 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
 
 // DEFAULT: OFF (no changes to pricing behavior)
 // UNIVERSAL_40_PLUS_SHORTHAUL_40: +40% universal for car/truck/suv, +40% additional for <1500 miles
-export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
+export const MULTIPLIER_MODE: MultiplierMode = 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
