@@ -1,0 +1,145 @@
+I need all car/truck/SUV prices to be 40% higher. Additionally, routes that previously received a 40% increase (short-haul, under 1,500 miles) should now be another 40% higher on top of that. Please implement this change in a strictly controlled, diagnostic-only workflow with a clear rollback path and zero UI/UX changes.
+
+MASTER PROMPT FOR REPLIT (copy/paste)
+# REPLIT – CONTROLLED IMPLEMENTATION PLAN
+# GOAL: For vehicle_type === "car/truck/suv":
+#   - Universal +40% multiplier (×1.40) for ALL distances
+#   - PLUS an additional +40% (×1.40) ONLY when distance < 1500
+#   - Net short-haul multiplier: ×1.96 (1.40 × 1.40)
+# HARD REQUIREMENTS:
+#   - DIAGNOSTIC FIRST. DO NOT PUSH CODE TO PROD.
+#   - NO schema changes. NO UI/UX changes. NO endpoint shape changes.
+#   - Single, centralized change with an explicit feature-flag for instant rollback.
+#   - Preserve existing minimum floors and other rules unless explicitly stated.
+
+###############################################################################
+# PHASE 0 — SAFETY / ROLLBACK SETUP (NO LOGIC CHANGES YET)
+###############################################################################
+1) Create a new branch and snapshot:
+   - git checkout -b feature/car-truck-suv-40plus40
+   - git status && git diff > safety_snapshot_before.patch
+
+2) Inventory files (for later verification no UI/UX touched):
+   - Record exact list of files you will edit (expect only pricing library + small config).
+
+3) Add a dedicated feature flag file (no env wiring yet to avoid churn):
+   - File: client/src/config/pricingFlags.ts  (new)
+   - Contents (default OFF):
+       export type MultiplierMode = 'OFF' | 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+       export const MULTIPLIER_MODE: MultiplierMode = 'OFF';
+
+   *This ensures we can enable/disable the behavior by flipping ONE constant later.
+   *Do NOT wire this to UI. Do NOT expose in any screen.
+
+###############################################################################
+# PHASE 1 — DIAGNOSTIC MAPPING (READ-ONLY)
+###############################################################################
+4) Confirm current calculation path (READ-ONLY; NO EDITS):
+   - Locate the pricing module (expected: client/src/lib/pricing.ts).
+   - Identify where:
+       a) vehicle_type is consumed in price calculation
+       b) distance is read
+       c) open vs enclosed prices are finalized
+       d) minimum floor logic is applied (e.g., $695)
+   - Paste back file/line references.
+
+5) Confirm DB storage status (READ-ONLY):
+   - If storage is disabled, note that this change remains purely calculation-stage.
+
+###############################################################################
+# PHASE 2 — GUARDED IMPLEMENTATION (STAGED ONLY, NO PUSH)
+###############################################################################
+6) Edit pricing file (EXPECTED: client/src/lib/pricing.ts). Make the smallest feasible change:
+   - Import the flag:
+       import { MULTIPLIER_MODE } from '@/config/pricingFlags';
+
+   - Ensure base flow order:
+       (i) compute basePrice
+       (ii) apply vehicle multiplier
+       (iii) (conditionally) apply short-haul extra factor
+       (iv) apply existing floors/rounding/other rules
+
+   - Implement logic (pseudo-TypeScript; adapt to local code):
+       // Universal +40% for car/truck/suv when flag enabled
+       if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40'
+           && vehicleType === 'car/truck/suv') {
+         basePrice = basePrice * 1.40;
+
+         // Additional +40% for short-haul only (<1500 mi)
+         if (distance < 1500) {
+           basePrice = basePrice * 1.40; // total ×1.96
+         }
+       }
+
+   - IMPORTANT:
+     * Do NOT remove existing floors (e.g., $695) or tier rules unless instructed.
+     * Ensure both OPEN and ENCLOSED price paths apply the same multiplier logic.
+     * Do NOT touch UI components or API response shapes.
+
+7) Prepare a diff (but DO NOT PUSH):
+   - git diff > staged_change_car_truck_suv_40plus40.patch
+   - Output the diff content as an artifact.
+
+###############################################################################
+# PHASE 3 — VALIDATION (RATIO-BASED TESTS, NO UI CHANGES)
+###############################################################################
+8) Add temporary console/test harness output (or unit tests) to verify RATIO ONLY:
+   - For vehicle_type = 'car/truck/suv', run these 6 probes and log BEFORE vs AFTER ratios:
+       A) distance=200 (open)     → expect ≈ ×1.96
+       B) distance=1200 (open)    → expect ≈ ×1.96
+       C) distance=2200 (open)    → expect ≈ ×1.40
+       D) distance=200 (enclosed) → expect ≈ ×1.96
+       E) distance=1200 (enclosed)→ expect ≈ ×1.96
+       F) distance=2200 (enclosed)→ expect ≈ ×1.40
+
+   - Control probes (unchanged vehicle types):
+       G) motorcycle 1200         → expect ×1.00 (no change)
+       H) rv 800                  → expect ×1.00 (no change)
+
+   - The test should print a table:
+       { vehicleType, distance, open/enclosed, price_before, price_after, ratio = after/before }
+
+   - IMPORTANT: Do not alter UI to run tests. Use existing dev logs or a unit test context.
+
+9) Floor & rule sanity:
+   - Confirm minimum floor still triggers after multipliers.
+   - Confirm any tier rules still trigger as before (unless explicitly disabled).
+   - Confirm rounding rules are applied last.
+
+###############################################################################
+# PHASE 4 — ZERO-TOUCH UI VERIFICATION
+###############################################################################
+10) Grep to confirm we did not touch UI:
+    - grep -r "src/components\|pages" for diffs should show ZERO edits.
+    - Provide a file list diff verifying only pricing + pricingFlags.ts changed.
+
+11) Enable the feature ONLY in local dev for a final preview:
+    - Flip the flag file once to enable:
+        export const MULTIPLIER_MODE = 'UNIVERSAL_40_PLUS_SHORTHAUL_40';
+    - Rebuild locally; verify the same ratios appear in the logs for the 8 probes.
+
+12) Produce a short validation report:
+    - List each probe with before/after/ratio.
+    - Confirm no non-target vehicle types changed.
+    - Confirm both open and enclosed respond identically.
+    - Confirm floors/tiers remain intact.
+
+###############################################################################
+# PHASE 5 — ROLLBACK PLAN (INSTANT)
+###############################################################################
+13) Rollback is one-line:
+    - Set flag back to:
+        export const MULTIPLIER_MODE = 'OFF';
+    - Alternatively, `git restore -p` on pricing.ts + pricingFlags.ts
+      or apply safety_snapshot_before.patch.
+
+14) DO NOT PUSH until I explicitly approve.
+    - Provide: (a) staged diff patch, (b) validation report, (c) confirmation that UI files were untouched.
+
+Notes for you
+
+This keeps everything centralized and reversible.
+
+The flag file gives you a one-line kill-switch if anything looks off.
+
+Tests are ratio-based, so you don’t need to expose internals or change UI to confirm behavior.

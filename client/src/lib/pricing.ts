@@ -1,4 +1,6 @@
 // UNIFIED PRICING SYSTEM - SINGLE PATHWAY FOR ALL VEHICLES
+import { MULTIPLIER_MODE } from '@/config/pricingFlags';
+
 const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile for all vehicles
 const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
 
@@ -98,11 +100,27 @@ export function calculatePrice(
     ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
     : distance * BASE_RATE_PER_MILE;
 
-  // Apply 40% markup for car/truck/suv routes under 1,500 miles
-  if (distance < 1500 && vehicleType === 'car/truck/suv') {
-    const priceBeforeMarkup = basePrice;
+  // PHASE 2: CONTROLLED IMPLEMENTATION - Universal +40% with additional short-haul +40%
+  if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'car/truck/suv') {
+    const priceBeforeUniversal = basePrice;
+    
+    // Universal +40% for ALL car/truck/suv
     basePrice = basePrice * 1.40;
-    console.log(`Applied 40% markup for car/truck/suv route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
+    console.log(`🔄 CONTROLLED: Universal +40% for car/truck/suv: $${priceBeforeUniversal.toFixed(2)} → $${basePrice.toFixed(2)}`);
+    
+    // Additional +40% for short-haul (<1500 miles) - Total ×1.96
+    if (distance < 1500) {
+      const priceBeforeShorthaul = basePrice;
+      basePrice = basePrice * 1.40;
+      console.log(`🔄 CONTROLLED: Additional +40% for short-haul (<1500mi): $${priceBeforeShorthaul.toFixed(2)} → $${basePrice.toFixed(2)} (Total: ×1.96)`);
+    }
+  } else {
+    // ORIGINAL LOGIC: Apply 40% markup for car/truck/suv routes under 1,500 miles
+    if (distance < 1500 && vehicleType === 'car/truck/suv') {
+      const priceBeforeMarkup = basePrice;
+      basePrice = basePrice * 1.40;
+      console.log(`Applied 40% markup for car/truck/suv route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
+    }
   }
 
   // Apply special route minimums if applicable
