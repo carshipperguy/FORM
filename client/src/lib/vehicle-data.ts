@@ -38,7 +38,7 @@ export const makes = [
 ].sort();
 
 export const modelsByMake: Record<string, string[]> = {
-  Toyota: ["4Runner", "Camry", "Corolla", "Highlander", "RAV4", "Sienna", "Tacoma", "Tundra"].sort(),
+  Toyota: ["4Runner", "Avalon", "Camry", "Corolla", "Highlander", "Land Cruiser", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra"].sort(),
   Honda: ["Accord", "Civic", "CR-V", "HR-V", "Odyssey", "Pilot", "Ridgeline"].sort(),
   Ford: [
     "Aerostar", "Aspire", "Bronco", "Bronco Sport", "C-Max", "Chateau", "Club Wagon", 
@@ -62,7 +62,7 @@ export const modelsByMake: Record<string, string[]> = {
     "Traverse", "Uplander", "Vega", "Venture", "Volt"
   ].sort(),
   BMW: ["3 Series", "5 Series", "7 Series", "M3", "M5", "X3", "X5", "X7"].sort(),
-  Audi: ["A3", "A4", "A6", "e-tron", "Q5", "Q7", "RS5", "RS7"].sort(),
+  Audi: ["A3", "A4", "A5", "A6", "A8", "e-tron", "Q3", "Q5", "Q7", "RS5", "RS7"].sort(),
   Tesla: ["Cybertruck", "Model 3", "Model S", "Model X", "Model Y"].sort(),
   RAM: ["1500", "2500", "3500", "ProMaster"].sort(),
   Ram: [
@@ -70,7 +70,7 @@ export const modelsByMake: Record<string, string[]> = {
     "ProMaster 3500 Cargo Van", "ProMaster Cutaway"
   ].sort(),
   GMC: [
-    "Acadia", "Canyon", "Savana 3500 Cutaway", "Savana 4500 Cutaway", "Savana Cargo Van",
+    "Acadia", "Canyon", "Envoy", "Hummer EV", "Savana 3500 Cutaway", "Savana 4500 Cutaway", "Savana Cargo Van",
     "Sierra", "Terrain", "Yukon"
   ].sort(),
   Nissan: [
@@ -80,7 +80,7 @@ export const modelsByMake: Record<string, string[]> = {
   Jeep: ["Cherokee", "Compass", "Gladiator", "Grand Cherokee", "Renegade", "Wrangler"].sort(),
   Hyundai: ["Elantra", "Kona", "Palisade", "Santa Fe", "Sonata", "Tucson"].sort(),
   Kia: ["Forte", "K5", "Sorento", "Soul", "Sportage", "Telluride"].sort(),
-  Volkswagen: ["Atlas", "Golf", "ID.4", "Jetta", "Passat", "Taos", "Tiguan"].sort(),
+  Volkswagen: ["Arteon", "Atlas", "Beetle", "CC", "Eos", "Golf", "ID.4", "ID.Buzz", "Jetta", "Passat", "Routan", "Taos", "Tiguan", "Touareg"].sort(),
   Subaru: ["Ascent", "Crosstrek", "Forester", "Impreza", "Legacy", "Outback"].sort(),
   Lexus: ["ES", "GX", "IS", "LX", "NX", "RX", "UX"].sort(),
   Dodge: [
