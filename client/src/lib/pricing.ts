@@ -114,6 +114,12 @@ export function calculatePrice(
       basePrice = basePrice * 1.40;
       console.log(`🔄 CONTROLLED: Additional +40% for short-haul (<1500mi): $${priceBeforeShorthaul.toFixed(2)} → $${basePrice.toFixed(2)} (Total: ×1.96)`);
     }
+  } else if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'motorcycle') {
+    const priceBeforeMotorcycle = basePrice;
+    
+    // +50% for ALL motorcycles
+    basePrice = basePrice * 1.50;
+    console.log(`🔄 CONTROLLED: +50% for motorcycle: $${priceBeforeMotorcycle.toFixed(2)} → $${basePrice.toFixed(2)}`);
   } else {
     // ORIGINAL LOGIC: Apply 40% markup for car/truck/suv routes under 1,500 miles
     if (distance < 1500 && vehicleType === 'car/truck/suv') {
