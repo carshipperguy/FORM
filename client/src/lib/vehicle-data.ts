@@ -39,7 +39,7 @@ export const makes = [
 
 export const modelsByMake: Record<string, string[]> = {
   Toyota: ["4Runner", "Avalon", "Camry", "Corolla", "Highlander", "Land Cruiser", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra"].sort(),
-  Honda: ["Accord", "Civic", "CR-V", "HR-V", "Odyssey", "Pilot", "Ridgeline"].sort(),
+  Honda: ["Accord", "Civic", "Clarity", "CR-V", "CR-Z", "Crosstour", "Element", "Fit", "HR-V", "Insight", "Odyssey", "Passport", "Pilot", "Prelude", "Prologue", "Ridgeline", "S2000"].sort(),
   Ford: [
     "Aerostar", "Aspire", "Bronco", "Bronco Sport", "C-Max", "Chateau", "Club Wagon", 
     "Contour", "Courier", "Crown Victoria", "Custom Van", "E-350 Cutaway", "E-450 Cutaway", 
@@ -77,7 +77,7 @@ export const modelsByMake: Record<string, string[]> = {
     "Altima", "Frontier", "Kicks", "Maxima", "NV1500 Cargo Van", "NV2500 HD Cargo Van",
     "NV3500 HD Cargo Van", "Pathfinder", "Rogue", "Titan"
   ].sort(),
-  Jeep: ["Cherokee", "Compass", "Gladiator", "Grand Cherokee", "Renegade", "Wrangler"].sort(),
+  Jeep: ["Cherokee", "Comanche", "Commander", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Liberty", "Patriot", "Renegade", "Wagoneer", "Wrangler"].sort(),
   Hyundai: ["Elantra", "Kona", "Palisade", "Santa Fe", "Sonata", "Tucson"].sort(),
   Kia: ["Forte", "K5", "Sorento", "Soul", "Sportage", "Telluride"].sort(),
   Volkswagen: ["Arteon", "Atlas", "Beetle", "CC", "Eos", "Golf", "ID.4", "ID.Buzz", "Jetta", "Passat", "Routan", "Taos", "Tiguan", "Touareg"].sort(),
