@@ -9,7 +9,6 @@ import {
 } from "@/lib/vehicle-data";
 import { calculatePrice } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
-import { PhoneCallTracker, PhoneIcon } from "./phone-call-tracker";
 import { getCurrentSessionId } from "@/lib/attribution-tracker";
 // CSS module import removed - reverting to inline styles
 
@@ -525,51 +524,6 @@ const SimpleQuoteForm = () => {
   return (
     <div className="simple-form-container">
       <form onSubmit={handleSubmit} className="fade-in">
-        {/* Contact Section for Testing Phone Call Tracking */}
-        <div
-          className="form-section"
-          style={{
-            backgroundColor: "#f8f9fa",
-            border: "2px solid #e9ecef",
-            borderRadius: "8px",
-            marginBottom: "20px",
-          }}
-        >
-          <div className="form-header">
-            <h2 style={{ color: "#495057", fontSize: "18px" }}>
-              Need Help? Contact Us
-            </h2>
-          </div>
-          <div style={{ padding: "15px", textAlign: "center" }}>
-            <div style={{ marginBottom: "10px" }}>
-              <span style={{ marginRight: "15px" }}>Call us now:</span>
-              <PhoneCallTracker
-                phoneNumber="(954) 671-8923"
-                source="text"
-                className="text-lg font-semibold"
-                showIcon={true}
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "20px",
-                alignItems: "center",
-              }}
-            >
-              <span>Quick contact:</span>
-              <PhoneIcon
-                phoneNumber="(954) 671-8923"
-                className="hover:bg-blue-100"
-                size="h-8 w-8"
-              />
-              <span style={{ fontSize: "14px", color: "#6c757d" }}>
-                ← Click to test phone tracking
-              </span>
-            </div>
-          </div>
-        </div>
 
         <div className="form-section">
           <div className="form-header">
