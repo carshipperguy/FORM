@@ -9,6 +9,8 @@ import {
 } from "@/lib/vehicle-data";
 import { calculatePrice } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
+import { PhoneCallTracker, PhoneIcon } from "./phone-call-tracker";
+import { getCurrentSessionId } from "@/lib/attribution-tracker";
 // CSS module import removed - reverting to inline styles
 
 const SimpleQuoteForm = () => {
@@ -205,9 +207,9 @@ const SimpleQuoteForm = () => {
 
   // Track Meta Pixel Lead event
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.fbq) {
+    if (typeof window !== "undefined" && window.fbq) {
       console.log("📊 Tracking Meta Pixel Lead event");
-      window.fbq('track', 'Lead');
+      window.fbq("track", "Lead");
     }
   }, []);
 
@@ -219,12 +221,12 @@ const SimpleQuoteForm = () => {
     console.log("📊 Current URL for attribution:", currentUrl);
 
     const attributionData = {
-      fbclid: urlParams.get('fbclid'),
-      utm_source: urlParams.get('utm_source'),
-      utm_medium: urlParams.get('utm_medium'),
-      utm_campaign: urlParams.get('utm_campaign'),
-      utm_term: urlParams.get('utm_term'),
-      utm_content: urlParams.get('utm_content')
+      fbclid: urlParams.get("fbclid"),
+      utm_source: urlParams.get("utm_source"),
+      utm_medium: urlParams.get("utm_medium"),
+      utm_campaign: urlParams.get("utm_campaign"),
+      utm_term: urlParams.get("utm_term"),
+      utm_content: urlParams.get("utm_content"),
     };
 
     console.log("📊 Facebook/Meta attribution parameters:", attributionData);
@@ -235,7 +237,7 @@ const SimpleQuoteForm = () => {
   // Get test event code from URL parameters
   const getTestEventCode = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const testEventCode = urlParams.get('test_event_code');
+    const testEventCode = urlParams.get("test_event_code");
 
     if (testEventCode) {
       console.log("🧪 Test event code detected:", testEventCode);
@@ -472,6 +474,19 @@ const SimpleQuoteForm = () => {
           }
         } else {
           console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
+
+          // Send GetQuote (Lead) event to Meta CAPI after successful quote submission
+          try {
+            console.log("📊 GetQuote: Sending Lead event to Meta CAPI...");
+            await sendGetQuoteEvent(quoteData, formData);
+            console.log("✅ GetQuote: Lead event sent successfully");
+          } catch (getQuoteError) {
+            console.error(
+              "❌ GetQuote: Failed to send Lead event:",
+              getQuoteError,
+            );
+            // Don't fail the quote submission if Meta tracking fails
+          }
         }
       } catch (webhookError) {
         console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
@@ -510,6 +525,52 @@ const SimpleQuoteForm = () => {
   return (
     <div className="simple-form-container">
       <form onSubmit={handleSubmit} className="fade-in">
+        {/* Contact Section for Testing Phone Call Tracking */}
+        <div
+          className="form-section"
+          style={{
+            backgroundColor: "#f8f9fa",
+            border: "2px solid #e9ecef",
+            borderRadius: "8px",
+            marginBottom: "20px",
+          }}
+        >
+          <div className="form-header">
+            <h2 style={{ color: "#495057", fontSize: "18px" }}>
+              Need Help? Contact Us
+            </h2>
+          </div>
+          <div style={{ padding: "15px", textAlign: "center" }}>
+            <div style={{ marginBottom: "10px" }}>
+              <span style={{ marginRight: "15px" }}>Call us now:</span>
+              <PhoneCallTracker
+                phoneNumber="(954) 671-8923"
+                source="text"
+                className="text-lg font-semibold"
+                showIcon={true}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "20px",
+                alignItems: "center",
+              }}
+            >
+              <span>Quick contact:</span>
+              <PhoneIcon
+                phoneNumber="(954) 671-8923"
+                className="hover:bg-blue-100"
+                size="h-8 w-8"
+              />
+              <span style={{ fontSize: "14px", color: "#6c757d" }}>
+                ← Click to test phone tracking
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="form-section">
           <div className="form-header">
             <h2>Origin & Destination</h2>
@@ -1003,5 +1064,77 @@ const SimpleQuoteForm = () => {
     </div>
   );
 };
+
+/**
+ * Send GetQuote (Lead) event to Meta CAPI
+ */
+async function sendGetQuoteEvent(quoteData, formData) {
+  // Get current session ID for attribution
+  const sessionId = getCurrentSessionId();
+
+  if (!sessionId) {
+    console.warn("⚠️ GetQuote: No session ID available for CAPI event");
+    return;
+  }
+
+  console.log("📊 GetQuote: Sending Lead event to Meta CAPI...");
+
+  const metaCapiUrl =
+    "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/meta-capi/event";
+
+  const eventData = {
+    eventName: "Lead",
+    eventData: {
+      event_source_url: window.location.href,
+      action_source: "website",
+      custom_data: {
+        content_name: "Auto Transport Quote",
+        content_category: "Auto Transport",
+        value: quoteData.openTransportPrice || 0,
+        currency: "USD",
+        pickup_location: formData.pickupLocation,
+        dropoff_location: formData.dropoffLocation,
+        vehicle_type: formData.vehicleType,
+        vehicle_year: formData.year,
+        vehicle_make: formData.make,
+        vehicle_model: formData.model,
+        distance: quoteData.distance,
+        session_id: sessionId,
+      },
+    },
+    userData: {
+      email: formData.email,
+      phone: formData.phone ? formData.phone.replace(/\D/g, "") : undefined,
+      first_name: formData.name ? formData.name.split(" ")[0] : undefined,
+      last_name: formData.name
+        ? formData.name.split(" ").slice(1).join(" ")
+        : undefined,
+      client_user_agent: navigator.userAgent,
+    },
+  };
+
+  try {
+    const response = await fetch(metaCapiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `GetQuote event failed: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    console.log("✅ GetQuote: Lead event sent successfully");
+    return await response.json();
+  } catch (error) {
+    console.error("❌ GetQuote: Lead event failed:", error);
+    throw error;
+  }
+}
 
 export default SimpleQuoteForm;

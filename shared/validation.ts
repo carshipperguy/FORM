@@ -40,9 +40,9 @@ export function validateFormData(
   formType: FormType = 'quote'
 ): ValidationError[] {
   const errors: ValidationError[] = [];
-  
+
   // Validate required fields according to the critical instruction document
-  
+
   // Contact information validation
   if (!formData.name) {
     errors.push({
@@ -50,7 +50,7 @@ export function validateFormData(
       message: 'Contact name is required'
     });
   }
-  
+
   // Email - Only check if it exists, no format validation
   if (!formData.email) {
     errors.push({
@@ -58,7 +58,7 @@ export function validateFormData(
       message: 'Email address is required'
     });
   }
-  
+
   // Phone - Only check if it exists, no format validation
   if (!formData.phone) {
     errors.push({
@@ -66,7 +66,7 @@ export function validateFormData(
       message: 'Phone number is required'
     });
   }
-  
+
   // Location validation - pickup
   if (!formData.pickupLocation) {
     errors.push({
@@ -74,14 +74,14 @@ export function validateFormData(
       message: 'Pickup city and state are required'
     });
   }
-  
+
   if (!formData.pickupZip) {
     errors.push({
       field: 'pickupZip',
       message: 'Pickup ZIP code is required'
     });
   }
-  
+
   // Location validation - dropoff
   if (!formData.dropoffLocation) {
     errors.push({
@@ -89,14 +89,14 @@ export function validateFormData(
       message: 'Delivery city and state are required'
     });
   }
-  
+
   if (!formData.dropoffZip) {
     errors.push({
       field: 'dropoffZip',
       message: 'Delivery ZIP code is required'
     });
   }
-  
+
   // Vehicle information validation - only check for presence, not format
   if (!formData.year) {
     errors.push({
@@ -104,21 +104,21 @@ export function validateFormData(
       message: 'Vehicle year is required'
     });
   }
-  
+
   if (!formData.make) {
     errors.push({
       field: 'make',
       message: 'Vehicle make is required'
     });
   }
-  
+
   if (!formData.model) {
     errors.push({
       field: 'model',
       message: 'Vehicle model is required'
     });
   }
-  
+
   // Shipment date validation - only check for presence, not format
   if (!formData.shipmentDate) {
     errors.push({
@@ -126,7 +126,7 @@ export function validateFormData(
       message: 'Shipment date is required'
     });
   }
-  
+
   return errors;
 }
 
@@ -148,7 +148,7 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
       };
     }
   }
-  
+
   // Phone validation (allow various formats, but ensure it's at least 10 digits)
   if (field === 'phone' || field.includes('Phone')) {
     const digitsOnly = String(value).replace(/\D/g, '');
@@ -159,7 +159,7 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
       };
     }
   }
-  
+
   // Location validation (City, State format)
   if (field === 'pickupLocation' || field === 'dropoffLocation') {
     const cityStateRegex = /^[^,]+,\s*[A-Z]{2}/;
@@ -170,7 +170,7 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
       };
     }
   }
-  
+
   // Year validation (should be a number between 1900 and current year + 1)
   if (field === 'year') {
     const year = parseInt(String(value), 10);
@@ -182,7 +182,7 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
       };
     }
   }
-  
+
   // Shipment date validation (should be a valid date)
   if (field === 'shipmentDate') {
     const shipmentDate = new Date(value);
@@ -193,7 +193,7 @@ function validateFieldFormat(field: string, value: any): ValidationError | null 
       };
     }
   }
-  
+
   // All checks passed
   return null;
 }
@@ -222,11 +222,11 @@ function formatFieldName(field: string): string {
     'openTransportPrice': 'Open transport price',
     'enclosedTransportPrice': 'Enclosed transport price'
   };
-  
+
   if (specialCases[field]) {
     return specialCases[field];
   }
-  
+
   // Convert camelCase to Title Case
   return field
     .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
@@ -243,59 +243,59 @@ export function formatValidationErrors(errors: ValidationError[]): string {
   if (errors.length === 0) {
     return '';
   }
-  
+
   if (errors.length === 1) {
     return errors[0].message;
   }
-  
+
   // Group by field type for more user-friendly messages
   const contactInfoErrors = errors.filter(e => 
     ['name', 'email', 'phone'].includes(e.field)
   );
-  
+
   const locationErrors = errors.filter(e => 
     ['pickupLocation', 'dropoffLocation', 'pickupAddress', 'dropoffAddress'].includes(e.field)
   );
-  
+
   const vehicleErrors = errors.filter(e => 
     ['vehicleType', 'year', 'make', 'model'].includes(e.field)
   );
-  
+
   const otherErrors = errors.filter(e => 
     !contactInfoErrors.includes(e) && 
     !locationErrors.includes(e) && 
     !vehicleErrors.includes(e)
   );
-  
+
   let message = 'Please correct the following issues:\n';
-  
+
   if (contactInfoErrors.length > 0) {
     message += '\nContact Information:\n';
     contactInfoErrors.forEach(error => {
       message += `- ${error.message}\n`;
     });
   }
-  
+
   if (locationErrors.length > 0) {
     message += '\nLocation Information:\n';
     locationErrors.forEach(error => {
       message += `- ${error.message}\n`;
     });
   }
-  
+
   if (vehicleErrors.length > 0) {
     message += '\nVehicle Information:\n';
     vehicleErrors.forEach(error => {
       message += `- ${error.message}\n`;
     });
   }
-  
+
   if (otherErrors.length > 0) {
     message += '\nOther Issues:\n';
     otherErrors.forEach(error => {
       message += `- ${error.message}\n`;
     });
   }
-  
+
   return message;
 }

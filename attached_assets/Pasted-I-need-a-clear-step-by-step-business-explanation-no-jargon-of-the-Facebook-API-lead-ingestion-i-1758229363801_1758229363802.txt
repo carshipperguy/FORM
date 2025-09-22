@@ -1,0 +1,57 @@
+I need a clear, step-by-step business explanation (no jargon) of the Facebook API / lead ingestion integration you are currently working on. Here’s the context and what I need explained back to me:
+
+System Context
+
+The app you are working on right now is our Quote Calculator app that sits on the landing page where leads first submit their information.
+
+That app is responsible for receiving lead data from Facebook Ads via the Facebook API (Conversions API / Webhooks).
+
+Once captured, this data is being passed downstream into our Replit CRM app (our main operational CRM).
+
+What I Need Broken Down
+
+Upstream (Facebook → Quote Calculator app)
+
+What exact Facebook API endpoints / permissions / subscriptions have been set up?
+
+How are leads triggered (webhook, server-to-server event, etc.)?
+
+What fields from Facebook are being pulled in (name, phone, email, campaign ID, adset ID, ad creative, etc.)?
+
+Where and how is authentication / token refresh being handled?
+
+Mid-Stream (Inside Quote Calculator app)
+
+How is the incoming payload from Facebook being validated, cleaned, and mapped?
+
+What database tables or storage are leads temporarily landing in inside the Quote Calculator app?
+
+How are we logging or error-handling if a lead fails to ingest correctly?
+
+Are we attaching source/UTM/fbclid data to each record at this stage?
+
+Downstream (Quote Calculator app → CRM app)
+
+By what mechanism is the lead being handed off to the CRM app (API call, queue, webhook, direct DB write)?
+
+In what data format is it being passed (JSON, SQL insert, etc.)?
+
+What fields are guaranteed to persist into the CRM?
+
+How are duplicates or retries handled if the same lead comes through twice?
+
+Additional Clarity Needed
+
+What pieces of this pipeline are already complete, what is partially complete, and what is still missing?
+
+What testing steps will confirm the flow works end-to-end (FB test lead → Quote Calculator → CRM)?
+
+What are the main risks or dependencies (token expiry, API rate limits, field mismatches, Zapier conflict, etc.)?
+
+I am not a developer, but I am technically literate. Please explain this in plain operational terms so I can fully understand:
+
+What has been done upstream, mid-stream, and downstream.
+
+How data flows from Facebook into the Quote Calculator app.
+
+How that data is then passed into the CRM app.

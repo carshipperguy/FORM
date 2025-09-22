@@ -9,32 +9,35 @@ app.use(express.urlencoded({ extended: false }));
 // Add CORS headers to allow cross-origin requests
 app.use((req, res, next) => {
   const origin = req.headers.origin || "";
-  
+
   // In development, allow all origins for local development
   if (app.get("env") === "development") {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header("Access-Control-Allow-Origin", "*");
   } else {
     // Only allow specific production domains in production
     const allowedOrigins = [
-      'https://amerigoautotransport.net',
-      'https://www.amerigoautotransport.net',
+      "https://amerigoautotransport.net",
+      "https://www.amerigoautotransport.net",
     ];
-    
-    if (allowedOrigins.includes(origin) || origin.includes('.replit.app')) {
-      res.header('Access-Control-Allow-Origin', origin);
+
+    if (allowedOrigins.includes(origin) || origin.includes(".replit.app")) {
+      res.header("Access-Control-Allow-Origin", origin);
     }
   }
-  
+
   // Allow credentials (cookies, authorization headers, etc.)
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+
   // Handle preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
-  
+
   next();
 });
 
@@ -88,9 +91,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
+  // Serve the app on the specified port (default to 5000 if not set)
   // this serves both the API and the client
-  const PORT = 5000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
