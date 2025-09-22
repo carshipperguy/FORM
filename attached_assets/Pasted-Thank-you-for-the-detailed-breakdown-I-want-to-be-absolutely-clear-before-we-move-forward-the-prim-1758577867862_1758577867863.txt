@@ -1,0 +1,39 @@
+Thank you for the detailed breakdown. I want to be absolutely clear before we move forward: the primary objective is to preserve all legitimate Facebook API attribution enhancements while fully removing the unintended UI changes without introducing any risk to the live environment.
+
+Alignment With Findings
+
+I agree that the contamination is isolated to the SimpleQuoteForm.jsx contact section (lines 12–13, 528–572) and the phone-call-tracker.tsx file.
+
+The backend logic — Meta Pixel event firing, attribution extraction, and webhook payload enhancements — must remain intact.
+
+The attribution tracker (lib/attribution-tracker.ts) is confirmed as stable and should be preserved in its entirety.
+
+Required Approach
+
+Surgical edits only — remove the UI imports and contact section code, no wider file rewrites.
+
+Backend integrity — double-check that none of the attribution functions rely on the phone-tracking imports before stripping them out.
+
+Controlled branch — work should be done in a separate branch cloned from the stable commit a09c56d, with cherry-picked Meta CAPI changes layered in.
+
+Testing first — isolate in a dev/test environment and validate against the exact pre-contamination UI.
+
+Testing Checklist Before Any Deployment
+
+UI parity: Form begins with “Origin & Destination,” no “Contact Us” or “Quick Call” elements anywhere.
+
+Meta Pixel validation: Confirm Lead event fires on form load, URL parameters are captured, webhook payload includes correct CAPI fields.
+
+Functional workflow: Pricing calculations, quote flow, webhook delivery, and CRM injection all operate identically to the last known stable version.
+
+Monitoring logs: Only expected attribution/pixel logs should appear; no phone-tracking calls, imports, or console noise.
+
+Risk Stance
+
+Rollback plan: Must have immediate rollback path to commit facf5a2 if any instability is detected.
+
+Zero schema change: No modifications allowed outside the UI cleanup.
+
+Deploy window: Should only be deployed after validation in an isolated environment, with rollback standing by.
+
+Next Step: Please prepare a branch exactly as outlined above, run through the full validation plan, and provide confirmation screenshots/logs before touching the live environment.
