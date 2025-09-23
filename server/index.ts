@@ -83,8 +83,8 @@ app.use((req, res, next) => {
   // Always serve static files in production mode
   serveStatic(app);
 
-  // Use port 5000 for production deployment
-  const PORT = Number(process.env.PORT) || 5000;
+  // Use port 5000 for both development and production to match workflow config
+  const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
