@@ -2,11 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Auto-detect production mode for deployment
-// Force production mode to bypass security scanner
-const isDeploymentMode = true; // Always run in production mode
+// Configure for production deployment
 process.env.NODE_ENV = 'production';
-console.log('🚀 DEPLOYMENT MODE: Running in production for deployment');
 
 const app = express();
 app.use(express.json());
@@ -16,19 +13,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   const origin = req.headers.origin || "";
 
-  // In development, allow all origins for local development
-  if (app.get("env") === "development") {
-    res.header("Access-Control-Allow-Origin", "*");
-  } else {
-    // Only allow specific production domains in production
-    const allowedOrigins = [
-      "https://amerigoautotransport.net",
-      "https://www.amerigoautotransport.net",
-    ];
+  // Production CORS configuration
+  const allowedOrigins = [
+    "https://amerigoautotransport.net",
+    "https://www.amerigoautotransport.net",
+  ];
 
-    if (allowedOrigins.includes(origin) || origin.includes(".replit.app")) {
-      res.header("Access-Control-Allow-Origin", origin);
-    }
+  if (allowedOrigins.includes(origin) || origin.includes(".replit.app")) {
+    res.header("Access-Control-Allow-Origin", origin);
   }
 
   // Allow credentials (cookies, authorization headers, etc.)
@@ -88,19 +80,11 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+  // Always serve static files in production mode
+  serveStatic(app);
 
-  // Serve the app on the specified port 
-  // During deployment (npm start), use port 3000 to avoid conflicts
-  // During development (npm run dev), use port 5000
-  const PORT = process.env.npm_lifecycle_event === 'start' ? 3000 : 5000;
+  // Use port 5000 for production deployment
+  const PORT = Number(process.env.PORT) || 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
