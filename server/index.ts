@@ -97,9 +97,10 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve the app on the specified port (default to 5000 if not set)
-  // this serves both the API and the client
-  const PORT = 5000; // Always use port 5000 for deployment compatibility
+  // Serve the app on the specified port 
+  // During deployment (npm start), use port 3000 to avoid conflicts
+  // During development (npm run dev), use port 5000
+  const PORT = process.env.npm_lifecycle_event === 'start' ? 3000 : 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
