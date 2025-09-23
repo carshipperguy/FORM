@@ -2,12 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Auto-detect production mode for deployment
-// Force production mode to bypass security scanner
-const isDeploymentMode = true; // Always run in production mode
-process.env.NODE_ENV = 'production';
-console.log('🚀 DEPLOYMENT MODE: Running in production for deployment');
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -99,7 +93,7 @@ app.use((req, res, next) => {
 
   // Serve the app on the specified port (default to 5000 if not set)
   // this serves both the API and the client
-  const PORT = 5000; // Always use port 5000 for deployment compatibility
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
