@@ -1,50 +1,100 @@
-// Production-ready server that works with workflow configuration
-// This runs the built production server instead of development server
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
 
-import { spawn } from 'child_process';
-import { existsSync } from 'fs';
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-console.log('🔄 Checking for production build...');
+// Add CORS headers to allow cross-origin requests
+app.use((req, res, next) => {
+  const origin = req.headers.origin || "";
 
-if (!existsSync('dist/index.js')) {
-  console.log('❌ Production build not found. Building now...');
-  const buildProcess = spawn('npm', ['run', 'build'], { 
-    stdio: 'inherit',
-    shell: true 
-  });
-  
-  buildProcess.on('close', (code) => {
-    if (code === 0) {
-      console.log('✅ Build completed. Starting production server...');
-      startProductionServer();
-    } else {
-      console.error('❌ Build failed with code', code);
-      process.exit(1);
+  // In development, allow all origins for local development
+  if (app.get("env") === "development") {
+    res.header("Access-Control-Allow-Origin", "*");
+  } else {
+    // Only allow specific production domains in production
+    const allowedOrigins = [
+      "https://amerigoautotransport.net",
+      "https://www.amerigoautotransport.net",
+    ];
+
+    if (allowedOrigins.includes(origin) || origin.includes(".replit.app")) {
+      res.header("Access-Control-Allow-Origin", origin);
+    }
+  }
+
+  // Allow credentials (cookies, authorization headers, etc.)
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
     }
   });
-} else {
-  console.log('✅ Production build found. Starting server...');
-  startProductionServer();
-}
 
-function startProductionServer() {
-  const productionProcess = spawn('node', ['dist/index.js'], {
-    env: { 
-      ...process.env, 
-      NODE_ENV: 'production',
-      PORT: '5000'
-    },
-    stdio: 'inherit',
-    shell: false
+  next();
+});
+
+(async () => {
+  const server = registerRoutes(app);
+
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    res.status(status).json({ message });
+    throw err;
   });
-  
-  productionProcess.on('error', (err) => {
-    console.error('❌ Production server error:', err);
-    process.exit(1);
+
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
+
+  // Serve the app on the specified port (default to 5000 if not set)
+  // this serves both the API and the client
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`serving on port ${PORT}`);
   });
-  
-  productionProcess.on('close', (code) => {
-    console.log(`🛑 Production server exited with code ${code}`);
-    process.exit(code || 0);
-  });
-}
+})();
