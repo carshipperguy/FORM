@@ -296,7 +296,8 @@ export const AttributionConfig = {
       "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session",
   },
   production: {
-    crmApiUrl: "https://your-production-crm.com/api/v1/tracking/session",
+    crmApiUrl:
+      "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session",
   },
 };
 
