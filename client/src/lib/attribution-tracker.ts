@@ -21,6 +21,7 @@ interface AttributionData {
   utmCampaign?: string;
   utmContent?: string;
   utmTerm?: string;
+  sourceUrl?: string;
 }
 
 interface AttributionConfig {
@@ -44,7 +45,7 @@ const defaultConfig: AttributionConfig = {
  */
 function generateSessionId(): string {
   const timestamp = Date.now();
-  const randomPart = Math.random().toString(36).substr(2, 10);
+  const randomPart = Math.random().toString(36).substring(2, 12);
   return `${timestamp}_${randomPart}`;
 }
 
@@ -99,11 +100,25 @@ function extractAttributionData(sessionId: string): AttributionData {
   console.log("📊 Attribution: Extracting attribution data...");
 
   let sourceUrl = window.location.href;
+  let parentParams: Record<string, string> = {};
 
-  // If we're in an iframe, try to get the parent URL for attribution
+  // If we're in an iframe, try to get attribution data from parent
   try {
     if (window.parent && window.parent !== window) {
-      // Attempt to read parent URL (may fail due to cross-origin restrictions)
+      console.log(
+        "📊 Attribution: Detected iframe, requesting parent attribution data...",
+      );
+
+      // Request attribution data from parent via postMessage
+      window.parent.postMessage(
+        {
+          type: "REQUEST_ATTRIBUTION_DATA",
+          origin: window.location.origin,
+        },
+        "*",
+      );
+
+      // Try to read parent URL (may fail due to cross-origin restrictions)
       try {
         sourceUrl = window.parent.location.href;
         console.log(
@@ -112,23 +127,47 @@ function extractAttributionData(sessionId: string): AttributionData {
         );
       } catch (crossOriginError) {
         console.log(
-          "📊 Attribution: Cannot access parent URL (cross-origin), using current URL",
+          "📊 Attribution: Cannot access parent URL (cross-origin), using postMessage approach",
         );
+
+        // Check if we already have parent attribution data stored
+        const storedParentData = sessionStorage.getItem(
+          "parent_attribution_data",
+        );
+        if (storedParentData) {
+          try {
+            parentParams = JSON.parse(storedParentData);
+            console.log(
+              "📊 Attribution: Using stored parent attribution data:",
+              parentParams,
+            );
+          } catch (parseError) {
+            console.log(
+              "📊 Attribution: Error parsing stored parent data:",
+              parseError,
+            );
+          }
+        }
       }
     }
   } catch (error) {
     console.log("📊 Attribution: Error checking iframe status:", error);
   }
 
-  // Extract UTM parameters and fbclid
+  // Extract UTM parameters and fbclid (prefer parent data, fallback to current URL)
   const attribution: AttributionData = {
     sessionId,
-    fbclid: getUrlParameter("fbclid", sourceUrl),
-    utmSource: getUrlParameter("utm_source", sourceUrl),
-    utmMedium: getUrlParameter("utm_medium", sourceUrl),
-    utmCampaign: getUrlParameter("utm_campaign", sourceUrl),
-    utmContent: getUrlParameter("utm_content", sourceUrl),
-    utmTerm: getUrlParameter("utm_term", sourceUrl),
+    fbclid: parentParams.fbclid || getUrlParameter("fbclid", sourceUrl),
+    utmSource:
+      parentParams.utm_source || getUrlParameter("utm_source", sourceUrl),
+    utmMedium:
+      parentParams.utm_medium || getUrlParameter("utm_medium", sourceUrl),
+    utmCampaign:
+      parentParams.utm_campaign || getUrlParameter("utm_campaign", sourceUrl),
+    utmContent:
+      parentParams.utm_content || getUrlParameter("utm_content", sourceUrl),
+    utmTerm: parentParams.utm_term || getUrlParameter("utm_term", sourceUrl),
+    sourceUrl: sourceUrl,
   };
 
   console.log("📊 Attribution: Extracted data:", {
@@ -137,6 +176,7 @@ function extractAttributionData(sessionId: string): AttributionData {
     hasFbclid: !!attribution.fbclid,
     utmCampaign: attribution.utmCampaign,
     sourceUrl: sourceUrl,
+    usedParentData: Object.keys(parentParams).length > 0,
   });
 
   return attribution;
@@ -357,8 +397,36 @@ async function sendPageViewEvent(
   return await response.json();
 }
 
+// Listen for attribution data from parent page (for iframe scenarios)
+if (typeof window !== "undefined") {
+  window.addEventListener("message", (event) => {
+    // Verify the message is attribution data
+    if (event.data && event.data.type === "ATTRIBUTION_DATA") {
+      console.log(
+        "📊 Attribution: Received attribution data from parent:",
+        event.data.params,
+      );
+
+      // Store the attribution data for use in extraction
+      sessionStorage.setItem(
+        "parent_attribution_data",
+        JSON.stringify(event.data.params),
+      );
+
+      // If attribution hasn't been initialized yet, initialize now with parent data
+      if (!(window as any).attributionInitialized) {
+        console.log("📊 Attribution: Re-initializing with parent data...");
+        initializeAttribution();
+      }
+    }
+  });
+}
+
 // Auto-initialize on script load (can be disabled by setting window.disableAutoAttribution = true)
 if (typeof window !== "undefined" && !(window as any).disableAutoAttribution) {
+  // Mark that we're initializing
+  (window as any).attributionInitialized = true;
+
   // Initialize on DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
