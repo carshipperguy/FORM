@@ -255,7 +255,7 @@ async function sendAttributionData(
 export async function initializeAttribution(
   customConfig?: Partial<AttributionConfig>,
 ): Promise<string> {
-  console.log("🚀 Attribution: Initializing attribution tracking...");
+  console.log("🚀 Attribution: Initializing attribution tracking (with 1-second delay)...");
 
   const config = { ...defaultConfig, ...customConfig };
 
@@ -263,7 +263,11 @@ export async function initializeAttribution(
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
 
-    // Extract attribution data from URL
+    // Wait 1 second after initialization before checking attribution data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log("📊 Attribution: 1-second delay completed, checking for attribution data...");
+
+    // Extract attribution data (now checks sessionStorage first)
     const attribution = extractAttributionData(sessionId);
 
     // Check if we have any attribution data
@@ -279,23 +283,18 @@ export async function initializeAttribution(
     // If no attribution data found and we're in an iframe, request from parent
     if (!hasAttributionData && window.parent && window.parent !== window) {
       console.log(
-        "📊 Attribution: No attribution data found, requesting from parent after delay...",
+        "📊 Attribution: No attribution data found after delay, requesting from parent...",
       );
 
-      // Wait 1 second, then request attribution data from parent
-      setTimeout(() => {
+      try {
+        window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
+        console.log("📊 Attribution: REQUEST_ATTRIBUTION_DATA sent to parent");
+      } catch (error) {
         console.log(
-          "📊 Attribution: Requesting attribution data from parent...",
+          "📊 Attribution: Error requesting data from parent:",
+          error,
         );
-        try {
-          window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
-        } catch (error) {
-          console.log(
-            "📊 Attribution: Error requesting data from parent:",
-            error,
-          );
-        }
-      }, 1000);
+      }
     }
 
     // Send to CRM API
