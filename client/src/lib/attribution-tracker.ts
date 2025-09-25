@@ -93,7 +93,7 @@ function getUrlParameter(name: string, url?: string): string | undefined {
 }
 
 /**
- * Extract attribution data from current URL and parent frame
+ * Extract attribution data from sessionStorage first, then URL fallback
  * Supports iframe scenarios where the form is embedded in another page
  */
 function extractAttributionData(sessionId: string): AttributionData {
@@ -102,56 +102,51 @@ function extractAttributionData(sessionId: string): AttributionData {
   let sourceUrl = window.location.href;
   let parentParams: Record<string, string> = {};
 
-  // If we're in an iframe, try to get attribution data from parent
+  // First priority: Check if we have parent attribution data in sessionStorage
   try {
-    if (window.parent && window.parent !== window) {
-      console.log(
-        "📊 Attribution: Detected iframe, requesting parent attribution data...",
-      );
-
-      // Request attribution data from parent via postMessage
-      window.parent.postMessage(
-        {
-          type: "REQUEST_ATTRIBUTION_DATA",
-          origin: window.location.origin,
-        },
-        "*",
-      );
-
-      // Try to read parent URL (may fail due to cross-origin restrictions)
+    const storedParentData = sessionStorage.getItem("parent_attribution_data");
+    if (storedParentData) {
       try {
-        sourceUrl = window.parent.location.href;
+        parentParams = JSON.parse(storedParentData);
         console.log(
-          "📊 Attribution: Using parent URL for attribution:",
-          sourceUrl,
+          "📊 Attribution: Using stored parent attribution data:",
+          parentParams,
         );
-      } catch (crossOriginError) {
+      } catch (parseError) {
         console.log(
-          "📊 Attribution: Cannot access parent URL (cross-origin), using postMessage approach",
+          "📊 Attribution: Error parsing stored parent data:",
+          parseError,
         );
-
-        // Check if we already have parent attribution data stored
-        const storedParentData = sessionStorage.getItem(
-          "parent_attribution_data",
-        );
-        if (storedParentData) {
-          try {
-            parentParams = JSON.parse(storedParentData);
-            console.log(
-              "📊 Attribution: Using stored parent attribution data:",
-              parentParams,
-            );
-          } catch (parseError) {
-            console.log(
-              "📊 Attribution: Error parsing stored parent data:",
-              parseError,
-            );
-          }
-        }
       }
     }
   } catch (error) {
-    console.log("📊 Attribution: Error checking iframe status:", error);
+    console.log("📊 Attribution: Error accessing sessionStorage:", error);
+  }
+
+  // If we don't have parent data and we're in an iframe, try legacy approaches
+  if (Object.keys(parentParams).length === 0) {
+    try {
+      if (window.parent && window.parent !== window) {
+        console.log(
+          "📊 Attribution: No stored data found, checking iframe context...",
+        );
+
+        // Try to read parent URL (may fail due to cross-origin restrictions)
+        try {
+          sourceUrl = window.parent.location.href;
+          console.log(
+            "📊 Attribution: Using parent URL for attribution:",
+            sourceUrl,
+          );
+        } catch (crossOriginError) {
+          console.log(
+            "📊 Attribution: Cannot access parent URL (cross-origin), will use fallback",
+          );
+        }
+      }
+    } catch (error) {
+      console.log("📊 Attribution: Error checking iframe status:", error);
+    }
   }
 
   // Extract UTM parameters and fbclid (prefer parent data, fallback to current URL)
@@ -270,6 +265,38 @@ export async function initializeAttribution(
 
     // Extract attribution data from URL
     const attribution = extractAttributionData(sessionId);
+
+    // Check if we have any attribution data
+    const hasAttributionData = !!(
+      attribution.fbclid ||
+      attribution.utmSource ||
+      attribution.utmMedium ||
+      attribution.utmCampaign ||
+      attribution.utmContent ||
+      attribution.utmTerm
+    );
+
+    // If no attribution data found and we're in an iframe, request from parent
+    if (!hasAttributionData && window.parent && window.parent !== window) {
+      console.log(
+        "📊 Attribution: No attribution data found, requesting from parent after delay...",
+      );
+
+      // Wait 1 second, then request attribution data from parent
+      setTimeout(() => {
+        console.log(
+          "📊 Attribution: Requesting attribution data from parent...",
+        );
+        try {
+          window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
+        } catch (error) {
+          console.log(
+            "📊 Attribution: Error requesting data from parent:",
+            error,
+          );
+        }
+      }, 1000);
+    }
 
     // Send to CRM API
     const success = await sendAttributionData(attribution, config);
@@ -400,10 +427,17 @@ async function sendPageViewEvent(
 // Listen for attribution data from parent page (for iframe scenarios)
 if (typeof window !== "undefined") {
   window.addEventListener("message", (event) => {
+    // First check that the message origin is from the trusted parent domain
+    const trustedOrigin = "https://amerigoautotransport.net";
+    if (event.origin !== trustedOrigin) {
+      // Ignore messages from untrusted origins
+      return;
+    }
+
     // Verify the message is attribution data
     if (event.data && event.data.type === "ATTRIBUTION_DATA") {
       console.log(
-        "📊 Attribution: Received attribution data from parent:",
+        "📊 Attribution: Received attribution data from trusted parent:",
         event.data.params,
       );
 
