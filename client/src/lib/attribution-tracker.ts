@@ -263,32 +263,16 @@ export async function initializeAttribution(
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
 
-    // Wait 1 second after initialization before checking attribution data
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("📊 Attribution: 1-second delay completed, checking for attribution data...");
-
-    // Extract attribution data (now checks sessionStorage first)
-    const attribution = extractAttributionData(sessionId);
-
-    // Check if we have any attribution data
-    const hasAttributionData = !!(
-      attribution.fbclid ||
-      attribution.utmSource ||
-      attribution.utmMedium ||
-      attribution.utmCampaign ||
-      attribution.utmContent ||
-      attribution.utmTerm
-    );
-
-    // If no attribution data found and we're in an iframe, request from parent
-    if (!hasAttributionData && window.parent && window.parent !== window) {
-      console.log(
-        "📊 Attribution: No attribution data found after delay, requesting from parent...",
-      );
-
+    // If we're in an iframe, request attribution data from parent and wait briefly
+    if (window.parent && window.parent !== window) {
+      console.log("📊 Attribution: Requesting attribution data from parent...");
       try {
         window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
         console.log("📊 Attribution: REQUEST_ATTRIBUTION_DATA sent to parent");
+        
+        // Wait up to 2 seconds for parent response
+        console.log("📊 Attribution: Waiting for parent response...");
+        await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (error) {
         console.log(
           "📊 Attribution: Error requesting data from parent:",
@@ -296,6 +280,9 @@ export async function initializeAttribution(
         );
       }
     }
+
+    // Extract attribution data (now checks sessionStorage first)
+    const attribution = extractAttributionData(sessionId);
 
     // Send to CRM API
     const success = await sendAttributionData(attribution, config);
@@ -427,8 +414,11 @@ async function sendPageViewEvent(
 if (typeof window !== "undefined") {
   window.addEventListener("message", (event) => {
     // First check that the message origin is from the trusted parent domain
-    const trustedOrigin = "https://amerigoautotransport.net";
-    if (event.origin !== trustedOrigin) {
+    const trustedOrigins = [
+      "https://amerigoautotransport.net",
+      "https://www.amerigoautotransport.net"
+    ];
+    if (!trustedOrigins.includes(event.origin)) {
       // Ignore messages from untrusted origins
       return;
     }
@@ -446,11 +436,11 @@ if (typeof window !== "undefined") {
         JSON.stringify(event.data.params),
       );
 
-      // If attribution hasn't been initialized yet, initialize now with parent data
-      if (!(window as any).attributionInitialized) {
-        console.log("📊 Attribution: Re-initializing with parent data...");
-        initializeAttribution();
-      }
+      // Always re-send attribution data when parent data is received
+      console.log("📊 Attribution: Re-sending attribution data with parent data...");
+      const sessionId = getOrCreateSessionId({ ...defaultConfig });
+      const attribution = extractAttributionData(sessionId);
+      sendAttributionData(attribution, { ...defaultConfig });
     }
   });
 }
