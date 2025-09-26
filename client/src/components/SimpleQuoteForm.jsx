@@ -429,6 +429,10 @@ const SimpleQuoteForm = () => {
         const apiUrl = `${currentDomain}/api/webhook`;
         console.log("Using webhook API URL:", apiUrl);
 
+        // 🔍 INTERCEPT AND DISPLAY COMPLETE WEBHOOK PAYLOAD
+        console.log("📦 COMPLETE WEBHOOK PAYLOAD:", JSON.stringify(webhookData, null, 2));
+        console.log("🔑 SESSION_ID IN PAYLOAD:", webhookData.session_id);
+
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
           headers: {
