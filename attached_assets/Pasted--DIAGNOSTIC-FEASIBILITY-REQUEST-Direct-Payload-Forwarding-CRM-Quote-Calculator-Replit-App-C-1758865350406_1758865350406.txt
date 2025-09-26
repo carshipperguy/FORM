@@ -1,0 +1,73 @@
+🚨 DIAGNOSTIC FEASIBILITY REQUEST — Direct Payload Forwarding (CRM → Quote Calculator Replit App)
+
+Context (read carefully):
+
+Current flow: When a customer submits a lead form in the CRM app, that lead data is routed to Zapier (which then forwards to other systems including our Quote Calculator app).
+
+Desired change (diagnosis only): Instead of sending the payload to Zapier, can the CRM app also (or instead) forward the same payload directly to our other Replit Quote Calculator app endpoint? Payload must include all marketing tracking info (UTM fields, fbclid, CAPI data, session id) and the full lead data.
+
+Important: Do not disable or remove existing Zapier integrations during analysis. This request is diagnostic/feasibility-only. No implementation or production changes allowed until we explicitly approve.
+
+❓ Primary Questions (answer each with code/file references where applicable)
+
+Feasibility: Is it possible to forward the exact lead payload (including utm_*, fbclid, Facebook CAPI fields, session id) from the CRM app to the Quote Calculator app directly, in addition to (or instead of) Zapier?
+
+Security & Auth: What auth mechanism is required/available between the two Replit apps (API keys, HMAC, OAuth, signed webhook)? Are there existing keys/endpoints? Recommend the safest method to accept direct POSTs.
+
+Payload Shape: Provide an example of the exact JSON body we should forward (include utm_source, utm_medium, utm_campaign, utm_term, utm_content, fbclid, session_id, fb_capi fields if present, and lead form fields).
+
+Reliability: What failure modes must we consider (network errors, rate limits, retries)? Recommend a safe retry/backoff policy and idempotency strategy.
+
+Privacy & Compliance: Any PII/PII+ tracking concerns when forwarding fbclid/CAPI data between apps? Are there cookie/session implications or consent flags that must be respected?
+
+Performance & Load: Can the Quote Calculator app handle direct POST traffic at current lead volumes? Any rate limits on Replit-hosted endpoints or required horizontal scaling?
+
+CORS & Origins: If forwarding originates in-browser or server-side, clarify CORS concerns and confirm whether the CRM should do a server-to-server POST (recommended) or a client-side redirect.
+
+Error handling & observability: What logs/traces must be added to detect dropped or malformed tracking fields? Recommend a minimal logging/alerting set for the forwarding path.
+
+🛠 Audit Tasks (diagnostic only — do not modify production)
+
+Inspect CRM lead ingestion flow and show where the payload is handed to Zapier (file names + lines).
+
+Show the exact payload sent to Zapier for a recent test lead (sanitized) — include sampled values of utm_*, fbclid, session id.
+
+Verify whether CRM currently persists these tracking fields to DB; if so, where (table, column names).
+
+Inspect Quote Calculator app’s ingestion endpoint (URI, accepted fields, required auth) and confirm whether it will accept the forwarded fields as-is.
+
+Produce a short sample script (pseudo or real curl/postman example) that demonstrates how to forward the CRM payload to Quote Calculator including headers & auth (diagnostic example only).
+
+⚠️ Things to watch for (you must report back on each)
+
+Field truncation / type conversion — Are UTM or fbclid being truncated or lost when Zapier forwards? Will direct forwarding avoid these problems?
+
+Session mapping — Does the Quote Calculator app expect a different session id format? Are session IDs valid across apps?
+
+Auth keys leakage risk — If storing API keys in CRM, where will they be kept (env/secrets)? Evaluate rotation plan.
+
+Idempotency — How to avoid duplicate leads if both Zapier and direct forwarding are enabled? Recommend an idempotency key strategy.
+
+Rate limits / timeouts — Any Replit or third-party endpoint limits that would cause dropped forwards.
+
+Deliverables (diagnostic)
+
+Feasibility verdict: Yes / No / Conditional (with explanation).
+
+Detailed evidence: code locations (files + line ranges) showing current Zapier handoff and Quote Calculator ingestion point.
+
+Recommended safe architecture for direct-forwarding (diagram + explanation). Must include: auth method, server-to-server POST as recommended approach, idempotency header, retry/backoff policy.
+
+Sample payload (JSON) and sample curl or Postman config to test forwarding.
+
+List of blocking issues (if any) that would prevent forwarding without changes (e.g., missing auth, mismatched fields, data not persisted, legal/consent issues).
+
+Estimated effort to implement safely (hours) and any minimal test plan required before a production rollout.
+
+Non-Negotiables
+
+This is diagnostic only. No code changes, no disabling Zapier, no deployments.
+
+Do not expose secrets in the report; reference storage locations instead (e.g., env:CRM_FORWARD_API_KEY).
+
+If implementation is feasible, provide a sandbox plan and a rollback plan before any production changes.
