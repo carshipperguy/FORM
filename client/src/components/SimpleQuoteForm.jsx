@@ -40,6 +40,17 @@ const SimpleQuoteForm = () => {
   const [availableModels, setAvailableModels] = useState([]);
   const [isStandardVehicle, setIsStandardVehicle] = useState(false);
 
+  // 🔥 CRITICAL FIX: Persistent attribution state management
+  const [attributionData, setAttributionData] = useState({
+    fbclid: null,
+    utm_source: null,
+    utm_medium: null,
+    utm_campaign: null,
+    utm_term: null,
+    utm_content: null,
+    referrer: "",
+  });
+
   // Determine if vehicle type is a standard car/truck/SUV
   useEffect(() => {
     // Only the "car/truck/suv" type should use dropdown menus
@@ -67,6 +78,67 @@ const SimpleQuoteForm = () => {
       setAvailableModels([]);
     }
   }, [formData.make, isStandardVehicle]);
+
+  // 🔥 CRITICAL FIX: Initialize and persist attribution data on page load
+  useEffect(() => {
+    console.log("🔥 ATTRIBUTION FIX: Initializing attribution data...");
+
+    // Helper function to extract URL parameter
+    const getUrlParameter = (name, url = window.location.href) => {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      return urlParams.get(name);
+    };
+
+    // Initialize attribution data from current URL
+    const initialAttributionData = {
+      fbclid: getUrlParameter("fbclid"),
+      utm_source: getUrlParameter("utm_source"),
+      utm_medium: getUrlParameter("utm_medium"),
+      utm_campaign: getUrlParameter("utm_campaign"),
+      utm_term: getUrlParameter("utm_term"),
+      utm_content: getUrlParameter("utm_content"),
+      referrer: document.referrer || "",
+    };
+
+    console.log("🔥 ATTRIBUTION FIX: Initial attribution data from URL:", initialAttributionData);
+
+    // Set the initial attribution data
+    setAttributionData(initialAttributionData);
+
+    // Listen for postMessage from parent (iframe scenarios)
+    const handleMessage = (event) => {
+      console.log("🔥 ATTRIBUTION FIX: Received postMessage:", event.data);
+
+      if (event.data && event.data.type === "ATTRIBUTION_DATA") {
+        const parentAttributionData = {
+          fbclid: event.data.fbclid || initialAttributionData.fbclid,
+          utm_source: event.data.utm_source || initialAttributionData.utm_source,
+          utm_medium: event.data.utm_medium || initialAttributionData.utm_medium,
+          utm_campaign: event.data.utm_campaign || initialAttributionData.utm_campaign,
+          utm_term: event.data.utm_term || initialAttributionData.utm_term,
+          utm_content: event.data.utm_content || initialAttributionData.utm_content,
+          referrer: event.data.referrer || initialAttributionData.referrer,
+        };
+
+        console.log("🔥 ATTRIBUTION FIX: Updated attribution data from parent:", parentAttributionData);
+        setAttributionData(parentAttributionData);
+      }
+    };
+
+    // Add event listener for postMessage
+    window.addEventListener("message", handleMessage);
+
+    // Request attribution data from parent if in iframe
+    if (window.parent && window.parent !== window) {
+      console.log("🔥 ATTRIBUTION FIX: Requesting attribution data from parent...");
+      window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
+    }
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []); // Empty dependency array - only run on mount
 
   // Check if vehicle year is pre-1990 for free-text model input
   const isVehiclePre1990 = formData.year && parseInt(formData.year) < 1990;
@@ -340,22 +412,18 @@ const SimpleQuoteForm = () => {
         return match ? decodeURIComponent(match[1]) : null;
       }
 
-      // Extract Facebook and UTM tracking parameters from current URL
-      const fbclid = getQueryParam("fbclid", currentUrl);
-      const utm_source = getQueryParam("utm_source", currentUrl);
-      const utm_medium = getQueryParam("utm_medium", currentUrl);
-      const utm_campaign = getQueryParam("utm_campaign", currentUrl);
-      const utm_term = getQueryParam("utm_term", currentUrl);
-      const utm_content = getQueryParam("utm_content", currentUrl);
+      // 🔥 CRITICAL FIX: Use persisted attribution data instead of reading from URL
+      console.log("📊 Facebook/Meta attribution parameters (from persisted state):", attributionData);
 
-      console.log("📊 Facebook/Meta attribution parameters:", {
+      // Extract from persisted state that was captured on page load
+      const {
         fbclid,
         utm_source,
         utm_medium,
         utm_campaign,
         utm_term,
         utm_content,
-      });
+      } = attributionData;
 
       // Track Meta Pixel event for form submission
       if (typeof window !== "undefined" && window.fbq) {
@@ -384,14 +452,14 @@ const SimpleQuoteForm = () => {
           ...quoteData,
           eventType: "quote_submission",
           eventDate: new Date().toISOString(),
-          // Meta CAPI attribution data
+          // Meta CAPI attribution data (from persisted state)
           fbclid: fbclid || null,
           utm_source: utm_source || null,
           utm_medium: utm_medium || null,
           utm_campaign: utm_campaign || null,
           utm_term: utm_term || null,
           utm_content: utm_content || null,
-          referrer: document.referrer || "",
+          referrer: attributionData.referrer || "",
           session_id: getCurrentSessionId(),
           // Meta CAPI specific data
           meta_capi_data: {
@@ -432,6 +500,15 @@ const SimpleQuoteForm = () => {
         // 🔍 INTERCEPT AND DISPLAY COMPLETE WEBHOOK PAYLOAD
         console.log("📦 COMPLETE WEBHOOK PAYLOAD:", JSON.stringify(webhookData, null, 2));
         console.log("🔑 SESSION_ID IN PAYLOAD:", webhookData.session_id);
+        console.log("🔥 ATTRIBUTION DATA IN PAYLOAD:", {
+          fbclid: webhookData.fbclid,
+          utm_source: webhookData.utm_source,
+          utm_medium: webhookData.utm_medium,
+          utm_campaign: webhookData.utm_campaign,
+          utm_term: webhookData.utm_term,
+          utm_content: webhookData.utm_content,
+          referrer: webhookData.referrer
+        });
 
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
@@ -497,17 +574,17 @@ const SimpleQuoteForm = () => {
         // Continue with navigation even if webhook fails
       }
 
-      // Add basic URL parameters to the URL-encoded data for the next page
+      // Add basic URL parameters to the URL-encoded data for the next page (from persisted state)
       const quoteDataWithAttribution = {
         ...quoteData,
-        // Basic attribution data from URL only
+        // Attribution data from persisted state (not URL)
         fbclid: fbclid || null,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
         utm_term: utm_term || null,
         utm_content: utm_content || null,
-        referrer: document.referrer || "",
+        referrer: attributionData.referrer || "",
       };
 
       const params = new URLSearchParams({
