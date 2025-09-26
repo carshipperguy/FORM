@@ -392,6 +392,7 @@ const SimpleQuoteForm = () => {
           utm_term: utm_term || null,
           utm_content: utm_content || null,
           referrer: document.referrer || "",
+          session_id: getCurrentSessionId(),
           // Meta CAPI specific data
           meta_capi_data: {
             event_name: "Lead",
