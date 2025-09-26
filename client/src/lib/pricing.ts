@@ -1,5 +1,5 @@
 // UNIFIED PRICING SYSTEM - SINGLE PATHWAY FOR ALL VEHICLES
-import { MULTIPLIER_MODE } from '@/config/pricingFlags';
+import { MULTIPLIER_MODE, ENABLE_NEW_SPECIAL_PRICING } from '@/config/pricingFlags';
 
 const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile for all vehicles
 const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
@@ -10,8 +10,6 @@ const VEHICLE_MULTIPLIERS: Record<string, number> = {
   "boat": 1.4,
   "golf cart": 0.8,
   "motorcycle": 0.7,
-  "rv/5th wheel": 1.8,
-  "travel trailer": 1.6,
   "atv/utv": 0.75,
   "heavy equipment": 2.0,
   "other": 1.3
@@ -38,6 +36,25 @@ function extractState(location: string): string | null {
 
 // Northeast states for Snowbird route detection
 const NORTHEAST_STATES = ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA'];
+
+// New special pricing function for RV/5th wheel/travel trailer
+function calculateSpecialPricing(miles: number): number {
+  const ratePerMile = 3.0;
+  const minimumPrice = 750;
+  const price = miles * ratePerMile;
+  return Math.max(price, minimumPrice);
+}
+
+// Check if vehicle type is RV/5th wheel/travel trailer
+function isSpecialVehicleType(vehicleType: string): boolean {
+  const lowerType = vehicleType.toLowerCase();
+  return lowerType === 'rv' || 
+         lowerType === 'rv/5th wheel' || 
+         lowerType === 'travel trailer' || 
+         lowerType.includes('rv') || 
+         lowerType.includes('5th wheel') || 
+         lowerType.includes('travel trailer');
+}
 
 export function calculatePrice(
   distance: number,
@@ -175,18 +192,11 @@ export function calculatePrice(
       basePrice = Math.round(basePrice * 1.2);
       console.log(`Car/Truck/SUV middle-range uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+20%)`);
     }
-  } else if (vehicleType.toLowerCase() === 'rv' || vehicleType.toLowerCase() === 'rv/5th wheel' || vehicleType.toLowerCase().includes('rv')) {
-    // RULE 3 & 4: RV-specific logic
-    if (basePrice < 750) {
-      // RULE 3: RV Minimum Floor - $750
-      basePrice = 750;
-      console.log(`RV minimum floor applied: $${priceBeforeRules.toFixed(2)} → $750`);
-    } else if (distance < 1500) {
-      // RULE 4: RV Short-Distance Uplift - 30% for routes under 1500 miles (only if already ≥$750)
-      const priceBeforeUplift = basePrice;
-      basePrice = Math.round(basePrice * 1.3);
-      console.log(`RV short-distance uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+30% for route under 1500 miles)`);
-    }
+  } else if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
+    // NEW SPECIAL PRICING: $3.00 per mile with $750 minimum
+    const specialPrice = calculateSpecialPricing(distance);
+    console.log(`🚀 NEW SPECIAL PRICING applied for ${vehicleType}: ${distance} miles × $3.00 = $${specialPrice} (minimum $750)`);
+    basePrice = specialPrice;
   } else {
     // For other vehicle types, apply $695 minimum as fallback
     const priceBeforeOtherMinimum = basePrice;
@@ -204,21 +214,38 @@ export function calculatePrice(
     priceAfterRules: basePrice.toFixed(2)
   });
 
-  // Apply vehicle type multiplier
+  // Apply vehicle type multiplier (skip for special pricing vehicles)
   let vehicleMultiplier = 1.0;
-  if (vehicleType in VEHICLE_MULTIPLIERS) {
-    vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+  let openTransportPrice = basePrice;
+  
+  if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
+    // Special pricing vehicles don't use multipliers - price is already calculated
+    console.log('Special pricing vehicle - skipping vehicle multiplier');
+    openTransportPrice = basePrice;
   } else {
-    console.warn(`Vehicle type "${vehicleType}" not found in multipliers, using default multiplier: 1.0`);
+    // Apply normal vehicle multiplier
+    if (vehicleType in VEHICLE_MULTIPLIERS) {
+      vehicleMultiplier = VEHICLE_MULTIPLIERS[vehicleType];
+    } else {
+      console.warn(`Vehicle type "${vehicleType}" not found in multipliers, using default multiplier: 1.0`);
+    }
+    openTransportPrice = basePrice * vehicleMultiplier;
   }
 
-  let openTransportPrice = basePrice * vehicleMultiplier;
-
-  console.log('Open transport calculation:', {
-    basePrice,
-    vehicleMultiplier,
-    formula: `$${basePrice.toFixed(2)} × ${vehicleMultiplier} = $${openTransportPrice.toFixed(2)}`
-  });
+  if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
+    console.log('Special pricing calculation:', {
+      distance,
+      ratePerMile: 3.0,
+      minimumFloor: 750,
+      formula: `${distance} miles × $3.00 = $${openTransportPrice} (min $750)`
+    });
+  } else {
+    console.log('Open transport calculation:', {
+      basePrice,
+      vehicleMultiplier,
+      formula: `$${basePrice.toFixed(2)} × ${vehicleMultiplier} = $${openTransportPrice.toFixed(2)}`
+    });
+  }
 
   let enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
 
