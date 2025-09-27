@@ -1,0 +1,64 @@
+🚨 Debug Prompt — Attribution to Zapier (Quote Calculator App)
+
+Objective:
+Verify that the Quote Calculator app is correctly receiving fbclid + UTM parameters from the browser, attaching them to the payload, and sending them to Zapier.
+
+1. Add Debug Logging for URL Parameters
+
+In client/src/main.tsx (or wherever your app boots):
+
+console.log("[ATTRIBUTION DEBUG] window.location.search =", window.location.search);
+
+
+This confirms whether fbclid + utm_* parameters are present when the user first lands on the form page.
+
+2. Log Extracted Attribution Object
+
+In client/src/lib/attribution-tracker.ts after extraction:
+
+console.log("ATTRIBUTION DEBUG (extracted):", {
+  fbclid: attribution.fbclid,
+  utm_source: attribution.utmSource,
+  utm_medium: attribution.utmMedium,
+  utm_campaign: attribution.utmCampaign,
+  utm_content: attribution.utmContent,
+  utm_term: attribution.utmTerm
+});
+
+
+This confirms the app is actually parsing the values from window.location.search and session storage.
+
+3. Log Payload at Form Submission
+
+In client/src/components/SimpleQuoteForm.jsx just before the webhook call:
+
+console.log("🔥 ATTRIBUTION DATA IN PAYLOAD:", {
+  fbclid,
+  utm_source,
+  utm_medium,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  referrer
+});
+
+
+This confirms the attribution fields are included in the body being sent to Zapier.
+
+4. Check Zapier History
+
+Submit a test lead via a Facebook ad click (not a direct URL).
+
+Go to Zapier → Task History.
+
+Confirm that fbclid and all utm_* fields appear in the incoming webhook payload.
+
+5. Pass/Fail Criteria
+
+✅ PASS → Parameters appear in console logs and in Zapier history. Attribution pipeline is working.
+
+❌ FAIL → Parameters missing in console logs → issue is with ad/iframe/browser.
+
+❌ FAIL → Parameters show in console logs but not Zapier history → issue is with webhook payload construction.
+
+⚡ Bottom Line: This debug workflow ensures you can pinpoint exactly where fbclid + UTM data is being lost: browser, extraction, payload construction, or Zapier ingestion.
