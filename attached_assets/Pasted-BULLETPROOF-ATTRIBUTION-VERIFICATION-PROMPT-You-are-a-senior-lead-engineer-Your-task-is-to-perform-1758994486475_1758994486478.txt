@@ -1,0 +1,84 @@
+BULLETPROOF ATTRIBUTION VERIFICATION PROMPT
+
+You are a senior lead engineer. Your task is to perform a full forensic audit of this Quote Calculator app (https://form-carshipperguy.replit.app), which is embedded inside the parent domain https://amerigoautotransport.net.
+
+Objectives
+
+Confirm the parent → iframe attribution handoff is working.
+
+The parent page must capture fbclid + all utm_* parameters from Meta ad URLs.
+
+The parent must securely send those parameters into the iframe via postMessage with targetOrigin set to https://form-carshipperguy.replit.app.
+
+The iframe must receive and persist them in sessionStorage (or equivalent).
+
+Confirm the iframe form submission → Zapier webhook pipeline is working.
+
+When a customer fills out the form, the payload MUST include:
+
+fbclid
+
+utm_source
+
+utm_medium
+
+utm_campaign
+
+utm_content
+
+utm_term
+
+referrer
+
+These fields must appear in the exact JSON payload sent to Zapier.
+
+Verify there are no remaining hardcoded development URLs.
+
+Search the entire codebase for kirk.replit.dev, localhost, or any dev domains.
+
+Replace with environment variables or https://form-carshipperguy.replit.app.
+
+Confirm debug visibility.
+
+Ensure logs exist at every stage:
+
+Incoming browser URL (window.location.search)
+
+Attribution object (attribution-tracker.ts)
+
+Final webhook payload (SimpleQuoteForm.jsx)
+
+Outbound Zapier request (server/utils/webhook.ts)
+
+Forensically scan for legacy or conflicting logic.
+
+Identify any duplicate attribution handlers.
+
+Identify any wildcard postMessage('*') calls.
+
+Identify circular attribution logic that could overwrite or nullify values.
+
+Identify any silent failures (errors caught but not logged).
+
+Deliverables
+
+Print the exact lines of code where:
+
+The parent extracts fbclid + UTM.
+
+The parent posts to the iframe.
+
+The iframe listens and validates event.origin.
+
+The form builds the webhook payload.
+
+The Zapier request is dispatched.
+
+Print a sample payload as it will appear in Zapier (with fbclid + utm values).
+
+Explicitly state if this pipeline is production-reliable, or if data will still be lost.
+
+If any risks remain (e.g. race conditions, legacy code, origin mismatches), list them clearly with fixes.
+
+⚡ Bottom line:
+When a customer clicks a Facebook ad → lands on amerigoautotransport.net → fills the embedded form → the resulting payload sent to Zapier must contain fbclid + all utm_ fields*. Your job is to confirm this end-to-end with code evidence and identify any single point of failure before redeployment.
