@@ -705,8 +705,8 @@ export function registerRoutes(app: Express): Server {
                 (Array.isArray(req.headers["x-forwarded-for"]) 
                   ? req.headers["x-forwarded-for"][0] 
                   : req.headers["x-forwarded-for"]?.split(",")[0]) ||
-                req.headers["x-real-ip"] ||
-                req.socket.remoteAddress,
+                (typeof req.headers["x-real-ip"] === "string" ? req.headers["x-real-ip"] : undefined) ||
+                req.socket.remoteAddress || undefined,
               clientUserAgent: req.headers["user-agent"],
             },
             customData: {

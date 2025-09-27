@@ -59,10 +59,6 @@ function getOrCreateSessionId(config: AttributionConfig): string {
     const existingSessionId = sessionStorage.getItem(config.sessionStorageKey);
 
     if (existingSessionId) {
-      console.log(
-        "📊 Attribution: Using existing session ID:",
-        existingSessionId,
-      );
       return existingSessionId;
     }
   } catch (error) {
