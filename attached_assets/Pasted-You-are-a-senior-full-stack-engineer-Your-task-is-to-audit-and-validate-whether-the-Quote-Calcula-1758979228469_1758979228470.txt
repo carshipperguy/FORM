@@ -1,0 +1,47 @@
+You are a senior full-stack engineer. 
+Your task is to audit and validate whether the Quote Calculator app (form-carshipperguy.replit.app) can fully support Facebook CAPI + Pixel integration.
+
+Steps:
+
+1. **Search for Env Variables**
+   - Verify that the .env file contains:
+     META_PIXEL_ID=xxxxxxxxxxxxxxxx
+     META_CAPI_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxxxxxxx
+   - If missing, output exact instructions to add them.
+
+2. **Check Attribution Capture**
+   - Search the codebase for logic that parses fbclid and UTM params from `window.location.search`.
+   - Confirm whether these values are stored (sessionStorage, cookies, or context).
+   - If missing, suggest the minimal code snippet required.
+
+3. **Check postMessage Flow**
+   - Confirm that attribution data captured in the parent site can be passed into this iframe app via postMessage.
+   - Verify origin validation exists:
+     - Parent → Iframe must use 'https://form-carshipperguy.replit.app'
+     - Iframe → Parent must use 'https://amerigoautotransport.net'
+
+4. **Validate Event Endpoints**
+   - Search for API endpoints in this app (`/api/v1/meta-capi/lead`, `/api/v1/meta-capi/purchase`).
+   - Confirm whether they exist here, or only in the CRM app.
+   - If they don’t exist, specify whether the Quote Calculator should POST directly to the CRM app, or implement its own relay.
+
+5. **Run Test Events**
+   - Use curl to simulate both Lead and Purchase from this app:
+     curl -s -X POST http://localhost:5000/api/v1/meta-capi/lead \
+       -H "Content-Type: application/json" \
+       -d '{"eventName":"Lead","userData":{"email":"test@example.com","phone":"+15551234567"},"eventData":{"custom_data":{"content_name":"Test Quote","value":1200}}}'
+     curl -s -X POST http://localhost:5000/api/v1/meta-capi/purchase \
+       -H "Content-Type: application/json" \
+       -d '{"eventName":"Purchase","userData":{"email":"test@example.com","phone":"+15551234567"},"eventData":{"custom_data":{"content_name":"Auto Transport Service","value":1500,"currency":"USD"}}}'
+   - Confirm a 200 response and log payload.
+
+6. **Forensic Risk Check**
+   - Flag any postMessage calls still using "*" (wildcards).
+   - Flag any message listeners without origin validation.
+   - Output file + line numbers if found.
+
+7. **Final Report**
+   - ✅ Confirm whether the Quote Calculator app can send Lead + Purchase events to Meta.
+   - 🔍 List any blockers (missing env vars, broken iframe messaging, missing API routes).
+   - ⚠️ Flag security risks if any wildcards or unvalidated origins are left.
+   - 📊 Confirm attribution flow: fbclid + UTMs → iframe → payload → CAPI → Meta.
