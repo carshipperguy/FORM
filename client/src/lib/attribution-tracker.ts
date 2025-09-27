@@ -267,7 +267,7 @@ export async function initializeAttribution(
     if (window.parent && window.parent !== window) {
       console.log("📊 Attribution: Requesting attribution data from parent...");
       try {
-        window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
+        window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "https://amerigoautotransport.net");
         console.log("📊 Attribution: REQUEST_ATTRIBUTION_DATA sent to parent");
         
         // Wait up to 2 seconds for parent response

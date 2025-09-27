@@ -131,7 +131,7 @@ const SimpleQuoteForm = () => {
     // Request attribution data from parent if in iframe
     if (window.parent && window.parent !== window) {
       console.log("🔥 ATTRIBUTION FIX: Requesting attribution data from parent...");
-      window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "*");
+      window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "https://amerigoautotransport.net");
     }
 
     // Cleanup event listener on unmount
