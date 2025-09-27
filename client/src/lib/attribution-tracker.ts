@@ -174,17 +174,7 @@ function extractAttributionData(sessionId: string): AttributionData {
     usedParentData: Object.keys(parentParams).length > 0,
   });
 
-  // 🚨 ATTRIBUTION DEBUG - Full attribution object for pipeline verification
-  console.log("ATTRIBUTION DEBUG:", {
-    fbclid: attribution.fbclid,
-    utm_source: attribution.utmSource,
-    utm_campaign: attribution.utmCampaign,
-    utm_medium: attribution.utmMedium,
-    utm_content: attribution.utmContent,
-    utm_term: attribution.utmTerm,
-    sessionId: attribution.sessionId,
-    sourceUrl: attribution.sourceUrl
-  });
+  // Attribution data extracted and stored for internal tracking only
 
   return attribution;
 }

@@ -515,18 +515,7 @@ const SimpleQuoteForm = () => {
         const apiUrl = `${currentDomain}/api/webhook`;
         console.log("Using webhook API URL:", apiUrl);
 
-        // 🔍 INTERCEPT AND DISPLAY COMPLETE WEBHOOK PAYLOAD
-        console.log("📦 COMPLETE WEBHOOK PAYLOAD:", JSON.stringify(webhookData, null, 2));
-        console.log("🔑 SESSION_ID IN PAYLOAD:", webhookData.session_id);
-        console.log("🔥 ATTRIBUTION DATA IN PAYLOAD:", {
-          fbclid: webhookData.fbclid,
-          utm_source: webhookData.utm_source,
-          utm_medium: webhookData.utm_medium,
-          utm_campaign: webhookData.utm_campaign,
-          utm_term: webhookData.utm_term,
-          utm_content: webhookData.utm_content,
-          referrer: webhookData.referrer
-        });
+        // Attribution data silently included in webhook payload
 
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
