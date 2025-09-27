@@ -356,7 +356,7 @@ export function registerRoutes(app: Express): Server {
 
       for (const field of requiredFields) {
         if (!formData[field]) {
-          const displayName = fieldDisplayNames[field] || "Required field";
+          const displayName = fieldDisplayNames[field as keyof typeof fieldDisplayNames] || "Required field";
           validationErrors.push({
             field,
             message: `${displayName} is required`,
@@ -699,10 +699,12 @@ export function registerRoutes(app: Express): Server {
             userData: {
               email: formData.email,
               phone: formData.phone,
-              firstName: formData.name?.split(" ")[0],
-              lastName: formData.name?.split(" ").slice(1).join(" "),
+              firstName: formData.name?.split(" ")?.[0] || "",
+              lastName: formData.name?.split(" ")?.slice(1).join(" ") || "",
               clientIpAddress:
-                req.headers["x-forwarded-for"]?.split(",")[0] ||
+                (Array.isArray(req.headers["x-forwarded-for"]) 
+                  ? req.headers["x-forwarded-for"][0] 
+                  : req.headers["x-forwarded-for"]?.split(",")[0]) ||
                 req.headers["x-real-ip"] ||
                 req.socket.remoteAddress,
               clientUserAgent: req.headers["user-agent"],

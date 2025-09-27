@@ -57,8 +57,6 @@ const SimpleQuoteForm = () => {
     const standardType = formData.vehicleType === "car/truck/suv";
     setIsStandardVehicle(standardType);
 
-    console.log("Vehicle type changed:", formData.vehicleType);
-    console.log("Is standard vehicle:", standardType);
   }, [formData.vehicleType]);
 
   // Show contact fields when shipment date is selected
@@ -81,7 +79,6 @@ const SimpleQuoteForm = () => {
 
   // 🔥 CRITICAL FIX: Initialize and persist attribution data on page load
   useEffect(() => {
-    console.log("🔥 ATTRIBUTION FIX: Initializing attribution data...");
 
     // Helper function to extract URL parameter
     const getUrlParameter = (name, url = window.location.href) => {
@@ -100,7 +97,6 @@ const SimpleQuoteForm = () => {
       referrer: document.referrer || "",
     };
 
-    console.log("🔥 ATTRIBUTION FIX: Initial attribution data from URL:", initialAttributionData);
 
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
@@ -117,7 +113,6 @@ const SimpleQuoteForm = () => {
         return;
       }
 
-      console.log("🔥 ATTRIBUTION FIX: Received postMessage from trusted origin:", event.data);
 
       if (event.data && event.data.type === "ATTRIBUTION_DATA" && event.data.params) {
         // Get current attribution data to preserve any existing values

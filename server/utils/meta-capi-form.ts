@@ -61,9 +61,9 @@ async function getSessionAttribution(sessionId: string): Promise<AttributionData
     if (response.ok) {
       const result = await response.json();
 
-      if (result.success && result.attribution) {
+      if ((result as any).success && (result as any).attribution) {
         console.log('✅ Meta CAPI Form: Attribution data retrieved successfully');
-        return result.attribution;
+        return (result as any).attribution;
       } else {
         console.warn('⚠️ Meta CAPI Form: No attribution data found for session');
         return null;
