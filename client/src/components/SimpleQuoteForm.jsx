@@ -26,7 +26,7 @@ const SimpleQuoteForm = () => {
   const [formData, setFormData] = useState({
     pickupLocation: "",
     dropoffLocation: "",
-    vehicleType: "",
+    vehicleType: localStorage.getItem('selectedVehicleType') || "",
     year: "",
     make: "",
     model: "",
@@ -148,6 +148,11 @@ const SimpleQuoteForm = () => {
 
     // When vehicle type changes, reset the year, make, and model fields
     if (name === "vehicleType") {
+      // Persist vehicle type to localStorage to prevent loss on page refresh
+      if (value) {
+        localStorage.setItem('selectedVehicleType', value);
+      }
+      
       setFormData((prev) => ({
         ...prev,
         [name]: value,
