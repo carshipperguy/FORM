@@ -253,7 +253,6 @@ async function sendAttributionData(
 export async function initializeAttribution(
   customConfig?: Partial<AttributionConfig>,
 ): Promise<string> {
-  console.log("🚀 Attribution: Initializing attribution tracking (with 1-second delay)...");
 
   const config = { ...defaultConfig, ...customConfig };
 
@@ -261,23 +260,7 @@ export async function initializeAttribution(
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
 
-    // If we're in an iframe, request attribution data from parent and wait briefly
-    if (window.parent && window.parent !== window) {
-      console.log("📊 Attribution: Requesting attribution data from parent...");
-      try {
-        window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "https://amerigoautotransport.net");
-        console.log("📊 Attribution: REQUEST_ATTRIBUTION_DATA sent to parent");
-        
-        // Wait up to 2 seconds for parent response
-        console.log("📊 Attribution: Waiting for parent response...");
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      } catch (error) {
-        console.log(
-          "📊 Attribution: Error requesting data from parent:",
-          error,
-        );
-      }
-    }
+    // No longer request data from parent - work with iframe URL only
 
     // Extract attribution data (now checks sessionStorage first)
     const attribution = extractAttributionData(sessionId);
@@ -286,11 +269,7 @@ export async function initializeAttribution(
     const success = await sendAttributionData(attribution, config);
 
     if (success) {
-      console.log("✅ Attribution: Tracking initialized successfully");
     } else {
-      console.warn(
-        "⚠️ Attribution: Failed to send attribution data, but continuing...",
-      );
     }
 
     return sessionId;
@@ -408,40 +387,7 @@ async function sendPageViewEvent(
   return await response.json();
 }
 
-// Listen for attribution data from parent page (for iframe scenarios)
-if (typeof window !== "undefined") {
-  window.addEventListener("message", (event) => {
-    // First check that the message origin is from the trusted parent domain
-    const trustedOrigins = [
-      "https://amerigoautotransport.net",
-      "https://www.amerigoautotransport.net"
-    ];
-    if (!trustedOrigins.includes(event.origin)) {
-      // Ignore messages from untrusted origins
-      return;
-    }
-
-    // Verify the message is attribution data
-    if (event.data && event.data.type === "ATTRIBUTION_DATA") {
-      console.log(
-        "📊 Attribution: Received attribution data from trusted parent:",
-        event.data.params,
-      );
-
-      // Store the attribution data for use in extraction
-      sessionStorage.setItem(
-        "parent_attribution_data",
-        JSON.stringify(event.data.params),
-      );
-
-      // Always re-send attribution data when parent data is received
-      console.log("📊 Attribution: Re-sending attribution data with parent data...");
-      const sessionId = getOrCreateSessionId({ ...defaultConfig });
-      const attribution = extractAttributionData(sessionId);
-      sendAttributionData(attribution, { ...defaultConfig });
-    }
-  });
-}
+// Parent message listener removed - no longer dependent on parent page
 
 // Auto-initialize on script load (can be disabled by setting window.disableAutoAttribution = true)
 if (typeof window !== "undefined" && !(window as any).disableAutoAttribution) {
