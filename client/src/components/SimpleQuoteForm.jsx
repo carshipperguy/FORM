@@ -514,16 +514,24 @@ const SimpleQuoteForm = () => {
         } else {
           console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
 
-          // Send GetQuote (Lead) event to Meta CAPI after successful quote submission
+          // Send coordinated GetQuote (Lead) event with Pixel+CAPI deduplication
           try {
-            console.log("📊 GetQuote: Sending Lead event to Meta CAPI...");
-            await sendGetQuoteEvent(quoteData, formData);
-            console.log("✅ GetQuote: Lead event sent successfully");
+            // Import coordinated tracking functions
+            const { trackEvent, generateEventId } = await import("@/lib/attribution-tracker");
+            const eventId = generateEventId("Lead");
+            
+            // Track coordinated Pixel event (via parent if in iframe)
+            trackEvent("Lead", {
+              content_name: "Auto Transport Quote Submission",
+              content_category: "Auto Transport", 
+              value: parseFloat(quoteData.finalPrice || quoteData.selectedPrice || "0"),
+              currency: "USD"
+            });
+            
+            // Send to Meta CAPI with same event_id for deduplication
+            await sendGetQuoteEvent(quoteData, formData, eventId);
           } catch (getQuoteError) {
-            console.error(
-              "❌ GetQuote: Failed to send Lead event:",
-              getQuoteError,
-            );
+            console.error("❌ GetQuote: Failed to send Lead event:", getQuoteError);
             // Don't fail the quote submission if Meta tracking fails
           }
         }
@@ -1062,7 +1070,7 @@ const SimpleQuoteForm = () => {
 /**
  * Send GetQuote (Lead) event to Meta CAPI
  */
-async function sendGetQuoteEvent(quoteData, formData) {
+async function sendGetQuoteEvent(quoteData, formData, eventId) {
   // Get current session ID for attribution
   const sessionId = getCurrentSessionId();
 
@@ -1078,8 +1086,10 @@ async function sendGetQuoteEvent(quoteData, formData) {
 
   const eventData = {
     eventName: "Lead",
+    eventId: eventId, // Add event ID for Pixel+CAPI deduplication
     eventData: {
       event_source_url: window.location.href,
+      event_id: eventId, // Include in event data for deduplication
       action_source: "website",
       custom_data: {
         content_name: "Auto Transport Quote",

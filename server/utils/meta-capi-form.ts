@@ -21,6 +21,7 @@ interface FormMetaCapiEventData {
   customData?: Record<string, any>;
   eventSourceUrl?: string;
   sessionId?: string;
+  eventId?: string; // For Pixel+CAPI deduplication
 }
 
 interface AttributionData {
@@ -32,6 +33,8 @@ interface AttributionData {
   utmTerm?: string;
   ipAddress?: string;
   userAgent?: string;
+  fbp?: string; // Facebook browser ID
+  fbc?: string; // Facebook click ID
 }
 
 /**
@@ -97,6 +100,7 @@ export async function sendGetQuoteEvent(eventData: FormMetaCapiEventData): Promi
       eventName: 'Lead', // GetQuote maps to Lead event
       eventData: {
         event_source_url: eventData.eventSourceUrl || '',
+        event_id: eventData.eventId, // For deduplication with Pixel
         custom_data: {
           content_name: 'Auto Transport Quote',
           content_category: 'Auto Transport',
@@ -111,8 +115,9 @@ export async function sendGetQuoteEvent(eventData: FormMetaCapiEventData): Promi
         last_name: eventData.userData.lastName,
         client_ip_address: eventData.userData.clientIpAddress,
         client_user_agent: eventData.userData.clientUserAgent,
-        // Add attribution data if available
-        ...(attributionData?.fbclid && { fbc: `fb.1.${Date.now()}.${attributionData.fbclid}` })
+        // Add Facebook attribution data if available
+        ...(attributionData?.fbc && { fbc: attributionData.fbc }),
+        ...(attributionData?.fbp && { fbp: attributionData.fbp })
       }
     };
 

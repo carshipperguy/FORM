@@ -693,7 +693,7 @@ export function registerRoutes(app: Express): Server {
           // Extract session ID from form data (if available)
           const sessionId = formData.sessionId || formData.session_id;
 
-          // Prepare event data for Meta CAPI
+          // Prepare event data for Meta CAPI with event_id for deduplication
           const getQuoteEventData = {
             eventName: "Lead",
             userData: {
@@ -724,6 +724,7 @@ export function registerRoutes(app: Express): Server {
             },
             eventSourceUrl: req.headers.referer || req.headers.origin,
             sessionId: sessionId,
+            eventId: formData.eventId, // Event ID for Pixel+CAPI deduplication
           };
 
           await sendGetQuoteEvent(getQuoteEventData);

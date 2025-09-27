@@ -22,6 +22,8 @@ interface AttributionData {
   utmContent?: string;
   utmTerm?: string;
   sourceUrl?: string;
+  fbp?: string; // Facebook browser ID
+  fbc?: string; // Facebook click ID (derived from fbclid)
 }
 
 interface AttributionConfig {
@@ -115,15 +117,18 @@ function extractAttributionData(sessionId: string): AttributionData {
   }
 
   // Extract attribution data (prefer parent data, fallback to iframe URL)
+  const fbclid = parentData.fbclid || getUrlParameter("fbclid");
   const attribution: AttributionData = {
     sessionId,
-    fbclid: parentData.fbclid || getUrlParameter("fbclid"),
+    fbclid: fbclid,
     utmSource: parentData.utm_source || getUrlParameter("utm_source"),
     utmMedium: parentData.utm_medium || getUrlParameter("utm_medium"),
     utmCampaign: parentData.utm_campaign || getUrlParameter("utm_campaign"),
     utmContent: parentData.utm_content || getUrlParameter("utm_content"),
     utmTerm: parentData.utm_term || getUrlParameter("utm_term"),
     sourceUrl: sourceUrl,
+    fbp: parentData.fbp, // Facebook browser ID from parent
+    fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined, // Generate fbc from fbclid
   };
 
   return attribution;
@@ -264,16 +269,41 @@ export function getCurrentSessionId(
 }
 
 /**
- * Track a custom event (to be used with Meta CAPI events)
- * This is a placeholder for future event tracking
+ * Generate unique event ID for Pixel+CAPI deduplication
+ */
+export function generateEventId(eventName: string): string {
+  const sessionId = getCurrentSessionId() || "no-session";
+  return `${sessionId}.${eventName}.${Date.now()}`;
+}
+
+/**
+ * Track coordinated Pixel+CAPI event with deduplication
  */
 export function trackEvent(
   eventName: string,
   eventData?: Record<string, any>,
 ): void {
-
-  // This will be expanded when we implement the actual Meta CAPI events
-  // For now, it just logs the event for debugging
+  const eventId = generateEventId(eventName);
+  
+  // Send Pixel event to parent (if in iframe)
+  if (window.parent && window.parent !== window) {
+    try {
+      window.parent.postMessage({
+        type: "AMERIGO_PIXEL_EVENT",
+        event: eventName,
+        eventId: eventId,
+        params: eventData || {}
+      }, "*");
+    } catch (error) {
+      // Silent fallback - try direct Pixel call
+      if ((window as any).fbq) {
+        (window as any).fbq('track', eventName, eventData, { eventID: eventId });
+      }
+    }
+  } else if ((window as any).fbq) {
+    // Direct Pixel call if not in iframe
+    (window as any).fbq('track', eventName, eventData, { eventID: eventId });
+  }
 }
 
 /**
