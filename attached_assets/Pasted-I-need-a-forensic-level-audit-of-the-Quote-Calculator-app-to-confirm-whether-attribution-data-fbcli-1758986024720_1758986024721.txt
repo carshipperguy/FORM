@@ -1,0 +1,73 @@
+I need a forensic-level audit of the Quote Calculator app to confirm whether attribution data (fbclid + all utm_* fields) is guaranteed to flow end-to-end, every time, under production conditions.
+
+1. Codebase Trace — fbclid + UTM Extraction
+
+Locate the exact lines where window.location.search is parsed.
+
+Confirm that fbclid, utm_source, utm_medium, utm_campaign, utm_content, and utm_term are always extracted, even when nested in an iframe.
+
+Show me the code paths where these values are stored (sessionStorage, variables, or state).
+
+2. Iframe → Parent → App Communication
+
+Display the exact postMessage calls and listeners.
+
+Confirm they are strictly locked to:
+
+Parent → Iframe targetOrigin: https://form-carshipperguy.replit.app
+
+Iframe → Parent targetOrigin: https://amerigoautotransport.net
+
+Prove the attribution payload survives this hop without being dropped.
+
+3. Webhook Construction
+
+Show the lines of code where the form payload (webhookData) is built before being sent to Zapier.
+
+Confirm the payload explicitly includes all attribution fields:
+
+fbclid
+
+utm_source
+
+utm_medium
+
+utm_campaign
+
+utm_content
+
+utm_term
+
+Confirm there is no conditional logic that could omit these fields when empty.
+
+4. Zapier Endpoint
+
+Identify the exact Zapier webhook URL or function call.
+
+Confirm attribution fields are part of the object that is sent.
+
+Show whether payload serialization (JSON.stringify or equivalent) includes these fields in every case.
+
+5. Failure Modes
+
+List all possible points where fbclid/utm could be dropped:
+
+Not present in browser URL
+
+Blocked by iframe origin mismatch
+
+Lost in sessionStorage → payload handoff
+
+Missing in webhook construction
+
+Confirm none of these are active risks under production deployment.
+
+Deliverable
+
+Provide:
+
+Exact code excerpts (not summaries) proving extraction, storage, and payload inclusion.
+
+Confirmation that all three checkpoints — Browser → App → Zapier — reliably carry fbclid + UTM fields.
+
+Final verdict: ✅ This pipeline is production-reliable OR ❌ Gaps exist.
