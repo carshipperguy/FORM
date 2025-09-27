@@ -1134,7 +1134,7 @@ async function sendGetQuoteEvent(quoteData, formData) {
   console.log("📊 GetQuote: Sending Lead event to Meta CAPI...");
 
   const metaCapiUrl =
-    "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/meta-capi/event";
+    `${import.meta.env.VITE_FORM_APP_DOMAIN || 'https://form-carshipperguy.replit.app'}/api/v1/meta-capi/event`;
 
   const eventData = {
     eventName: "Lead",

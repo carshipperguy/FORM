@@ -44,9 +44,7 @@ async function getSessionAttribution(sessionId: string): Promise<AttributionData
   }
 
   try {
-    const crmApiUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://your-production-crm.com/api/v1/tracking/session'
-      : 'https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session';
+    const crmApiUrl = `https://${process.env.CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/tracking/session`;
 
     console.log(`📊 Meta CAPI Form: Retrieving attribution for session: ${sessionId}`);
 
@@ -119,9 +117,7 @@ export async function sendGetQuoteEvent(eventData: FormMetaCapiEventData): Promi
     };
 
     // Send to CRM Meta CAPI service
-    const crmApiUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://your-production-crm.com/api/v1/meta-capi/event'
-      : 'https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/meta-capi/event';
+    const crmApiUrl = `https://${process.env.CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/meta-capi/event`;
 
     console.log('📊 Meta CAPI Form: Sending to CRM Meta CAPI service...');
 
@@ -187,9 +183,7 @@ export async function sendPageViewEvent(
     };
 
     // Send to CRM Meta CAPI service
-    const crmApiUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://your-production-crm.com/api/v1/meta-capi/event'
-      : 'https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/meta-capi/event';
+    const crmApiUrl = `https://${process.env.CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/meta-capi/event`;
 
     const response = await fetch(crmApiUrl, {
       method: 'POST',
