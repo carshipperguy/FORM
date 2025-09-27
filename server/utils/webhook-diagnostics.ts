@@ -6,6 +6,8 @@
  * without modifying the core webhook functionality.
  */
 
+import { Console } from "console";
+
 // In-memory store for webhook transmission analytics
 interface WebhookStats {
   totalAttempts: number;
@@ -109,6 +111,7 @@ export function recordWebhookStart(details: WebhookRequestDetails): void {
   console.log(`📤 Event Type: ${details.eventType}`);
   
   // Log headers for debugging 
+  Console.log("EDWARD HERE 007!!!");
   console.log(`📋 Headers: ${JSON.stringify(details.headers, null, 2)}`);
 }
 
