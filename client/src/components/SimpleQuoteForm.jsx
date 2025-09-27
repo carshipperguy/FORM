@@ -248,7 +248,7 @@ const SimpleQuoteForm = () => {
   // Track Meta Pixel Lead event
   useEffect(() => {
     if (typeof window !== "undefined" && window.fbq) {
-      console.log("📊 Tracking Meta Pixel Lead event");
+
       window.fbq("track", "Lead");
     }
   }, []);
@@ -396,7 +396,7 @@ const SimpleQuoteForm = () => {
 
       // Track Meta Pixel event for form submission
       if (typeof window !== "undefined" && window.fbq) {
-        console.log("📊 Tracking Meta Pixel Lead event");
+  
         window.fbq("track", "Lead", {
           content_name: "Auto Transport Quote",
           content_category: "Auto Transport",
