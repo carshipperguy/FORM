@@ -214,9 +214,35 @@ export async function initializeAttribution(
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
 
-    // Request attribution data from parent if in iframe (safe, invisible communication)
+    // ALWAYS try to request attribution from parent (production fix)
+    // Even if iframe detection fails, attempt communication
+    try {
+      console.log("🚀 PRODUCTION FIX: REQUESTING ATTRIBUTION FROM PARENT...");
+      window.parent.postMessage({
+        type: "AMERIGO_ATTR_REQUEST",
+        sessionId: sessionId,
+        sourceUrl: window.location.href
+      }, "*");
+      console.log("📤 Attribution request sent to parent");
+      
+      // Wait for parent response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.log("⚠️ Parent communication failed (normal if not in iframe):", error);
+    }
+
+    // Backup: Also check if iframe detection works properly
+    console.log("🔍 IFRAME DETECTION:", {
+      hasParent: !!window.parent,
+      parentEqualsWindow: window.parent === window,
+      isInIframe: window.parent && window.parent !== window,
+      location: window.location.href,
+      topLocation: window.top?.location.href || "cannot access"
+    });
+    
     if (window.parent && window.parent !== window) {
       try {
+        console.log("🔄 BACKUP: Sending second attribution request...");
         window.parent.postMessage({
           type: "AMERIGO_ATTR_REQUEST",
           sessionId: sessionId,
@@ -224,10 +250,12 @@ export async function initializeAttribution(
         }, "*");
         
         // Wait briefly for parent response (non-blocking)
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
-        // Silent fallback - continue with iframe-only data
+        console.error("❌ Error requesting attribution from parent:", error);
       }
+    } else {
+      console.log("⚠️ NOT IN IFRAME - Will use URL-only attribution");
     }
 
     // Extract attribution data (now checks sessionStorage first)
@@ -396,6 +424,7 @@ if (typeof window !== "undefined") {
     // Handle attribution response from parent
     if (event.data && event.data.type === "AMERIGO_ATTR_RESPONSE") {
       try {
+        console.log("📥 RECEIVED ATTRIBUTION FROM PARENT:", event.data.attribution);
         sessionStorage.setItem("parent_attribution_data", JSON.stringify(event.data.attribution));
         
         // Re-send attribution with updated data
@@ -403,7 +432,7 @@ if (typeof window !== "undefined") {
         const attribution = extractAttributionData(sessionId);
         sendAttributionData(attribution, { ...defaultConfig });
       } catch (error) {
-        // Silent error handling
+        console.error("❌ Error processing parent attribution:", error);
       }
     }
   });
