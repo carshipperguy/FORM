@@ -83,8 +83,8 @@ app.use((req, res, next) => {
   // Always serve static files in production mode
   serveStatic(app);
 
-  // Use PORT environment variable or default to 3000 for production deployment
-  const PORT = Number(process.env.PORT) || 3000;
+  // Force port 5000 for Replit deployment (workflow expects this port)
+  const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });

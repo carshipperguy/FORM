@@ -119,15 +119,18 @@ const SimpleQuoteForm = () => {
 
       console.log("🔥 ATTRIBUTION FIX: Received postMessage from trusted origin:", event.data);
 
-      if (event.data && event.data.type === "ATTRIBUTION_DATA") {
+      if (event.data && event.data.type === "ATTRIBUTION_DATA" && event.data.params) {
+        // Get current attribution data to preserve any existing values
+        const currentData = attributionData || initialAttributionData;
+        
         const parentAttributionData = {
-          fbclid: event.data.fbclid || initialAttributionData.fbclid,
-          utm_source: event.data.utm_source || initialAttributionData.utm_source,
-          utm_medium: event.data.utm_medium || initialAttributionData.utm_medium,
-          utm_campaign: event.data.utm_campaign || initialAttributionData.utm_campaign,
-          utm_term: event.data.utm_term || initialAttributionData.utm_term,
-          utm_content: event.data.utm_content || initialAttributionData.utm_content,
-          referrer: event.data.referrer || initialAttributionData.referrer,
+          fbclid: event.data.params.fbclid || currentData.fbclid,
+          utm_source: event.data.params.utm_source || currentData.utm_source,
+          utm_medium: event.data.params.utm_medium || currentData.utm_medium,
+          utm_campaign: event.data.params.utm_campaign || currentData.utm_campaign,
+          utm_term: event.data.params.utm_term || currentData.utm_term,
+          utm_content: event.data.params.utm_content || currentData.utm_content,
+          referrer: event.data.params.referrer || currentData.referrer,
         };
 
         console.log("🔥 ATTRIBUTION FIX: Updated attribution data from parent:", parentAttributionData);
