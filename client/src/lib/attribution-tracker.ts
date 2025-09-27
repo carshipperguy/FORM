@@ -88,21 +88,41 @@ function getUrlParameter(name: string, url?: string): string | undefined {
 }
 
 /**
- * Extract attribution data from current iframe URL only
- * Simple extraction without parent page dependency
+ * Extract attribution data with safe parent page communication
+ * Falls back to iframe URL if parent data not available
  */
 function extractAttributionData(sessionId: string): AttributionData {
-  const sourceUrl = window.location.href;
+  let sourceUrl = window.location.href;
+  let parentData: Record<string, any> = {};
 
-  // Extract UTM parameters and fbclid from current iframe URL only
+  // Check for parent attribution data in sessionStorage (from postMessage)
+  try {
+    const storedParentData = sessionStorage.getItem("parent_attribution_data");
+    if (storedParentData) {
+      parentData = JSON.parse(storedParentData);
+    }
+  } catch (error) {
+    // Silent fallback to iframe-only data
+  }
+
+  // If in iframe and no stored parent data, try to access parent URL for sourceUrl
+  if (Object.keys(parentData).length === 0 && window.parent && window.parent !== window) {
+    try {
+      sourceUrl = window.parent.location.href;
+    } catch (crossOriginError) {
+      // Cross-origin restriction - use iframe URL
+    }
+  }
+
+  // Extract attribution data (prefer parent data, fallback to iframe URL)
   const attribution: AttributionData = {
     sessionId,
-    fbclid: getUrlParameter("fbclid"),
-    utmSource: getUrlParameter("utm_source"),
-    utmMedium: getUrlParameter("utm_medium"),
-    utmCampaign: getUrlParameter("utm_campaign"),
-    utmContent: getUrlParameter("utm_content"),
-    utmTerm: getUrlParameter("utm_term"),
+    fbclid: parentData.fbclid || getUrlParameter("fbclid"),
+    utmSource: parentData.utm_source || getUrlParameter("utm_source"),
+    utmMedium: parentData.utm_medium || getUrlParameter("utm_medium"),
+    utmCampaign: parentData.utm_campaign || getUrlParameter("utm_campaign"),
+    utmContent: parentData.utm_content || getUrlParameter("utm_content"),
+    utmTerm: parentData.utm_term || getUrlParameter("utm_term"),
     sourceUrl: sourceUrl,
   };
 
@@ -189,7 +209,21 @@ export async function initializeAttribution(
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
 
-    // No longer request data from parent - work with iframe URL only
+    // Request attribution data from parent if in iframe (safe, invisible communication)
+    if (window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({
+          type: "AMERIGO_ATTR_REQUEST",
+          sessionId: sessionId,
+          sourceUrl: window.location.href
+        }, "*");
+        
+        // Wait briefly for parent response (non-blocking)
+        await new Promise(resolve => setTimeout(resolve, 800));
+      } catch (error) {
+        // Silent fallback - continue with iframe-only data
+      }
+    }
 
     // Extract attribution data (now checks sessionStorage first)
     const attribution = extractAttributionData(sessionId);
@@ -315,7 +349,35 @@ async function sendPageViewEvent(
   return await response.json();
 }
 
-// Parent message listener removed - no longer dependent on parent page
+// Safe parent message listener for attribution data
+if (typeof window !== "undefined") {
+  window.addEventListener("message", (event) => {
+    // Validate trusted origins
+    const trustedOrigins = [
+      "https://amerigoautotransport.net",
+      "https://www.amerigoautotransport.net"
+    ];
+    
+    // Allow requests from same origin or trusted origins
+    if (event.origin !== window.location.origin && !trustedOrigins.includes(event.origin)) {
+      return;
+    }
+
+    // Handle attribution response from parent
+    if (event.data && event.data.type === "AMERIGO_ATTR_RESPONSE") {
+      try {
+        sessionStorage.setItem("parent_attribution_data", JSON.stringify(event.data.attribution));
+        
+        // Re-send attribution with updated data
+        const sessionId = getOrCreateSessionId({ ...defaultConfig });
+        const attribution = extractAttributionData(sessionId);
+        sendAttributionData(attribution, { ...defaultConfig });
+      } catch (error) {
+        // Silent error handling
+      }
+    }
+  });
+}
 
 // Auto-initialize on script load (can be disabled by setting window.disableAutoAttribution = true)
 if (typeof window !== "undefined" && !(window as any).disableAutoAttribution) {
