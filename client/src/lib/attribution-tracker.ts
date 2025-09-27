@@ -75,7 +75,6 @@ function getOrCreateSessionId(config: AttributionConfig): string {
     console.warn("⚠️ Attribution: Could not store session ID:", error);
   }
 
-  console.log("📊 Attribution: Generated new session ID:", newSessionId);
   return newSessionId;
 }
 
@@ -89,88 +88,23 @@ function getUrlParameter(name: string, url?: string): string | undefined {
 }
 
 /**
- * Extract attribution data from sessionStorage first, then URL fallback
- * Supports iframe scenarios where the form is embedded in another page
+ * Extract attribution data from current iframe URL only
+ * Simple extraction without parent page dependency
  */
 function extractAttributionData(sessionId: string): AttributionData {
-  console.log("📊 Attribution: Extracting attribution data...");
+  const sourceUrl = window.location.href;
 
-  let sourceUrl = window.location.href;
-  let parentParams: Record<string, string> = {};
-
-  // First priority: Check if we have parent attribution data in sessionStorage
-  try {
-    const storedParentData = sessionStorage.getItem("parent_attribution_data");
-    if (storedParentData) {
-      try {
-        parentParams = JSON.parse(storedParentData);
-        console.log(
-          "📊 Attribution: Using stored parent attribution data:",
-          parentParams,
-        );
-      } catch (parseError) {
-        console.log(
-          "📊 Attribution: Error parsing stored parent data:",
-          parseError,
-        );
-      }
-    }
-  } catch (error) {
-    console.log("📊 Attribution: Error accessing sessionStorage:", error);
-  }
-
-  // If we don't have parent data and we're in an iframe, try legacy approaches
-  if (Object.keys(parentParams).length === 0) {
-    try {
-      if (window.parent && window.parent !== window) {
-        console.log(
-          "📊 Attribution: No stored data found, checking iframe context...",
-        );
-
-        // Try to read parent URL (may fail due to cross-origin restrictions)
-        try {
-          sourceUrl = window.parent.location.href;
-          console.log(
-            "📊 Attribution: Using parent URL for attribution:",
-            sourceUrl,
-          );
-        } catch (crossOriginError) {
-          console.log(
-            "📊 Attribution: Cannot access parent URL (cross-origin), will use fallback",
-          );
-        }
-      }
-    } catch (error) {
-      console.log("📊 Attribution: Error checking iframe status:", error);
-    }
-  }
-
-  // Extract UTM parameters and fbclid (prefer parent data, fallback to current URL)
+  // Extract UTM parameters and fbclid from current iframe URL only
   const attribution: AttributionData = {
     sessionId,
-    fbclid: parentParams.fbclid || getUrlParameter("fbclid", sourceUrl),
-    utmSource:
-      parentParams.utm_source || getUrlParameter("utm_source", sourceUrl),
-    utmMedium:
-      parentParams.utm_medium || getUrlParameter("utm_medium", sourceUrl),
-    utmCampaign:
-      parentParams.utm_campaign || getUrlParameter("utm_campaign", sourceUrl),
-    utmContent:
-      parentParams.utm_content || getUrlParameter("utm_content", sourceUrl),
-    utmTerm: parentParams.utm_term || getUrlParameter("utm_term", sourceUrl),
+    fbclid: getUrlParameter("fbclid"),
+    utmSource: getUrlParameter("utm_source"),
+    utmMedium: getUrlParameter("utm_medium"),
+    utmCampaign: getUrlParameter("utm_campaign"),
+    utmContent: getUrlParameter("utm_content"),
+    utmTerm: getUrlParameter("utm_term"),
     sourceUrl: sourceUrl,
   };
-
-  console.log("📊 Attribution: Extracted data:", {
-    sessionId: attribution.sessionId,
-    hasUtmSource: !!attribution.utmSource,
-    hasFbclid: !!attribution.fbclid,
-    utmCampaign: attribution.utmCampaign,
-    sourceUrl: sourceUrl,
-    usedParentData: Object.keys(parentParams).length > 0,
-  });
-
-  // Attribution data extracted and stored for internal tracking only
 
   return attribution;
 }
@@ -182,11 +116,9 @@ async function sendAttributionData(
   attribution: AttributionData,
   config: AttributionConfig,
 ): Promise<boolean> {
-  console.log("📊 Attribution: Sending data to CRM API...");
 
   for (let attempt = 1; attempt <= config.retryAttempts; attempt++) {
     try {
-      console.log(`📊 Attribution: Attempt ${attempt}/${config.retryAttempts}`);
 
       const response = await fetch(config.crmApiUrl, {
         method: "POST",
@@ -201,13 +133,10 @@ async function sendAttributionData(
 
       if (response.ok) {
         const result = await response.json();
-        console.log("✅ Attribution: Data sent successfully:", result);
 
         // Send PageView event to Meta CAPI after successful attribution tracking
         try {
-          console.log("📊 Attribution: Sending PageView event to Meta CAPI...");
           await sendPageViewEvent(attribution, config.crmApiUrl);
-          console.log("✅ Attribution: PageView event sent successfully");
         } catch (pageViewError) {
           console.error(
             "❌ Attribution: Failed to send PageView event:",
@@ -308,7 +237,6 @@ export function trackEvent(
   eventName: string,
   eventData?: Record<string, any>,
 ): void {
-  console.log(`📊 Attribution: Event tracked: ${eventName}`, eventData);
 
   // This will be expanded when we implement the actual Meta CAPI events
   // For now, it just logs the event for debugging

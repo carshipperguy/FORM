@@ -101,51 +101,7 @@ const SimpleQuoteForm = () => {
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
 
-    // Listen for postMessage from parent (iframe scenarios)
-    const handleMessage = (event) => {
-      // First check that the message origin is from the trusted parent domain
-      const trustedOrigins = [
-        "https://amerigoautotransport.net",
-        "https://www.amerigoautotransport.net"
-      ];
-      if (!trustedOrigins.includes(event.origin)) {
-        // Ignore messages from untrusted origins
-        return;
-      }
-
-
-      if (event.data && event.data.type === "ATTRIBUTION_DATA" && event.data.params) {
-        // Get current attribution data to preserve any existing values
-        const currentData = attributionData || initialAttributionData;
-        
-        const parentAttributionData = {
-          fbclid: event.data.params.fbclid || currentData.fbclid,
-          utm_source: event.data.params.utm_source || currentData.utm_source,
-          utm_medium: event.data.params.utm_medium || currentData.utm_medium,
-          utm_campaign: event.data.params.utm_campaign || currentData.utm_campaign,
-          utm_term: event.data.params.utm_term || currentData.utm_term,
-          utm_content: event.data.params.utm_content || currentData.utm_content,
-          referrer: event.data.params.referrer || currentData.referrer,
-        };
-
-        console.log("🔥 ATTRIBUTION FIX: Updated attribution data from parent:", parentAttributionData);
-        setAttributionData(parentAttributionData);
-      }
-    };
-
-    // Add event listener for postMessage
-    window.addEventListener("message", handleMessage);
-
-    // Request attribution data from parent if in iframe
-    if (window.parent && window.parent !== window) {
-      console.log("🔥 ATTRIBUTION FIX: Requesting attribution data from parent...");
-      window.parent.postMessage({ type: "REQUEST_ATTRIBUTION_DATA" }, "https://amerigoautotransport.net");
-    }
-
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
+    // No longer listening for parent messages - working with iframe URL only
   }, []); // Empty dependency array - only run on mount
 
   // Check if vehicle year is pre-1990 for free-text model input
