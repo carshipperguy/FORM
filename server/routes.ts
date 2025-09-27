@@ -335,14 +335,31 @@ export function registerRoutes(app: Express): Server {
         formData.selectedPrice = formData.finalPrice;
       }
 
-      // Simple validation for required fields
+      // Simple validation for required fields - prevent exposing raw field names to users
       const validationErrors = [];
+
+      // Safe field name mapping to prevent exposing raw field names or URL parameters to users
+      const fieldDisplayNames = {
+        name: "Name",
+        email: "Email address",
+        phone: "Phone number", 
+        pickupLocation: "Pickup location",
+        pickupZip: "Pickup ZIP code",
+        dropoffLocation: "Delivery location",
+        dropoffZip: "Delivery ZIP code", 
+        vehicleType: "Vehicle type",
+        year: "Vehicle year",
+        make: "Vehicle make",
+        model: "Vehicle model", 
+        shipmentDate: "Shipment date"
+      };
 
       for (const field of requiredFields) {
         if (!formData[field]) {
+          const displayName = fieldDisplayNames[field] || "Required field";
           validationErrors.push({
             field,
-            message: `${field} is required`,
+            message: `${displayName} is required`,
           });
         }
       }
