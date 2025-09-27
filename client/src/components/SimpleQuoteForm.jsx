@@ -107,7 +107,17 @@ const SimpleQuoteForm = () => {
 
     // Listen for postMessage from parent (iframe scenarios)
     const handleMessage = (event) => {
-      console.log("🔥 ATTRIBUTION FIX: Received postMessage:", event.data);
+      // First check that the message origin is from the trusted parent domain
+      const trustedOrigins = [
+        "https://amerigoautotransport.net",
+        "https://www.amerigoautotransport.net"
+      ];
+      if (!trustedOrigins.includes(event.origin)) {
+        // Ignore messages from untrusted origins
+        return;
+      }
+
+      console.log("🔥 ATTRIBUTION FIX: Received postMessage from trusted origin:", event.data);
 
       if (event.data && event.data.type === "ATTRIBUTION_DATA") {
         const parentAttributionData = {
