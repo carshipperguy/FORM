@@ -1,0 +1,64 @@
+🚨 Diagnostic Prompt — Attribution Debugging
+
+Goal: Confirm whether fbclid and utm_* parameters are being received from the parent URL, stored in the iframe, and passed into the final payload.
+
+Step 1: Log Incoming URL Params
+
+In your main entry file (e.g. index.tsx or main.jsx), add:
+
+console.log("[ATTRIBUTION DEBUG] window.location.search =", window.location.search);
+
+
+This will show you if the browser URL actually contains fbclid and UTMs when the form loads.
+
+Step 2: Log Session Storage
+
+Inside client/src/lib/attribution-tracker.ts (or wherever attribution is extracted):
+
+console.log("[ATTRIBUTION DEBUG] Extracted UTM + fbclid data =", attribution);
+sessionStorage.setItem("amerigo_debug_attribution", JSON.stringify(attribution));
+
+
+Now you’ll be able to open DevTools → Application → Session Storage and verify that fbclid, utm_source, utm_campaign, etc. are stored.
+
+Step 3: Log postMessage Events
+
+In your iframe listener (likely SimpleQuoteForm.jsx):
+
+window.addEventListener("message", (event) => {
+  console.log("[ATTRIBUTION DEBUG] Received postMessage event =", event.data, "from origin:", event.origin);
+});
+
+
+This ensures the parent → iframe communication is actually firing with attribution data.
+
+Step 4: Log Payload at Submission
+
+Wherever the form payload is built (before fetch/axios call to CRM/Zapier):
+
+console.log("[ATTRIBUTION DEBUG] Final payload before submit =", payload);
+
+
+This shows you whether attribution values are actually included with the customer’s lead data.
+
+Step 5: Test a Live Lead
+
+Open an incognito browser window.
+
+Click one of your live ads (so fbclid + UTMs are guaranteed in the URL).
+
+Submit a test lead (use fake email/phone like test+debug@amerigo.com).
+
+Watch the Replit logs and browser console for the [ATTRIBUTION DEBUG] output at all 4 stages.
+
+Expected Trace
+
+Stage 1: URL shows ?fbclid=xxx&utm_campaign=yyy ✅
+
+Stage 2: SessionStorage contains those params ✅
+
+Stage 3: postMessage event delivers them into the iframe ✅
+
+Stage 4: Final payload JSON includes them ✅
+
+If any stage is missing → that’s the exact break point.

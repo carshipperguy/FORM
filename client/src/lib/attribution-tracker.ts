@@ -33,7 +33,7 @@ interface AttributionConfig {
 
 const defaultConfig: AttributionConfig = {
   crmApiUrl:
-    "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session",
+    `https://${import.meta.env.VITE_CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/tracking/session`,
   retryAttempts: 3,
   retryDelay: 1000,
   sessionStorageKey: "amerigo_session_id",
@@ -346,11 +346,11 @@ export const AttributionConfig = {
   },
   staging: {
     crmApiUrl:
-      "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session",
+      `https://${import.meta.env.VITE_CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/tracking/session`,
   },
   production: {
     crmApiUrl:
-      "https://695a4a81-366a-4e94-8190-f79aabe7683b-00-1g5fss84wssp7.kirk.replit.dev/api/v1/tracking/session",
+      `https://${import.meta.env.VITE_CRM_DOMAIN || 'amerigoautotransport.replit.app'}/api/v1/tracking/session`,
   },
 };
 
