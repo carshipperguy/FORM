@@ -84,6 +84,7 @@ function getOrCreateSessionId(config: AttributionConfig): string {
  * Extract URL parameter value
  */
 function getUrlParameter(name: string, url?: string): string | undefined {
+  console.log("EDWARD HERE!!!")
   const searchUrl = url || window.location.href;
   const urlParams = new URLSearchParams(new URL(searchUrl).search);
   return urlParams.get(name) || undefined;
@@ -94,6 +95,8 @@ function getUrlParameter(name: string, url?: string): string | undefined {
  * Falls back to iframe URL if parent data not available
  */
 function extractAttributionData(sessionId: string): AttributionData {
+  console.log("EDWARD HERE 2 !!!")
+
   let sourceUrl = window.location.href;
   let parentData: Record<string, any> = {};
 
@@ -144,6 +147,7 @@ async function sendAttributionData(
 
   for (let attempt = 1; attempt <= config.retryAttempts; attempt++) {
     try {
+      console.log("EDWARD HERE 3 !!!")
 
       const response = await fetch(config.crmApiUrl, {
         method: "POST",
@@ -409,6 +413,8 @@ async function sendPageViewEvent(
 
 // Safe parent message listener for attribution data
 if (typeof window !== "undefined") {
+  console.log("EDWARD HERE 4!!!")
+
   window.addEventListener("message", (event) => {
     // Validate trusted origins
     const trustedOrigins = [
