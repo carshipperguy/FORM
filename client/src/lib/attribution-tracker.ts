@@ -284,9 +284,9 @@ export async function initializeAttribution(
     return sessionId;
   } catch (error) {
     console.error("🔥 ATTRIBUTION INIT ERROR:", error);
-    console.error("🔥 ERROR STACK:", error?.stack);
-    console.error("🔥 ERROR TYPE:", error?.constructor?.name);
-    console.error("🔥 ERROR MESSAGE:", error?.message);
+    console.error("🔥 ERROR STACK:", (error as any)?.stack);
+    console.error("🔥 ERROR TYPE:", (error as any)?.constructor?.name);
+    console.error("🔥 ERROR MESSAGE:", (error as any)?.message);
 
     // Re-throw so the browser console surfaces the error visibly
     throw error;
