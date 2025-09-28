@@ -802,7 +802,7 @@ const SimpleQuoteForm = () => {
           disabled={isSubmitting}
           aria-busy={isSubmitting}
         >
-          {isSubmitting ? "Calculating Quote..." : "Get Quote"}
+          {isSubmitting ? "Calculating Quote..." : "Get Quote - Edward"}
         </button>
       </form>
 

@@ -75,7 +75,7 @@ export default function Checkout() {
         <div className="mb-4">
           <div className="bg-white text-black border border-gray-200 mb-3">
             <div className="bg-[#002C42] text-white p-2">
-              <h2 className="text-sm font-medium">Your Shipping Details</h2>
+              <h2 className="text-sm font-medium">Your Shipping Details - Edward</h2>
             </div>
             <div className="p-3 space-y-2 text-sm text-gray-700">
               <div>
