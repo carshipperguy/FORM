@@ -372,7 +372,7 @@ export default function Booking() {
           </div>
           <div className="p-3 space-y-2 text-sm text-gray-700">
             <div>
-              <span className="font-medium text-[#002C42]">Vehicle:</span>{" "}
+              <span className="font-medium text-[#002C42]">Edward - Vehicle:</span>{" "}
               {data.year} {data.make} {data.model}
             </div>
             <div>

@@ -1,0 +1,40 @@
+your primary task is to conduct a final, definitive audit of this frontend application and explain why it is failing in the live production environment, especially why attribution data is still appearing as null
+
+you must perform your audit with the following critical information about the CRM backend you are supposed to communicate with
+
+CRM Status- the CRM Agent is NOT DEPLOYED
+CRM Configuration- it is hardcoded with localhost URLs
+CRM Environment- it is running in development mode
+
+with this context, provide a full report that answers the following-
+
+1. your deployment status-
+
+first report your own deployment status. is there an active, live deployment of this form Agent? provide the URL and the last update date
+
+2. root cause analysis of the null value bug-
+
+We are still reporting that all attribution data (fbclid, utm_source) is null in the final payload. your previous fixes have not worked in the live environment
+
+you must re-audit your code and provide a definitive explanation for this failure. your analysis must answer-
+does your code still contain any logic that could result in overwriting valid data with null?
+is the "handshake" protocol (IFRAME_READY) correctly implemented?
+
+could the total failure of the CRM backend (which is not deployed and misconfigured) be causing a downstream error in your code that results in the null values?
+
+3. production readiness audit
+
+re-run a full audit of your own configuration for production blockers
+API Endpoints- verify that all your API calls point to the correct production variable. flag any that point to the known-broken localhost or undeployed CRM URL
+parent script- confirm that the latest version of the parent-script.js with the correct handshake protocol is present and ready for deployment
+missing pageView event- confirm the PageView event logic is present and explain the conditions under which it is supposed to fire
+
+4. the final report & action plan-
+
+Based on everything, generate a final status report-
+Deployment Status - Deployed / Not Deployed
+Production Ready - YES / NO
+Definitive Reason for null Data Failure - provide a clear, final explanation
+
+actionable checklist- provide a final, numbered list of every action required to make this Form and its communication with the parent page 100% ready for a successful deployment
+
