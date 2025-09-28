@@ -1,0 +1,81 @@
+🔎 Phase 5 — Phantom Attribution System Autopsy (Quote Calculator App, Replit)
+
+You must act as a world-class forensic auditor.
+The mission is to locate, identify, and isolate the phantom attribution system that is generating fake success logs, while confirming if the real client/src/lib/attribution-tracker.ts file is being bundled into the production build.
+
+⚠️ Do not delete or refactor any code.
+⚠️ Do not disable production code yet.
+⚠️ Report only — this is diagnostic.
+
+Task Requirements
+1. Phantom Log Source Hunt
+
+Search the entire codebase and build outputs for these exact phantom log strings:
+
+🚀 Attribution: Initializing attribution tracking...
+
+📊 Attribution: Extracting attribution data...
+
+✅ Attribution: Tracking initialized successfully
+
+For each occurrence, report:
+
+File name + line number.
+
+Whether it lives in src/, public/, or a generated /dist bundle.
+
+2. Build Inclusion Check
+
+Confirm if client/src/lib/attribution-tracker.ts is actually imported in the live app bundle.
+
+Report:
+
+Import chain (which files include it).
+
+If it’s excluded, show the bundler reason (tree-shaken, not imported, renamed).
+
+3. Phantom Execution Path
+
+Trace how the phantom system runs at startup:
+
+Is it injected via index.html?
+
+Imported in main.tsx?
+
+Or a legacy script in /public or attached_assets/?
+
+Show where phantom attribution overrides or bypasses the real system.
+
+4. Controlled Disablement Plan (Report Only)
+
+Propose how the phantom system could be temporarily disabled (e.g., comment out in index.html, remove from build entrypoint).
+
+Do not execute — only describe exact lines/files to adjust.
+
+Deliverables
+
+Provide a structured forensic report with these sections:
+
+Phantom Log Source Locations (files, lines, confirmation).
+
+Real Attribution File Status (is attribution-tracker.ts bundled?).
+
+Phantom Execution Path (how phantom runs at startup).
+
+Disablement Plan (sandbox-only instructions).
+
+Filtration Notes (prove that no state or DB connections were altered during analysis).
+
+Goal
+
+By the end of this step, we must know:
+
+Exactly which file generates phantom attribution logs.
+
+Whether attribution-tracker.ts is dead code (not bundled).
+
+How phantom attribution hijacks execution.
+
+How to disable phantom safely so the real system can run.
+
+⚡ This is the surgical autopsy step. Once the phantom system is identified and isolated on paper, we can design the micro-steps to kill it and re-enable the real attribution flow.
