@@ -14,7 +14,8 @@ function sendAttributionToIframe() {
   };
   console.log("Edward - Fixed Parent Script!!!");
   console.log('📊 Parent: Attempting to send attribution data:', attributionData);
-  
+  console.log("Edward - Fixed Parent Script!!!");
+
   // Find iframe - try multiple selectors
   var iframe = document.querySelector('iframe[src*="form-carshipperguy"]') || 
                document.querySelector('iframe[src*="replit"]') ||
@@ -99,7 +100,10 @@ var retryInterval = setInterval(function() {
   
   if (retryCount > 15) {
     clearInterval(retryInterval);
+    console.log("Edward - Fixed Parent Script!!!");
     console.log('📊 Parent: Stopped retrying after 15 attempts');
+    console.log("Edward - Fixed Parent Script!!!");
+
     return;
   }
   
