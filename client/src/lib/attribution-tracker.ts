@@ -98,13 +98,20 @@ function extractAttributionData(sessionId: string): AttributionData {
   console.log("EDWARD HERE 2 !!!")
 
   let sourceUrl = window.location.href;
+  console.log("🌐 Current URL:", sourceUrl); 
+  
   let parentData: Record<string, any> = {};
+
+  
 
   // Check for parent attribution data in sessionStorage (from postMessage)
   try {
     const storedParentData = sessionStorage.getItem("parent_attribution_data");
     if (storedParentData) {
       parentData = JSON.parse(storedParentData);
+      console.log("EDWARD HERE - 008 - Parent Data !!!")
+
+      console.log("📦 Parent Data:", parentData);
     }
   } catch (error) {
     // Silent fallback to iframe-only data
