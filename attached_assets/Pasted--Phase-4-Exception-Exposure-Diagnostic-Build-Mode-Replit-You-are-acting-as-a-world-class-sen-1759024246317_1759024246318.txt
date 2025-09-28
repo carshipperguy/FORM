@@ -1,0 +1,79 @@
+🧙 Phase 4 — Exception Exposure Diagnostic (Build Mode, Replit)
+
+You are acting as a world-class senior developer performing surgical diagnostics on the quote calculator app.
+Your task is to expose the silent exception between lines 226–231 in client/src/lib/attribution-tracker.ts that halts attribution initialization.
+⚠️ Do not modify or “clean up” any other parts of the codebase.
+⚠️ Do not optimize, restructure, or remove legacy code.
+⚠️ Do not touch any backend, schema, or unrelated frontend logic.
+
+Target File
+
+client/src/lib/attribution-tracker.ts
+
+Step 1 — Strengthen Try/Catch Logging (Lines 283–287)
+
+Current Code:
+
+} catch (error) {
+  console.error("❌ Attribution: Failed to initialize tracking:", error);
+  // Return a session ID anyway so the app can continue functioning
+  return generateSessionId();
+}
+
+
+Replace With (Diagnostic Only):
+
+} catch (error) {
+  console.error("🔥 ATTRIBUTION INIT ERROR:", error);
+  console.error("🔥 ERROR STACK:", error?.stack);
+  console.error("🔥 ERROR TYPE:", error?.constructor?.name);
+  console.error("🔥 ERROR MESSAGE:", error?.message);
+
+  // Re-throw so the browser console surfaces the error visibly
+  throw error;
+}
+
+Step 2 — Insert Debug Markers After Line 226
+
+Immediately after:
+
+const sessionId = getOrCreateSessionId(config);
+
+
+Add:
+
+console.log("🔥 DEBUG: Session ID created successfully:", sessionId);
+console.log("🔥 DEBUG: About to start parent communication...");
+
+Step 3 — Guardrails
+
+Do not change function signatures, imports, or utility code.
+
+Do not move this code outside of its current function.
+
+Do not attempt to “fix” attribution yet — diagnostic only.
+
+This is a temporary logging enhancement to expose the silent killer.
+
+Deliverable
+
+When I click Run in Build mode, the console/browser logs must now show:
+
+🔥 DEBUG: Session ID created successfully: log if execution reaches line 226.
+
+The exact hidden error object (type, stack, message).
+
+Phantom attribution logs (🚀 …) still appearing in parallel — proving the phantom system is independent.
+
+Success Criteria
+
+The silent exception between lines 226–231 is exposed in full detail.
+
+I can see the exact error type and stack trace in browser console.
+
+No unrelated code or logic was altered.
+
+No database writes, no API calls — purely logging.
+
+⚡ Important Reminder:
+This is not a fix, only a forensic exposure step. The purpose is to unmask the exact exception that has been silently killing attribution. After this, we will analyze the surfaced error before planning any surgical fix.

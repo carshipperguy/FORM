@@ -1,0 +1,52 @@
+Prompt
+
+I need you to perform a full forensic debug of why Facebook attribution parameters (fbclid + all utm_ fields)* are not appearing in my Zapier payload when leads submit through the Quote Calculator app (https://form-carshipperguy.replit.app, embedded in https://amerigoautotransport.net).
+
+1. Trace End-to-End Data Flow
+
+Start from the Facebook ad click with URL like:
+?fbclid=xxx&utm_source=facebook&utm_medium=cpc&utm_campaign={{campaign.name}}&utm_content={{ad.id}}&utm_term={{ad.name}}.
+
+Verify the parameters appear in the landing page URL.
+
+Check the parent → iframe postMessage handoff: confirm the script on the landing page sends those params into the iframe.
+
+Inspect the iframe listener (attribution-tracker.ts): confirm it receives, validates origin, and persists them to sessionStorage.
+
+Confirm the form state (SimpleQuoteForm.jsx) pulls those values and attaches them into the webhook payload.
+
+Finally, trace into server/utils/webhook.ts: confirm those values are serialized and POSTed to Zapier.
+
+2. Debug Logging Validation
+
+Verify the following logs output in production when a form is submitted from a Facebook ad click:
+
+[ATTRIBUTION DEBUG] window.location.search shows all params including fbclid.
+
+ATTRIBUTION DEBUG: object includes utm_source, utm_campaign, etc.
+
+🔥 ATTRIBUTION DATA IN PAYLOAD: shows values before sending webhook.
+
+If these logs show empty strings, isolate whether the loss happens (a) browser → parent, (b) parent → iframe, or (c) iframe → webhook.
+
+3. Check for Blockers
+
+Ensure no legacy hardcoded dev URLs are still used in attribution calls.
+
+Confirm no wildcard postMessage("*") leaks are interfering with correct origin.
+
+Make sure Zapier field mapping includes fbclid + all utm_* fields and isn’t discarding them.
+
+4. Deliverable
+
+Provide a final forensic report that answers:
+
+Are fbclid and utm params being captured correctly in the browser session?
+
+Are they being handed off correctly from parent → iframe?
+
+Are they included in the webhook payload sent to Zapier?
+
+If not, show the exact file + line number where the breakdown occurs.
+
+Focus on actual root cause (not just “it works in dev”), and guarantee that production payloads contain fbclid + all utm_ values*.

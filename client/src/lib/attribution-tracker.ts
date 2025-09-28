@@ -98,7 +98,7 @@ function extractAttributionData(sessionId: string): AttributionData {
   console.log("EDWARD HERE 2 !!!")
 
   let sourceUrl = window.location.href;
-  console.log("🌐 Current URL:", sourceUrl); 
+  console.log("🌐 AMERICA--Current URL:", sourceUrl); 
   
   let parentData: Record<string, any> = {};
 
@@ -224,6 +224,8 @@ export async function initializeAttribution(
   try {
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
+    console.log("🔥 DEBUG: Session ID created successfully:", sessionId);
+    console.log("🔥 DEBUG: About to start parent communication...");
 
     // ALWAYS try to request attribution from parent (production fix)
     // Even if iframe detection fails, attempt communication
@@ -281,9 +283,13 @@ export async function initializeAttribution(
 
     return sessionId;
   } catch (error) {
-    console.error("❌ Attribution: Failed to initialize tracking:", error);
-    // Return a session ID anyway so the app can continue functioning
-    return generateSessionId();
+    console.error("🔥 ATTRIBUTION INIT ERROR:", error);
+    console.error("🔥 ERROR STACK:", error?.stack);
+    console.error("🔥 ERROR TYPE:", error?.constructor?.name);
+    console.error("🔥 ERROR MESSAGE:", error?.message);
+
+    // Re-throw so the browser console surfaces the error visibly
+    throw error;
   }
 }
 

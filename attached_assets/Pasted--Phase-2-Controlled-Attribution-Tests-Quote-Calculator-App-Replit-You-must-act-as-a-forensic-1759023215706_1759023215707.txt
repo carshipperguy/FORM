@@ -1,0 +1,103 @@
+🔎 Phase 2 — Controlled Attribution Tests (Quote Calculator App, Replit)
+
+You must act as a forensic auditor of the attribution system.
+The goal is to prove why extractAttributionData() never executes and whether the dev iframe or phantom logging system is blocking real attribution flow.
+⚠️ No code pushes — diagnostic report only.
+
+Task Requirements
+1. Canary Log Verification (Line 273 Test)
+
+Insert temporary debug markers immediately before and after line 273:
+
+console.log("🟢 BEFORE extractAttributionData()");
+const attribution = extractAttributionData(sessionId);
+console.log("🟢 AFTER extractAttributionData()");
+
+
+Confirm whether either/both appear in console.
+
+Report findings:
+
+Both logs missing → code path never reached.
+
+Before appears, after missing → function call itself halts execution.
+
+Both appear → execution works but attribution returns null.
+
+Filtration Check: Adding logs must not alter flow or create false positives.
+
+2. Production vs Development Iframe Context
+
+Compare test runs in:
+
+Dev iframe: https://bc80087a.../__replco/workspace_iframe.html
+
+Prod iframe: https://form-carshipperguy.replit.app
+
+Report whether extractAttributionData() executes in prod environment.
+
+Confirm if fbclid/utm params survive iframe load in prod.
+
+Filtration Check: Ensure testing does not modify prod DB or send API payloads — console log only.
+
+3. Phantom Logger Isolation
+
+Identify exact source of phantom log messages (“🚀 Attribution: Initializing attribution tracking…” etc).
+
+Likely candidate: attached_assets/meta-attribution-script.js or external injected script.
+
+Catalog: file, line numbers, message text.
+
+Temporarily disable phantom logger (sandbox only) and confirm if real logs appear.
+
+Filtration Check: Disabling phantom logger must not break session ID generation or utility functions.
+
+4. Message Listener Probe
+
+Test the parent → iframe communication path:
+
+From parent, send a postMessage with mock attribution payload.
+
+Confirm if message listener (client/src/lib/attribution-tracker.ts:422–452) ever receives and logs it.
+
+Report whether listener is active or dead.
+
+Filtration Check: Ensure test uses mock payload only; no API calls or DB writes.
+
+Deliverables
+
+Provide a structured diagnostic report containing:
+
+Line 273 Canary Log Results (before/after presence).
+
+Prod vs Dev Iframe Results (execution differences, param survival).
+
+Phantom Logger Source Catalog (files, lines, messages).
+
+Listener Probe Outcome (did it wake up?).
+
+Filtration Notes (prove that no test altered app state or DB).
+
+Output Format
+
+Respond in structured sections:
+
+Canary Log Findings
+
+Iframe Context Findings
+
+Phantom Logger Source
+
+Message Listener Findings
+
+Filtration Notes
+
+⚡ This step forces Replit to prove exactly why attribution dies instead of guessing. After this, we’ll know if the problem is:
+
+Dev iframe stripping params,
+
+extractAttributionData bypassed,
+
+Phantom logger hijacking logs,
+
+Or a dead message listener.

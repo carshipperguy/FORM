@@ -1,0 +1,82 @@
+🎯 Objective
+
+Produce a clear, line-by-line, upstream-to-downstream trace of where attribution fails. Treat this as an autopsy: every stage of the flow must be accounted for, whether data survives or disappears. Legacy and junk code must be identified so the real execution path is clear.
+
+🔎 Required Scope
+
+Browser Layer
+
+Confirm the landing page URL contains fbclid and UTM params.
+
+Determine how/if these params are forwarded into the iframe src.
+
+Identify if redirects, router rules, or middleware are stripping params.
+
+Iframe Handling
+
+Inspect iframe instantiation (__replco/workspace_iframe.html).
+
+Log the exact window.location.href inside the iframe.
+
+If fbclid/utm are missing here, specify why:
+
+Parent not appending?
+
+Querystring not passed through?
+
+Redirect discarding them?
+
+Frontend Flow (React/TS in Quote Calculator App)
+
+Show how attribution data is expected to be parsed.
+
+Provide the actual payload that should be sent to the backend.
+
+If values are dropped, identify exactly where (function/file).
+
+Backend API Layer
+
+Trace Node/Express endpoints that should receive attribution payloads.
+
+Confirm whether logging statements execute.
+
+Identify any phantom/dead code paths that never run.
+
+Service & Database Layer
+
+Determine whether ORM/database logic receives attribution fields.
+
+Note if values are stripped, renamed, or never written.
+
+Call out mismatches between schema and payload.
+
+Logging Integrity
+
+Audit why existing logs are misleading (phantom lines, mis-sequenced output).
+
+Recommend a standardized log schema for future debugging (report only).
+
+📄 Deliverables
+
+The diagnostic output must be a comprehensive written report that includes:
+
+Step-by-step forensic trace:
+“Browser: fbclid=XYZ present → Iframe: missing → Frontend payload: undefined → Backend API: absent → DB: not written.”
+
+Exact failing handoff point(s) (Browser→Iframe, Iframe→Frontend, Frontend→Backend, Backend→DB).
+
+Annotated code references (file names, line numbers, functions) showing where attribution is supposed to pass and where it fails.
+
+Catalog of misleading log statements and explanation of why they create false positives.
+
+Ranked suspected causes (e.g., iframe param stripping > unused parser > legacy attribution handler bypass).
+
+Actionable recommendations for fixing the issue — without implementing changes.
+
+🛑 Guardrails
+
+No code pushes or production edits.
+
+All findings must be documented in writing with evidence.
+
+Treat this as a needle-in-haystack forensic audit — nothing is too small to log or note.
