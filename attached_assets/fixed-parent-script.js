@@ -12,7 +12,7 @@ function sendAttributionToIframe() {
     utm_term: urlParams.get('utm_term'),
     referrer: document.referrer
   };
-  
+  console.log("Edward - Fixed Parent Script!!!");
   console.log('📊 Parent: Attempting to send attribution data:', attributionData);
   
   // Find iframe - try multiple selectors
