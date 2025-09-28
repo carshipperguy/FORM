@@ -89,7 +89,7 @@ export function QuoteForm({ onCalculate, isCalculating }: QuoteFormProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[10px]">
             <div>
               <div className="bg-[#1e3a8a] text-white text-[10px] font-medium p-1 mb-1.5 rounded-sm">
-                ORIGIN & DESTINATION
+                ORIGIN & DESTINATION 2
               </div>
               <div className="space-y-1">
                 <FormField
