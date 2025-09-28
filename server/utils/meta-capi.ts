@@ -112,7 +112,7 @@ export async function sendMetaCAPIEvent(
     });
 
     if (metaEvent.custom_data) {
-      console.log("🏷️ CUSTOM DATA:");
+      console.log("🏷️ CUSTOM DATA: Edward");
       Object.entries(metaEvent.custom_data).forEach(([key, value]) => {
         console.log(`  ${key}:`, value || "NOT PROVIDED");
       });
