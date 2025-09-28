@@ -427,6 +427,8 @@ async function sendPageViewEvent(
 // Safe parent message listener for attribution data
 if (typeof window !== "undefined") {
   console.log("EDWARD HERE 4!!!")
+  console.log("EDWARD HERE 004!!!")
+
 
   window.addEventListener("message", (event) => {
     // Validate trusted origins
