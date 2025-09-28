@@ -198,6 +198,7 @@ export default function Booking() {
   const onSubmit = async (formData: any) => {
     setIsSubmitting(true);
     try {
+      console.log("🟢 EDWARD - FORM SUBMISSION - DEBUGGING ORDER BOOKING WEBHOOK");
       // Create formatted address strings
       const pickupAddress = `${formData.pickupStreetAddress}, ${formData.pickupCity}, ${formData.pickupState} ${formData.pickupZip}`;
       const dropoffAddress = `${formData.deliveryStreetAddress}, ${formData.deliveryCity}, ${formData.deliveryState} ${formData.deliveryZip}`;
