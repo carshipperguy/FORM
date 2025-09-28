@@ -726,7 +726,7 @@ const SimpleQuoteForm = () => {
 
         <div className="form-section">
           <div className="form-header">
-            <h2>Shipment Details</h2>
+            <h2>Shipment Details - Edward</h2>
           </div>
           <div className="form-fields">
             <div
