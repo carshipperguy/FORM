@@ -20,6 +20,7 @@
 
   // Listen for attribution requests from iframe
   window.addEventListener('message', function(event) {
+    console.log("Edward - America!!!");
     // Only respond to Amerigo attribution requests
     if (!event.data || event.data.type !== 'AMERIGO_ATTR_REQUEST') return;
     
