@@ -1,0 +1,77 @@
+🔍 Senior Dev Diagnostic Prompt: Attribution Listener Audit
+
+We have attribution data flowing from the parent page into the iframe via postMessage. Logs confirm the parent is sending correctly (Parent: Successfully sent attribution data to iframe…).
+
+❌ Problem:
+The iframe listener is not picking up these messages. Zapier payloads remain empty (no utm_* / fbclid).
+
+✅ What I Need You To Do
+
+Audit the Iframe Listener Setup
+
+Locate the listener in SimpleQuoteForm.jsx or attribution-tracker.ts.
+
+Confirm that window.addEventListener("message", …) is registered at iframe load (not after form mount or async delay).
+
+Verify the handler is not accidentally scoped inside a component lifecycle where it gets garbage-collected.
+
+Check Event Origin Handling
+
+Is the code rejecting the message because of a strict origin check?
+Example of failure:
+
+if (event.origin !== "https://your-parent-site.com") return;
+
+
+If our iframe can be embedded on multiple domains, this check must be flexible (allowlist or dynamic validation).
+
+For testing, temporarily log all incoming messages without blocking:
+
+console.log("📥 Raw message received in iframe:", event.origin, event.data);
+
+
+Check Payload Matching
+
+Parent sends { type: "AMERIGO_ATTR_RESPONSE", payload: {...} }.
+
+Ensure iframe listener matches this exact structure (event.data.type === "AMERIGO_ATTR_RESPONSE").
+
+Audit for typos / mismatched casing / different key names.
+
+Persistence
+
+Ensure attribution data is stored in persistent component state or a module variable:
+
+let attributionData = {};
+attributionData = { ...event.data.payload };
+
+
+Confirm that data is attached to the form submission payload before the Zapier webhook fires.
+
+Debugging Checklist
+
+Add console.log at the top of the listener to confirm it’s firing at all.
+
+Log both event.origin and event.data.
+
+Submit a test lead with UTMs in parent URL (?utm_source=facebook&fbclid=test123).
+
+Confirm whether the iframe ever prints "📥 Raw message received".
+
+🎯 Deliverable
+
+Tell me why the iframe listener is failing:
+
+Not being registered?
+
+Origin blocked?
+
+Payload mismatch?
+
+State not persisted?
+
+Show me the logs proving either success or failure inside the iframe console.
+
+Confirm that after the fix, Zapier payload includes utm_source, utm_campaign, and fbclid.
+
+👉 You are not allowed to say “it works on my end.” I want a line-by-line audit of the iframe listener setup, proof it runs in production, and a clear explanation of why the data isn’t making it to Zapier.
