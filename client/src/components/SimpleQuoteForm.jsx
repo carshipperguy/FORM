@@ -115,6 +115,9 @@ const SimpleQuoteForm = () => {
       referrer: document.referrer || "",
     };
 
+    // 🔥 SPECIFIC UTM_SOURCE CONSOLE LOG
+    console.log("🎯 UTM_SOURCE VALUE:", getUrlParameter("utm_source"));
+
     console.log("📊 CAPTURED ATTRIBUTION DATA:", initialAttributionData);
     console.log("🎯 Facebook Click ID (fbclid):", initialAttributionData.fbclid || "NOT FOUND");
     console.log("📈 UTM Source:", initialAttributionData.utm_source || "NOT FOUND");
