@@ -80,8 +80,23 @@ const SimpleQuoteForm = () => {
   // 🔥 CRITICAL FIX: Initialize and persist attribution data on page load
   useEffect(() => {
     console.log("🚀 FORM LOAD: Raw URL analysis starting...");
-    console.log("📍 Current URL:", window.location.href);
+    console.log("📍 Current URL (iframe):", window.location.href);
     console.log("🔍 URL Search Params:", window.location.search);
+    
+    // 🔥 ATTEMPT TO ACCESS PARENT URL
+    console.log("🔍 Attempting to access parent URL...");
+    try {
+      if (window.parent && window.parent !== window) {
+        const parentUrl = window.parent.location.href;
+        console.log("✅ PARENT URL (one level up):", parentUrl);
+      } else {
+        console.log("ℹ️ Not in iframe or parent is same window");
+      }
+    } catch (error) {
+      console.log("❌ Cannot access parent URL due to cross-origin restrictions");
+      console.log("🔒 Security Error:", error.message);
+      console.log("💡 This means iframe is on different domain than parent");
+    }
 
     // Helper function to extract URL parameter
     const getUrlParameter = (name, url = window.location.href) => {
