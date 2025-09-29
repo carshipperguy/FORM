@@ -110,6 +110,11 @@ const SimpleQuoteForm = () => {
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
 
+    // 🔥 INVOKE getAttributionData function as requested
+    console.log("🚀 INVOKING getAttributionData function...");
+    const retrievedAttributionData = getAttributionData();
+    console.log("✅ getAttributionData returned:", retrievedAttributionData);
+
     // No longer listening for parent messages - working with iframe URL only
   }, []); // Empty dependency array - only run on mount
 
