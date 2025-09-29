@@ -140,22 +140,30 @@ const SimpleQuoteForm = () => {
       
       console.log('🔥 RECEIVED MESSAGE FROM PARENT:', event.data);
       
-      if (event.data.type === 'AMERIGO_ATTR_RESPONSE') {
+      // 🔥 MATCH YOUR PARENT SCRIPT: Listen for 'ATTRIBUTION_DATA' type
+      if (event.data.type === 'ATTRIBUTION_DATA') {
+        const parentParams = event.data.params;
+        
+        console.log('🎯 UTM_SOURCE from parent:', parentParams.utm_source);
+        console.log('📊 FULL PARENT UTM DATA:', parentParams);
+        
         const parentUtmData = {
-          fbclid: event.data.fbclid,
-          utm_source: event.data.utm_source,
-          utm_medium: event.data.utm_medium,
-          utm_campaign: event.data.utm_campaign,
-          utm_term: event.data.utm_term,
-          utm_content: event.data.utm_content,
-          referrer: event.data.referrer || document.referrer
+          fbclid: parentParams.fbclid,
+          utm_source: parentParams.utm_source,
+          utm_medium: parentParams.utm_medium,
+          utm_campaign: parentParams.utm_campaign,
+          utm_term: parentParams.utm_term,
+          utm_content: parentParams.utm_content,
+          referrer: parentParams.referrer || document.referrer
         };
         
-        console.log('✅ PARENT UTM DATA RECEIVED:', parentUtmData);
+        console.log('✅ PARENT UTM DATA RECEIVED and PROCESSED:', parentUtmData);
+        console.log('🔥 SPECIFIC UTM_SOURCE VALUE:', parentUtmData.utm_source);
+        
         setAttributionData(parentUtmData);
         
         // Store in sessionStorage for other components
-        sessionStorage.setItem('parent_attribution_data', JSON.stringify(event.data));
+        sessionStorage.setItem('parent_attribution_data', JSON.stringify(parentParams));
       }
     };
     
