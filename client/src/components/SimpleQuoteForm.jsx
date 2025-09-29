@@ -79,6 +79,9 @@ const SimpleQuoteForm = () => {
 
   // 🔥 CRITICAL FIX: Initialize and persist attribution data on page load
   useEffect(() => {
+    console.log("🚀 FORM LOAD: Raw URL analysis starting...");
+    console.log("📍 Current URL:", window.location.href);
+    console.log("🔍 URL Search Params:", window.location.search);
 
     // Helper function to extract URL parameter
     const getUrlParameter = (name, url = window.location.href) => {
@@ -97,6 +100,12 @@ const SimpleQuoteForm = () => {
       referrer: document.referrer || "",
     };
 
+    console.log("📊 CAPTURED ATTRIBUTION DATA:", initialAttributionData);
+    console.log("🎯 Facebook Click ID (fbclid):", initialAttributionData.fbclid || "NOT FOUND");
+    console.log("📈 UTM Source:", initialAttributionData.utm_source || "NOT FOUND");
+    console.log("🔗 UTM Medium:", initialAttributionData.utm_medium || "NOT FOUND");
+    console.log("📣 UTM Campaign:", initialAttributionData.utm_campaign || "NOT FOUND");
+    console.log("🏷️ Referrer:", initialAttributionData.referrer || "NOT FOUND");
 
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
