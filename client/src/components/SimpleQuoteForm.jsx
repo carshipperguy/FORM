@@ -148,6 +148,7 @@ const SimpleQuoteForm = () => {
         const parentParams = event.data.params;
         
         console.log('🎯 UTM_SOURCE from parent:', parentParams.utm_source);
+        console.log('🎯 UTM_SOURCE from parent:', parentParams.fbclid);
         console.log('📊 FULL PARENT UTM DATA:', parentParams);
         
         const parentUtmData = {
