@@ -130,7 +130,41 @@ const SimpleQuoteForm = () => {
     const retrievedAttributionData = getAttributionData();
     console.log("✅ getAttributionData returned:", retrievedAttributionData);
 
-    // No longer listening for parent messages - working with iframe URL only
+    // 🔥 LISTEN FOR PARENT UTM DATA via postMessage
+    const handleParentMessage = (event) => {
+      // Security: verify origin is your website
+      if (!event.origin.includes('amerigoautotransport.net')) {
+        console.log('❌ Rejected message from unknown origin:', event.origin);
+        return;
+      }
+      
+      console.log('🔥 RECEIVED MESSAGE FROM PARENT:', event.data);
+      
+      if (event.data.type === 'AMERIGO_ATTR_RESPONSE') {
+        const parentUtmData = {
+          fbclid: event.data.fbclid,
+          utm_source: event.data.utm_source,
+          utm_medium: event.data.utm_medium,
+          utm_campaign: event.data.utm_campaign,
+          utm_term: event.data.utm_term,
+          utm_content: event.data.utm_content,
+          referrer: event.data.referrer || document.referrer
+        };
+        
+        console.log('✅ PARENT UTM DATA RECEIVED:', parentUtmData);
+        setAttributionData(parentUtmData);
+        
+        // Store in sessionStorage for other components
+        sessionStorage.setItem('parent_attribution_data', JSON.stringify(event.data));
+      }
+    };
+    
+    window.addEventListener('message', handleParentMessage);
+    
+    // Cleanup listener on unmount
+    return () => {
+      window.removeEventListener('message', handleParentMessage);
+    };
   }, []); // Empty dependency array - only run on mount
 
   // Check if vehicle year is pre-1990 for free-text model input
