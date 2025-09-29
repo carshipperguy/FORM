@@ -735,7 +735,7 @@ const SimpleQuoteForm = () => {
 
         <div className="form-section">
           <div className="form-header">
-            <h2>Shipment Details - Edward</h2>
+            <h2>Shipment Details</h2>
           </div>
           <div className="form-fields">
             <div
@@ -811,7 +811,7 @@ const SimpleQuoteForm = () => {
           disabled={isSubmitting}
           aria-busy={isSubmitting}
         >
-          {isSubmitting ? "Calculating Quote..." : "Get Quote - Edward"}
+          {isSubmitting ? "Calculating Quote..." : "Get Quote"}
         </button>
       </form>
 
