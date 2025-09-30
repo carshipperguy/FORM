@@ -143,9 +143,9 @@ const SimpleQuoteForm = () => {
       
       console.log('🔥 RECEIVED MESSAGE FROM PARENT:', event.data);
       
-      // 🔥 MATCH YOUR PARENT SCRIPT: Listen for 'ATTRIBUTION_DATA' type
-      if (event.data.type === 'ATTRIBUTION_DATA') {
-        const parentParams = event.data.params;
+      // Accept both legacy 'ATTRIBUTION_DATA' and current 'AMERIGO_ATTR_RESPONSE'
+      if (event.data.type === 'ATTRIBUTION_DATA' || event.data.type === 'AMERIGO_ATTR_RESPONSE') {
+        const parentParams = event.data.params || event.data.attribution;
         
         console.log('🎯 UTM_SOURCE from parent:', parentParams.utm_source);
         console.log('🎯 fbclid from parent:', parentParams.fbclid);
@@ -320,13 +320,7 @@ const SimpleQuoteForm = () => {
     return errors.length === 0;
   };
 
-  // Track Meta Pixel Lead event
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.fbq) {
-
-      window.fbq("track", "Lead");
-    }
-  }, []);
+  // Removed duplicate Lead tracking on mount; coordinated tracking handled later
 
   // Get attribution data from URL and current page
   const getAttributionData = () => {
@@ -469,24 +463,7 @@ const SimpleQuoteForm = () => {
         utm_content,
       } = attributionData;
 
-      // Track Meta Pixel event for form submission
-      if (typeof window !== "undefined" && window.fbq) {
-  
-        window.fbq("track", "Lead", {
-          content_name: "Auto Transport Quote",
-          content_category: "Auto Transport",
-          value: openTransportPrice,
-          currency: "USD",
-          custom_data: {
-            pickup_location: formData.pickupLocation,
-            dropoff_location: formData.dropoffLocation,
-            vehicle_type: formData.vehicleType,
-            vehicle_year: formData.year,
-            vehicle_make: formData.make,
-            vehicle_model: formData.model,
-          },
-        });
-      }
+      // Removed direct Pixel Lead on submit; use coordinated trackEvent + CAPI below
 
       // Send data to webhook when "Get Quote" is clicked
       console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
