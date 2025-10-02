@@ -605,15 +605,18 @@ const SimpleQuoteForm = () => {
         referrer: attributionData.referrer || "",
       };
 
-      const params = new URLSearchParams({
-        data: encodeURIComponent(JSON.stringify(quoteDataWithAttribution)),
-      });
+      // Store data in sessionStorage to avoid PII in URL
+      try {
+        sessionStorage.setItem('quote_data', JSON.stringify(quoteDataWithAttribution));
+      } catch (e) {
+        console.warn('Unable to persist quote_data to sessionStorage', e);
+      }
 
       // Reset submission state before navigating
       setIsSubmitting(false);
 
       // Navigate to the final quote page
-      navigate(`/final-quote?${params.toString()}`);
+      navigate(`/final-quote`);
     } catch (error) {
       console.error("Error in form submission:", error);
       setIsSubmitting(false);

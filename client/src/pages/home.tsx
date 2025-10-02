@@ -319,11 +319,14 @@ export default function Home() {
         console.error("⚡ ERROR PREPARING WEBHOOK DATA:", error);
       }
 
-      const params = new URLSearchParams({
-        data: encodeURIComponent(JSON.stringify(quoteData)),
-      });
+      // Store data in sessionStorage to avoid PII in URL
+      try {
+        sessionStorage.setItem('quote_data', JSON.stringify(quoteData));
+      } catch (e) {
+        console.warn('Unable to persist quote_data to sessionStorage', e);
+      }
 
-      navigate(`/final-quote?${params.toString()}`);
+      navigate(`/final-quote`);
     } catch (error) {
       console.error("Calculation error:", error);
       

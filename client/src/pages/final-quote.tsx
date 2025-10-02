@@ -19,19 +19,27 @@ export default function FinalQuote() {
 
   useEffect(() => {
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const encodedData = searchParams.get("data");
-      
-      if (!encodedData) {
-        navigate("/");
-        return;
+      // Prefer sessionStorage to avoid putting PII in the URL
+      const stored = sessionStorage.getItem('quote_data');
+      if (!stored) {
+        // Fallback: legacy URL param (for backward compatibility only)
+        const searchParams = new URLSearchParams(window.location.search);
+        const encodedData = searchParams.get("data");
+        if (!encodedData) {
+          navigate("/");
+          return;
+        }
+        console.log("Raw encoded URL data:", encodedData);
+        const decodedURI = decodeURIComponent(encodedData);
+        console.log("Decoded URI:", decodedURI);
+        const decodedData = JSON.parse(decodedURI);
+        setQuoteData(decodedData);
+      } else {
+        const decodedData = JSON.parse(stored);
+        setQuoteData(decodedData);
+        // Best effort cleanup
+        try { sessionStorage.removeItem('quote_data'); } catch (_) {}
       }
-      
-      console.log("Raw encoded URL data:", encodedData);
-      const decodedURI = decodeURIComponent(encodedData);
-      console.log("Decoded URI:", decodedURI);
-      
-      const decodedData = JSON.parse(decodedURI);
       
       // Debug check for the distance value
       if (decodedData.distance) {
@@ -53,8 +61,7 @@ export default function FinalQuote() {
         return;
       }
       
-      console.log("DECODED FINAL QUOTE DATA:", JSON.stringify(decodedData, null, 2));
-      setQuoteData(decodedData);
+      console.log("DECODED FINAL QUOTE DATA:", JSON.stringify(quoteData, null, 2));
     } catch (error) {
       console.error("Error parsing quote data:", error);
       navigate("/");
