@@ -456,7 +456,9 @@ const SimpleQuoteForm = () => {
           utm_term: utm_term || null,
           utm_content: utm_content || null,
           referrer: attributionData.referrer || "",
+          // Provide both spellings to maximize Zapier field matching
           session_id: getCurrentSessionId(),
+          sessionId: getCurrentSessionId(),
           // Meta CAPI specific data
           meta_capi_data: {
             event_name: "Lead",
