@@ -77,25 +77,19 @@ const SimpleQuoteForm = () => {
     }
   }, [formData.make, isStandardVehicle]);
 
-  // 🔥 CRITICAL FIX: Initialize and persist attribution data on page load
+  // Initialize and persist attribution data on page load
   useEffect(() => {
-    console.log("🚀 FORM LOAD: Raw URL analysis starting...");
-    console.log("📍 Current URL (iframe):", window.location.href);
-    console.log("🔍 URL Search Params:", window.location.search);
-    
-    // 🔥 ATTEMPT TO ACCESS PARENT URL
-    console.log("🔍 Attempting to access parent URL...");
+    // Attempt to access parent URL (will fail cross-origin; safe to ignore)
     try {
       if (window.parent && window.parent !== window) {
-        const parentUrl = window.parent.location.href;
-        console.log("✅ PARENT URL (one level up):", parentUrl);
+        // access attempt only; no-op
+        // eslint-disable-next-line no-unused-vars
+        const _ = window.parent.location.href;
       } else {
-        console.log("ℹ️ Not in iframe or parent is same window");
+        
       }
     } catch (error) {
-      console.log("❌ Cannot access parent URL due to cross-origin restrictions");
-      console.log("🔒 Security Error:", error.message);
-      console.log("💡 This means iframe is on different domain than parent");
+      
     }
 
     // Helper function to extract URL parameter
@@ -115,23 +109,13 @@ const SimpleQuoteForm = () => {
       referrer: document.referrer || "",
     };
 
-    // 🔥 SPECIFIC UTM_SOURCE CONSOLE LOG
-    console.log("🎯 UTM_SOURCE VALUE:", getUrlParameter("utm_source"));
-
-    console.log("📊 CAPTURED ATTRIBUTION DATA:", initialAttributionData);
-    console.log("🎯 Facebook Click ID (fbclid):", initialAttributionData.fbclid || "NOT FOUND");
-    console.log("📈 UTM Source:", initialAttributionData.utm_source || "NOT FOUND");
-    console.log("🔗 UTM Medium:", initialAttributionData.utm_medium || "NOT FOUND");
-    console.log("📣 UTM Campaign:", initialAttributionData.utm_campaign || "NOT FOUND");
-    console.log("🏷️ Referrer:", initialAttributionData.referrer || "NOT FOUND");
+    
 
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
 
-    // 🔥 INVOKE getAttributionData function as requested
-    console.log("🚀 INVOKING getAttributionData function...");
     const retrievedAttributionData = getAttributionData();
-    console.log("✅ getAttributionData returned:", retrievedAttributionData);
+    
 
     // 🔥 LISTEN FOR PARENT UTM DATA via postMessage
     const handleParentMessage = (event) => {
@@ -141,15 +125,9 @@ const SimpleQuoteForm = () => {
         return;
       }
       
-      console.log('🔥 RECEIVED MESSAGE FROM PARENT:', event.data);
-      
       // Accept both legacy 'ATTRIBUTION_DATA' and current 'AMERIGO_ATTR_RESPONSE'
       if (event.data.type === 'ATTRIBUTION_DATA' || event.data.type === 'AMERIGO_ATTR_RESPONSE') {
         const parentParams = event.data.params || event.data.attribution;
-        
-        console.log('🎯 UTM_SOURCE from parent:', parentParams.utm_source);
-        console.log('🎯 fbclid from parent:', parentParams.fbclid);
-        console.log('📊 FULL PARENT UTM DATA:', parentParams);
         
         const parentUtmData = {
           fbclid: parentParams.fbclid,
@@ -160,9 +138,6 @@ const SimpleQuoteForm = () => {
           utm_content: parentParams.utm_content,
           referrer: parentParams.referrer || document.referrer
         };
-        
-        console.log('✅ PARENT UTM DATA RECEIVED and PROCESSED:', parentUtmData);
-        console.log('🔥 SPECIFIC UTM_SOURCE VALUE:', parentUtmData.utm_source);
         
         setAttributionData(parentUtmData);
         

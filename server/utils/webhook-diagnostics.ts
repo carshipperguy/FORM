@@ -111,7 +111,6 @@ export function recordWebhookStart(details: WebhookRequestDetails): void {
   console.log(`📤 Event Type: ${details.eventType}`);
   
   // Log headers for debugging 
-  console.log("EDWARD HERE 007!!!");
   console.log(`📋 Headers: ${JSON.stringify(details.headers, null, 2)}`);
 }
 

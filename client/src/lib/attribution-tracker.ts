@@ -84,7 +84,6 @@ function getOrCreateSessionId(config: AttributionConfig): string {
  * Extract URL parameter value
  */
 function getUrlParameter(name: string, url?: string): string | undefined {
-  console.log("EDWARD HERE!!!")
   const searchUrl = url || window.location.href;
   const urlParams = new URLSearchParams(new URL(searchUrl).search);
   return urlParams.get(name) || undefined;
@@ -95,10 +94,7 @@ function getUrlParameter(name: string, url?: string): string | undefined {
  * Falls back to iframe URL if parent data not available
  */
 function extractAttributionData(sessionId: string): AttributionData {
-  console.log("EDWARD HERE 2 !!!")
-
   let sourceUrl = window.location.href;
-  console.log("🌐 AMERICA--Current URL:", sourceUrl); 
   
   let parentData: Record<string, any> = {};
 
@@ -109,9 +105,6 @@ function extractAttributionData(sessionId: string): AttributionData {
     const storedParentData = sessionStorage.getItem("parent_attribution_data");
     if (storedParentData) {
       parentData = JSON.parse(storedParentData);
-      console.log("EDWARD HERE - 008 - Parent Data !!!")
-
-      console.log("📦 Parent Data:", parentData);
     }
   } catch (error) {
     // Silent fallback to iframe-only data
@@ -154,8 +147,6 @@ async function sendAttributionData(
 
   for (let attempt = 1; attempt <= config.retryAttempts; attempt++) {
     try {
-      console.log("EDWARD HERE 3 !!!")
-
       const response = await fetch(config.crmApiUrl, {
         method: "POST",
         headers: {
@@ -224,19 +215,16 @@ export async function initializeAttribution(
   try {
     // Get or create session ID
     const sessionId = getOrCreateSessionId(config);
-    console.log("🔥 DEBUG: Session ID created successfully:", sessionId);
-    console.log("🔥 DEBUG: About to start parent communication...");
 
     // ALWAYS try to request attribution from parent (production fix)
     // Even if iframe detection fails, attempt communication
     try {
-      console.log("🚀 PRODUCTION FIX: REQUESTING ATTRIBUTION FROM PARENT...");
       window.parent.postMessage({
         type: "AMERIGO_ATTR_REQUEST",
         sessionId: sessionId,
         sourceUrl: window.location.href
       }, "*");
-      console.log("📤 Attribution request sent to parent");
+      
       
       // Wait for parent response
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -245,17 +233,10 @@ export async function initializeAttribution(
     }
 
     // Backup: Also check if iframe detection works properly
-    console.log("🔍 IFRAME DETECTION:", {
-      hasParent: !!window.parent,
-      parentEqualsWindow: window.parent === window,
-      isInIframe: window.parent && window.parent !== window,
-      location: window.location.href,
-      topLocation: window.top?.location.href || "cannot access"
-    });
+    
     
     if (window.parent && window.parent !== window) {
       try {
-        console.log("🔄 BACKUP: Sending second attribution request...");
         window.parent.postMessage({
           type: "AMERIGO_ATTR_REQUEST",
           sessionId: sessionId,
@@ -268,7 +249,7 @@ export async function initializeAttribution(
         console.error("❌ Error requesting attribution from parent:", error);
       }
     } else {
-      console.log("⚠️ NOT IN IFRAME - Will use URL-only attribution");
+      
     }
 
     // Extract attribution data (now checks sessionStorage first)
@@ -426,10 +407,6 @@ async function sendPageViewEvent(
 
 // Safe parent message listener for attribution data
 if (typeof window !== "undefined") {
-  console.log("EDWARD HERE 4!!!")
-  console.log("EDWARD HERE 004!!!")
-
-
   window.addEventListener("message", (event) => {
     // Validate trusted origins
     const trustedOrigins = [
@@ -445,7 +422,6 @@ if (typeof window !== "undefined") {
     // Handle attribution response from parent
     if (event.data && event.data.type === "AMERIGO_ATTR_RESPONSE") {
       try {
-        console.log("📥 RECEIVED ATTRIBUTION FROM PARENT:", event.data.attribution);
         sessionStorage.setItem("parent_attribution_data", JSON.stringify(event.data.attribution));
         
         // Re-send attribution with updated data
