@@ -381,9 +381,8 @@ async function sendPageViewEvent(
     },
     userData: {
       client_user_agent: navigator.userAgent,
-      ...(attribution.fbclid && {
-        fbc: `fb.1.${Date.now()}.${attribution.fbclid}`,
-      }),
+      ...(attribution.fbclid && { fbc: `fb.1.${Date.now()}.${attribution.fbclid}` }),
+      ...(attribution.fbp && { fbp: attribution.fbp }),
     },
   };
 

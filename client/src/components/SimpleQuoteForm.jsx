@@ -1114,6 +1114,12 @@ async function sendGetQuoteEvent(quoteData, formData, eventId) {
   const metaCapiUrl =
     `${import.meta.env.VITE_FORM_APP_DOMAIN || 'https://form-carshipperguy.replit.app'}/api/v1/meta-capi/event`;
 
+  // Read _fbp cookie if available
+  const fbpCookieMatch = typeof document !== 'undefined'
+    ? document.cookie.match(/(?:^|; )_fbp=([^;]+)/)
+    : null;
+  const fbpCookie = fbpCookieMatch ? fbpCookieMatch[1] : undefined;
+
   const eventData = {
     eventName: "Lead",
     eventId: eventId, // Add event ID for Pixel+CAPI deduplication
@@ -1144,6 +1150,9 @@ async function sendGetQuoteEvent(quoteData, formData, eventId) {
         ? formData.name.split(" ").slice(1).join(" ")
         : undefined,
       client_user_agent: navigator.userAgent,
+      // Improve match quality
+      external_id: sessionId || undefined,
+      fbp: fbpCookie,
     },
   };
 
@@ -1164,7 +1173,12 @@ async function sendGetQuoteEvent(quoteData, formData, eventId) {
     }
 
     console.log("✅ GetQuote: Lead event sent successfully");
-    return await response.json();
+    // Some gateways return HTML; only parse JSON if provided
+    const ct = response.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      return await response.json();
+    }
+    return null;
   } catch (error) {
     console.error("❌ GetQuote: Lead event failed:", error);
     throw error;
