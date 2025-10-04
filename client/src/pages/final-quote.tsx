@@ -19,6 +19,7 @@ export default function FinalQuote() {
 
   useEffect(() => {
     try {
+      let parsed: any | null = null;
       // Prefer sessionStorage to avoid putting PII in the URL
       const stored = sessionStorage.getItem('quote_data');
       if (!stored) {
@@ -32,36 +33,36 @@ export default function FinalQuote() {
         console.log("Raw encoded URL data:", encodedData);
         const decodedURI = decodeURIComponent(encodedData);
         console.log("Decoded URI:", decodedURI);
-        const decodedData = JSON.parse(decodedURI);
-        setQuoteData(decodedData);
+        parsed = JSON.parse(decodedURI);
+        setQuoteData(parsed);
       } else {
-        const decodedData = JSON.parse(stored);
-        setQuoteData(decodedData);
+        parsed = JSON.parse(stored);
+        setQuoteData(parsed);
         // Best effort cleanup
         try { sessionStorage.removeItem('quote_data'); } catch (_) {}
       }
       
       // Debug check for the distance value
-      if (decodedData.distance) {
+      if (parsed && parsed.distance) {
         console.log("🔍 DISTANCE VALUE CHECK:", {
-          distanceValue: decodedData.distance,
-          distanceType: typeof decodedData.distance,
-          isExactly1200: decodedData.distance === 1200,
-          pickupLocation: decodedData.pickupLocation,
-          dropoffLocation: decodedData.dropoffLocation
+          distanceValue: parsed.distance,
+          distanceType: typeof parsed.distance,
+          isExactly1200: parsed.distance === 1200,
+          pickupLocation: parsed.pickupLocation,
+          dropoffLocation: parsed.dropoffLocation
         });
       } else {
         console.warn("⚠️ NO DISTANCE FOUND IN QUOTE DATA");
       }
       
       // Validate required properties to prevent rendering errors
-      if (!decodedData.openTransportPrice || !decodedData.enclosedTransportPrice) {
+      if (!parsed || !parsed.openTransportPrice || !parsed.enclosedTransportPrice) {
         console.error("Missing required price data");
         navigate("/");
         return;
       }
       
-      console.log("DECODED FINAL QUOTE DATA:", JSON.stringify(quoteData, null, 2));
+      console.log("DECODED FINAL QUOTE DATA:", JSON.stringify(parsed, null, 2));
     } catch (error) {
       console.error("Error parsing quote data:", error);
       navigate("/");
