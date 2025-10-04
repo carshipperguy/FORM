@@ -69,8 +69,8 @@ export function calculatePrice(
   console.log('UNIFIED PRICING CALCULATION STARTED');
   console.log('Input parameters:', { distance, vehicleType, date });
 
-  // Handle undefined distance
-  if (!distance) {
+  // Handle invalid distance (but allow 0 so we can apply local minimum logic)
+  if (distance == null || Number.isNaN(distance as unknown as number)) {
     console.warn('Distance is undefined, returning error message');
     return {
       openTransport: 0,
