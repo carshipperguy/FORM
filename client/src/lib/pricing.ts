@@ -3,6 +3,8 @@ import { MULTIPLIER_MODE, ENABLE_NEW_SPECIAL_PRICING } from '@/config/pricingFla
 
 const BASE_RATE_PER_MILE = 0.614;  // Base rate per mile for all vehicles
 const ENCLOSED_MULTIPLIER = 1.40;   // Enclosed transport is 40% more expensive
+// Safe minimum distance used to price extremely short/local routes and same-zip scenarios
+const MIN_LOCAL_DISTANCE_MILES = 120;
 
 // Vehicle type multipliers
 const VEHICLE_MULTIPLIERS: Record<string, number> = {
@@ -78,19 +80,17 @@ export function calculatePrice(
     };
   }
 
-  // Calculate transit time based on distance
-  const transitTime = Math.ceil(distance / 400) + 1;
+  // For pricing, apply a safe minimum distance for very short hauls (<=100mi) or same-zip (~0mi)
+  const isVeryShort = distance <= 100;
+  const distanceForPricing = isVeryShort ? Math.max(distance, MIN_LOCAL_DISTANCE_MILES) : distance;
+
+  // Calculate transit time based on original distance (keeps expectations realistic for locals)
+  const transitTime = Math.ceil(Math.max(distance, 1) / 400) + 1;
   console.log('Calculated transit time:', transitTime);
 
-  // For short distances, return message only
-  if (distance <= 100) {
-    console.log('Distance <= 100 miles, returning custom quote message');
-    return {
-      openTransport: 0,
-      enclosedTransport: 0,
-      transitTime,
-      message: "For short distances under 100 miles, please contact us directly for a custom quote."
-    };
+  // NOTE: We no longer block short distances; we price them using a safe minimum distance
+  if (isVeryShort) {
+    console.log(`Short/local route detected (${distance}mi). Using safe minimum distance for pricing: ${distanceForPricing}mi`);
   }
 
   // Check for special routes (only for car/truck/suv)
@@ -113,9 +113,9 @@ export function calculatePrice(
   }
 
   // Calculate initial base price
-  let basePrice = distance <= 800
-    ? distance * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
-    : distance * BASE_RATE_PER_MILE;
+  let basePrice = distanceForPricing <= 800
+    ? distanceForPricing * BASE_RATE_PER_MILE * 1.10  // 10% higher for mid-range trips
+    : distanceForPricing * BASE_RATE_PER_MILE;
 
   // PHASE 2: CONTROLLED IMPLEMENTATION - Universal +40% with additional short-haul +40%
   if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'car/truck/suv') {
@@ -126,7 +126,7 @@ export function calculatePrice(
     console.log(`🔄 CONTROLLED: Universal +40% for car/truck/suv: $${priceBeforeUniversal.toFixed(2)} → $${basePrice.toFixed(2)}`);
     
     // Additional +40% for short-haul (<1500 miles) - Total ×1.96
-    if (distance < 1500) {
+    if (distanceForPricing < 1500) {
       const priceBeforeShorthaul = basePrice;
       basePrice = basePrice * 1.40;
       console.log(`🔄 CONTROLLED: Additional +40% for short-haul (<1500mi): $${priceBeforeShorthaul.toFixed(2)} → $${basePrice.toFixed(2)} (Total: ×1.96)`);
@@ -139,7 +139,7 @@ export function calculatePrice(
     console.log(`🔄 CONTROLLED: +50% for motorcycle: $${priceBeforeMotorcycle.toFixed(2)} → $${basePrice.toFixed(2)}`);
   } else {
     // ORIGINAL LOGIC: Apply 40% markup for car/truck/suv routes under 1,500 miles
-    if (distance < 1500 && vehicleType === 'car/truck/suv') {
+    if (distanceForPricing < 1500 && vehicleType === 'car/truck/suv') {
       const priceBeforeMarkup = basePrice;
       basePrice = basePrice * 1.40;
       console.log(`Applied 40% markup for car/truck/suv route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
@@ -164,11 +164,11 @@ export function calculatePrice(
   }
 
   console.log('Base price calculation:', {
-    distance,
+    distance: distanceForPricing,
     ratePerMile: BASE_RATE_PER_MILE,
-    midRangeMultiplier: distance <= 800 ? 1.10 : 1,
-    under1500MileMarkup: (distance < 1500 && vehicleType === 'car/truck/suv') ? 1.40 : 1,
-    formula: `${distance} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`
+    midRangeMultiplier: distanceForPricing <= 800 ? 1.10 : 1,
+    under1500MileMarkup: (distanceForPricing < 1500 && vehicleType === 'car/truck/suv') ? 1.40 : 1,
+    formula: `${distanceForPricing} miles × $${BASE_RATE_PER_MILE}/mile = $${basePrice.toFixed(2)}`
   });
 
   // MASTER PRICING RULES - Apply vehicle-specific minimums and uplifts
@@ -209,7 +209,7 @@ export function calculatePrice(
   console.log('Master pricing rules applied:', {
     vehicleType,
     isCarTruckSUV,
-    distance,
+    distance: distanceForPricing,
     priceBeforeRules: priceBeforeRules.toFixed(2),
     priceAfterRules: basePrice.toFixed(2)
   });
@@ -270,11 +270,15 @@ export function calculatePrice(
   }
 
   // Round prices to nearest whole dollar
-  const result = {
+  const result: PricingResult = {
     openTransport: Math.round(openTransportPrice),
     enclosedTransport: Math.round(enclosedTransportPrice),
     transitTime
   };
+
+  if (isVeryShort) {
+    result.message = "Local route estimate — short‑haul minimum applied";
+  }
 
   console.log('FINAL PRICING RESULT:', result);
   console.log('--------------------------------');
