@@ -55,8 +55,12 @@ export default function FinalQuote() {
         console.warn("⚠️ NO DISTANCE FOUND IN QUOTE DATA");
       }
       
-      // Validate required properties to prevent rendering errors
-      if (!parsed || !parsed.openTransportPrice || !parsed.enclosedTransportPrice) {
+      // Validate required properties (allow 0; only block null/undefined)
+      if (
+        !parsed ||
+        parsed.openTransportPrice == null ||
+        parsed.enclosedTransportPrice == null
+      ) {
         console.error("Missing required price data");
         navigate("/");
         return;
