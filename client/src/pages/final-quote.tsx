@@ -37,6 +37,12 @@ export default function FinalQuote() {
         setQuoteData(parsed);
       } else {
         parsed = JSON.parse(stored);
+        // 🔍 CRITICAL DIAGNOSTIC: Log what was retrieved from sessionStorage
+        console.log("🔍 DISTANCE RETRIEVED FROM SESSIONSTORAGE:", parsed.distance);
+        console.log("🔍 PRICES RETRIEVED FROM SESSIONSTORAGE:", {
+          openTransportPrice: parsed.openTransportPrice,
+          enclosedTransportPrice: parsed.enclosedTransportPrice
+        });
         setQuoteData(parsed);
         // Best effort cleanup
         try { sessionStorage.removeItem('quote_data'); } catch (_) {}

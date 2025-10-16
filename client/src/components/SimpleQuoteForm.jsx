@@ -397,6 +397,9 @@ const SimpleQuoteForm = () => {
         enclosedTransportPrice,
       });
 
+      // 🔍 CRITICAL DIAGNOSTIC: Log distance used for pricing
+      console.log("🔍 DISTANCE USED FOR PRICING CALCULATION:", distanceData.distance);
+
       // Create the complete quote data with real calculated values and ZIP codes
       const quoteData = {
         ...formData,
@@ -407,6 +410,9 @@ const SimpleQuoteForm = () => {
         transitTime: transitTime,
         distance: distanceData.distance,
       };
+      
+      // 🔍 CRITICAL DIAGNOSTIC: Verify distance in quoteData
+      console.log("🔍 DISTANCE IN QUOTEDATA:", quoteData.distance);
 
       console.log("Added ZIP codes to quote data:", {
         pickupZip,
@@ -592,6 +598,12 @@ const SimpleQuoteForm = () => {
 
       // Store data in sessionStorage to avoid PII in URL
       try {
+        // 🔍 CRITICAL DIAGNOSTIC: Verify distance before storing in sessionStorage
+        console.log("🔍 DISTANCE BEING STORED IN SESSIONSTORAGE:", quoteDataWithAttribution.distance);
+        console.log("🔍 PRICES BEING STORED IN SESSIONSTORAGE:", {
+          openTransportPrice: quoteDataWithAttribution.openTransportPrice,
+          enclosedTransportPrice: quoteDataWithAttribution.enclosedTransportPrice
+        });
         sessionStorage.setItem('quote_data', JSON.stringify(quoteDataWithAttribution));
       } catch (e) {
         console.warn('Unable to persist quote_data to sessionStorage', e);
