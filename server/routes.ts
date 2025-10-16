@@ -386,6 +386,15 @@ export function registerRoutes(app: Express): Server {
 
       // Meta event code removed as part of rollback
 
+      // 🔍 CRITICAL DIAGNOSTIC: Log distance and pricing before webhook
+      console.log("🔍🔍🔍 FINAL SUBMISSION DISTANCE/PRICE DIAGNOSTIC:");
+      console.log("Distance:", formData.distance);
+      console.log("Open Transport Price:", formData.openTransportPrice);
+      console.log("Enclosed Transport Price:", formData.enclosedTransportPrice);
+      console.log("Selected Price:", formData.selectedPrice);
+      console.log("Final Price:", formData.finalPrice);
+      console.log("Vehicle Type:", formData.vehicleType);
+      
       // Log the incoming data for debugging (comprehensive)
       console.log("📝 FINAL FORM DATA RECEIVED:", {
         name: formData.name || "Not provided",
