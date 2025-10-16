@@ -191,6 +191,17 @@ export async function sendToWebhook(data: any, headers: any = {}): Promise<{ suc
       ...structuredData,
       ...originalFormat
     } : structuredData;
+    
+    // 🔍 DIAGNOSTIC: Log exact prices being sent to Zapier
+    console.log("🔍 DIAGNOSTIC: Prices in payload to Zapier:", {
+      vehicleType: data.vehicleType,
+      distance: data.distance,
+      "data.openTransportPrice": data.openTransportPrice,
+      "data.enclosedTransportPrice": data.enclosedTransportPrice,
+      "formattedData.openTransportPrice": formattedData.openTransportPrice,
+      "formattedData.enclosedTransportPrice": formattedData.enclosedTransportPrice,
+      "formattedData.PriceDetailsOpenTransport": (formattedData as any)["Price Details Total Price (Open Transport Only)"]
+    });
 
     // Generate diagnostic information
     const formType = eventType === 'final_submission' ? 'final' : 'quote';

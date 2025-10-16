@@ -1216,6 +1216,14 @@ export function registerRoutes(app: Express): Server {
         to: formData?.dropoffLocation || "Not provided",
         eventType: formData?.eventType || "Not specified",
       });
+      
+      // 🔍 DIAGNOSTIC: Log exact prices received from form
+      console.log("🔍 DIAGNOSTIC: Prices received at webhook endpoint:", {
+        vehicleType: formData?.vehicleType,
+        distance: formData?.distance,
+        openTransportPrice: formData?.openTransportPrice,
+        enclosedTransportPrice: formData?.enclosedTransportPrice
+      });
 
       // Validate minimal required data
       if (!formData) {

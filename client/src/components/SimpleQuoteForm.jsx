@@ -496,6 +496,14 @@ const SimpleQuoteForm = () => {
         console.log("Using webhook API URL:", apiUrl);
 
         // Attribution data silently included in webhook payload
+        
+        // 🔍 DIAGNOSTIC: Log exact prices being sent to Zapier
+        console.log("🔍 DIAGNOSTIC: Prices being sent to webhook:", {
+          vehicleType: webhookData.vehicleType,
+          distance: webhookData.distance,
+          openTransportPrice: webhookData.openTransportPrice,
+          enclosedTransportPrice: webhookData.enclosedTransportPrice
+        });
 
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
