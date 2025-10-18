@@ -194,8 +194,10 @@ export function calculatePrice(
     }
   } else if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
     // NEW SPECIAL PRICING: $3.00 per mile with $750 minimum
+    console.log(`🔍🔍🔍 RV PRICING: Using distance parameter = ${distance} miles`);
     const specialPrice = calculateSpecialPricing(distance);
     console.log(`🚀 NEW SPECIAL PRICING applied for ${vehicleType}: ${distance} miles × $3.00 = $${specialPrice} (minimum $750)`);
+    console.log(`🔍🔍🔍 RV PRICING: calculated specialPrice = $${specialPrice}`);
     basePrice = specialPrice;
   } else {
     // For other vehicle types, apply $695 minimum as fallback
@@ -233,12 +235,15 @@ export function calculatePrice(
   }
 
   if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
-    console.log('Special pricing calculation:', {
+    console.log('🔍🔍🔍 RV PRICING FINAL:', {
+      vehicleType,
       distance,
       ratePerMile: 3.0,
       minimumFloor: 750,
+      openTransportPrice,
       formula: `${distance} miles × $3.00 = $${openTransportPrice} (min $750)`
     });
+    console.log('🔍🔍🔍 RV PRICING: Returning openTransport =', openTransportPrice, 'for distance =', distance, 'miles');
   } else {
     console.log('Open transport calculation:', {
       basePrice,

@@ -373,10 +373,12 @@ const SimpleQuoteForm = () => {
       }
 
       console.log("Distance calculation result:", distanceData);
+      console.log("🔍🔍🔍 DISTANCE FROM API:", distanceData.distance, "miles");
 
       // Use the imported pricing calculation function
 
       // Use the pricing calculation function with locations for Snowbird rule detection
+      console.log("🔍🔍🔍 CALLING calculatePrice WITH DISTANCE:", distanceData.distance, "VEHICLE TYPE:", formData.vehicleType);
       const pricingResult = calculatePrice(
         distanceData.distance,
         formData.vehicleType,
@@ -384,6 +386,11 @@ const SimpleQuoteForm = () => {
         formData.pickupLocation,
         formData.dropoffLocation,
       );
+      console.log("🔍🔍🔍 PRICING RESULT:", {
+        openTransport: pricingResult.openTransport,
+        enclosedTransport: pricingResult.enclosedTransport,
+        transitTime: pricingResult.transitTime
+      });
 
       // Extract the calculated values
       const transitTime = pricingResult.transitTime;
@@ -413,6 +420,14 @@ const SimpleQuoteForm = () => {
       
       // 🔍 CRITICAL DIAGNOSTIC: Verify distance in quoteData
       console.log("🔍 DISTANCE IN QUOTEDATA:", quoteData.distance);
+      console.log("🔍🔍🔍 COMPLETE QUOTEDATA:", JSON.stringify({
+        vehicleType: quoteData.vehicleType,
+        distance: quoteData.distance,
+        openTransportPrice: quoteData.openTransportPrice,
+        enclosedTransportPrice: quoteData.enclosedTransportPrice,
+        pickupLocation: quoteData.pickupLocation,
+        dropoffLocation: quoteData.dropoffLocation
+      }, null, 2));
 
       console.log("Added ZIP codes to quote data:", {
         pickupZip,
@@ -510,6 +525,14 @@ const SimpleQuoteForm = () => {
           openTransportPrice: webhookData.openTransportPrice,
           enclosedTransportPrice: webhookData.enclosedTransportPrice
         });
+        console.log("🔍🔍🔍 COMPLETE WEBHOOKDATA BEING SENT:", JSON.stringify({
+          vehicleType: webhookData.vehicleType,
+          distance: webhookData.distance,
+          openTransportPrice: webhookData.openTransportPrice,
+          enclosedTransportPrice: webhookData.enclosedTransportPrice,
+          pickupLocation: webhookData.pickupLocation,
+          dropoffLocation: webhookData.dropoffLocation
+        }, null, 2));
 
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
