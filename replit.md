@@ -76,3 +76,23 @@ The application follows a full-stack architecture with clear separation between 
 **Health Monitoring**: Built-in webhook monitoring and diagnostic endpoints for troubleshooting integration issues
 
 The application prioritizes reliability and performance with comprehensive error handling, request logging, and fallback mechanisms for external service failures.
+
+## Recent Changes
+
+### October 18, 2025 - RV/5th Wheel Price Discrepancy Fix
+
+**Issue**: Customers saw different prices for RV/5th Wheel quotes on screen versus what was sent to Zapier webhook. Display showed ~$3,100 while webhook sent ~$3,876 for the same quote.
+
+**Root Cause**: The booking page (`client/src/pages/booking.tsx`) contained a `useEffect` hook that recalculated pricing after quote submission. This recalculation used potentially stale or simplified location data, causing different distance calculations and therefore different prices.
+
+**Fix**: Removed the automatic price recalculation in booking.tsx (lines 118-152). The booking page now uses the `finalPrice` that was calculated during initial quote submission, ensuring the displayed price matches exactly what was sent to the webhook.
+
+**Impact**: 
+- ✅ Eliminates price discrepancies between UI display and webhook payload
+- ✅ Ensures customers see the exact same price that gets recorded in CRM
+- ✅ Maintains data integrity across the entire quote-to-booking flow
+
+**Files Modified**:
+- `client/src/pages/booking.tsx`: Removed recalculation useEffect, added validation logging
+- `client/src/components/SimpleQuoteForm.jsx`: Added diagnostic logging for distance/price values
+- `client/src/lib/pricing.ts`: Added diagnostic logging for RV pricing calculations
