@@ -428,6 +428,14 @@ const SimpleQuoteForm = () => {
         pickupLocation: quoteData.pickupLocation,
         dropoffLocation: quoteData.dropoffLocation
       }, null, 2));
+      
+      // 🔬 FORENSIC TRACE POINT 1
+      console.log("═══════════════════════════════════════");
+      console.log("🔬 FORENSIC TRACE - QUOTE CALCULATION");
+      console.log("[DISTANCE] miles:", quoteData.distance);
+      console.log("[CALCULATED] openTransport:", quoteData.openTransportPrice);
+      console.log("[CALCULATED] enclosed:", quoteData.enclosedTransportPrice);
+      console.log("═══════════════════════════════════════");
 
       console.log("Added ZIP codes to quote data:", {
         pickupZip,
@@ -533,6 +541,14 @@ const SimpleQuoteForm = () => {
           pickupLocation: webhookData.pickupLocation,
           dropoffLocation: webhookData.dropoffLocation
         }, null, 2));
+        
+        // 🔬 FORENSIC TRACE POINT 2
+        console.log("═══════════════════════════════════════");
+        console.log("🔬 FORENSIC TRACE - WEBHOOK PAYLOAD");
+        console.log("[DISTANCE] miles:", webhookData.distance);
+        console.log("[PAYLOAD] openTransport:", webhookData.openTransportPrice);
+        console.log("[PAYLOAD] enclosed:", webhookData.enclosedTransportPrice);
+        console.log("═══════════════════════════════════════");
 
         const webhookResponse = await fetch(apiUrl, {
           method: "POST",
@@ -627,6 +643,15 @@ const SimpleQuoteForm = () => {
           openTransportPrice: quoteDataWithAttribution.openTransportPrice,
           enclosedTransportPrice: quoteDataWithAttribution.enclosedTransportPrice
         });
+        
+        // 🔬 FORENSIC TRACE POINT 3
+        console.log("═══════════════════════════════════════");
+        console.log("🔬 FORENSIC TRACE - SESSION STORAGE");
+        console.log("[DISTANCE] miles:", quoteDataWithAttribution.distance);
+        console.log("[SESSION] openTransport:", quoteDataWithAttribution.openTransportPrice);
+        console.log("[SESSION] enclosed:", quoteDataWithAttribution.enclosedTransportPrice);
+        console.log("═══════════════════════════════════════");
+        
         sessionStorage.setItem('quote_data', JSON.stringify(quoteDataWithAttribution));
       } catch (e) {
         console.warn('Unable to persist quote_data to sessionStorage', e);

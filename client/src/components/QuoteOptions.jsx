@@ -37,6 +37,16 @@ const QuoteOptions = ({ data }) => {
   const standardPrice = isEnclosedStandard ? formData.enclosedTransportPrice : formData.openTransportPrice;
   const expressPrice = isEnclosedExpress ? Math.round(formData.enclosedTransportPrice * 1.2) : Math.round(formData.openTransportPrice * 1.2);
   
+  // 🔬 FORENSIC TRACE POINT 4
+  console.log("═══════════════════════════════════════");
+  console.log("🔬 FORENSIC TRACE - DISPLAY PRICE");
+  console.log("[DISTANCE] miles:", formData.distance);
+  console.log("[DISPLAY] standardPrice:", standardPrice);
+  console.log("[DISPLAY] expressPrice:", expressPrice);
+  console.log("[DISPLAY] isEnclosedStandard:", isEnclosedStandard);
+  console.log("[DISPLAY] isEnclosedExpress:", isEnclosedExpress);
+  console.log("═══════════════════════════════════════");
+  
   const formatUSD = (price) => new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',

@@ -1,0 +1,66 @@
+Hey — before we even think about redeploying, I need a forensic-level validation of the RV/5th-Wheel pricing flow. The goal is to confirm, with proof, that the price a customer sees in the UI is identical to what is stored, sent, and logged — across every layer.
+
+This is not a standard QA pass. Treat it as a code-integrity investigation.
+
+🔬 REQUIREMENTS
+
+1. Controlled Self-Submission Test (Must Be Done by Replit)
+
+Submit at least one real quote internally using the live build:
+
+Pickup: Conway, SC 29527
+
+Dropoff: Lawton, OK 73503
+
+Vehicle Type: 5th Wheel / RV
+
+Confirm the quote submission completes successfully (no blocked webhook, no client error).
+
+Record:
+
+Price displayed on the screen
+
+Price in the outgoing payload (exact numeric value)
+
+Distance returned by API
+
+This is mandatory — I will not perform this test on my end.
+
+2. Deep Code Forensics — Legacy & Residual Logic Erasure
+I need a line-by-line inspection for any legacy or redundant logic that could still recalc, round, or mutate price data post-submission. Specifically:
+
+Any reference to:
+
+calculatePrice, calculateSpecialPricing, or similar calls outside SimpleQuoteForm.jsx
+
+finalPrice being reassigned in booking.tsx, final-quote.tsx, or any useEffect
+
+Session or localStorage reads/writes of quoteData, quoteDataWithAttribution, data, or pricingResult
+
+Verify that no other component runs a secondary calculation or rounding rule.
+
+Delete or isolate all stale or commented-out versions of pricing logic so there’s one clean authoritative path from calculatePrice → payload → display.
+
+3. Instrumentation Proof
+Add diagnostic logs (temporary only) to print the following in a single trace per submission:
+
+[DISPLAY] price: $____
+[PAYLOAD] price: $____
+[SESSION] price: $____
+[DISTANCE] miles: ____
+
+
+If these four numbers ever differ by even $1, capture the full state object (vehicleType, distance, route, timestamp) and include in your report.
+
+4. Deliverables
+
+Console logs from your controlled self-submission
+
+Screenshot or textual capture of the quote screen
+
+Confirmation that no legacy pricing calls exist anywhere in the repo
+
+List of every function or hook that can modify price and a note confirming whether each is still active or deprecated
+
+5. No Redeploy Until Verification Complete
+Do not push or rebuild the project until this forensic check and controlled self-submission are complete and validated.
