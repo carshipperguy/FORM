@@ -114,41 +114,23 @@ export default function Booking() {
     return null;
   }
   
-  // Use the pricing library directly for consistent pricing across all pages
+  // REMOVED: Auto-recalculation that was causing price discrepancies
+  // The finalPrice should already be set from the quote form submission
+  // Recalculating here with potentially stale/different data causes the displayed
+  // price to differ from what was sent to the webhook/Zapier
+  
+  // If finalPrice is missing (shouldn't happen), log an error but don't recalculate
   useEffect(() => {
-    async function recalculatePricing() {
-      if (!data?.vehicleType || !data?.distance) return;
-      
-      try {
-        // Import the pricing calculation function
-        const { calculatePrice } = await import('../lib/pricing');
-        
-        // Re-calculate pricing using the pricing library
-        const pricing = calculatePrice(
-          data.distance,
-          data.vehicleType,
-          new Date(),
-          data.pickupLocation,
-          data.dropoffLocation
-        );
-        
-        console.log("Recalculated pricing:", pricing);
-        
-        // Set the correct price based on transport type
-        if (data.selectedTransport === 'enclosed') {
-          data.finalPrice = pricing.enclosedTransport;
-        } else {
-          data.finalPrice = pricing.openTransport;
-        }
-        
-        console.log("Final price set to:", data.finalPrice);
-      } catch (error) {
-        console.error("Error recalculating price:", error);
-        // Keep the existing price if there's an error
-      }
+    if (!data?.finalPrice) {
+      console.error("⚠️ WARNING: finalPrice is missing from booking data. Using fallback.");
+      console.log("Booking data:", { 
+        distance: data?.distance, 
+        vehicleType: data?.vehicleType,
+        selectedTransport: data?.selectedTransport 
+      });
+    } else {
+      console.log("✅ Using finalPrice from quote submission:", data.finalPrice);
     }
-    
-    recalculatePricing();
   }, [data]);
   
   console.log("FINAL PRICE:", {
