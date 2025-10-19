@@ -1,0 +1,50 @@
+Code-Level Audit — Confirm How Displayed Price Is Derived (No Cache or Deployment Discussion)
+
+Hey — stop focusing on cache or deployment.
+This issue has nothing to do with caching.
+I need a pure code-level audit of how the displayed price is derived in the UI and whether it is even theoretically possible for the user to see one value while a different one is sent in the webhook.
+
+🔍 REQUIRED TASKS
+
+1. Trace the Display Path (line-by-line).
+Locate and document exactly how the value shown to the customer on screen is produced.
+You must identify:
+
+The variable or state field holding the displayed value.
+
+The function that calculates or formats it.
+
+Every place that variable is set, read, or transformed.
+
+Whether any formatting (rounding, division, markup, or conversion) is applied only to the displayed value.
+
+2. Trace the Payload Path.
+Document how the payload’s price is created, from the same calculation or a separate one.
+Show every assignment leading to quoteData.openTransportPrice and webhookData.openTransportPrice.
+
+3. Compare Both Paths.
+Provide a side-by-side table showing:
+
+Source	File & Line	Function	Variable	Notes
+Display (UI)				
+Payload (Webhook)				
+
+4. Evaluate Theoretical Divergence.
+Explicitly state whether any timing, state, or async event could cause those two values to differ, even for a millisecond (e.g., re-render, stale state, race condition, rounding, parallel call).
+
+5. Confirm Humanly Impossible Scenario.
+I need written confirmation that after this audit it is humanly impossible under any condition — route, vehicle type, timing, or user input — for the displayed price to differ from the payload price.
+
+⚙️ Deliverables
+
+Full trace of all files/functions controlling display and payload prices.
+
+A flow diagram or table showing where the values originate and when they diverge (if ever).
+
+A definitive statement verifying or disproving the possibility of mismatch.
+
+No discussion of cache, build artifacts, or CDN layers — this must come purely from reading and tracing the code.
+
+No code pushes or rebuilds until this audit is complete and reviewed.
+
+— Zach
