@@ -1,0 +1,65 @@
+Hey — I just reproduced the issue inside the same Replit dev environment you audited.
+No cache, no CDN, no build discrepancy — the environment is identical to what you inspected.
+
+Yet I watched this happen in real time:
+Displayed: $3,203
+Payload sent: $3,876
+
+That means your “humanly impossible” conclusion is incorrect.
+The system can and does display one value while sending another, even in this environment.
+
+🔍 REQUIRED IMMEDIATE ACTIONS
+
+Run the exact same quote yourself, in the same dev environment.
+
+Pickup: Myrtle Beach, SC 29572
+
+Dropoff: Lawton, OK 73503
+
+Vehicle Type: RV / 5th Wheel
+
+Do not rebuild or redeploy — run it as-is.
+
+Add these temporary console logs (do not push new code yet):
+
+console.log("💬 CALCULATED:", pricingResult.openTransport);
+console.log("💬 QUOTED:", quoteData.openTransportPrice);
+console.log("💬 WEBHOOK:", webhookData.openTransportPrice);
+console.log("💬 DISPLAY:", formData.openTransportPrice);
+
+
+Then submit the quote and capture all values side-by-side with timestamps.
+
+Prove the execution flow with evidence, not static code.
+
+Identify which line assigns 3,203 to the displayed value.
+
+Show where and how that transformation happens between the calculatePrice() output and what renders.
+
+Provide the exact file name and line number of the mutation.
+
+Confirm whether any of these mechanisms are in play:
+
+Secondary formatting logic (Math.round, division, or conversion).
+
+Any useEffect or derived state reassigning price post-calculation.
+
+Any Redux, Zustand, or context update modifying formData after submission.
+
+Do not mention cache or deployment again.
+This is occurring inside the same dev workspace, not production.
+The discrepancy is inside the live execution path, not in distribution.
+
+🧩 Expectation
+
+You must deliver:
+
+Console log output with all four values printed live.
+
+File and line number where 3,203 is introduced.
+
+Written confirmation of which function causes the display mutation.
+
+A clear plan to eliminate the transformation permanently.
+
+Until you can demonstrate equal values for both display and payload inside this same dev instance, the system cannot be considered stable or production-safe.
