@@ -1,0 +1,65 @@
+Subject: System-Wide Audit — Verify Display vs Webhook Pricing Consistency Across All Vehicle Types
+
+Hey — before any code changes or new deployments, I need a complete forensic audit to confirm whether it’s even possible anywhere in the system for a price to display one value in the UI and transmit a different one through the webhook.
+
+This isn’t limited to RV/5th-Wheel — I want a full, global analysis covering all vehicle types and code paths.
+
+🔍 SCOPE OF THE AUDIT
+
+Trace all points where price is calculated, formatted, or modified.
+
+Identify every instance of calculatePrice, calculateSpecialPricing, applyMinimumPrice, applyMarkup, or similar.
+
+For each instance, specify which variable is responsible for the displayed price (UI) and which is used in the payload/webhook.
+
+List every transformation or adjustment function.
+
+Example: divisions like /1.21, rounding, conditional markups, or formatting adjustments.
+
+Note which components they live in (e.g., SimpleQuoteForm.jsx, final-quote.tsx, booking.tsx, pricing.ts, etc.).
+
+Confirm whether these transformations affect only what’s rendered, or whether they mutate the data sent to the backend.
+
+Establish lineage of price data.
+
+Show where pricingResult originates and how it travels from calculation → display → payload → webhook.
+
+Identify every step that could create a mismatch between front-end and transmitted values.
+
+Audit all vehicle categories.
+
+Car, Truck, SUV
+
+RV / 5th-Wheel
+
+Motorcycle
+
+Boat / Trailer / Misc
+
+Confirm that none of these paths re-use markup logic incorrectly (like the /1.21 issue).
+
+Deliver a system-wide consistency test plan.
+
+Outline how you’ll verify, in a controlled environment, that the value displayed on screen and the value in the webhook are identical for every vehicle type.
+
+Include screenshots or console logs showing displayed vs. payload equality for each class.
+
+Identify all potential race conditions.
+
+Confirm whether any asynchronous state updates (e.g., delayed React state or double submissions) could cause the displayed price to lag behind the one being sent.
+
+⚙️ DELIVERABLES
+
+A written forensic report detailing:
+
+Each price-handling function’s role and file location.
+
+All display-vs-payload value pathways.
+
+A definitive statement on whether any other mismatch is possible anywhere in the app.
+
+A proposed global safeguard plan ensuring one authoritative price variable system-wide (immutable once displayed).
+
+Explicit confirmation that any changes made will have zero unintended consequences for Zapier, CRM ingestion, CAPI tracking, or attribution logic.
+
+No code pushes or commits until this audit is completed and validated.
