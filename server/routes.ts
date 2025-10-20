@@ -151,6 +151,45 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/quotes/today", async (req, res) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayTimestamp = today.getTime();
+
+      // Import submission functions
+      const { getAllSubmissions } = await import('./utils/webhook-monitor-queue');
+      
+      // Get all submissions from webhook tracking
+      const allSubmissions = getAllSubmissions();
+      
+      // Filter submissions from today
+      const todaySubmissions = allSubmissions.filter(sub => {
+        const subDate = new Date(sub.timestamp);
+        subDate.setHours(0, 0, 0, 0);
+        return subDate.getTime() === todayTimestamp;
+      });
+
+      // Transform submissions to a more readable format
+      const quotes = todaySubmissions.map(sub => ({
+        id: sub.id,
+        timestamp: sub.timestamp,
+        formType: sub.formType,
+        data: sub.originalData,
+        success: sub.success,
+      }));
+
+      res.json({
+        success: true,
+        count: quotes.length,
+        quotes,
+      });
+    } catch (error) {
+      console.error("Error fetching today's quotes:", error);
+      res.status(500).json({ error: "Failed to fetch quotes" });
+    }
+  });
+
   // Endpoint for instant quote notifications (email and SMS)
   app.post("/api/send-quote-notification", async (req, res) => {
     console.log("🚀 /api/send-quote-notification triggered!");

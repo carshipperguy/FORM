@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,20 +12,25 @@ import FinalQuote from "./pages/final-quote";
 import SimpleQuote from "./pages/simple-quote";
 import TestMapQuest from "./pages/test-mapquest";
 import EmbeddingInstructions from "./pages/embedding-instructions";
+import QuotesToday from "./pages/quotes-today";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={SimpleQuote} />
-      <Route path="/home" component={Home} />
-      <Route path="/final-quote" component={FinalQuote} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/booking" component={Booking} />
-      <Route path="/thank-you" component={ThankYou} />
-      <Route path="/test-mapquest" component={TestMapQuest} />
-      <Route path="/embedding-instructions" component={EmbeddingInstructions} />
-      <Route component={NotFound} />
-    </Switch>
+    <WouterRouter base={import.meta.env.BASE_URL || '/'}>
+      <Switch>
+        <Route path="/" component={SimpleQuote} />
+        <Route path="/index.html" component={SimpleQuote} />
+        <Route path="/home" component={Home} />
+        <Route path="/final-quote" component={FinalQuote} />
+        <Route path="/checkout" component={Checkout} />
+        <Route path="/booking" component={Booking} />
+        <Route path="/thank-you" component={ThankYou} />
+        <Route path="/test-mapquest" component={TestMapQuest} />
+        <Route path="/embedding-instructions" component={EmbeddingInstructions} />
+        <Route path="/quotes-today" component={QuotesToday} />
+        <Route component={NotFound} />
+      </Switch>
+    </WouterRouter>
   );
 }
 
