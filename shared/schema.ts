@@ -1,7 +1,8 @@
-import { pgTable, text, serial, integer, real, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, real, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { vehicleTypes } from "../client/src/lib/vehicle-data";
+import { sql } from "drizzle-orm";
 
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
@@ -21,6 +22,12 @@ export const quotes = pgTable("quotes", {
   openTransportPrice: real("open_transport_price").notNull(),
   enclosedTransportPrice: real("enclosed_transport_price").notNull(),
   transitTime: integer("transit_time").notNull(),
+});
+
+export const fallbackLeads = pgTable("fallback_leads", {
+  id: serial("id").primaryKey(),
+  data: jsonb("data").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
 export const quoteFormSchema = z.object({
