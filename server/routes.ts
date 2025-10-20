@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import cors from "cors";
 import { storage } from "./storage";
-import { insertQuoteSchema } from "@shared/schema";
+import { insertQuoteSchema, fallbackLeads } from "@shared/schema";
 import {
   sendConfirmationEmail,
   sendConfirmationSMS,
@@ -23,6 +23,7 @@ import {
   searchLocations,
   getPopularLocations,
 } from "./utils/location-service";
+import { db } from "./db";
 
 // Use MapQuest with your API key
 // Using the new key you provided
@@ -1316,45 +1317,72 @@ export function registerRoutes(app: Express): Server {
         `📊 [${diagnosticId}] ATTEMPTING MAIN WEBHOOK - ${new Date().toISOString()}`,
       );
 
-      // Send the webhook - this is the actual CRM integration
-      const webhookResult = await sendToWebhook(formData, req.headers);
+      // RUN CONCURRENT OPERATIONS: Save to Postgres AND send to Zapier in parallel
+      const [dbResult, webhookResult] = await Promise.allSettled([
+        // Operation 1: Save to local Postgres (fallback_leads table)
+        db.insert(fallbackLeads).values({ data: formData }),
+        
+        // Operation 2: Send to Zapier webhook
+        sendToWebhook(formData, req.headers)
+      ]);
+
+      // Handle database save result
+      if (dbResult.status === 'fulfilled') {
+        console.log("✅ Lead saved locally to fallback_leads table");
+      } else {
+        console.error("❌ Failed to save lead locally:", dbResult.reason);
+      }
+
+      // Handle Zapier webhook result
+      let zapierSuccess = false;
+      let zapierError: string | null = null;
+
+      if (webhookResult.status === 'fulfilled') {
+        const result = webhookResult.value;
+        if (result && result.success) {
+          zapierSuccess = true;
+          console.log(
+            `🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM`,
+          );
+        } else {
+          zapierError = result?.message || "Unknown webhook error";
+          console.error(`⚠️ Zapier send failed: ${zapierError}`);
+        }
+      } else {
+        zapierError = webhookResult.reason instanceof Error 
+          ? webhookResult.reason.message 
+          : String(webhookResult.reason);
+        console.error(`⚠️ Zapier send failed:`, zapierError);
+      }
 
       // DIAGNOSTIC: Log webhook result with the same ID for correlation
       console.log(
-        `📊 [${diagnosticId}] WEBHOOK RESULT: ${webhookResult?.success ? "SUCCESS" : "FAILURE"} - ${new Date().toISOString()}`,
+        `📊 [${diagnosticId}] WEBHOOK RESULT: ${zapierSuccess ? "SUCCESS" : "FAILURE"} - ${new Date().toISOString()}`,
       );
 
-      if (webhookResult && webhookResult.success) {
-        console.log(
-          `🎉 [${diagnosticId}] WEBHOOK SUCCESSFULLY DELIVERED TO CRM`,
-        );
-
+      // Always return success to the user if data was saved locally
+      // Even if Zapier fails, the lead is not lost
+      if (dbResult.status === 'fulfilled') {
+        res.json({
+          success: true,
+          message: "Lead successfully sent to CRM system",
+        });
+      } else if (zapierSuccess) {
+        // If DB failed but Zapier succeeded
         res.json({
           success: true,
           message: "Lead successfully sent to CRM system",
         });
       } else {
-        // Handle case where webhookResult is undefined or null
-        const errorMessage =
-          webhookResult?.message ||
-          "Webhook function returned undefined - critical system error";
-        const errorDetails = webhookResult
-          ? `Webhook failed: ${errorMessage}`
-          : "Webhook function failed to return a result object";
-
+        // Both failed - this is a critical error
         console.error(
-          `❌ [${diagnosticId}] WEBHOOK DELIVERY FAILED:`,
-          errorDetails,
-        );
-        console.error(
-          `❌ [${diagnosticId}] Full webhook result:`,
-          webhookResult,
+          `❌ [${diagnosticId}] CRITICAL: Both DB and Zapier failed`,
         );
 
         res.status(500).json({
           success: false,
           message: "Failed to send lead to CRM system",
-          error: errorMessage,
+          error: zapierError || "Unknown error",
           diagnosticId: diagnosticId,
         });
       }
