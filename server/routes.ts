@@ -170,19 +170,46 @@ export function registerRoutes(app: Express): Server {
         return subDate.getTime() === todayTimestamp;
       });
 
-      // Transform submissions to a more readable format
-      const quotes = todaySubmissions.map(sub => ({
+      // Transform webhook submissions to a more readable format
+      const webhookQuotes = todaySubmissions.map(sub => ({
         id: sub.id,
         timestamp: sub.timestamp,
         formType: sub.formType,
         data: sub.originalData,
         success: sub.success,
+        source: 'webhook',
       }));
+
+      // Get leads from fallback_leads table for today
+      const { eq, gte, sql } = await import('drizzle-orm');
+      const dbLeads = await db.select().from(fallbackLeads).where(
+        sql`DATE(${fallbackLeads.createdAt}) = CURRENT_DATE`
+      );
+
+      // Transform database leads
+      const databaseLeads = dbLeads.map(lead => ({
+        id: `lead_${lead.id}`,
+        timestamp: new Date(lead.createdAt).getTime(),
+        formType: 'quote' as const,
+        data: lead.data,
+        success: true,
+        source: 'database',
+      }));
+
+      // Combine all quotes
+      const allQuotes = [...webhookQuotes, ...databaseLeads];
+      
+      // Sort by timestamp, newest first
+      allQuotes.sort((a, b) => b.timestamp - a.timestamp);
 
       res.json({
         success: true,
-        count: quotes.length,
-        quotes,
+        count: allQuotes.length,
+        quotes: allQuotes,
+        breakdown: {
+          webhook: webhookQuotes.length,
+          database: databaseLeads.length,
+        }
       });
     } catch (error) {
       console.error("Error fetching today's quotes:", error);

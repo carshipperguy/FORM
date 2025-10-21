@@ -11,12 +11,17 @@ interface QuoteData {
   formType: "quote" | "final";
   data: any;
   success: boolean;
+  source?: "webhook" | "database";
 }
 
 interface QuotesResponse {
   success: boolean;
   count: number;
   quotes: QuoteData[];
+  breakdown?: {
+    webhook: number;
+    database: number;
+  };
 }
 
 export default function QuotesToday() {
@@ -64,8 +69,15 @@ export default function QuotesToday() {
               {quotes.length}
             </div>
             <div className="text-sm text-gray-600">
-              {quotes.length === 1 ? "quote" : "quotes"} submitted
+              {quotes.length === 1 ? "lead" : "leads"} submitted
             </div>
+            {data?.breakdown && (data.breakdown.webhook > 0 || data.breakdown.database > 0) && (
+              <div className="text-xs text-gray-500 mt-1">
+                {data.breakdown.database > 0 && `${data.breakdown.database} stored`}
+                {data.breakdown.webhook > 0 && data.breakdown.database > 0 && " • "}
+                {data.breakdown.webhook > 0 && `${data.breakdown.webhook} in-memory`}
+              </div>
+            )}
           </div>
         </div>
 
