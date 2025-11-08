@@ -1,0 +1,49 @@
+Emergency Diagnostic Prompt (No Code Changes / No Pushes)
+
+Objective: Diagnose why instant quotes are looping or failing to return results on different devices (mobile, tablet, desktop). Identify whether the issue is frontend-side (React rendering / device event handling / state persistence) or backend-side (API response timing, payload mismatch, or CORS/device token issues).
+
+Prompt for Replit Developer / Debug Console:
+
+“Run a full diagnostic on the quote calculation and response-return cycle for the Instant Quote feature.
+
+Check if the frontend getQuote() or equivalent submission handler is properly resolving promises on all devices and browsers (Safari iOS, Chrome Android, desktop Chrome, Firefox, Edge).
+
+Trace the sequence from input submission → API call → response parse → state update → render and log all transitions.
+
+Look for any device-specific issues:
+
+Input fields not triggering the submit handler (onSubmit not firing due to mobile keyboard behavior or form focus).
+
+Debounce logic or useEffect dependencies re-triggering the call and causing infinite loops.
+
+API returning a 200 response with malformed payload, causing client retries.
+
+Session or UTM param parsing errors creating an unhandled re-render in the quote component.
+
+Cached or stale service worker data serving old JS bundle (test in incognito/private windows).
+
+Verify whether the issue reproduces under:
+
+Mobile Chrome (latest Android),
+
+iOS Safari (latest),
+
+Desktop Chrome/Edge.
+
+Inspect network requests for multiple identical calls (quote endpoint firing twice or more).
+
+Confirm that await and setState (or React Query mutation) are resolving in correct order—no race conditions.
+
+Confirm environment variables and endpoint URLs are identical across devices; no staging/live mismatch.
+
+Output a structured log identifying:
+
+Whether loop originates from frontend or backend.
+
+Devices where reproduction is confirmed.
+
+Root cause (debounce, payload mismatch, unhandled promise, or API timeout).
+
+Recommended fix (UI event handler, validation guard, or backend delay).
+
+Do not modify code or push commits. Log only. Report findings with timestamps, device type, and component path.”
