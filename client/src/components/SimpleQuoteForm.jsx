@@ -635,33 +635,63 @@ const SimpleQuoteForm = () => {
         referrer: attributionData.referrer || "",
       };
 
+      // 🔧 STORAGE CAPABILITY DETECTION: Test if sessionStorage is available
+      // This prevents infinite loops on privacy browsers (iOS Safari Private, Firefox Strict, etc.)
+      const isStorageAvailable = () => {
+        try {
+          const testKey = '__storage_test__';
+          sessionStorage.setItem(testKey, 'test');
+          sessionStorage.removeItem(testKey);
+          return true;
+        } catch (e) {
+          console.warn('⚠️ SessionStorage blocked or unavailable:', e.name);
+          return false;
+        }
+      };
+
       // Store data in sessionStorage to avoid PII in URL
-      try {
-        // 🔍 CRITICAL DIAGNOSTIC: Verify distance before storing in sessionStorage
-        console.log("🔍 DISTANCE BEING STORED IN SESSIONSTORAGE:", quoteDataWithAttribution.distance);
-        console.log("🔍 PRICES BEING STORED IN SESSIONSTORAGE:", {
-          openTransportPrice: quoteDataWithAttribution.openTransportPrice,
-          enclosedTransportPrice: quoteDataWithAttribution.enclosedTransportPrice
-        });
-        
-        // 🔬 FORENSIC TRACE POINT 3
-        console.log("═══════════════════════════════════════");
-        console.log("🔬 FORENSIC TRACE - SESSION STORAGE");
-        console.log("[DISTANCE] miles:", quoteDataWithAttribution.distance);
-        console.log("[SESSION] openTransport:", quoteDataWithAttribution.openTransportPrice);
-        console.log("[SESSION] enclosed:", quoteDataWithAttribution.enclosedTransportPrice);
-        console.log("═══════════════════════════════════════");
-        
-        sessionStorage.setItem('quote_data', JSON.stringify(quoteDataWithAttribution));
-      } catch (e) {
-        console.warn('Unable to persist quote_data to sessionStorage', e);
+      // 🔧 FALLBACK MECHANISM: Use URL params if storage is blocked
+      let useUrlFallback = false;
+      
+      if (isStorageAvailable()) {
+        // Storage available - use sessionStorage (preferred method)
+        try {
+          // 🔍 CRITICAL DIAGNOSTIC: Verify distance before storing in sessionStorage
+          console.log("🔍 DISTANCE BEING STORED IN SESSIONSTORAGE:", quoteDataWithAttribution.distance);
+          console.log("🔍 PRICES BEING STORED IN SESSIONSTORAGE:", {
+            openTransportPrice: quoteDataWithAttribution.openTransportPrice,
+            enclosedTransportPrice: quoteDataWithAttribution.enclosedTransportPrice
+          });
+          
+          // 🔬 FORENSIC TRACE POINT 3
+          console.log("═══════════════════════════════════════");
+          console.log("🔬 FORENSIC TRACE - SESSION STORAGE");
+          console.log("[DISTANCE] miles:", quoteDataWithAttribution.distance);
+          console.log("[SESSION] openTransport:", quoteDataWithAttribution.openTransportPrice);
+          console.log("[SESSION] enclosed:", quoteDataWithAttribution.enclosedTransportPrice);
+          console.log("═══════════════════════════════════════");
+          
+          sessionStorage.setItem('quote_data', JSON.stringify(quoteDataWithAttribution));
+        } catch (e) {
+          console.warn('⚠️ SessionStorage write failed, falling back to URL params:', e);
+          useUrlFallback = true;
+        }
+      } else {
+        // Storage blocked - must use URL fallback
+        console.log('📋 Using URL fallback (sessionStorage unavailable)');
+        useUrlFallback = true;
       }
 
       // Reset submission state before navigating
       setIsSubmitting(false);
 
-      // Navigate to the final quote page
-      navigate(`/final-quote`);
+      // Navigate to the final quote page (with URL fallback if storage blocked)
+      if (useUrlFallback) {
+        const encoded = encodeURIComponent(JSON.stringify(quoteDataWithAttribution));
+        navigate(`/final-quote?data=${encoded}`);
+      } else {
+        navigate(`/final-quote`);
+      }
     } catch (error) {
       console.error("Error in form submission:", error);
       setIsSubmitting(false);

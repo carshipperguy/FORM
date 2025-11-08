@@ -20,8 +20,18 @@ export default function FinalQuote() {
   useEffect(() => {
     try {
       let parsed: any | null = null;
-      // Prefer sessionStorage to avoid putting PII in the URL
-      const stored = sessionStorage.getItem('quote_data');
+      
+      // 🔧 SAFE STORAGE ACCESS: Wrap in try/catch to handle blocked sessionStorage
+      let stored: string | null = null;
+      try {
+        // Prefer sessionStorage to avoid putting PII in the URL
+        stored = sessionStorage.getItem('quote_data');
+      } catch (storageError) {
+        console.warn('⚠️ SessionStorage read blocked, using URL fallback:', storageError);
+        // stored remains null, will trigger URL fallback below
+      }
+      
+      // 🔧 FALLBACK ACTIVATION: If storage is null/blocked, check URL params
       if (!stored) {
         // Fallback: legacy URL param (for backward compatibility only)
         const searchParams = new URLSearchParams(window.location.search);
