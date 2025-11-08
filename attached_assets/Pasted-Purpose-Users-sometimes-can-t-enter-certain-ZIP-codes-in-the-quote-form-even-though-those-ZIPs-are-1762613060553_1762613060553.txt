@@ -1,0 +1,58 @@
+Purpose:
+Users sometimes can’t enter certain ZIP codes in the quote form, even though those ZIPs are valid and should exist in the MapQuest ZIP Code API dataset. This prompt must diagnose why, without editing or deploying any code.
+
+INSTRUCTIONS (read carefully before running any analysis):
+
+Do NOT push, commit, or deploy any code.
+This is a diagnostic-only session — no code writes, merges, or saves are allowed.
+
+Do NOT alter any API keys, endpoints, or environment variables.
+You are here to inspect logic only.
+
+You are NOT fixing or patching behavior in this session.
+The only deliverable is a written explanation of why the error occurs.
+
+PROMPT:
+
+You are operating in a diagnostic-only capacity.
+Your task is to identify the root cause of a bug in the Amerigo Auto Transport quote app where users sometimes cannot input certain ZIP codes that should exist in the MapQuest ZIP Code API dataset.
+
+Proceed with the following investigation steps without modifying or deploying code:
+
+Trace the ZIP input flow:
+
+Locate the frontend ZIP input handler component (React or HTML input).
+
+Identify how the entered value is validated before API submission.
+
+Determine whether validation occurs via regex, client-side range check, or asynchronous lookup.
+
+Inspect the API call to MapQuest:
+
+Verify the request format and endpoint used for ZIP validation.
+
+Check whether the API uses postalCode, location, or a placeId parameter.
+
+Look for request throttling, rate limits, or region filters that might block certain ZIPs.
+
+Check server-side logic (if applicable):
+
+Confirm whether backend middleware re-validates ZIP codes using a cached MapQuest dataset.
+
+Identify if there’s any hardcoded list of valid ZIP ranges or a numeric pattern filter (e.g., only U.S. mainland ZIPs).
+
+Reproduce failure:
+
+Select 3–5 known problematic ZIP codes and observe console/network logs.
+
+Note whether the rejection occurs before or after the API call (client-side vs. server-side).
+
+Return findings:
+
+Clearly list which file(s) and function(s) contain the validation logic.
+
+Explain the most likely failure point (regex pattern mismatch, truncated API response, regional filtering, etc.).
+
+Suggest non-code-level next steps (e.g., expand API parameter coverage, log validation layer responses, or temporarily disable ZIP pre-filtering).
+
+Do not modify any live code or environment configurations under any circumstances.
