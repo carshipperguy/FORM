@@ -1,0 +1,52 @@
+Objective:
+Conduct a zero-risk, read-only diagnostic audit of the quote form front-end and its connected API calls. Do not modify or push any code. Focus purely on identifying potential causes behind the following issues:
+
+Circular or infinite loading loop after submission or page render.
+
+Valid ZIP codes not resolving or being rejected despite existing in the MapQuest API dataset.
+
+Any other blocking behaviors preventing the form from fully loading or working.
+
+Scope:
+
+Audit all input validation logic (ZIP, city/state, email, phone, vehicle info).
+
+Audit MapQuest API call sequence and dependency timing — check if await or Promise chains could deadlock on network errors or rate-limits.
+
+Examine network layer for CORS, preflight, and timeout handling — identify if retry loops are unbounded.
+
+Verify that the MapQuest endpoint and API key are being initialized only once (no recursive useEffect or duplicated onChange calls).
+
+Review state management for conditions like:
+
+loading or setLoading toggling twice, never resolving.
+
+Unconditional re-renders triggered by a useEffect dependency on state that updates within itself.
+
+Conflicts between controlled and uncontrolled inputs on ZIP/state fields.
+
+Review MapQuest response parsing — ensure fallback behavior exists for missing or malformed responses.
+
+Review any try/catch handling or error-boundary wrappers around async calls that might be silently failing.
+
+Review the form’s submit handler for unawaited asynchronous calls or race conditions between validation and rendering updates.
+
+Confirm all required env vars (REACT_APP_MAPQUEST_KEY, API endpoints, etc.) are loaded and not undefined in runtime.
+
+Identify whether circular loads only occur on certain browsers, mobile devices, or cache states (inspect localStorage/sessionStorage interactions).
+
+Deliverables:
+
+List every potential cause found, grouped by category (Frontend Logic, API Behavior, Network Layer, Data Validation, State Management).
+
+Include for each item: likelihood rating (High/Med/Low), how to replicate, and recommended fix (conceptual only — no code changes).
+
+Provide a short final summary explaining the top 3 most probable causes for circular behavior or ZIP failures.
+
+Constraints:
+
+Read-only diagnostic only. No deploys, merges, or pushes.
+
+All findings must be observable via console logs, DevTools Network tab, or static code inspection.
+
+Maintain complete isolation from live environment data.
