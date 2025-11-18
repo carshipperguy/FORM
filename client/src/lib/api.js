@@ -84,10 +84,13 @@ const SEARCH_CACHE_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
  * @returns {Promise<Array>} - Array of location objects
  */
 export async function searchLocations(query, limit = 200) {
-  if (!query || query.length < 2) return [];
+  if (!query) return [];
   
   // Normalize the query for consistent caching
   const normalizedQuery = query.trim().toLowerCase();
+  
+  if (normalizedQuery.length === 0) return [];
+  
   const cacheKey = `${normalizedQuery}:${limit}`;
   
   // Check if we have a cached result for this query

@@ -66,20 +66,38 @@ export function searchLocations(query: string, limit: number = 200): LocationOpt
     return [];
   }
   
-  if (!query || query.length < 2) return [];
-
-  const queryLower = query.toLowerCase();
+  if (!query) return [];
+  
+  const queryLower = query.trim().toLowerCase();
+  
+  if (queryLower.length === 0) return [];
   
   // Search by city, state, or zip code
   const matches = locationOptions.filter(option => {
-    // Match by city or state
-    if (option.city.toLowerCase().includes(queryLower) || 
-        option.state.toLowerCase().includes(queryLower) ||
-        option.value.toLowerCase().includes(queryLower)) {
+    // Match by city (starts with has priority, then contains)
+    if (option.city.toLowerCase().startsWith(queryLower)) {
+      return true;
+    }
+    if (option.city.toLowerCase().includes(queryLower)) {
       return true;
     }
     
-    // Match by zip
+    // Match by state
+    if (option.state.toLowerCase().startsWith(queryLower)) {
+      return true;
+    }
+    
+    // Match by full location value
+    if (option.value.toLowerCase().includes(queryLower)) {
+      return true;
+    }
+    
+    // Match by ZIP - prioritize ZIPs that START with query for better UX
+    if (option.zips && option.zips.some(zip => zip.startsWith(queryLower))) {
+      return true;
+    }
+    
+    // Fallback: match ZIPs that contain query
     if (option.zips && option.zips.some(zip => zip.includes(queryLower))) {
       return true;
     }

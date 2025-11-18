@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // Use our API client instead of direct imports or fetch calls
 import { searchLocations, getPopularLocations } from '../lib/api';
 // Import CSS module instead of using inline styles
@@ -13,21 +13,25 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   const [searchInput, setSearchInput] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchKey, setSearchKey] = useState(0);
+  
+  const searchTimeoutRef = useRef(null);
+  const abortControllerRef = useRef(null);
   
   // Load popular cities on initial render
   useEffect(() => {
     async function loadPopularCities() {
-      // Only show loading indicator after a delay to avoid flicker for fast responses
-      const loadingDelay = setTimeout(() => setIsLoading(true), 150);
+      setIsLoading(true);
       
       try {
         // Use our API client which handles development vs production environments
         const data = await getPopularLocations(200);
         setFilteredOptions(data);
+        setSearchKey(prev => prev + 1);
       } catch (error) {
         console.error('Error loading popular cities:', error);
+        setFilteredOptions([]);
       } finally {
-        clearTimeout(loadingDelay);
         setIsLoading(false);
       }
     }
@@ -37,26 +41,48 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   
   // Update filtered options when search input changes using API
   useEffect(() => {
-    // Use debounce to avoid too many API calls
-    const debounceTimeout = setTimeout(async () => {
-      if (searchInput.length >= 2) {
-        // Only show loading indicator after a delay to avoid flicker for fast responses
-        const loadingDelay = setTimeout(() => setIsLoading(true), 150);
-        
-        try {
-          // Use our API client which handles development vs production environments
-          const data = await searchLocations(searchInput, 200);
-          setFilteredOptions(data);
-        } catch (error) {
-          console.error('Error searching locations:', error);
-        } finally {
-          clearTimeout(loadingDelay);
-          setIsLoading(false);
-        }
-      }
-    }, 300); // 300ms debounce
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
     
-    return () => clearTimeout(debounceTimeout);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    if (!searchInput || searchInput.trim().length === 0) {
+      return;
+    }
+    
+    const debounceTime = searchInput.length >= 5 ? 0 : 100;
+    
+    searchTimeoutRef.current = setTimeout(async () => {
+      setIsLoading(true);
+      
+      abortControllerRef.current = new AbortController();
+      
+      try {
+        const data = await searchLocations(searchInput, 200);
+        setFilteredOptions(data);
+        setSearchKey(prev => prev + 1);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error searching locations:', error);
+        }
+        setFilteredOptions([]);
+        setSearchKey(prev => prev + 1);
+      } finally {
+        setIsLoading(false);
+      }
+    }, debounceTime);
+    
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [searchInput]);
   
   const handleInputChange = (e) => {
@@ -95,23 +121,39 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
           type="text"
           value={searchInput}
           onChange={handleInputChange}
-          onFocus={() => setShowDropdown(true)}
+          onFocus={async () => {
+            setShowDropdown(true);
+            if (!searchInput || searchInput.trim().length === 0) {
+              setIsLoading(true);
+              try {
+                const data = await getPopularLocations(200);
+                setFilteredOptions(data);
+                setSearchKey(prev => prev + 1);
+              } catch (error) {
+                console.error('Error refreshing popular cities:', error);
+              } finally {
+                setIsLoading(false);
+              }
+            }
+          }}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
           placeholder={placeholder || "Search and select from dropdown (required)"}
           required={required}
           className={styles['location-input']}
+          autoComplete="off"
         />
         
         {showDropdown && (
-          <div className={styles['location-dropdown']}>
+          <div className={styles['location-dropdown']} key={searchKey}>
             {isLoading ? (
               <div className={styles['loading-indicator']}>Searching for locations...</div>
             ) : filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div 
-                  key={index} 
+                  key={`${option.city}-${option.state}-${index}`} 
                   className={styles['location-option']}
                   onClick={() => handleOptionSelect(option)}
+                  onMouseDown={(e) => e.preventDefault()}
                 >
                   <div className={styles['location-option-city']}>{option.city}, {option.state}</div>
                   {option.zips && option.zips.length > 0 && (
@@ -120,7 +162,12 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
                 </div>
               ))
             ) : (
-              <div className={styles['no-results']}>No matching locations found. Try a different city name or ZIP code.</div>
+              <div className={styles['no-results']}>
+                {searchInput && searchInput.trim().length > 0 
+                  ? `No locations found for "${searchInput}". Try a different city, state, or ZIP code.`
+                  : 'Start typing to search for a location...'
+                }
+              </div>
             )}
           </div>
         )}

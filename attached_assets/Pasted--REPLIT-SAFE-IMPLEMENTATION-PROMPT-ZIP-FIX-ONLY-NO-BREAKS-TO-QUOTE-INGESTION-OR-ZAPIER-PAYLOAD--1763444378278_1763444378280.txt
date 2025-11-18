@@ -1,0 +1,192 @@
+✅ REPLIT — SAFE IMPLEMENTATION PROMPT (ZIP FIX ONLY, NO BREAKS TO QUOTE INGESTION OR ZAPIER PAYLOAD)
+
+You are only implementing the ZIP selector fixes.
+This must be a strictly isolated update with zero changes to any other workflows.
+
+Follow these rules exactly:
+
+🚫 1. DO NOT TOUCH QUOTE INGESTION UNDER ANY CIRCUMSTANCES
+
+This includes:
+
+New Quote tile
+
+New Quotes list
+
+Quote Bank
+
+Follow-Up ingestion
+
+quote creation controller/service/route
+
+schema for quotes
+
+assignedUser
+
+fallback_leads
+
+pixel/CAPI event triggers
+
+Zapier webhooks
+
+Zapier payload formatting
+
+Required fields
+
+UTM/source tracking
+
+lead-type logic
+
+pricing rules
+
+timestamps
+
+If ANY code path is connected to quote creation or ingestion, DO NOT MODIFY IT.
+
+🚫 2. DO NOT TOUCH UI/UX ANYWHERE ELSE
+
+No changes to:
+
+layout
+
+spacing
+
+alignment
+
+borders
+
+inputs
+
+containers
+
+modals
+
+styling
+
+labels
+
+dropdown behavior (other than fixing ZIP results visibility)
+
+The entire app must remain pixel-identical except the ZIP suggestions now display correctly.
+
+🚫 3. DO NOT TOUCH ZAPIER WEBHOOKS OR PAYLOADS
+
+This is critical.
+
+Do NOT modify:
+
+the Zapier POST request
+
+the Zapier trigger endpoint
+
+the JSON payload structure
+
+field names
+
+timing of when the webhook is fired
+
+order of fields
+
+any transformations
+
+any event sequencing
+
+Zapier must continue receiving the identical payload it receives now.
+
+If ANY part of the ZIP fix attempts to modify or interfere with the quote object sent to Zapier, STOP immediately and notify me.
+
+📌 4. THE ONLY FILES YOU MAY MODIFY
+
+You are only allowed to update the ZIP selector code:
+
+LocationMenuSelector.jsx
+
+location-service.ts (ZIP search logic ONLY)
+
+api.js (ZIP lookup ONLY)
+
+No other files may be touched.
+
+📌 5. APPLY THE FIXES EXACTLY AS DOCUMENTED
+
+You may implement ONLY the previously identified and audited ZIP fixes:
+
+Remove debounce race condition
+
+Remove minimum search length restriction
+
+Eliminate stale state issues
+
+Force re-render when results update
+
+Immediate loading state
+
+Refresh results when dropdown opens
+
+Ensure consistent rendering on mobile Safari/Chrome
+
+Nothing else.
+
+📌 6. VALIDATE THE FOLLOWING AFTER IMPLEMENTATION
+
+Run a full test to ensure:
+
+ZIP FIELD
+
+ZIP suggestions always appear instantly
+
+Selecting a ZIP immediately binds the correct value
+
+No “blank dropdown” scenarios
+
+Works with typing, pasting, fast input, and slow input
+
+Works on iOS Safari, Android Chrome, Desktop Chrome
+
+QUOTE INGESTION
+
+Quotes still appear in New Quotes tile
+
+Quotes still appear in the Quote Bank
+
+No fields missing
+
+Lead source tracking intact
+
+UTM parameters still attach
+
+fallback_leads still works
+
+No errors in the quote creation API
+
+No timing changes
+
+No new fields
+
+No removed fields
+
+ZAPIER
+
+Webhook fires exactly once
+
+Payload matches PRECISELY the existing structure
+
+No extra fields
+
+No missing fields
+
+No renames
+
+No formatting changes
+
+No timing/sequence changes
+
+If ANY deviation is detected, revert immediately and notify me.
+
+🚨 FINAL DIRECTIVE
+
+This must be a risk-free, zero-regression update.
+
+If any part of your implementation attempts to touch quote ingestion logic, UI in other fields, or Zapier payloads — abort the change immediately and notify me before proceeding.
+
+Only the ZIP selector display bug is being fixed. Nothing else.
