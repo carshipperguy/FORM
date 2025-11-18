@@ -1,0 +1,155 @@
+We have a critical UI bug in the ZIP code selector. Customers are entering valid ZIP codes, but the ZIP does NOT visually appear in the dropdown, even though it does exist in the ZIP dataset and appears when checked manually moments later. This is NOT a data issue. This is NOT user error. This is a frontend rendering failure.
+
+You must audit every layer of code that influences:
+
+ZIP dataset loading
+
+ZIP filtering
+
+ZIP rendering
+
+React state updates
+
+UI re-renders
+
+debouncing / throttling
+
+conditional rendering
+
+memoization
+
+asynchronous data access
+
+The failure is:
+Valid ZIP codes sometimes fail to visually render in the lookup list, even though they exist in the source data.
+
+Audit for the following issues:
+
+1. Asynchronous rendering race condition
+
+ZIP list may be loading async. If filtering runs BEFORE the data loads, React will render an empty list and never update it. Audit:
+
+useEffect order
+
+dependency arrays
+
+initial load state
+
+race conditions between data load and filter trigger
+
+2. Over-aggressive filtering
+
+Ensure filtering is not too strict or relying on an exact match. Check for:
+
+trailing space
+
+uppercase/lowercase mismatch
+
+partial match logic missing
+
+hidden unicode characters
+
+trimming/sanitization missing
+
+3. Premature early-return in render()
+
+A common bug is something like:
+
+if (!zipList.length) return null;
+
+
+This causes the component to “give up” before the ZIPs finish loading.
+
+4. Memoization bugs (useMemo / React.memo)
+
+If the ZIP list is memoized with incorrect dependency arrays, React might reuse stale data even when a valid ZIP exists. Audit:
+
+all useMemo
+
+all React.memo components
+
+dependency arrays
+
+5. Stale state in filtering function
+
+If the dropdown filter runs on a state value that hasn’t updated yet, the display will be empty. Audit:
+
+debouncing
+
+throttling
+
+state batching
+
+asynchronous setState issues
+
+6. Hidden UI blockers (CSS / layout issues)
+
+If the ZIP result is rendered but hidden, inspect:
+
+z-index
+
+overflow: hidden
+
+height/visibility conditions
+
+conditional “no results” overlays
+
+7. Incorrect conditional rendering logic
+
+Look for code like:
+
+if (!query) return [];
+
+
+or
+
+if (query.length < 3) return [];
+
+
+customers often type 5 digits, but the first digits must still show partial results.
+
+8. Event suppression
+
+Check whether input events are being blocked or not firing:
+
+onChange not updating
+
+onInput blocked
+
+autocomplete disabling state updates
+
+9. Two parallel ZIP datasets
+
+Ensure there aren’t two lists:
+
+one customer sees
+
+one admin sees
+
+one updated on load, one stale
+
+10. Re-render blocking due to React error boundary
+
+If an error fires inside the zip list component, React may suppress updates silently.
+
+✔️ Deliverables Required
+
+Produce the following:
+
+Full root-cause analysis
+
+Identify EXACT lines of code causing the failure
+
+Rewrite corrected code
+
+Show where to insert the fixes
+
+Provide a reproducible test plan
+
+Validate the fix across mobile Safari, Chrome, iOS, Android, and desktop
+
+No assumptions.
+No shortcuts.
+Audit every zip-related component, hook, context provider, and filtering function.
+
+This is a production-blocking bug and must be fixed comprehensively and safely.
