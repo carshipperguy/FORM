@@ -1,0 +1,189 @@
+Got it — this is ONLY for the public-facing Replit quote form UI, not ShipDesk, not CRM, not internal flows.
+This prompt will diagnose every possible reason a customer cannot generate a quote from the Replit-hosted quote form.
+
+Here is the corrected, streamlined, Replit Form–only diagnostic prompt.
+
+Copy/paste this EXACTLY into Replit.
+
+⸻
+
+✅ REPLIT QUOTE FORM UI – FULL DIAGNOSTIC PROMPT
+
+Purpose: Diagnose ALL possible reasons a user cannot generate a quote in the PUBLIC quote form UI.
+This includes browsers, devices, ZIP codes, validation, async issues, network, and any UI glitches.
+
+DO NOT MAKE CHANGES. DO NOT FIX ANYTHING.
+ONLY DIAGNOSE.
+
+⸻
+
+PROMPT FOR REPLIT — EXACT TEXT BELOW
+
+I need a complete diagnostic analysis of every possible scenario that can prevent a user from successfully generating a quote from the PUBLIC Replit Quote Form.
+
+This is NOT ShipDesk and NOT the CRM.
+This is ONLY the standalone Replit quote form that customers use.
+
+Do NOT modify code, do NOT fix anything yet.
+Your job is to enumerate 100% of all root causes that could block quote generation in any environment.
+
+⸻
+
+🔍 1. FRONT-END / UI FAILURE SCENARIOS
+
+List every possible front-end cause, including:
+
+Browser-related
+	•	Chrome autofill bugs
+	•	Safari input focus issues
+	•	iOS Safari blocking cookies/localStorage
+	•	Private mode blocking IndexedDB
+	•	Android WebView quirks
+	•	Firefox form validation oddities
+	•	Popup blockers / script blockers
+	•	AdBlock interfering with fetch calls
+
+Form field behavior
+	•	ZIP input race conditions
+	•	User typing too fast before ZIP suggestions load
+	•	Valid ZIP returns “undefined” city/state
+	•	Required field validation not firing
+	•	Input fields passing empty strings
+	•	Trimming issues (spaces, dashes, special characters)
+	•	Incorrect regex acceptance or rejection
+	•	Vehicle type dropdown not setting state
+	•	State not passed into payload
+	•	Form submit button disabled and not re-enabled
+	•	Double-submit blocked due to stale state
+
+React state and async
+	•	setState not finishing before submit
+	•	useEffect dependency issues
+	•	Unmounted component during async call
+	•	Cached stale results interfering
+	•	Autocomplete returning outdated objects
+	•	Event listeners firing out of order
+	•	Debounce issues in ZIP validator
+	•	UI freezing on slow devices
+
+For each: Explain how it happens AND what symptom the user sees.
+
+⸻
+
+🌐 2. NETWORK & API FAILURES
+
+List all network-layer blockers:
+	•	fetch() blocked by browser
+	•	CORS failures
+	•	Timeout before backend receives request
+	•	400-series errors returned but swallowed
+	•	JSON malformed
+	•	Incorrect content-type headers
+	•	Missing required fields in payload
+	•	URL path mismatch
+	•	API environment variable unset
+	•	Replit cold start delays returning blank responses
+
+⸻
+
+🖥 3. BACKEND FAILURES (Replit Form Service)
+
+We need every possible backend cause:
+	•	Validation rejecting payload
+	•	ZIP/city/state mismatch
+	•	Missing price calculation inputs
+	•	Required fields undefined
+	•	Incorrect schema mapping
+	•	Race condition in quote creation logic
+	•	Undefined variables in controller
+	•	Logic depending on UTM but UTM missing
+	•	Backend swallowing thrown errors
+	•	Promise not awaited → UI sees nothing
+	•	DB connection hiccups
+	•	Price calculation returning null/NaN
+
+⸻
+
+🗄 4. DATABASE FAILURES
+
+List database-level scenarios:
+	•	Insert failure
+	•	Null field where non-null required
+	•	Unsupported ZIP
+	•	Foreign key mismatch
+	•	DB connection pool exhausted
+	•	Duplicate record constraint
+	•	DB write delays causing UI timeout
+	•	Prisma/ORM input type mismatch
+
+⸻
+
+🌎 5. ZIP CODE FAILURES
+
+Explicitly diagnose issues related to ZIP codes:
+	•	ZIP not in dataset
+	•	ZIP returns a city/state not expected by backend
+	•	ZIP lookup API throttled
+	•	Leading zero ZIP inputs failing (e.g., NJ, MA, CT)
+	•	Spaces/dashes in ZIP input
+	•	International ZIPs
+	•	User typing 4 digits then leaving field
+	•	Autocomplete returning an object with missing ID
+	•	ZIP dataset outdated
+
+Explain each.
+
+⸻
+
+📱 6. DEVICE-SPECIFIC FAILURES
+
+List scenarios based on:
+	•	iPhone Safari
+	•	Android low-end devices
+	•	Tablets
+	•	Desktop vs mobile input differences
+	•	Slow CPU throttling causing async hangs
+	•	Keyboard overlay blocking submit button
+	•	User unable to scroll to submit button
+	•	Zoom level breaking layout
+	•	Mobile orientation switch breaking form state
+
+⸻
+
+🧩 7. SILENT FAILURE / NO-ERROR SCENARIOS
+
+These are critical:
+	•	Backend error returned but UI never displays error message
+	•	UI swallows errors due to missing catch blocks
+	•	UI shows loader forever
+	•	User clicks generate quote → nothing happens
+	•	React Query or fetch resolves undefined
+	•	Component unmounts during promise
+	•	Loading spinner not clearing
+
+List all possibilities.
+
+⸻
+
+📋 8. DELIVERABLE FORMAT
+
+Deliver:
+	•	A complete list of every single possible root cause
+	•	Categorized clearly (UI, ZIP, network, backend, DB, device)
+	•	Exact reproduction cases
+	•	What user sees
+	•	How we would detect/log it later
+
+NO FIXES.
+NO code changes.
+NO refactors.
+
+PURE DIAGNOSTIC ENUMERATION ONLY.
+
+⸻
+
+END OF PROMPT
+
+⸻
+
+If you want, I can also write the follow-up prompt that forces Replit to run real-world tests across browsers and devices using simulated environments.
