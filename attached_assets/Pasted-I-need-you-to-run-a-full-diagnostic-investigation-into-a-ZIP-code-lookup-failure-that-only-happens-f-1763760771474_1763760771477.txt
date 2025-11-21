@@ -1,0 +1,125 @@
+I need you to run a full diagnostic investigation into a ZIP code lookup failure that only happens for customers, not for me, even when using the exact same ZIP codes.
+
+Before doing ANY code pushes, I need a root-cause analysis explaining WHY this happens.
+
+Observed Behavior
+
+I personally type any ZIP code into the quote form and it always works.
+
+Customers type the exact same ZIP and they get:
+“No locations found. Try a different city, state, or ZIP code.”
+
+This happens MOST frequently on mobile devices and when customers use autofill or paste a ZIP.
+
+MapQuest absolutely recognizes these ZIP codes.
+
+This is NOT a missing-ZIP-in-the-database issue — I can reproduce success every time.
+
+Your job is to diagnose, not fix. No code pushes yet.
+
+I need you to examine and report on every possible front-end failure point that could cause the same ZIP to work for me but fail for customers.
+
+Your investigation must cover:
+
+1. INPUT SANITIZATION FAILURES
+
+Check whether customer ZIP inputs may contain:
+
+trailing spaces
+
+leading spaces
+
+Unicode whitespace
+
+non-breaking spaces (\u00A0)
+
+ZIP+4 formats (e.g., “90210-1234”)
+
+autofill-inserted characters
+
+hidden characters from mobile copy/paste
+
+smart hyphens from iOS keyboards
+
+I need confirmation of whether searchLocations() receives a clean, 5-digit numeric string or something polluted.
+
+2. AUTOFILL + MOBILE KEYBOARD BEHAVIOR
+
+Autofill sometimes does NOT trigger onChange — meaning the search never fires.
+
+I need you to verify:
+
+Does Chrome autofill trigger onChange in our component?
+
+Does Safari autofill trigger onChange?
+
+Do iPhone numeric keyboards insert any hidden characters?
+
+Does pasting a ZIP trigger search consistently?
+
+3. REACT STATE SYNC + RACE CONDITIONS
+
+We need to know if:
+
+The input field visually updates, but internal state doesn’t.
+
+Debounce timing (0–100ms) is causing some inputs to be ignored.
+
+A fast user types “37027” → but state only logs “3702”.
+
+AbortController may be cancelling a valid search.
+
+Your report should show whether user input and actual state diverge.
+
+4. AUTOCOMPLETE FILTERING FAILURE
+
+Even if the ZIP exists in the dataset, customers might be sending something like:
+
+"37027 "
+" 37027"
+"37027\u00A0"
+"37027-0000"
+
+These will not match the filtering logic.
+
+I need you to confirm:
+
+Does the search logic normalize or trim before matching?
+
+Does it reject ZIP+4 formats?
+
+Does it reject any input containing anything but 0–9?
+
+Does it fail silently if searchInput.length changes too quickly?
+
+5. DIFFERENCES BETWEEN MY TESTING AND CUSTOMER TESTING
+
+Explain WHY:
+
+When I type directly into the browser, it always works.
+
+When customers type the same ZIP, it fails.
+
+This is the core question you must answer.
+
+6. REQUIRED OUTPUT
+
+Provide a single diagnostic report that includes:
+
+EXACT payloads the client is sending when customers type ZIPs
+
+Whether hidden characters exist
+
+Whether autofill bypasses onChange
+
+Whether React state mismatches the visible field
+
+Whether filtering logic rejects ZIP+4 or whitespace
+
+Whether debounce or abort logic causes dropped queries
+
+Do NOT fix anything yet.
+Do NOT refactor anything.
+Do NOT change a single line of code.
+
+Just surface the cause.
