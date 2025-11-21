@@ -1,0 +1,269 @@
+*FULL-SPECTRUM ZIP CODE + FORM FAILURE DIAGNOSTIC PROMPT
+
+(NO CODE CHANGES — DIAGNOSIS ONLY)**
+
+We need a deep, comprehensive diagnostic of ALL possible breakage points in our quote form related to ZIP code entry, dropdown selection, and the subsequent form submission.
+
+Do NOT push any code.
+Do NOT modify any files.
+This is an investigative task only.
+
+THE PROBLEM
+
+We have multiple recurring customer complaints:
+
+Some ZIP codes return “No locations found” even though they are valid and work perfectly when I test them.
+
+Some users see the ZIP suggestions, click the correct one…
+…and then the form stops working, spins indefinitely, or jumps back to the beginning.
+
+Some users select a ZIP, hit “Next,” and the app does nothing.
+
+Some users submit the form and get redirected to the start as if the form reset.
+
+Some users see the dropdown appear but cannot click a ZIP.
+
+Some users get an error after selecting ZIPs that should work.
+
+Some users say the app “acts weird” and doesn’t recognize their selection.
+
+Some users have the ZIP “accepted” visually, but the submission payload contains:
+
+a blank ZIP
+
+the wrong ZIP
+
+a truncated ZIP
+
+or no pickup/delivery ZIP at all
+
+I need a system-wide diagnostic explaining every possible reason the experience could diverge between me (smooth 100% success) and customers (frequent failures).
+
+WHAT TO INVESTIGATE (DIAGNOSIS ONLY)
+
+You must evaluate ALL of the following categories:
+
+1. Input Field Differences
+
+onChange not firing
+
+onInput not firing
+
+autofill bypassing React events
+
+Safari iOS autofill issue
+
+Android Gboard formatting differences
+
+ZIP+4 format
+
+hidden unicode characters
+
+smart hyphens
+
+clipboard artifacts
+
+trailing or leading invisible characters
+
+stale state
+
+React controlled input desync
+
+focus/blur interference
+
+debounce misfiring
+
+2. Dropdown Selection Failures
+
+selection not firing onClick
+
+selection firing but state not updating
+
+selection updating state but UI not updating
+
+selection updating UI but NOT updating the actual payload
+
+click handlers blocked by overlay divs
+
+mobile Safari click delay
+
+keyboard input event suppression
+
+Race between:
+
+abortController
+
+debounce timer
+
+state update
+
+dropdown closing early
+
+3. API Search Issues
+
+incorrect value being sent from client
+
+mismatches between:
+
+what UI displays
+
+what state stores
+
+what API receives
+
+differences in URL encoding
+
+Unicode escaping
+
+ZIP normalization differences between client vs server
+
+API receiving stale or previous ZIP
+
+4. Form Submission Failures
+
+Investigate all paths where a user selects a ZIP but submission fails:
+
+Possible issues:
+
+form submits stale data
+
+ZIP fields undefined
+
+ZIP overwritten by empty string on submit
+
+state resets before submission event
+
+user navigates mid-update
+
+async race between:
+
+dropdown closing
+
+validation running
+
+form submitting
+
+loading spinner not resolving
+
+API call never sent
+
+API call sent but server rejects invalid shape
+
+server validation failing silently
+
+backend responding with 301/302 redirect causing “reset to start”
+
+fetch promise rejected but UI not showing error
+
+global error boundary resetting the app
+
+5. Routing + Redirect Failures
+
+Users report the app:
+
+sending them back to the beginning
+
+refreshing unexpectedly
+
+resetting the form
+
+failing to store state between steps
+
+Check:
+
+react-router history issues
+
+unhandled promise rejections
+
+error boundaries resetting app state
+
+navigation guard triggers
+
+hydration mismatch (SSR vs client mismatch)
+
+anything causing a full rerender wiping state
+
+6. Device + Browser-Specific Bugs
+
+Simulate all of these cleanly:
+
+Mobile Safari (highest failure rate)
+
+autofill not firing onChange
+
+paste adding hidden characters
+
+dropdown scrolling issues
+
+blur firing prematurely
+
+Mobile Chrome
+
+keyboard suggestion bar injecting mixed characters
+
+autofill formatting ZIP+4
+
+Desktop Chrome
+
+works perfectly — understand why
+
+Desktop Safari
+
+different event firing order
+
+selection event not recognized
+
+Firefox
+
+event timing differences
+
+7. FULL END-TO-END TRACE REQUIRED
+
+Replit must trace the lifecycle:
+
+User types or pastes a ZIP →
+React event captured →
+State updated →
+Debounce triggers →
+API search is made →
+Dropdown renders results →
+User selects ZIP →
+State updates →
+Form submission →
+Payload generated →
+API receives payload →
+Confirmation screen or failure
+
+
+At each step, you must identify ALL possible points of failure.
+
+DELIVERABLES
+
+Provide me a complete diagnostic report answering:
+
+Why do certain ZIPs fail for customers but succeed for me?
+
+Are certain devices or input methods sending malformed ZIPs or different characters?
+
+Are users selecting ZIPs but the payload not updating?
+
+Is there any async race preventing state from being ready when submitting?
+
+Are redirects or errors resetting the form?
+
+Are there unhandled exceptions or silent errors breaking the flow?
+
+Are ZIPs being wiped, altered, or overwritten between selection and submit?
+
+Are there UI blocking layers intercepting clicks?
+
+Is the form spinner getting stuck because of a promise or race?
+
+Is the app resetting due to routing or state mismanagement?
+
+What steps are needed to reproduce every failure above?
+
+Important: Do NOT propose fixes or modify code yet.
+This is a pure diagnostic investigation.
+
+Once the diagnostic is complete, I will request a second prompt for implementation.
