@@ -1,0 +1,75 @@
+I need a full diagnostic on a recurring issue with the ZIP code selector in our quote calculator. Multiple customers are reporting that valid ZIP codes are “not found,” even though those same ZIP codes appear in the MapQuest API, are present in MapQuest’s documentation, and work when manually tested directly through MapQuest or on the public MapQuest website.
+
+Before anything else, DO NOT PUSH ANY CODE OR MAKE ANY CHANGES.
+This request is diagnostic only.
+
+Please perform a complete audit and answer with written findings only.
+
+Here is exactly what I need:
+
+Explain every possible scenario that could cause a ZIP code to fail client-side or server-side even when the API supports it. This includes:
+
+caching
+
+stale autocomplete data
+
+debounce issues
+
+race conditions
+
+rate limiting
+
+request formatting issues
+
+input sanitation or trimming
+
+front-end filters
+
+back-end ZIP validation mismatches
+
+state/city fallback behavior
+
+any incorrect assumptions about response shape
+
+edge cases with leading zeros
+
+MapQuest partial-match behavior
+
+asynchronous cancellation issues
+
+Log and surface any actual API errors the current code is swallowing, suppressing, or not surfacing in the UI.
+
+Show me, in writing, the exact network requests currently being made, including:
+
+final endpoint URL
+
+full request payload
+
+full response
+
+what is being parsed
+
+what (if anything) is being filtered out before the user sees results
+
+If the issue is intermittent, explain the exact pattern and root cause of intermittency.
+
+Explicitly confirm whether our current front-end is relying on a cached MapQuest city/ZIP database, and if so, what the TTL and refresh behavior is.
+
+Confirm whether we are hitting autocomplete or lookup limits with MapQuest, even sporadically.
+
+Confirm whether any ZIP codes are being rejected due to internal distance-logic constraints, such as:
+
+lat/long mismatches
+
+regions missing bounding boxes
+
+server-side business rules
+
+Explain how we can reproduce the issue on our end with 100% reliability, using controlled test cases.
+
+Provide screenshots or console logs showing the actual failure mode when a ZIP code is rejected.
+
+Only after ALL of the above is complete, provide a step-by-step remediation plan, but DO NOT implement or push these fixes until explicitly approved.
+
+Once again:
+Do not push code. Do not modify any part of the system. Provide diagnostics and written findings only.
