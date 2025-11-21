@@ -1,0 +1,119 @@
+I need a very specific diagnostic done on the ZIP code lookup system in the quote calculator.
+Do not push any code, do not modify anything, do not deploy anything.
+This is a pure investigation request only.
+
+THE PROBLEM
+
+Multiple customers are reporting that when they type a ZIP code into the city/ZIP input box, the ZIP code they are entering does not appear in the dropdown list, even though:
+
+The ZIP is 100% valid
+
+The ZIP appears in MapQuest
+
+I can manually search the ZIP on MapQuest and it works
+
+When I open the form and type the same ZIP, it usually appears
+
+The customer sees “ZIP not found” and abandons the form
+
+They think we don’t ship to their ZIP when we absolutely do
+
+WHAT I NEED DIAGNOSED
+
+I need you to tell me exactly why a known, valid ZIP code would not appear in our city/ZIP selector.
+
+Focus ONLY on the autocomplete/dropdown data source and filtering logic.
+
+WHAT YOU MUST INVESTIGATE (NO CODE CHANGES)
+
+Is our city/ZIP list missing entries?
+Compare our local static database to MapQuest’s ZIP directory and confirm if we are missing ZIPs or city entries.
+
+Is the front-end filtering logic accidentally excluding ZIPs?
+Investigate search behavior including:
+
+.startsWith() logic
+
+.includes() logic
+
+case sensitivity
+
+leading zero handling
+
+state filtering logic
+
+city-first priority before ZIP logic
+
+partial match behavior
+
+minimum character thresholds
+
+trimming, whitespace, formatting mismatches
+
+any accidental requirement for city/state before ZIP
+
+Is the database loaded on the client incomplete, corrupted, or outdated?
+Check the actual loaded JSON in the client bundle.
+Confirm the ZIP the customer typed is present inside the file we ship.
+
+Is there a caching or race condition returning an old or partial copy of the city/ZIP file?
+Investigate:
+
+stale static assets
+
+browser cache
+
+CDN cache (if applicable)
+
+stale service worker cache
+
+old city-data.json still being used in certain sessions
+
+Is the autocomplete abort logic prematurely cancelling the request before results return?
+The user might type fast — confirm older aborts aren’t wiping the new results.
+
+Is the dropdown failing to render results even though matches exist?
+Check the UI rendering logic:
+
+mapping
+
+key usage
+
+truncation
+
+suppression
+
+hidden overflow
+
+conditional rendering bugs
+
+display count limits
+
+Is the ZIP stored under a different structure (e.g., nested, multiple ZIPs per city) and therefore not being read correctly?
+
+Check the EXACT customer ZIPs that failed.
+Validate against our local data and show me whether they exist or not.
+
+WHAT I EXPECT BACK
+
+I want the following in your reply:
+
+The exact cause(s) why the dropdown would fail even for valid ZIPs
+
+Proof — logs, snippets, screenshots, or console statements showing what the system is actually loading
+
+Whether the ZIPs reported by customers exist in our local city-data.json
+
+If they do exist, explain precisely why they failed to appear
+
+A simple remediation plan, but again NO CODE PUSHES until I approve
+
+KEY REQUIREMENTS
+
+This is diagnostic ONLY
+
+Absolutely no code changes
+
+Absolutely no deployments
+
+Identify root cause and show your evidence
