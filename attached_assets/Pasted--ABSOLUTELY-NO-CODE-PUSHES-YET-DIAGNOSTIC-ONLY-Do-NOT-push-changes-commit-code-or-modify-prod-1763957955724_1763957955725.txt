@@ -1,0 +1,57 @@
+🚨 ABSOLUTELY NO CODE PUSHES YET — DIAGNOSTIC ONLY
+
+Do NOT push changes, commit code, or modify production files until I explicitly approve the findings.
+This task is diagnostic ONLY.
+You are to inspect, confirm, and report — not implement.
+
+⸻
+
+✅ PROMPT FOR REPLIT — MOBILE SCROLLING BUG DIAGNOSTIC (NO CODE CHANGES)
+
+I need you to run a diagnostic on the quote calculator form to confirm whether mobile scrolling / viewport container bugs are preventing customers on certain devices and browsers from completing the form. This is a known failure pattern where a form renders correctly but the user cannot scroll down to required fields or the submit button.
+
+This can cause a silent failure that looks like customer abandonment.
+
+Your diagnostic must confirm the following:
+	1.	Inspect the DOM and CSS to see if the form or its parent containers use any of the following:
+	•	overflow: hidden
+	•	position: fixed
+	•	any fixed height restrictions (e.g., height: 100%, height: 100vh, etc.)
+	•	nested scroll containers (scrollable child inside a fixed parent)
+	2.	Test on actual devices, not desktop emulation:
+	•	iPhone Safari
+	•	iPhone Chrome
+	•	Android Chrome
+	•	Samsung browser (if accessible)
+	3.	Evaluate whether the form scrolls fully from top to bottom:
+	•	Can a user reach every field?
+	•	Does the keyboard hide fields with no ability to scroll upward?
+	•	Does the form become “stuck” and not respond to touch scrolling?
+	•	Is the submit button inaccessible due to non-scrolling containers?
+	4.	Verify whether the main form wrapper includes or lacks these essential properties:
+	•	overflow-y: auto;
+	•	-webkit-overflow-scrolling: touch;
+	•	height: 100vh;
+	•	max-height: 100vh;
+	5.	Identify if any parent container blocks scroll by combining:
+	•	overflow: hidden
+with
+	•	a scrollable child element
+(This is one of the most common causes of this issue.)
+
+⸻
+
+❗ AGAIN — DO NOT IMPLEMENT FIXES YET
+
+Your job right now is to diagnose, confirm root cause, and provide a written report.
+
+⸻
+
+📄 Your required output:
+
+Please return a clear written report including:
+	1.	Whether the mobile scroll-blocking issue is present (yes/no).
+	2.	Which specific container(s) are responsible.
+	3.	What CSS properties on those containers are causing the issue.
+	4.	Screenshots or recordings demonstrating the scrolling behavior on at least one iPhone and one Android device.
+	5.	A recommended fix plan — but do not implement it until I approve.
