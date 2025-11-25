@@ -90,7 +90,13 @@ export const modelsByMake: Record<string, string[]> = {
     "Z (350Z, 370Z, 400Z)", "240SX", "300ZX"
   ].sort(),
   Jeep: ["Cherokee", "Comanche", "Commander", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Liberty", "Patriot", "Renegade", "Wagoneer", "Wrangler"].sort(),
-  Hyundai: ["Elantra", "Kona", "Palisade", "Santa Fe", "Sonata", "Tucson"].sort(),
+  Hyundai: [
+    "Accent", "Azera", "Elantra", "Entourage", "Genesis", "Genesis Coupe",
+    "Ioniq", "Ioniq 5", "Ioniq 6", "Kona", "Kona Electric", "Kona N",
+    "Nexo", "Palisade", "Santa Fe", "Santa Fe Hybrid", "Santa Fe Plug-In Hybrid",
+    "Sonata", "Tiburon", "Tucson", "Tucson Hybrid", "Tucson Plug-In Hybrid",
+    "Veloster", "Veloster N", "Venue"
+  ].sort(),
   Kia: [
     "Rio", "Forte", "K5", "Optima", "Cadenza", "K900", "Stinger",
     "Soul", "Seltos", "Sportage", "Sorento", "Telluride", "Borrego",
