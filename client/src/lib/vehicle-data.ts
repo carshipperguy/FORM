@@ -38,7 +38,13 @@ export const makes = [
 ].sort();
 
 export const modelsByMake: Record<string, string[]> = {
-  Toyota: ["4Runner", "Avalon", "Camry", "Corolla", "Highlander", "Land Cruiser", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra"].sort(),
+  Toyota: [
+    "4Runner", "Avalon", "bZ4X", "Camry", "Camry Hybrid", "Celica", "Corolla", "Corolla Cross",
+    "Corolla Cross Hybrid", "Corolla Hatchback", "Crown", "FJ Cruiser", "GR Corolla", "GR86",
+    "GR Supra", "Grand Highlander", "Grand Highlander Hybrid", "Highlander", "Highlander Hybrid",
+    "Land Cruiser", "Matrix", "Mirai", "MR2", "Prius", "Prius Prime", "RAV4", "RAV4 Hybrid",
+    "RAV4 Prime", "Sequoia", "Sienna", "Supra", "Tacoma", "Tundra", "Venza", "Yaris"
+  ].sort(),
   Honda: [
     "Accord", "Accord Hybrid", "Civic", "Civic Hybrid", "Clarity", "Clarity EV", "CR-V", "CR-Z",
     "Crosstour", "Element", "Fit", "HR-V", "Insight", "Insight Hybrid", "Legend", "NSX",
@@ -71,7 +77,13 @@ export const modelsByMake: Record<string, string[]> = {
     "i3", "i4", "i5", "i7", "i8", "iX", "iX1", "iX3",
     "M1", "M2", "M3", "M4", "M5", "M6", "M8", "X3M", "X4M", "X5M", "X6M"
   ].sort(),
-  Audi: ["A3", "A4", "A5", "A6", "A8", "e-tron", "Q3", "Q5", "Q7", "RS5", "RS7"].sort(),
+  Audi: [
+    "A3", "A4", "A4 allroad", "A5", "A5 Cabriolet", "A6", "A7", "A8",
+    "e-tron", "e-tron GT", "Q3", "Q4 e-tron", "Q5", "Q5 Sportback", "Q7", "Q8", "Q8 e-tron",
+    "R8", "RS3", "RS4", "RS5", "RS6 Avant", "RS7", "RS e-tron GT", "RS Q3", "RS Q8",
+    "S3", "S4", "S5", "S5 Cabriolet", "S6", "S7", "S8", "SQ5", "SQ7", "SQ8",
+    "TT", "TTS", "TT RS"
+  ].sort(),
   Tesla: ["Cybertruck", "Model 3", "Model S", "Model X", "Model Y"].sort(),
   RAM: ["1500", "2500", "3500", "ProMaster"].sort(),
   Ram: [
@@ -79,8 +91,10 @@ export const modelsByMake: Record<string, string[]> = {
     "ProMaster 3500 Cargo Van", "ProMaster Cutaway"
   ].sort(),
   GMC: [
-    "Acadia", "Canyon", "Envoy", "Hummer EV", "Savana 3500 Cutaway", "Savana 4500 Cutaway", "Savana Cargo Van",
-    "Sierra", "Terrain", "Yukon"
+    "Acadia", "Canyon", "Envoy", "Hummer EV", "Hummer EV SUV", "Jimmy", "Safari",
+    "Savana 3500 Cutaway", "Savana 4500 Cutaway", "Savana Cargo Van", "Savana Passenger Van",
+    "Sierra", "Sierra 1500", "Sierra 2500 HD", "Sierra 3500 HD", "Sierra EV",
+    "Sonoma", "Syclone", "Terrain", "Typhoon", "Yukon", "Yukon XL"
   ].sort(),
   Nissan: [
     "Altima", "Altima Coupe", "Armada", "Cube", "Frontier", "GT-R", "Juke", "Kicks",
@@ -89,7 +103,12 @@ export const modelsByMake: Record<string, string[]> = {
     "Rogue Sport", "Sentra", "Titan", "Titan XD", "Versa", "Xterra",
     "Z (350Z, 370Z, 400Z)", "240SX", "300ZX"
   ].sort(),
-  Jeep: ["Cherokee", "Comanche", "Commander", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Liberty", "Patriot", "Renegade", "Wagoneer", "Wrangler"].sort(),
+  Jeep: [
+    "Cherokee", "CJ-5", "CJ-7", "Comanche", "Commander", "Compass", "Gladiator",
+    "Grand Cherokee", "Grand Cherokee 4xe", "Grand Cherokee L", "Grand Cherokee SRT",
+    "Grand Wagoneer", "Grand Wagoneer L", "Liberty", "Patriot", "Renegade",
+    "Scrambler", "Trackhawk", "Wagoneer", "Wagoneer L", "Wrangler", "Wrangler 4xe", "Wrangler Unlimited"
+  ].sort(),
   Hyundai: [
     "Accent", "Azera", "Elantra", "Entourage", "Genesis", "Genesis Coupe",
     "Ioniq", "Ioniq 5", "Ioniq 6", "Kona", "Kona Electric", "Kona N",
@@ -98,15 +117,25 @@ export const modelsByMake: Record<string, string[]> = {
     "Veloster", "Veloster N", "Venue"
   ].sort(),
   Kia: [
-    "Rio", "Forte", "K5", "Optima", "Cadenza", "K900", "Stinger",
-    "Soul", "Seltos", "Sportage", "Sorento", "Telluride", "Borrego",
-    "Niro", "Sedona", "Carnival", "EV6", "EV9", "EV5",
-    "Optima Hybrid", "Optima PHEV", "Niro Hybrid", "Niro EV", "Niro PHEV",
-    "Sorento Hybrid", "Sorento PHEV", "Sportage Hybrid", "Mohave", "Bongo"
+    "Amanti", "Bongo", "Borrego", "Cadenza", "Carnival", "EV5", "EV6", "EV9",
+    "Forte", "K5", "K900", "Mohave", "Niro", "Niro EV", "Niro Hybrid", "Niro PHEV",
+    "Optima", "Optima Hybrid", "Optima PHEV", "Rio", "Rondo", "Sedona", "Seltos",
+    "Sorento", "Sorento Hybrid", "Sorento PHEV", "Soul", "Soul EV", "Spectra",
+    "Sportage", "Sportage Hybrid", "Stinger", "Telluride"
   ].sort(),
-  Volkswagen: ["Arteon", "Atlas", "Beetle", "CC", "Eos", "Golf", "ID.4", "ID.Buzz", "Jetta", "Passat", "Routan", "Taos", "Tiguan", "Touareg"].sort(),
-  Subaru: ["Ascent", "Crosstrek", "Forester", "Impreza", "Legacy", "Outback"].sort(),
-  Lexus: ["ES", "GX", "IS", "LX", "NX", "RX", "UX"].sort(),
+  Volkswagen: [
+    "Arteon", "Atlas", "Atlas Cross Sport", "Beetle", "CC", "Corrado", "Eos", "Golf",
+    "Golf GTI", "Golf R", "ID.4", "ID.Buzz", "Jetta", "Jetta GLI", "Karmann Ghia",
+    "Passat", "Phaeton", "Rabbit", "Routan", "Taos", "Tiguan", "Touareg"
+  ].sort(),
+  Subaru: [
+    "Ascent", "Baja", "BRZ", "Crosstrek", "Forester", "Impreza", "Legacy", "Outback",
+    "Solterra", "SVX", "Tribeca", "WRX", "WRX STI", "XT"
+  ].sort(),
+  Lexus: [
+    "CT", "ES", "GS", "GX", "HS", "IS", "IS F", "LC", "LFA", "LS", "LX",
+    "NX", "RC", "RC F", "RX", "RZ", "SC", "TX", "UX"
+  ].sort(),
   Dodge: [
     "400", "600", "Aries K-car", "Aspen", "Avenger", "B-Series Van", "Caravan", "Challenger",
     "Charger", "Coronet", "D100 D150", "D200 D250", "D300 D350", "Dakota", "Dart", "Daytona",
