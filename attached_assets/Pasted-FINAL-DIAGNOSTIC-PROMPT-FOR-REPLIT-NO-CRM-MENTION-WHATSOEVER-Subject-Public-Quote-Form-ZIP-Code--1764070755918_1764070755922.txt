@@ -1,0 +1,91 @@
+FINAL DIAGNOSTIC PROMPT FOR REPLIT (NO CRM MENTION WHATSOEVER)
+
+Subject: Public Quote Form ZIP Code Lookup — Critical Failure Diagnostic
+
+We have a major issue on the public-facing quote form where customers type in a ZIP code, and the form fails to show their ZIP or city in the dropdown. This happens with many valid ZIP codes across the U.S. and creates the impression that we “don’t ship there.”
+
+I need a full forensic audit of the ZIP-code lookup pipeline inside the public form codebase only. Please trace the failure end-to-end and identify the exact root cause. Do not provide theories — open the actual files and determine the real cause.
+
+🔍 WHAT MUST BE AUDITED
+1. ZIP Input Handling
+
+Locate the exact component where the user types a ZIP code and audit:
+
+What event triggers the lookup? (onChange, onInput, onBlur, etc.)
+
+Is the ZIP being parsed to a number anywhere?
+
+Are leading zeros being stripped?
+
+Are trimming/regex/length checks blocking valid ZIPs?
+
+What exact value is passed into the lookup function for a failing ZIP?
+
+Provide file path, function name, and the relevant lines.
+
+2. ZIP Lookup Function
+
+Find the function that sends the lookup request (MapQuest or whichever service the public form uses) and confirm:
+
+Does the function fire for the failing ZIPs?
+
+If not, what condition stops it?
+
+If yes, what EXACT request payload is sent?
+
+What response is received?
+
+Are we filtering out valid results incorrectly?
+
+Do property names mismatch the API response?
+
+We need the real inputs and outputs.
+
+3. Network Request Behavior
+
+Using devtools or logging:
+
+Does a network request occur at all when the user types a ZIP that fails?
+
+If not, which line blocks the request?
+
+If yes, confirm whether:
+
+the request URL is correct
+
+the query parameters match the expected ZIP format
+
+the response contains results that we later discard
+
+4. Dropdown Rendering Logic
+
+Audit the component that displays ZIP/city matches:
+
+Does it receive results but fail to render them?
+
+Is an empty state being caused by a filtering issue?
+
+Are we expecting a field like postalCode but getting postal_code?
+
+Are we expecting city objects while the API returns postal objects?
+
+Does a mapping function fail silently?
+
+List the file, function, line numbers, and the exact condition that breaks rendering.
+
+5. EXACT DELIVERABLE STRUCTURE
+
+I need the real root cause in this format:
+
+File path:
+Function:
+Line number:
+Root cause:
+Why it causes ZIPs not to appear:
+Exact failing example ZIP:
+Proposed fix:
+
+
+This must be based on actual code inspection and execution, not guesses.
+
+✔️ Send this back with a full breakdown of the real cause.
