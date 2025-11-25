@@ -39,7 +39,11 @@ export const makes = [
 
 export const modelsByMake: Record<string, string[]> = {
   Toyota: ["4Runner", "Avalon", "Camry", "Corolla", "Highlander", "Land Cruiser", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra"].sort(),
-  Honda: ["Accord", "Civic", "Clarity", "CR-V", "CR-Z", "Crosstour", "Element", "Fit", "HR-V", "Insight", "Odyssey", "Passport", "Pilot", "Prelude", "Prologue", "Ridgeline", "S2000"].sort(),
+  Honda: [
+    "Accord", "Accord Hybrid", "Civic", "Civic Hybrid", "Clarity", "Clarity EV", "CR-V", "CR-Z",
+    "Crosstour", "Element", "Fit", "HR-V", "Insight", "Insight Hybrid", "Legend", "NSX",
+    "Odyssey", "Passport", "Pilot", "Prelude", "Prologue", "Ridgeline", "S2000", "ZR-V"
+  ].sort(),
   Ford: [
     "Aerostar", "Aspire", "Bronco", "Bronco Sport", "C-Max", "Chateau", "Club Wagon", 
     "Contour", "Courier", "Crown Victoria", "Custom Van", "E-350 Cutaway", "E-450 Cutaway", 
@@ -61,7 +65,12 @@ export const modelsByMake: Record<string, string[]> = {
     "Silverado 3500HD", "Sonic", "SS", "SSR", "Suburban", "Tahoe", "Tracker", "Trailblazer", 
     "Traverse", "Uplander", "Vega", "Venture", "Volt"
   ].sort(),
-  BMW: ["3 Series", "5 Series", "7 Series", "M3", "M5", "X3", "X5", "X7"].sort(),
+  BMW: [
+    "1 Series", "2 Series", "3 Series", "4 Series", "5 Series", "6 Series", "7 Series", "8 Series",
+    "Z3", "Z4", "Z8", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "XM",
+    "i3", "i4", "i5", "i7", "i8", "iX", "iX1", "iX3",
+    "M1", "M2", "M3", "M4", "M5", "M6", "M8", "X3M", "X4M", "X5M", "X6M"
+  ].sort(),
   Audi: ["A3", "A4", "A5", "A6", "A8", "e-tron", "Q3", "Q5", "Q7", "RS5", "RS7"].sort(),
   Tesla: ["Cybertruck", "Model 3", "Model S", "Model X", "Model Y"].sort(),
   RAM: ["1500", "2500", "3500", "ProMaster"].sort(),
@@ -79,7 +88,13 @@ export const modelsByMake: Record<string, string[]> = {
   ].sort(),
   Jeep: ["Cherokee", "Comanche", "Commander", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Liberty", "Patriot", "Renegade", "Wagoneer", "Wrangler"].sort(),
   Hyundai: ["Elantra", "Kona", "Palisade", "Santa Fe", "Sonata", "Tucson"].sort(),
-  Kia: ["Forte", "K5", "Sorento", "Soul", "Sportage", "Telluride"].sort(),
+  Kia: [
+    "Rio", "Forte", "K5", "Optima", "Cadenza", "K900", "Stinger",
+    "Soul", "Seltos", "Sportage", "Sorento", "Telluride", "Borrego",
+    "Niro", "Sedona", "Carnival", "EV6", "EV9", "EV5",
+    "Optima Hybrid", "Optima PHEV", "Niro Hybrid", "Niro EV", "Niro PHEV",
+    "Sorento Hybrid", "Sorento PHEV", "Sportage Hybrid", "Mohave", "Bongo"
+  ].sort(),
   Volkswagen: ["Arteon", "Atlas", "Beetle", "CC", "Eos", "Golf", "ID.4", "ID.Buzz", "Jetta", "Passat", "Routan", "Taos", "Tiguan", "Touareg"].sort(),
   Subaru: ["Ascent", "Crosstrek", "Forester", "Impreza", "Legacy", "Outback"].sort(),
   Lexus: ["ES", "GX", "IS", "LX", "NX", "RX", "UX"].sort(),
