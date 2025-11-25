@@ -83,8 +83,11 @@ export const modelsByMake: Record<string, string[]> = {
     "Sierra", "Terrain", "Yukon"
   ].sort(),
   Nissan: [
-    "Altima", "Frontier", "Kicks", "Maxima", "NV1500 Cargo Van", "NV2500 HD Cargo Van",
-    "NV3500 HD Cargo Van", "Pathfinder", "Rogue", "Titan"
+    "Altima", "Altima Coupe", "Armada", "Cube", "Frontier", "GT-R", "Juke", "Kicks",
+    "Leaf", "Maxima", "Murano", "Murano CrossCabriolet", "NV200", "NV1500 Cargo Van",
+    "NV2500 HD Cargo Van", "NV3500 HD Cargo Van", "Pathfinder", "Quest", "Rogue",
+    "Rogue Sport", "Sentra", "Titan", "Titan XD", "Versa", "Xterra",
+    "Z (350Z, 370Z, 400Z)", "240SX", "300ZX"
   ].sort(),
   Jeep: ["Cherokee", "Comanche", "Commander", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Liberty", "Patriot", "Renegade", "Wagoneer", "Wrangler"].sort(),
   Hyundai: ["Elantra", "Kona", "Palisade", "Santa Fe", "Sonata", "Tucson"].sort(),
