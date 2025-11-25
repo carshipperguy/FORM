@@ -93,22 +93,26 @@ export function calculatePrice(
     console.log(`Short/local route detected (${distance}mi). Using safe minimum distance for pricing: ${distanceForPricing}mi`);
   }
 
-  // Check for special routes (only for car/truck/suv)
+  // Vehicle types that use standard car/truck/suv pricing logic
+  const STANDARD_PRICING_TYPES = ['car/truck/suv', 'motorcycle', 'golf cart'];
+  const usesStandardPricing = STANDARD_PRICING_TYPES.includes(vehicleType.toLowerCase());
+
+  // Check for special routes (for all standard pricing vehicle types)
   let isSnowbirdRoute = false;
   let isNCGAtoNYRoute = false;
   
-  if (vehicleType === 'car/truck/suv' && pickupLocation && dropoffLocation) {
+  if (usesStandardPricing && pickupLocation && dropoffLocation) {
     const pickupState = extractState(pickupLocation);
     const dropoffState = extractState(dropoffLocation);
     
     if (pickupState === 'FL' && dropoffState && NORTHEAST_STATES.includes(dropoffState)) {
       isSnowbirdRoute = true;
-      console.log(`*** SNOWBIRD ROUTE DETECTED: FL to ${dropoffState} ***`);
+      console.log(`*** SNOWBIRD ROUTE DETECTED: FL to ${dropoffState} (${vehicleType}) ***`);
     }
     
     if ((pickupState === 'NC' || pickupState === 'GA') && dropoffState === 'NY') {
       isNCGAtoNYRoute = true;
-      console.log(`*** NC/GA TO NY ROUTE DETECTED: ${pickupState} to NY ***`);
+      console.log(`*** NC/GA TO NY ROUTE DETECTED: ${pickupState} to NY (${vehicleType}) ***`);
     }
   }
 
@@ -118,12 +122,13 @@ export function calculatePrice(
     : distanceForPricing * BASE_RATE_PER_MILE;
 
   // PHASE 2: CONTROLLED IMPLEMENTATION - Universal +40% with additional short-haul +40%
-  if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'car/truck/suv') {
+  // Now applies to all standard pricing types: car/truck/suv, motorcycle, golf cart
+  if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && usesStandardPricing) {
     const priceBeforeUniversal = basePrice;
     
-    // Universal +40% for ALL car/truck/suv
+    // Universal +40% for ALL standard pricing vehicle types
     basePrice = basePrice * 1.40;
-    console.log(`🔄 CONTROLLED: Universal +40% for car/truck/suv: $${priceBeforeUniversal.toFixed(2)} → $${basePrice.toFixed(2)}`);
+    console.log(`🔄 CONTROLLED: Universal +40% for ${vehicleType}: $${priceBeforeUniversal.toFixed(2)} → $${basePrice.toFixed(2)}`);
     
     // Additional +40% for short-haul (<1500 miles) - Total ×1.96
     if (distanceForPricing < 1500) {
@@ -131,18 +136,12 @@ export function calculatePrice(
       basePrice = basePrice * 1.40;
       console.log(`🔄 CONTROLLED: Additional +40% for short-haul (<1500mi): $${priceBeforeShorthaul.toFixed(2)} → $${basePrice.toFixed(2)} (Total: ×1.96)`);
     }
-  } else if (MULTIPLIER_MODE === 'UNIVERSAL_40_PLUS_SHORTHAUL_40' && vehicleType === 'motorcycle') {
-    const priceBeforeMotorcycle = basePrice;
-    
-    // +50% for ALL motorcycles
-    basePrice = basePrice * 1.50;
-    console.log(`🔄 CONTROLLED: +50% for motorcycle: $${priceBeforeMotorcycle.toFixed(2)} → $${basePrice.toFixed(2)}`);
   } else {
-    // ORIGINAL LOGIC: Apply 40% markup for car/truck/suv routes under 1,500 miles
-    if (distanceForPricing < 1500 && vehicleType === 'car/truck/suv') {
+    // ORIGINAL LOGIC: Apply 40% markup for standard pricing types under 1,500 miles
+    if (distanceForPricing < 1500 && usesStandardPricing) {
       const priceBeforeMarkup = basePrice;
       basePrice = basePrice * 1.40;
-      console.log(`Applied 40% markup for car/truck/suv route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
+      console.log(`Applied 40% markup for ${vehicleType} route under 1,500 miles: $${priceBeforeMarkup.toFixed(2)} → $${basePrice.toFixed(2)}`);
     }
   }
 
@@ -175,22 +174,23 @@ export function calculatePrice(
   console.log('*** APPLYING MASTER PRICING RULES ***');
   const priceBeforeRules = basePrice;
 
-  // Check if this is a car/truck/suv type
+  // Check if this is a car/truck/suv type (legacy check, now use usesStandardPricing)
   const isCarTruckSUV = ['car', 'truck', 'suv'].includes(vehicleType.toLowerCase()) || 
                        vehicleType.toLowerCase() === 'car/truck/suv';
 
-  if (isCarTruckSUV) {
-    // RULE 1: Car/Truck/SUV Minimum Floor - $695
+  // Apply standard pricing rules to car/truck/suv, motorcycle, and golf cart
+  if (usesStandardPricing) {
+    // RULE 1: Standard Pricing Minimum Floor - $695
     if (basePrice < 695) {
       basePrice = 695;
-      console.log(`Car/Truck/SUV minimum floor applied: $${priceBeforeRules.toFixed(2)} → $695`);
+      console.log(`${vehicleType} minimum floor applied: $${priceBeforeRules.toFixed(2)} → $695`);
     }
 
-    // RULE 2: Car/Truck/SUV Middle-Range Uplift - 20% for $696-$1070 range
+    // RULE 2: Standard Pricing Middle-Range Uplift - 20% for $696-$1070 range
     if (basePrice >= 696 && basePrice <= 1070) {
       const priceBeforeUplift = basePrice;
       basePrice = Math.round(basePrice * 1.2);
-      console.log(`Car/Truck/SUV middle-range uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+20%)`);
+      console.log(`${vehicleType} middle-range uplift applied: $${priceBeforeUplift.toFixed(2)} → $${basePrice} (+20%)`);
     }
   } else if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
     // NEW SPECIAL PRICING: $3.00 per mile with $750 minimum
@@ -210,7 +210,7 @@ export function calculatePrice(
 
   console.log('Master pricing rules applied:', {
     vehicleType,
-    isCarTruckSUV,
+    usesStandardPricing,
     distance: distanceForPricing,
     priceBeforeRules: priceBeforeRules.toFixed(2),
     priceAfterRules: basePrice.toFixed(2)
