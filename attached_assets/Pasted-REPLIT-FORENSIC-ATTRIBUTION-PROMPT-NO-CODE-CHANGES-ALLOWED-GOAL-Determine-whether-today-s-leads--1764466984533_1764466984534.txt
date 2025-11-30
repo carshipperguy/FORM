@@ -1,0 +1,165 @@
+REPLIT FORENSIC ATTRIBUTION PROMPT — NO CODE CHANGES ALLOWED
+
+GOAL: Determine whether today’s leads came from Facebook, Google, or Unknown sources
+based ONLY on real data and real evidence.
+
+You must now perform a pure analysis (NO modifications, NO refactors, NO code pushes) on the leads captured today by the Quote App.
+
+This analysis must be based ONLY on:
+
+real data in the quote app database
+
+real attribution metadata collected by the app
+
+real logs
+
+real request payloads passed to Zapier
+
+real browser/referrer/session information captured by the quote app
+
+Absolutely no simulated results and no fabricated values are allowed.
+
+This is an audit only.
+
+🔍 WHAT YOU MUST ANALYZE
+
+For every lead created today, you must determine:
+
+1. How many leads are confidently Facebook-origin?
+
+(using actual signals like fbclid, fbc/fbp if present, referrer, in-app browser UA, etc.)
+
+2. How many leads are confidently Google-origin?
+
+(using actual signals like gclid, gbraid, wbraid, Google referrers, etc.)
+
+3. How many leads cannot be confidently classified?
+
+(i.e., attribution ambiguous or missing)
+
+4. WHY each lead was classified the way it was.
+
+You must explain for each classification:
+
+what field(s) were present
+
+what field(s) were missing
+
+why attribution succeeded
+
+why attribution failed
+
+what browser/redirect/privacy behavior may have caused missing data
+
+This requires real evidence from the quote app.
+
+🔍 YOU MUST DISPLAY REAL DATA FOR:
+
+utm_campaign
+
+utm_source
+
+utm_medium
+
+fbclid
+
+gclid
+
+referrer
+
+user-agent (if captured)
+
+timestamp (landing + submit)
+
+any metadata passed to Zapier
+
+You must NOT guess ANY of this.
+
+You must pull and show exact real values as stored.
+
+🔍 DATA SOURCES YOU MUST INSPECT
+
+You must audit:
+
+The quote records created today
+
+Any attribution object stored per lead
+
+Any session or visitor metadata the quote app captured
+
+The request payloads sent to Zapier
+
+Any history logs the quote app stores for attribution
+
+Any postMessage attribution data the app received today
+
+Nothing outside this environment.
+
+🔍 ABSOLUTELY FORBIDDEN
+
+Do NOT:
+
+modify files
+
+modify schemas
+
+write new data
+
+refactor
+
+fix code
+
+simulate results
+
+fabricate values
+
+hallucinate file paths or data structures
+
+make “educated guesses”
+
+This must be a pure evidence-based analysis.
+
+🔍 OUTPUT FORMAT YOU MUST FOLLOW
+
+Organize the results EXACTLY like this:
+
+Section A — Total leads created today
+
+(Real count, real IDs, real timestamps)
+
+Section B — Facebook leads
+
+Show which leads are Facebook-origin and paste the evidence for each.
+
+Section C — Google leads
+
+Show which leads are Google-origin and paste the evidence for each.
+
+Section D — Unknown-source leads
+
+Show which leads cannot be classified and paste the evidence.
+
+Section E — Forensic reasoning
+
+Explain, using real data from the quote app:
+
+why FBCLID/UTM/GCLID may have been missing
+
+whether Safari/iOS privacy behavior affected attribution
+
+whether the referrer was stripped by iframe context
+
+whether postMessage was missing for that session
+
+whether Zapier sanitized fields
+
+Section F — Summary + confidence assessment
+
+Final count of:
+
+Facebook
+
+Google
+
+Unknown
+(with reasoning only based on actual stored data)
