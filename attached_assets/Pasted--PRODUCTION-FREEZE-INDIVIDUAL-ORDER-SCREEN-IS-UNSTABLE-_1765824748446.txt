@@ -1,0 +1,234 @@
+🚨 PRODUCTION FREEZE — INDIVIDUAL ORDER SCREEN IS UNSTABLE (FORENSIC ANALYSIS REQUIRED)
+READ THIS CAREFULLY — NO CODE PUSHES YET
+
+The Individual Order screen is currently a complete mess and cannot be trusted in production.
+
+We are seeing:
+
+Emails from the individual order screen not sending
+
+Random errors when sending emails
+
+Screens not loading
+
+Silent failures
+
+UI breaking when adjusting email templates or price layout
+
+Fields not loading
+
+Error messages appearing inconsistently
+
+Previously working flows breaking after small UI/layout changes
+
+This is not one bug.
+This is systemic instability in the Individual Order screen.
+
+👉 NO CODE CHANGES ARE ALLOWED YET.
+We need a hard forensic analysis first.
+
+🎯 OBJECTIVE
+
+Produce a complete, evidence-based diagnostic of every feature and dependency of the Individual Order screen:
+
+Upstream
+
+Midstream
+
+Downstream
+
+Before any fix or deployment.
+
+🔒 GLOBAL RULES (NON-NEGOTIABLE)
+
+❌ No code pushes
+
+❌ No refactors
+
+❌ No “quick fixes”
+
+❌ No UI tweaks
+
+❌ No guessing
+
+❌ No “this should work”
+
+This phase is READ-ONLY + ANALYSIS ONLY.
+
+🔬 REQUIRED FORENSIC SCOPE
+
+You must audit EVERY mechanism tied to the Individual Order screen.
+
+A. UPSTREAM (DATA + STATE ORIGINS)
+
+Document:
+
+How an order reaches the Individual Order screen
+
+What data is assumed to already exist
+
+What data is fetched fresh
+
+What data is pulled from cache
+
+What data is passed via navigation state
+
+Explicitly answer:
+
+Does the screen rely on list-view state?
+
+Does it break on hard refresh?
+
+Does it assume prior queries ran?
+
+Are any fields conditionally undefined?
+
+B. MIDSTREAM (UI + STATE MANAGEMENT)
+
+Audit every interactive feature on the Individual Order screen:
+
+Email send buttons
+
+Payment buttons
+
+Price fields
+
+Status updates
+
+Notes
+
+Carrier assignment
+
+Any modals
+
+Any layout-driven logic
+
+For each feature:
+
+What state it depends on
+
+What hooks it uses
+
+What backend call it makes
+
+What happens on failure
+
+Whether errors are surfaced or swallowed
+
+⚠️ If changing layout or formatting breaks logic, that is a design flaw and must be identified.
+
+C. DOWNSTREAM (SIDE EFFECTS)
+
+Audit all downstream effects triggered from the Individual Order screen:
+
+Emails (which ones, how, and when)
+
+Payment actions
+
+Status changes
+
+Activity logs
+
+Webhooks
+
+Notifications
+
+Database writes
+
+Explicitly identify:
+
+What fails silently
+
+What throws errors
+
+What partially succeeds
+
+What is not transactional
+
+🧠 FAILURE MODE INVENTORY (MANDATORY)
+
+You must produce a list of all known failure modes, including but not limited to:
+
+Screen not loading
+
+Infinite loaders
+
+Email send fails
+
+UI throws error on price change
+
+UI breaks after email template edit
+
+State desync between UI and backend
+
+Cache poisoning
+
+Missing error boundaries
+
+Each failure must be tied to:
+
+Component
+
+Hook
+
+Route
+
+API call
+
+Or state assumption
+
+🧾 REQUIRED DELIVERABLES (NO EXCEPTIONS)
+
+Before any fix is attempted, provide:
+
+A written system map of the Individual Order screen
+
+A list of all dependencies
+
+A list of all side effects
+
+A list of all failure points
+
+Screenshots of console errors (if any)
+
+Network call inventory
+
+Clear explanation of why small UI/layout changes are breaking logic
+
+⛔ IMPORTANT
+
+Do NOT:
+
+Push defensive guards
+
+Add retries
+
+Disable buttons
+
+Mask errors
+
+“Stabilize” by hiding failures
+
+That only hides the real problem.
+
+✅ NEXT STEP (ONLY AFTER ANALYSIS)
+
+Only after this forensic analysis is reviewed and approved will we:
+
+Prioritize fixes
+
+Fix issues one by one
+
+Add regression protection
+
+Restore trust in the Individual Order screen
+
+FINAL NOTE
+
+The Individual Order screen is core revenue infrastructure.
+If it’s unstable, the CRM is not usable.
+
+We are switching from build mode to engineering discipline mode.
+
+No more assumptions.
+No more compounding bugs.
