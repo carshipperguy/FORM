@@ -158,50 +158,47 @@ export function registerRoutes(app: Express): Server {
       const todayTimestamp = today.getTime();
 
       // Import submission functions
-      const { getAllSubmissions } = await import(
-        "./utils/webhook-monitor-queue"
-      );
-
+      const { getAllSubmissions } = await import('./utils/webhook-monitor-queue');
+      
       // Get all submissions from webhook tracking
       const allSubmissions = getAllSubmissions();
-
+      
       // Filter submissions from today
-      const todaySubmissions = allSubmissions.filter((sub) => {
+      const todaySubmissions = allSubmissions.filter(sub => {
         const subDate = new Date(sub.timestamp);
         subDate.setHours(0, 0, 0, 0);
         return subDate.getTime() === todayTimestamp;
       });
 
       // Transform webhook submissions to a more readable format
-      const webhookQuotes = todaySubmissions.map((sub) => ({
+      const webhookQuotes = todaySubmissions.map(sub => ({
         id: sub.id,
         timestamp: sub.timestamp,
         formType: sub.formType,
         data: sub.originalData,
         success: sub.success,
-        source: "webhook",
+        source: 'webhook',
       }));
 
       // Get leads from fallback_leads table for today
-      const { eq, gte, sql } = await import("drizzle-orm");
-      const dbLeads = await db
-        .select()
-        .from(fallbackLeads)
-        .where(sql`DATE(${fallbackLeads.createdAt}) = CURRENT_DATE`);
+      const { eq, gte, sql } = await import('drizzle-orm');
+      const dbLeads = await db.select().from(fallbackLeads).where(
+        sql`DATE(${fallbackLeads.createdAt}) = CURRENT_DATE`
+      );
 
       // Transform database leads
-      const databaseLeads = dbLeads.map((lead) => ({
+      const databaseLeads = dbLeads.map(lead => ({
         id: `lead_${lead.id}`,
         timestamp: new Date(lead.createdAt).getTime(),
-        formType: "quote" as const,
+        formType: 'quote' as const,
         data: lead.data,
         success: true,
-        source: "database",
+        source: 'database',
       }));
 
       // Combine all quotes
       const allQuotes = [...webhookQuotes, ...databaseLeads];
-
+      
       // Sort by timestamp, newest first
       allQuotes.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -212,7 +209,7 @@ export function registerRoutes(app: Express): Server {
         breakdown: {
           webhook: webhookQuotes.length,
           database: databaseLeads.length,
-        },
+        }
       });
     } catch (error) {
       console.error("Error fetching today's quotes:", error);
@@ -412,23 +409,21 @@ export function registerRoutes(app: Express): Server {
       const fieldDisplayNames = {
         name: "Name",
         email: "Email address",
-        phone: "Phone number",
+        phone: "Phone number", 
         pickupLocation: "Pickup location",
         pickupZip: "Pickup ZIP code",
         dropoffLocation: "Delivery location",
-        dropoffZip: "Delivery ZIP code",
+        dropoffZip: "Delivery ZIP code", 
         vehicleType: "Vehicle type",
         year: "Vehicle year",
         make: "Vehicle make",
-        model: "Vehicle model",
-        shipmentDate: "Shipment date",
+        model: "Vehicle model", 
+        shipmentDate: "Shipment date"
       };
 
       for (const field of requiredFields) {
         if (!formData[field]) {
-          const displayName =
-            fieldDisplayNames[field as keyof typeof fieldDisplayNames] ||
-            "Required field";
+          const displayName = fieldDisplayNames[field as keyof typeof fieldDisplayNames] || "Required field";
           validationErrors.push({
             field,
             message: `${displayName} is required`,
@@ -466,7 +461,7 @@ export function registerRoutes(app: Express): Server {
       console.log("Selected Price:", formData.selectedPrice);
       console.log("Final Price:", formData.finalPrice);
       console.log("Vehicle Type:", formData.vehicleType);
-
+      
       // Log the incoming data for debugging (comprehensive)
       console.log("📝 FINAL FORM DATA RECEIVED:", {
         name: formData.name || "Not provided",
@@ -783,14 +778,11 @@ export function registerRoutes(app: Express): Server {
               firstName: formData.name?.split(" ")?.[0] || "",
               lastName: formData.name?.split(" ")?.slice(1).join(" ") || "",
               clientIpAddress:
-                (Array.isArray(req.headers["x-forwarded-for"])
-                  ? req.headers["x-forwarded-for"][0]
+                (Array.isArray(req.headers["x-forwarded-for"]) 
+                  ? req.headers["x-forwarded-for"][0] 
                   : req.headers["x-forwarded-for"]?.split(",")[0]) ||
-                (typeof req.headers["x-real-ip"] === "string"
-                  ? req.headers["x-real-ip"]
-                  : undefined) ||
-                req.socket.remoteAddress ||
-                undefined,
+                (typeof req.headers["x-real-ip"] === "string" ? req.headers["x-real-ip"] : undefined) ||
+                req.socket.remoteAddress || undefined,
               clientUserAgent: req.headers["user-agent"],
             },
             customData: {
@@ -1300,13 +1292,13 @@ export function registerRoutes(app: Express): Server {
         to: formData?.dropoffLocation || "Not provided",
         eventType: formData?.eventType || "Not specified",
       });
-
+      
       // 🔍 DIAGNOSTIC: Log exact prices received from form
       console.log("🔍 DIAGNOSTIC: Prices received at webhook endpoint:", {
         vehicleType: formData?.vehicleType,
         distance: formData?.distance,
         openTransportPrice: formData?.openTransportPrice,
-        enclosedTransportPrice: formData?.enclosedTransportPrice,
+        enclosedTransportPrice: formData?.enclosedTransportPrice
       });
 
       // Validate minimal required data
@@ -1395,13 +1387,13 @@ export function registerRoutes(app: Express): Server {
       const [dbResult, webhookResult] = await Promise.allSettled([
         // Operation 1: Save to local Postgres (fallback_leads table)
         db.insert(fallbackLeads).values({ data: formData }),
-
+        
         // Operation 2: Send to Zapier webhook
-        sendToWebhook(formData, req.headers),
+        sendToWebhook(formData, req.headers)
       ]);
 
       // Handle database save result
-      if (dbResult.status === "fulfilled") {
+      if (dbResult.status === 'fulfilled') {
         console.log("✅ Lead saved locally to fallback_leads table");
       } else {
         console.error("❌ Failed to save lead locally:", dbResult.reason);
@@ -1411,7 +1403,7 @@ export function registerRoutes(app: Express): Server {
       let zapierSuccess = false;
       let zapierError: string | null = null;
 
-      if (webhookResult.status === "fulfilled") {
+      if (webhookResult.status === 'fulfilled') {
         const result = webhookResult.value;
         if (result && result.success) {
           zapierSuccess = true;
@@ -1423,10 +1415,9 @@ export function registerRoutes(app: Express): Server {
           console.error(`⚠️ Zapier send failed: ${zapierError}`);
         }
       } else {
-        zapierError =
-          webhookResult.reason instanceof Error
-            ? webhookResult.reason.message
-            : String(webhookResult.reason);
+        zapierError = webhookResult.reason instanceof Error 
+          ? webhookResult.reason.message 
+          : String(webhookResult.reason);
         console.error(`⚠️ Zapier send failed:`, zapierError);
       }
 
@@ -1437,7 +1428,7 @@ export function registerRoutes(app: Express): Server {
 
       // Always return success to the user if data was saved locally
       // Even if Zapier fails, the lead is not lost
-      if (dbResult.status === "fulfilled") {
+      if (dbResult.status === 'fulfilled') {
         res.json({
           success: true,
           message: "Lead successfully sent to CRM system",
@@ -1711,34 +1702,35 @@ export function registerRoutes(app: Express): Server {
   // Database health check endpoint
   app.get("/api/database-health", async (req, res) => {
     try {
-      const { drizzle } = await import("drizzle-orm/neon-serverless");
-      const { Pool, neonConfig } = await import("@neondatabase/serverless");
-      const ws = await import("ws");
+      const { drizzle } = await import('drizzle-orm/neon-serverless');
+      const { Pool, neonConfig } = await import('@neondatabase/serverless');
+      const ws = await import('ws');
 
       neonConfig.webSocketConstructor = ws.default;
 
       if (!process.env.DATABASE_URL) {
-        throw new Error("DATABASE_URL environment variable is not set");
+        throw new Error('DATABASE_URL environment variable is not set');
       }
 
       const pool = new Pool({ connectionString: process.env.DATABASE_URL });
       const db = drizzle({ client: pool });
 
       // Simple query to test connection
-      await db.execute("SELECT 1");
+      await db.execute('SELECT 1');
 
       res.status(200).json({
         success: true,
-        message: "Database connection successful",
-        timestamp: new Date().toISOString(),
+        message: 'Database connection successful',
+        timestamp: new Date().toISOString()
       });
+
     } catch (error) {
-      console.error("❌ Database health check failed:", error);
+      console.error('❌ Database health check failed:', error);
 
       res.status(500).json({
         success: false,
-        error: "Database connection failed",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Database connection failed',
+        message: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
