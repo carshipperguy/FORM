@@ -1,0 +1,148 @@
+COPY + PASTE TO REPLIT
+
+Subject: CRITICAL — Quote Form Failure Risk (MapQuest Dependency) — Full Forensic Audit Required
+
+We have a production-critical concern with the quote calculator app.
+
+There is a potential failure point where the form submission depends on the MapQuest API, and if that API fails, the form may silently break or not submit properly.
+
+This is not acceptable — we need a full forensic audit of this flow.
+
+🔍 SCOPE OF AUDIT
+
+You must trace the entire quote submission pipeline end-to-end:
+
+Frontend (Quote Form)
+
+Identify exactly where MapQuest is used
+
+Determine:
+
+Is MapQuest required for submission?
+
+Does failure block submission?
+
+Are errors caught or silently swallowed?
+
+Check:
+
+address parsing
+
+distance calculation
+
+lat/lng resolution
+
+any required fields derived from MapQuest
+
+Failure Scenarios (MANDATORY)
+
+Simulate and report behavior for:
+
+MapQuest API timeout
+
+MapQuest returns 500
+
+MapQuest returns invalid/partial data
+
+Network failure (no response)
+
+For EACH scenario answer:
+
+Does form still submit?
+
+Does UI show error?
+
+Does it hang?
+
+Does it fail silently?
+
+Is lead LOST or still captured?
+
+Backend / API Layer
+
+Does backend require MapQuest-derived fields?
+
+Are there validation constraints that reject submissions if missing?
+
+Does backend log failed submissions?
+
+Lead Loss Quantification (VERY IMPORTANT)
+
+You must estimate:
+
+% of submissions dependent on MapQuest success
+
+% of failure scenarios that result in:
+
+total lead loss
+
+partial lead (incomplete data)
+
+successful fallback
+
+Then provide:
+
+👉 Estimated leads lost per month based on current traffic
+
+If exact data not available:
+
+derive from logs
+
+approximate based on failure rate assumptions
+
+but DO NOT skip this — I need a number
+
+Logging + Observability Audit
+
+Confirm:
+
+Are MapQuest errors logged anywhere?
+
+Can we detect failures historically?
+
+Do we have:
+
+error logs
+
+failed submissions
+
+frontend error tracking
+
+If NOT:
+→ this is a critical gap — explicitly state it
+
+Required Output Format
+
+I want a structured report:
+
+SECTION 1 — Where MapQuest is used
+SECTION 2 — Is it a hard dependency?
+SECTION 3 — Exact failure behavior (all scenarios)
+SECTION 4 — Lead loss risk (quantified monthly impact)
+SECTION 5 — Logging gaps
+SECTION 6 — Risk level (LOW / MEDIUM / HIGH / CRITICAL)
+
+⚠️ IMPORTANT RULES
+
+NO assumptions
+
+NO “should be fine”
+
+NO guessing
+
+Everything must be based on:
+
+actual code paths
+
+actual runtime behavior
+
+or clearly labeled estimates
+
+🚨 WHY THIS MATTERS
+
+We are spending money on ads and driving real traffic.
+
+If MapQuest failure = broken form = lost leads
+→ we are directly losing revenue without visibility
+
+This must be treated as a revenue leak audit, not a code review.
