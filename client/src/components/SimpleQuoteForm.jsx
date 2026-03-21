@@ -7,7 +7,6 @@ import {
   modelsByMake,
   newMakesWithFreeTextModels,
 } from "@/lib/vehicle-data";
-import { calculatePrice } from "@/lib/pricing";
 import LocationMenuSelector from "./LocationMenuSelector";
 import { getCurrentSessionId } from "@/lib/attribution-tracker";
 // CSS module import removed - reverting to inline styles
@@ -346,118 +345,10 @@ const SimpleQuoteForm = () => {
         return;
       }
 
-      // Calculate real distance using the server API
       // Get the current domain to handle iframe scenarios
       const currentDomain = window.location.origin;
 
-      // Use the full URL to avoid issues when embedded in an iframe
-      const serverDistanceUrl = `${currentDomain}/api/distance?origin=${encodeURIComponent(formData.pickupLocation)}&destination=${encodeURIComponent(formData.dropoffLocation)}`;
-      console.log(
-        "Calculating real distance using server API:",
-        serverDistanceUrl,
-      );
-
-      const distanceResponse = await fetch(serverDistanceUrl, {
-        // Include credentials to ensure cookies are sent even for cross-origin requests
-        credentials: "include",
-      });
-      const distanceData = await distanceResponse.json();
-
-      if (distanceData.error) {
-        console.error("Error calculating distance:", distanceData.error);
-        alert(
-          "There was an error calculating the distance. Please check your locations and try again.",
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      console.log("Distance calculation result:", distanceData);
-      console.log("🔍🔍🔍 DISTANCE FROM API:", distanceData.distance, "miles");
-
-      // Use the imported pricing calculation function
-
-      // Use the pricing calculation function with locations for Snowbird rule detection
-      console.log("🔍🔍🔍 CALLING calculatePrice WITH DISTANCE:", distanceData.distance, "VEHICLE TYPE:", formData.vehicleType);
-      const pricingResult = calculatePrice(
-        distanceData.distance,
-        formData.vehicleType,
-        new Date(), // Current date
-        formData.pickupLocation,
-        formData.dropoffLocation,
-      );
-      console.log("🔍🔍🔍 PRICING RESULT:", {
-        openTransport: pricingResult.openTransport,
-        enclosedTransport: pricingResult.enclosedTransport,
-        transitTime: pricingResult.transitTime
-      });
-
-      // Extract the calculated values
-      const transitTime = pricingResult.transitTime;
-      const openTransportPrice = pricingResult.openTransport;
-      const enclosedTransportPrice = pricingResult.enclosedTransport;
-
-      console.log("Calculated pricing:", {
-        distance: distanceData.distance,
-        transitTime,
-        openTransportPrice,
-        enclosedTransportPrice,
-      });
-
-      // 🔍 CRITICAL DIAGNOSTIC: Log distance used for pricing
-      console.log("🔍 DISTANCE USED FOR PRICING CALCULATION:", distanceData.distance);
-
-      // Create the complete quote data with real calculated values and ZIP codes
-      const quoteData = {
-        ...formData,
-        pickupZip: pickupZip,
-        dropoffZip: dropoffZip,
-        openTransportPrice: openTransportPrice,
-        enclosedTransportPrice: enclosedTransportPrice,
-        transitTime: transitTime,
-        distance: distanceData.distance,
-      };
-      
-      // 🔍 CRITICAL DIAGNOSTIC: Verify distance in quoteData
-      console.log("🔍 DISTANCE IN QUOTEDATA:", quoteData.distance);
-      console.log("🔍🔍🔍 COMPLETE QUOTEDATA:", JSON.stringify({
-        vehicleType: quoteData.vehicleType,
-        distance: quoteData.distance,
-        openTransportPrice: quoteData.openTransportPrice,
-        enclosedTransportPrice: quoteData.enclosedTransportPrice,
-        pickupLocation: quoteData.pickupLocation,
-        dropoffLocation: quoteData.dropoffLocation
-      }, null, 2));
-      
-      // 🔬 FORENSIC TRACE POINT 1
-      console.log("═══════════════════════════════════════");
-      console.log("🔬 FORENSIC TRACE - QUOTE CALCULATION");
-      console.log("[DISTANCE] miles:", quoteData.distance);
-      console.log("[CALCULATED] openTransport:", quoteData.openTransportPrice);
-      console.log("[CALCULATED] enclosed:", quoteData.enclosedTransportPrice);
-      console.log("═══════════════════════════════════════");
-
-      console.log("Added ZIP codes to quote data:", {
-        pickupZip,
-        dropoffZip,
-      });
-
-      console.log("Final quote data with real distance:", quoteData);
-
-      // Extract Facebook/Meta tracking parameters from the current URL only
-      const currentUrl = window.location.href;
-      console.log("📊 Current URL for attribution:", currentUrl);
-
-      // Function to extract query parameters from URL
-      function getQueryParam(name, url) {
-        const match = url.match(new RegExp("[?&]" + name + "=([^&]+)"));
-        return match ? decodeURIComponent(match[1]) : null;
-      }
-
-      // 🔥 CRITICAL FIX: Use persisted attribution data instead of reading from URL
-      console.log("📊 Facebook/Meta attribution parameters (from persisted state):", attributionData);
-
-      // Extract from persisted state that was captured on page load
+      // Extract attribution data from persisted state
       const {
         fbclid,
         utm_source,
@@ -467,165 +358,109 @@ const SimpleQuoteForm = () => {
         utm_content,
       } = attributionData;
 
-      // Removed direct Pixel Lead on submit; use coordinated trackEvent + CAPI below
-
-      // Send data to webhook when "Get Quote" is clicked
-      console.log("⚡ SENDING QUOTE DATA TO WEBHOOK");
-      try {
-        // Add Meta CAPI data to the webhook payload
-        const webhookData = {
-          ...quoteData,
-          eventType: "quote_submission",
-          eventDate: new Date().toISOString(),
-          // Meta CAPI attribution data (from persisted state)
-          fbclid: fbclid || null,
-          utm_source: utm_source || null,
-          utm_medium: utm_medium || null,
-          utm_campaign: utm_campaign || null,
-          utm_term: utm_term || null,
-          utm_content: utm_content || null,
-          referrer: attributionData.referrer || "",
-          // Provide both spellings to maximize Zapier field matching
-          session_id: getCurrentSessionId(),
-          sessionId: getCurrentSessionId(),
-          // Meta CAPI specific data
-          meta_capi_data: {
-            event_name: "Lead",
-            event_time: Math.floor(Date.now() / 1000),
-            user_data: {
-              em: quoteData.email ? quoteData.email.toLowerCase().trim() : null,
-              ph: quoteData.phone ? quoteData.phone.replace(/\D/g, "") : null,
-              client_ip_address: null, // Will be populated server-side
-              client_user_agent: navigator.userAgent,
-              fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
-              fbp: getCookie("_fbp") || null,
-            },
-            custom_data: {
-              content_name: "Auto Transport Quote",
-              content_category: "Auto Transport",
-              value: openTransportPrice,
-              currency: "USD",
-              pickup_location: formData.pickupLocation,
-              dropoff_location: formData.dropoffLocation,
-              vehicle_type: formData.vehicleType,
-              vehicle_year: formData.year,
-              vehicle_make: formData.make,
-              vehicle_model: formData.model,
-            },
+      // Build the complete lead payload for the server
+      const leadPayload = {
+        ...formData,
+        pickupZip: pickupZip,
+        dropoffZip: dropoffZip,
+        eventType: "quote_submission",
+        eventDate: new Date().toISOString(),
+        fbclid: fbclid || null,
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_term: utm_term || null,
+        utm_content: utm_content || null,
+        referrer: attributionData.referrer || "",
+        session_id: getCurrentSessionId(),
+        sessionId: getCurrentSessionId(),
+        meta_capi_data: {
+          event_name: "Lead",
+          event_time: Math.floor(Date.now() / 1000),
+          user_data: {
+            em: formData.email ? formData.email.toLowerCase().trim() : null,
+            ph: formData.phone ? formData.phone.replace(/\D/g, "") : null,
+            client_ip_address: null,
+            client_user_agent: navigator.userAgent,
+            fbc: fbclid ? `fb.1.${Date.now()}.${fbclid}` : null,
+            fbp: getCookie("_fbp") || null,
           },
+          custom_data: {
+            content_name: "Auto Transport Quote",
+            content_category: "Auto Transport",
+            value: 0,
+            currency: "USD",
+            pickup_location: formData.pickupLocation,
+            dropoff_location: formData.dropoffLocation,
+            vehicle_type: formData.vehicleType,
+            vehicle_year: formData.year,
+            vehicle_make: formData.make,
+            vehicle_model: formData.model,
+          },
+        },
+      };
+
+      // Single server call — handles MapQuest (8s timeout), DB save, and Zapier
+      console.log("⚡ Submitting lead to /api/submit-lead...");
+      const submitResponse = await fetch(`${currentDomain}/api/submit-lead`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(leadPayload),
+        signal: AbortSignal.timeout(12000),
+      });
+
+      const submitResult = await submitResponse.json();
+      console.log("⚡ /api/submit-lead response:", submitResult);
+
+      // Build quoteData from server response
+      let quoteData;
+      if (submitResult.mapquestSuccess) {
+        quoteData = {
+          ...formData,
+          pickupZip: pickupZip,
+          dropoffZip: dropoffZip,
+          openTransportPrice: submitResult.openTransportPrice,
+          enclosedTransportPrice: submitResult.enclosedTransportPrice,
+          transitTime: submitResult.transitTime,
+          distance: submitResult.distance,
+          priceUnavailable: false,
         };
 
-        // Use await to ensure we catch any errors properly
-        // Get the current domain to handle iframe scenarios
-        const currentDomain = window.location.origin;
-        console.log("Current domain for API request:", currentDomain);
-
-        // Use the full URL to avoid issues when embedded in an iframe
-        const apiUrl = `${currentDomain}/api/webhook`;
-        console.log("Using webhook API URL:", apiUrl);
-
-        // Attribution data silently included in webhook payload
-        
-        // 🔍 DIAGNOSTIC: Log exact prices being sent to Zapier
-        console.log("🔍 DIAGNOSTIC: Prices being sent to webhook:", {
-          vehicleType: webhookData.vehicleType,
-          distance: webhookData.distance,
-          openTransportPrice: webhookData.openTransportPrice,
-          enclosedTransportPrice: webhookData.enclosedTransportPrice
-        });
-        console.log("🔍🔍🔍 COMPLETE WEBHOOKDATA BEING SENT:", JSON.stringify({
-          vehicleType: webhookData.vehicleType,
-          distance: webhookData.distance,
-          openTransportPrice: webhookData.openTransportPrice,
-          enclosedTransportPrice: webhookData.enclosedTransportPrice,
-          pickupLocation: webhookData.pickupLocation,
-          dropoffLocation: webhookData.dropoffLocation
-        }, null, 2));
-        
-        // 🔬 FORENSIC TRACE POINT 2
-        console.log("═══════════════════════════════════════");
-        console.log("🔬 FORENSIC TRACE - WEBHOOK PAYLOAD");
-        console.log("[DISTANCE] miles:", webhookData.distance);
-        console.log("[PAYLOAD] openTransport:", webhookData.openTransportPrice);
-        console.log("[PAYLOAD] enclosed:", webhookData.enclosedTransportPrice);
-        console.log("═══════════════════════════════════════");
-
-        const webhookResponse = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          // Include credentials to ensure cookies are sent even for cross-origin requests
-          credentials: "include",
-          body: JSON.stringify(webhookData),
-        });
-
-        console.log({
-          webhookResponse,
-        });
-
-        // Handle webhook response
-        if (!webhookResponse.ok) {
-          console.error(
-            "⚡ WEBHOOK ERROR:",
-            webhookResponse.status,
-            webhookResponse.statusText,
-          );
-
-          // Try to parse the error response for validation errors
-          try {
-            const errorResponse = await webhookResponse.json();
-
-            // If server validation found errors we didn't catch client-side
-            if (errorResponse.validationErrors) {
-              console.error(
-                "Server validation failed:",
-                errorResponse.validationErrors,
-              );
-              setValidationErrors(errorResponse.validationErrors);
-              setIsSubmitting(false);
-              return; // Prevent navigation to next screen
-            }
-          } catch (parseError) {
-            console.error(
-              "Could not parse webhook error response:",
-              parseError,
-            );
-          }
-        } else {
-          console.log("⚡ WEBHOOK SENT SUCCESSFULLY");
-
-          // Send coordinated GetQuote (Lead) event with Pixel+CAPI deduplication
-          try {
-            // Import coordinated tracking functions
-            const { trackEvent, generateEventId } = await import("@/lib/attribution-tracker");
-            const eventId = generateEventId("Lead");
-            
-            // Track coordinated Pixel event (via parent if in iframe)
-            trackEvent("Lead", {
-              content_name: "Auto Transport Quote Submission",
-              content_category: "Auto Transport", 
-              value: parseFloat(quoteData.finalPrice || quoteData.selectedPrice || "0"),
-              currency: "USD"
-            });
-            
-            // Send to Meta CAPI with same event_id for deduplication
-            await sendGetQuoteEvent(quoteData, formData, eventId);
-          } catch (getQuoteError) {
-            console.error("❌ GetQuote: Failed to send Lead event:", getQuoteError);
-            // Don't fail the quote submission if Meta tracking fails
-          }
+        // Fire Meta tracking for successful quotes
+        try {
+          const { trackEvent, generateEventId } = await import("@/lib/attribution-tracker");
+          const eventId = generateEventId("Lead");
+          trackEvent("Lead", {
+            content_name: "Auto Transport Quote Submission",
+            content_category: "Auto Transport",
+            value: submitResult.openTransportPrice,
+            currency: "USD",
+          });
+          await sendGetQuoteEvent(quoteData, formData, eventId);
+        } catch (getQuoteError) {
+          console.error("❌ GetQuote: Failed to send Lead event:", getQuoteError);
         }
-      } catch (webhookError) {
-        console.error("⚡ ERROR SENDING DATA TO WEBHOOK:", webhookError);
-        // Continue with navigation even if webhook fails
+      } else {
+        // MapQuest failed — lead is still captured; show "we'll call you" screen
+        quoteData = {
+          ...formData,
+          pickupZip: pickupZip,
+          dropoffZip: dropoffZip,
+          openTransportPrice: 0,
+          enclosedTransportPrice: 0,
+          transitTime: 0,
+          distance: 0,
+          priceUnavailable: true,
+        };
       }
 
-      // Add basic URL parameters to the URL-encoded data for the next page (from persisted state)
+      // Add attribution to quoteData for the next page
       const quoteDataWithAttribution = {
         ...quoteData,
-        // Attribution data from persisted state (not URL)
         fbclid: fbclid || null,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,

@@ -9,6 +9,7 @@ import {
 } from "./utils/notifications";
 import { sendToWebhook } from "./utils/webhook";
 import { sendAttributionToCRM } from "./utils/attribution-webhook";
+import { calculatePriceServer } from "./utils/pricing-server";
 import {
   registerWebhookDiagnosticEndpoints,
   webhookDiagnosticMiddleware,
@@ -1226,6 +1227,132 @@ export function registerRoutes(app: Express): Server {
         success: false,
         message: "Error running webhook diagnostic test",
         error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // NEW: Single-call lead submission endpoint
+  //   1. Tries MapQuest with 8-second hard timeout
+  //   2. ALWAYS saves lead to DB and fires Zapier (real price or $0)
+  //   3. Returns pricing data to client if MapQuest succeeded
+  // ─────────────────────────────────────────────────────────────
+  app.post("/api/submit-lead", async (req, res) => {
+    const formData = req.body;
+
+    // Guard: ignore health-check pings
+    if (!formData || (!formData.phone && !formData.name)) {
+      return res.status(400).json({ success: false, error: "Missing required fields" });
+    }
+
+    console.log("\n🔔 /api/submit-lead - Processing lead for:", formData.name, formData.email);
+
+    // ── Step 1: MapQuest with 8-second hard timeout ────────────
+    let distance = 0;
+    let mapquestTime: string | undefined;
+    let mapquestSuccess = false;
+
+    try {
+      const cityStateRegex = /([^,]+,\s*[A-Z]{2})/i;
+      const originMatch = (formData.pickupLocation || "").match(cityStateRegex);
+      const destMatch = (formData.dropoffLocation || "").match(cityStateRegex);
+      const originFormatted = originMatch ? originMatch[1].trim() : formData.pickupLocation;
+      const destFormatted = destMatch ? destMatch[1].trim() : formData.dropoffLocation;
+
+      const mapquestUrl = `http://www.mapquestapi.com/directions/v2/route?key=${MAPQUEST_API_KEY}&from=${encodeURIComponent(originFormatted)}&to=${encodeURIComponent(destFormatted)}&unit=m`;
+
+      console.log("🗺️  MapQuest request:", { from: originFormatted, to: destFormatted });
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const mqResponse = await fetch(mapquestUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      const mqData = await mqResponse.json();
+      if (mqData.route && typeof mqData.route.distance === "number") {
+        distance = Math.round(mqData.route.distance);
+        mapquestTime = mqData.route.formattedTime;
+        mapquestSuccess = true;
+        console.log("✅ MapQuest success:", distance, "miles");
+      } else {
+        console.warn("⚠️  MapQuest returned unexpected response:", JSON.stringify(mqData).substring(0, 200));
+      }
+    } catch (mqErr: any) {
+      const reason = mqErr?.name === "AbortError" ? "8-second timeout" : (mqErr?.message || String(mqErr));
+      console.error("⚠️  MapQuest failed:", reason);
+    }
+
+    // ── Step 2: Calculate prices if MapQuest succeeded ─────────
+    let openTransportPrice = 0;
+    let enclosedTransportPrice = 0;
+    let transitTime = 0;
+
+    if (mapquestSuccess) {
+      const pricing = calculatePriceServer(
+        distance,
+        formData.vehicleType || "car/truck/suv",
+        new Date(),
+        formData.pickupLocation,
+        formData.dropoffLocation,
+      );
+      openTransportPrice = pricing.openTransport;
+      enclosedTransportPrice = pricing.enclosedTransport;
+      transitTime = pricing.transitTime;
+      console.log("💰 Pricing:", { openTransportPrice, enclosedTransportPrice, transitTime });
+    }
+
+    // ── Step 3: Build webhook payload ──────────────────────────
+    const webhookPayload = {
+      ...formData,
+      distance,
+      openTransportPrice,
+      enclosedTransportPrice,
+      transitTime,
+      mapquestSuccess,
+      eventType: formData.eventType || "quote_submission",
+      eventDate: formData.eventDate || new Date().toISOString(),
+    };
+
+    // ── Step 4: Save to DB + fire Zapier in parallel (ALWAYS) ──
+    const diagnosticId = `sl_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+    console.log(`📊 [${diagnosticId}] Saving lead and firing Zapier (mapquestSuccess=${mapquestSuccess})...`);
+
+    const [dbResult, webhookResult] = await Promise.allSettled([
+      db.insert(fallbackLeads).values({ data: webhookPayload }),
+      sendToWebhook(webhookPayload, req.headers),
+    ]);
+
+    if (dbResult.status === "fulfilled") {
+      console.log(`✅ [${diagnosticId}] Lead saved to DB`);
+    } else {
+      console.error(`❌ [${diagnosticId}] DB save failed:`, dbResult.reason);
+    }
+
+    if (webhookResult.status === "fulfilled" && webhookResult.value?.success) {
+      console.log(`✅ [${diagnosticId}] Zapier webhook delivered`);
+    } else {
+      const zapierErr = webhookResult.status === "rejected" ? webhookResult.reason : webhookResult.value?.message;
+      console.error(`⚠️ [${diagnosticId}] Zapier send failed:`, zapierErr);
+    }
+
+    // Fire attribution webhook independently (non-blocking, best-effort)
+    sendAttributionToCRM(webhookPayload);
+
+    // ── Step 5: Respond to client ──────────────────────────────
+    if (mapquestSuccess) {
+      return res.json({
+        success: true,
+        mapquestSuccess: true,
+        distance,
+        openTransportPrice,
+        enclosedTransportPrice,
+        transitTime,
+      });
+    } else {
+      return res.json({
+        success: true,
+        mapquestSuccess: false,
       });
     }
   });

@@ -14,6 +14,7 @@ export default function FinalQuote() {
     distance: number;
     pickupZip?: string;
     dropoffZip?: string;
+    priceUnavailable?: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -105,6 +106,46 @@ export default function FinalQuote() {
   if (!quoteData) {
     navigate("/");
     return null;
+  }
+
+  if (quoteData.priceUnavailable) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+          <div className="mb-6">
+            <img
+              src="https://i.postimg.cc/wxSYD63g/Amerigo-auto-transport-logo222.png"
+              className="mx-auto h-14 object-contain"
+              alt="Amerigo Auto Transport"
+            />
+          </div>
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[#002C42]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-[#002C42] mb-3">We've Got Your Request!</h1>
+          <p className="text-gray-600 mb-6">
+            Your quote request was received. One of our transport specialists will call you shortly with your exact price.
+          </p>
+          <div className="bg-blue-50 rounded-lg p-4 text-left mb-6">
+            <p className="text-sm font-semibold text-[#002C42] mb-1">Your shipment details:</p>
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">Vehicle:</span> {quoteData.year} {quoteData.make} {quoteData.model}
+            </p>
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">From:</span> {quoteData.pickupLocation}
+            </p>
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">To:</span> {quoteData.dropoffLocation}
+            </p>
+          </div>
+          <p className="text-xs text-gray-400">
+            Questions? Call us at <a href="tel:+18557246863" className="text-[#002C42] font-medium">(855) 724-6863</a>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return <QuoteOptions data={quoteData} />;
