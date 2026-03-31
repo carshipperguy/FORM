@@ -483,6 +483,7 @@ const SimpleQuoteForm = () => {
         credentials: "include",
         body: JSON.stringify(leadPayload),
         signal: AbortSignal.timeout(12000),
+        keepalive: true,
       });
 
       const submitResult = await submitResponse.json();
