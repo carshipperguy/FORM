@@ -22,15 +22,17 @@ export function trackEvent(eventName: string, data: Record<string, unknown> = {}
     }
 
     const payload = {
-      event: eventName,
-      timestamp: new Date().toISOString(),
-      session_id: sessionId,
-      ...data,
+      event_name: eventName,
+      session_id: sessionId || null,
+      data: data || {},
     };
 
     fetch(`${CRM_URL}/api/events`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "amerigo_secret_123",
+      },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(3000),
       keepalive: true,
