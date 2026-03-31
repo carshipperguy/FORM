@@ -1,0 +1,134 @@
+This is a STRICT DEPLOYMENT STABILITY AUDIT.
+
+DO NOT change any code.
+DO NOT guess.
+ONLY use real logs, real responses, and actual runtime behavior.
+
+---
+
+GOAL:
+
+Confirm there are NO:
+- 404 errors
+- 500 errors
+- failed network calls
+- silent frontend failures
+- broken endpoints
+- UI-triggered glitches
+
+---
+
+SECTION 1 — SERVER ROUTES HEALTH
+
+1. List ALL active API routes.
+
+2. For each route:
+   - Confirm it responds (200/201)
+   - Confirm it does NOT return 404 or 500
+
+Focus especially on:
+- /api/submit-lead
+- /api/partial-lead
+- /api/events
+- /api/location-search/*
+- any MapQuest-related route
+
+---
+
+SECTION 2 — ERROR LOG SCAN
+
+Scan server logs during live usage and show:
+
+1. Any occurrences of:
+   - 404
+   - 500
+   - unhandled errors
+   - rejected promises
+
+2. If none:
+   explicitly state:
+   → NO ERRORS FOUND IN LOGS
+
+---
+
+SECTION 3 — FRONTEND NETWORK VALIDATION
+
+Simulate real usage:
+
+1. Load form
+2. Type phone (trigger partial lead)
+3. Submit form
+
+Show:
+
+- All network calls made
+- Status codes for each
+
+Expected:
+- /api/partial-lead → 200
+- /api/submit-lead → 200
+- /api/events → 200
+
+---
+
+SECTION 4 — EDGE CASE TESTS
+
+Run each scenario and show results:
+
+1. MapQuest failure (invalid locations)
+   → Confirm:
+      - no crash
+      - /api/submit-lead still returns 200
+
+2. Rapid typing in phone field
+   → Confirm:
+      - no multiple requests
+      - no errors
+
+3. Submit then close tab immediately
+   → Confirm:
+      - request still received (log proof)
+
+4. Slow network simulation
+   → Confirm:
+      - no UI freeze
+      - no unhandled errors
+
+---
+
+SECTION 5 — 404 / ROUTING CHECK
+
+1. Attempt to hit:
+   - invalid API route
+   - incorrect endpoints
+
+2. Confirm:
+   - proper 404 handling
+   - no crashes
+
+---
+
+SECTION 6 — UI GLITCH CHECK
+
+1. Interact with:
+   - all inputs
+   - submit button
+   - validation
+
+2. Confirm:
+   - no flicker
+   - no layout shift
+   - no input lag
+   - no double-submit
+
+---
+
+SECTION 7 — FINAL VERDICT
+
+Answer ONLY:
+
+1. Any 404 errors? YES or NO  
+2. Any 500/server errors? YES or NO  
+3. Any failed network calls? YES or NO  
+4. Any UI glitches or instability? YES or NO  
+5. Confidence level (0–100%) system is stable in production
