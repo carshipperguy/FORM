@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, real, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, real, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { vehicleTypes } from "../client/src/lib/vehicle-data";
@@ -27,6 +27,17 @@ export const quotes = pgTable("quotes", {
 export const fallbackLeads = pgTable("fallback_leads", {
   id: serial("id").primaryKey(),
   data: jsonb("data").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const partialLeads = pgTable("partial_leads", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id"),
+  name: text("name"),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  vehicleType: text("vehicle_type"),
+  converted: boolean("converted").notNull().default(false),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 

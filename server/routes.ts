@@ -2,7 +2,8 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import cors from "cors";
 import { storage } from "./storage";
-import { insertQuoteSchema, fallbackLeads } from "@shared/schema";
+import { insertQuoteSchema, fallbackLeads, partialLeads } from "@shared/schema";
+import { eq, and, gte } from "drizzle-orm";
 import {
   sendConfirmationEmail,
   sendConfirmationSMS,
@@ -1232,6 +1233,57 @@ export function registerRoutes(app: Express): Server {
   });
 
   // ─────────────────────────────────────────────────────────────
+  // Partial lead capture — saves contact info before full submit
+  //   - Requires phone (minimum viable lead)
+  //   - Deduplicates by session_id (30-min window)
+  //   - NEVER fires Zapier — DB only
+  // ─────────────────────────────────────────────────────────────
+  app.post("/api/partial-lead", async (req, res) => {
+    try {
+      const { name, phone, email, vehicleType, session_id } = req.body;
+
+      // Require at least a sanitized phone number (7+ digits)
+      const digits = (phone || "").replace(/\D/g, "");
+      if (digits.length < 7) {
+        return res.status(400).json({ success: false, reason: "phone_required" });
+      }
+
+      // Server-side deduplication: skip if same session already captured in last 30 min
+      if (session_id) {
+        const cutoff = new Date(Date.now() - 30 * 60 * 1000);
+        const existing = await db
+          .select({ id: partialLeads.id })
+          .from(partialLeads)
+          .where(
+            and(
+              eq(partialLeads.sessionId, session_id),
+              gte(partialLeads.createdAt, cutoff)
+            )
+          )
+          .limit(1);
+
+        if (existing.length > 0) {
+          return res.json({ success: true, skipped: true });
+        }
+      }
+
+      await db.insert(partialLeads).values({
+        sessionId: session_id || null,
+        name: name || null,
+        phone: digits,
+        email: email || null,
+        vehicleType: vehicleType || null,
+        converted: false,
+      });
+
+      return res.json({ success: true });
+    } catch (err) {
+      console.error("⚠️ /api/partial-lead error:", err);
+      return res.status(500).json({ success: false });
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
   // NEW: Single-call lead submission endpoint
   //   1. Tries MapQuest with 8-second hard timeout
   //   2. ALWAYS saves lead to DB and fires Zapier (real price or $0)
@@ -1338,6 +1390,15 @@ export function registerRoutes(app: Express): Server {
 
     // Fire attribution webhook independently (non-blocking, best-effort)
     sendAttributionToCRM(webhookPayload);
+
+    // Mark any partial lead for this session as converted (non-blocking, best-effort)
+    const sessionIdForConversion = formData.session_id || formData.sessionId || null;
+    if (sessionIdForConversion) {
+      db.update(partialLeads)
+        .set({ converted: true })
+        .where(eq(partialLeads.sessionId, sessionIdForConversion))
+        .catch(() => {});
+    }
 
     // ── Step 5: Respond to client ──────────────────────────────
     if (mapquestSuccess) {

@@ -76,6 +76,19 @@ const SimpleQuoteForm = () => {
     }
   }, [formData.shipmentDate]);
 
+  // Partial lead capture — 2s debounce fires when user pauses typing in phone field
+  useEffect(() => {
+    if (phoneDebounceRef.current) {
+      clearTimeout(phoneDebounceRef.current);
+    }
+    phoneDebounceRef.current = setTimeout(() => {
+      sendPartialLead();
+    }, 2000);
+    return () => {
+      if (phoneDebounceRef.current) clearTimeout(phoneDebounceRef.current);
+    };
+  }, [formData.phone]);
+
   // Get available models for standard vehicles
   useEffect(() => {
     if (isStandardVehicle && formData.make) {
@@ -224,6 +237,40 @@ const SimpleQuoteForm = () => {
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const contactFieldsShownFired = useRef(false);
+  const partialLeadSentRef = useRef(false);
+  const phoneDebounceRef = useRef(null);
+
+  const sendPartialLead = () => {
+    try {
+      if (partialLeadSentRef.current) return;
+      const digits = (formData.phone || "").replace(/\D/g, "");
+      if (digits.length < 7) return;
+      partialLeadSentRef.current = true;
+      const sessionId = typeof getCurrentSessionId === "function" ? getCurrentSessionId() : null;
+      fetch("/api/partial-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name || null,
+          phone: digits,
+          email: formData.email || null,
+          vehicleType: formData.vehicleType || null,
+          session_id: sessionId,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {
+      // swallow all errors — never affects form
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    if (phoneDebounceRef.current) {
+      clearTimeout(phoneDebounceRef.current);
+      phoneDebounceRef.current = null;
+    }
+    sendPartialLead();
+  };
 
   // Client-side validation before submission
   const validateForm = () => {
@@ -776,6 +823,7 @@ const SimpleQuoteForm = () => {
                     name="phone"
                     value={formData.phone || ""}
                     onChange={handleChange}
+                    onBlur={handlePhoneBlur}
                     placeholder="Phone Number"
                     required
                   />
