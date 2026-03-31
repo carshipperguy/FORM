@@ -1,0 +1,176 @@
+READ-ONLY FEASIBILITY ANALYSIS — FORM APP → CRM EVENT TRACKING
+
+This is a STRICT READ-ONLY task.
+
+DO NOT:
+- Write code
+- Modify any files
+- Add functions
+- Touch handleSubmit logic
+- Touch /api/submit-lead
+- Change MapQuest logic
+- Push any changes
+
+You are ONLY analyzing feasibility, safety, and edge cases.
+
+---
+
+OBJECTIVE
+
+We want the form app (this app) to send passive tracking events to a separate CRM Replit app:
+
+POST https://<CRM_APP_URL>/api/events
+
+This must be:
+- Fire-and-forget
+- Non-blocking
+- Zero impact on submission
+- Invisible to the user
+
+---
+
+SECTION 1 — NETWORK + CORS
+
+Analyze:
+
+1. Can this frontend successfully POST to an external Replit app URL?
+2. Will CORS block this by default?
+3. EXACT headers required on the CRM app to allow this request
+4. Should credentials be included or omitted?
+5. Any HTTPS / browser restrictions?
+
+---
+
+SECTION 2 — FAILURE ISOLATION (CRITICAL)
+
+We REQUIRE:
+
+If CRM endpoint:
+- is down
+- times out
+- returns 500
+- rejects request
+
+THEN:
+→ form must behave EXACTLY the same as today
+
+Analyze:
+
+1. Does non-awaited fetch() fully isolate failure?
+2. Could ANY failure:
+   - delay submission
+   - block UI
+   - trigger React errors
+3. Is `.catch(() => {})` sufficient to swallow ALL failures?
+
+---
+
+SECTION 3 — PERFORMANCE IMPACT
+
+Analyze:
+
+1. Will firing 3–6 small POST requests per session impact:
+   - page speed
+   - mobile devices
+2. Could this interfere with:
+   - handleSubmit timing
+   - /api/submit-lead request
+3. Confirm whether these calls enter the critical path or not
+
+---
+
+SECTION 4 — SAFE INSERTION POINTS
+
+We plan to add tracking at:
+
+- form_loaded (useEffect on mount)
+- contact_fields_shown
+- submit_clicked
+- submit_success
+- mapquest_failed
+- client_timeout_triggered
+
+For EACH:
+
+1. Is state stable at that moment?
+2. Could inserting a fetch() here:
+   - cause race conditions
+   - interfere with React state
+3. Identify ANY unsafe hook points
+
+---
+
+SECTION 5 — SECURITY
+
+We plan to send:
+
+Header:
+x-api-key: <SECRET>
+
+Analyze:
+
+1. Is exposing this in frontend acceptable?
+2. Can it be abused?
+3. Should we restrict by:
+   - origin
+   - rate limiting
+4. Any safer lightweight alternative?
+
+---
+
+SECTION 6 — DUPLICATE / OVERFIRE RISK
+
+Analyze:
+
+1. Could React re-renders double-fire events?
+2. Could rapid typing or interaction flood events?
+3. Do we need:
+   - debounce
+   - once-per-session guards
+4. Identify exact risk points
+
+---
+
+SECTION 7 — EDGE CASES
+
+Analyze impact of:
+
+- user closes tab mid-submit
+- client timeout occurs
+- slow/mobile network
+- fetch blocked entirely
+- ad blockers
+
+For each:
+→ confirm tracking does NOT affect submission
+
+---
+
+SECTION 8 — FINAL VERDICT
+
+Provide:
+
+1. SAFE / NOT SAFE
+2. Required constraints before implementation
+3. Optional safeguards
+4. ANY scenario where this could impact lead capture
+
+---
+
+OUTPUT RULES
+
+- No code
+- No implementation
+- Reference real files where possible
+- If uncertain → say "NOT VERIFIED"
+
+---
+
+FINAL WARNING
+
+This system handles paid leads.
+
+Any regression = lost revenue.
+
+Be conservative.
+Do not assume safety — prove it.
