@@ -30,6 +30,13 @@ export const fallbackLeads = pgTable("fallback_leads", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+export const trackingEvents = pgTable("tracking_events", {
+  id: serial("id").primaryKey(),
+  event: text("event").notNull(),
+  data: jsonb("data").notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 export const quoteFormSchema = z.object({
   vehicleType: z.enum(vehicleTypes),
   year: z.string().min(1, "Year is required"),

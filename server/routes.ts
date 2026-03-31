@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import cors from "cors";
 import { storage } from "./storage";
-import { insertQuoteSchema, fallbackLeads } from "@shared/schema";
+import { insertQuoteSchema, fallbackLeads, trackingEvents } from "@shared/schema";
 import {
   sendConfirmationEmail,
   sendConfirmationSMS,
@@ -1859,6 +1859,25 @@ export function registerRoutes(app: Express): Server {
         error: 'Database connection failed',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Passive event tracking endpoint
+  // Receives fire-and-forget events from the form frontend.
+  // Failure here has zero impact on lead submission.
+  // ─────────────────────────────────────────────────────────────
+  app.post("/api/events", async (req, res) => {
+    try {
+      const body = req.body || {};
+      if (!body.event || typeof body.event !== "string") {
+        return res.status(400).json({ success: false, error: "Missing event name" });
+      }
+      await db.insert(trackingEvents).values({ event: body.event, data: body });
+      return res.json({ success: true });
+    } catch (err) {
+      console.error("⚠️  /api/events insert failed:", err);
+      return res.status(500).json({ success: false });
     }
   });
 

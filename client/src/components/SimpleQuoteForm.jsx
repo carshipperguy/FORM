@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import {
   vehicleTypes,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/vehicle-data";
 import LocationMenuSelector from "./LocationMenuSelector";
 import { getCurrentSessionId } from "@/lib/attribution-tracker";
+import { trackEvent as logEvent } from "@/lib/track-event";
 // CSS module import removed - reverting to inline styles
 
 const SimpleQuoteForm = () => {
@@ -62,6 +63,14 @@ const SimpleQuoteForm = () => {
   useEffect(() => {
     if (formData.shipmentDate) {
       setShowContactFields(true);
+      // PASSIVE TRACKING — guard ensures this fires at most once per session
+      if (!contactFieldsShownFired.current) {
+        contactFieldsShownFired.current = true;
+        logEvent("contact_fields_shown", {
+          vehicleType: formData.vehicleType,
+          shipmentDate: formData.shipmentDate,
+        });
+      }
     } else {
       setShowContactFields(false);
     }
@@ -112,6 +121,14 @@ const SimpleQuoteForm = () => {
 
     // Set the initial attribution data
     setAttributionData(initialAttributionData);
+
+    // PASSIVE TRACKING — fire-and-forget, zero impact on form
+    logEvent("form_loaded", {
+      referrer: initialAttributionData.referrer,
+      utm_source: initialAttributionData.utm_source,
+      utm_medium: initialAttributionData.utm_medium,
+      utm_campaign: initialAttributionData.utm_campaign,
+    });
 
     const retrievedAttributionData = getAttributionData();
     
@@ -206,6 +223,7 @@ const SimpleQuoteForm = () => {
 
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const contactFieldsShownFired = useRef(false);
 
   // Client-side validation before submission
   const validateForm = () => {
