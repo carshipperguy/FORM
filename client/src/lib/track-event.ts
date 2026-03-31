@@ -3,11 +3,14 @@
  *
  * ALL calls are:
  * - Fire-and-forget (never awaited)
- * - Non-blocking (no impact on submission path)
+ * - Non-blocking (zero impact on submission path)
  * - Failure-safe (all errors silently swallowed)
  *
- * Posts to /api/events on this same origin — no CORS required.
+ * Posts directly to the CRM app — no routing through this app's backend.
+ * CORS is handled on the CRM side.
  */
+
+const CRM_URL = `https://${import.meta.env.VITE_CRM_DOMAIN || "amerigoautotransport.replit.app"}`;
 
 export function trackEvent(eventName: string, data: Record<string, unknown> = {}): void {
   try {
@@ -15,7 +18,7 @@ export function trackEvent(eventName: string, data: Record<string, unknown> = {}
     try {
       sessionId = sessionStorage.getItem("amerigo_session_id");
     } catch {
-      // sessionStorage blocked (private mode); proceed without it
+      // sessionStorage blocked (private/incognito mode) — proceed without it
     }
 
     const payload = {
@@ -25,7 +28,7 @@ export function trackEvent(eventName: string, data: Record<string, unknown> = {}
       ...data,
     };
 
-    fetch("/api/events", {
+    fetch(`${CRM_URL}/api/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -33,6 +36,6 @@ export function trackEvent(eventName: string, data: Record<string, unknown> = {}
       keepalive: true,
     }).catch(() => {});
   } catch {
-    // Swallow all synchronous errors (malformed payload, AbortSignal unavailable, etc.)
+    // Swallow all synchronous errors (malformed URL, AbortSignal unavailable, etc.)
   }
 }

@@ -363,6 +363,13 @@ const SimpleQuoteForm = () => {
         return;
       }
 
+      // PASSIVE TRACKING — fire-and-forget, not awaited, cannot block submission
+      logEvent("submit_clicked", {
+        vehicleType: formData.vehicleType,
+        pickupLocation: formData.pickupLocation,
+        dropoffLocation: formData.dropoffLocation,
+      });
+
       // Get the current domain to handle iframe scenarios
       const currentDomain = window.location.origin;
 
@@ -462,6 +469,13 @@ const SimpleQuoteForm = () => {
         } catch (getQuoteError) {
           console.error("❌ GetQuote: Failed to send Lead event:", getQuoteError);
         }
+
+        // PASSIVE TRACKING — outside Meta try/catch; not awaited; cannot block navigation
+        logEvent("submit_success", {
+          mapquestSuccess: true,
+          openTransportPrice: submitResult.openTransportPrice,
+          vehicleType: formData.vehicleType,
+        });
       } else {
         // MapQuest failed — lead is still captured; show "we'll call you" screen
         quoteData = {
@@ -474,6 +488,13 @@ const SimpleQuoteForm = () => {
           distance: 0,
           priceUnavailable: true,
         };
+
+        // PASSIVE TRACKING — fire-and-forget, not awaited, lead already captured in DB + Zapier
+        logEvent("mapquest_failed", {
+          vehicleType: formData.vehicleType,
+          pickupLocation: formData.pickupLocation,
+          dropoffLocation: formData.dropoffLocation,
+        });
       }
 
       // Add attribution to quoteData for the next page
@@ -546,6 +567,12 @@ const SimpleQuoteForm = () => {
         navigate(`/final-quote`);
       }
     } catch (error) {
+      // PASSIVE TRACKING — first line in catch; logEvent is synchronous-safe; cannot rethrow
+      logEvent("client_timeout_triggered", {
+        error_name: error?.name || "UnknownError",
+        error_message: error?.message || String(error),
+        vehicleType: formData.vehicleType,
+      });
       console.error("Error in form submission:", error);
       setIsSubmitting(false);
       alert("There was an error processing your request. Please try again.");
