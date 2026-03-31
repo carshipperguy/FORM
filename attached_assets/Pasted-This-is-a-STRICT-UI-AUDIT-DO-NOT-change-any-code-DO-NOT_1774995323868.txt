@@ -1,0 +1,125 @@
+This is a STRICT UI AUDIT.
+
+DO NOT change any code.
+DO NOT describe visually from memory.
+DO NOT guess.
+
+All answers must be based on:
+- actual code
+- actual rendered DOM
+- computed styles
+
+---
+
+GOAL:
+
+Prove that the UI is IDENTICAL (pixel-for-pixel behavior) after the recent changes:
+- partial lead capture
+- keepalive addition
+
+---
+
+SECTION 1 — FILE CHANGE SCOPE
+
+1. List ALL files modified in this deployment.
+
+2. For each file, show:
+   - exact diff
+   - line numbers changed
+
+3. Confirm:
+   → Are ANY JSX elements changed? YES or NO  
+   → Are ANY classNames changed? YES or NO  
+   → Are ANY layout containers changed? YES or NO  
+
+---
+
+SECTION 2 — FORM STRUCTURE VERIFICATION
+
+File: SimpleQuoteForm.jsx
+
+1. Show the EXACT JSX for:
+   - phone input
+   - submit button
+   - form container
+
+2. Confirm:
+   - No added wrappers
+   - No removed elements
+   - No conditional rendering changes
+
+---
+
+SECTION 3 — STYLE & LAYOUT VERIFICATION
+
+From rendered DOM:
+
+1. Extract computed styles for:
+   - phone input
+   - submit button
+   - main form container
+
+Include:
+- width
+- height
+- padding
+- margin
+- border
+- font-size
+- display
+- position
+
+2. Confirm:
+   → Any changes compared to previous version? YES or NO
+
+---
+
+SECTION 4 — EVENT HANDLER IMPACT
+
+1. List ALL new event handlers added:
+   - onBlur
+   - useEffect debounce
+
+2. Confirm:
+   - Do any handlers trigger re-render? YES or NO  
+   - Do any handlers modify layout state? YES or NO  
+   - Do any handlers affect validation UI? YES or NO  
+
+---
+
+SECTION 5 — RENDER CYCLE VERIFICATION
+
+1. Confirm:
+   - Does typing in phone input cause any additional re-renders beyond previous behavior?
+
+2. Show:
+   - where setState is called
+   - whether it affects layout or just triggers background logic
+
+---
+
+SECTION 6 — NETWORK SIDE EFFECTS
+
+1. Confirm:
+   - Are any network calls tied to render cycle? YES or NO  
+   - Are any async operations blocking paint? YES or NO  
+
+---
+
+SECTION 7 — PERFORMANCE IMPACT
+
+1. Confirm:
+   - Any synchronous operations added to input handlers? YES or NO  
+   - Any layout thrashing risk? YES or NO  
+
+---
+
+SECTION 8 — FINAL UI VERDICT
+
+Answer ONLY:
+
+1. Is UI structure identical? YES or NO  
+2. Is visual layout identical? YES or NO  
+3. Is user interaction identical? YES or NO  
+4. Is there ANY pixel-level difference introduced? YES or NO  
+5. Confidence level (0–100%) UI is unchanged
