@@ -1,0 +1,91 @@
+This is a STRICT PROOF REQUEST. Do NOT explain — SHOW PROOF from the actual running system.
+
+No assumptions. No summaries. Only logs, queries, and exact code paths.
+
+---
+
+SECTION 1 — PARTIAL LEAD EXECUTION PROOF
+
+1. Trigger a real partial lead:
+   - Enter phone in the form
+   - Wait 2–3 seconds OR blur the field
+
+2. Show:
+   - The exact server log entry when /api/partial-lead is hit
+   - The exact SQL insert that runs (or query builder equivalent)
+   - The inserted row from the database:
+
+SELECT id, phone, name, email, created_at
+FROM partial_leads
+ORDER BY created_at DESC
+LIMIT 3;
+
+3. Confirm:
+   → This row was created WITHOUT clicking submit
+
+---
+
+SECTION 2 — SUBMIT FLOW PROOF (MAPQUEST FAILURE)
+
+1. Simulate a MapQuest failure:
+   - Force timeout OR invalid request
+
+2. Show logs in order:
+
+   A. Log when /api/submit-lead is hit  
+   B. Log when MapQuest request starts  
+   C. Log when MapQuest fails or times out  
+   D. Log when DB insert runs  
+   E. Log when Zapier webhook fires  
+
+3. Show proof that ALL still execute:
+
+   - DB insert query or result  
+   - Zapier request log or payload  
+
+---
+
+SECTION 3 — ORDER OF OPERATIONS PROOF
+
+Show the exact code snippet with line numbers where:
+
+- MapQuest is called
+- DB insert runs
+- Zapier is triggered
+
+Confirm visually:
+
+→ DB insert + Zapier are NOT inside any conditional that depends on MapQuest success
+
+---
+
+SECTION 4 — TAB CLOSE PROTECTION PROOF
+
+1. Show the exact fetch call in SimpleQuoteForm.jsx
+
+2. Confirm visually:
+
+   keepalive: true is present
+
+3. Explain (1–2 sentences max):
+
+   → Why this ensures request continues after tab close
+
+---
+
+SECTION 5 — FINAL PROOF STATEMENT
+
+Answer ONLY with:
+
+1. Partial lead fires without submit: YES or NO  
+2. MapQuest failure still saves lead: YES or NO  
+3. MapQuest failure still sends to Zapier: YES or NO  
+4. Tab close after submit still sends request: YES or NO  
+
+---
+
+STRICT RULES:
+
+- No explanations without proof
+- Must include logs OR SQL results OR exact code snippets
+- If something cannot be proven, say NOT VERIFIED
