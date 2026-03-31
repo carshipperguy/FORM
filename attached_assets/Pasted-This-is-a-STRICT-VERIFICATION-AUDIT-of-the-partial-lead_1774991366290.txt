@@ -1,0 +1,109 @@
+This is a STRICT VERIFICATION AUDIT of the partial lead system.
+
+DO NOT change any code.
+
+I need confirmation that the previously implemented partial lead capture is REAL, FUNCTIONAL, and COMPLETE.
+
+---
+
+SECTION 1 — BACKEND ROUTE VERIFICATION
+
+1. Does POST /api/partial-lead exist?
+
+2. Show:
+   - exact file path
+   - full route handler code
+
+3. Confirm:
+   - Does it insert into partial_leads table?
+   - What validation is applied?
+   - What happens if payload is missing phone/email?
+
+4. Confirm deduplication logic:
+   - Is duplicate prevention implemented?
+   - How (phone match? time window?)
+
+---
+
+SECTION 2 — DATABASE VERIFICATION
+
+1. Does table partial_leads exist?
+
+2. Show schema:
+   - all columns
+   - data types
+
+3. Show 5 most recent rows:
+   SELECT * FROM partial_leads ORDER BY created_at DESC LIMIT 5;
+
+4. Confirm:
+   - Are real records being written?
+   - Are timestamps correct?
+
+---
+
+SECTION 3 — FRONTEND TRIGGER VERIFICATION
+
+File: SimpleQuoteForm.jsx
+
+1. Show EXACT code where partial lead is triggered
+
+2. Confirm trigger method:
+   - onBlur?
+   - debounce?
+   - both?
+
+3. Confirm conditions:
+   - Does it require name + phone?
+   - Or phone only?
+
+4. Confirm duplicate prevention:
+   - Is there a useRef flag?
+   - Or debounce logic?
+
+5. Confirm request behavior:
+   - fetch is NOT awaited
+   - wrapped in catch()
+   - uses keepalive: true
+
+---
+
+SECTION 4 — ACTUAL EXECUTION FLOW
+
+Walk through EXACTLY what happens when:
+
+User types:
+- name
+- phone
+- email
+
+Then clicks elsewhere
+
+→ Does request fire? YES or NO
+
+→ What payload is sent EXACTLY
+
+---
+
+SECTION 5 — FAILURE TEST
+
+What happens if:
+
+1. User types info → immediately closes tab  
+2. User types info → refreshes page  
+3. Network is slow or drops mid-request  
+
+For each:
+→ Is partial lead saved? YES or NO
+
+---
+
+SECTION 6 — FINAL VERDICT
+
+Answer clearly:
+
+1. Is partial lead capture FULLY WORKING? YES or NO
+
+2. Is there ANY scenario where a user enters phone/email and we still lose them?
+
+3. Confidence level (0–100%) that leads are no longer being lost before submit
