@@ -1,0 +1,104 @@
+This is a READ-ONLY AUDIT. Do NOT change any code.
+
+I need a complete and exact breakdown of what currently exists for:
+lead capture, partial capture, and event tracking in the quote form app
+
+---
+
+SECTION 1 — PARTIAL LEAD CAPTURE (CRITICAL)
+
+1. Does ANY endpoint exist for partial leads?
+   - /api/partial-lead
+   - or similar
+
+2. If yes:
+   - show exact route file
+   - show payload structure
+   - show database table used
+
+3. If no:
+   - explicitly state: NO PARTIAL LEAD CAPTURE EXISTS
+
+---
+
+SECTION 2 — FRONTEND BEHAVIOR (QUOTE FORM)
+
+File: SimpleQuoteForm.jsx (or equivalent)
+
+1. When does ANY data get sent to backend?
+   - on submit only?
+   - onBlur?
+   - onChange?
+
+2. Are name / phone / email ever sent BEFORE full submit?
+
+3. If yes:
+   - show exact function
+   - show trigger (onBlur, debounce, etc.)
+   - show payload sent
+
+4. If no:
+   - explicitly confirm:
+     User data is NOT captured until full form submission
+
+---
+
+SECTION 3 — EVENT TRACKING (track-event.ts)
+
+1. List ALL events currently firing:
+   - form_loaded
+   - anything else
+
+2. When do they fire?
+
+3. Confirm payload structure EXACTLY
+
+4. Confirm if any user data (name/phone/email) is included in event tracking
+
+---
+
+SECTION 4 — FAILURE SCENARIOS
+
+Walk through EXACTLY what happens if:
+
+1. MapQuest API fails or freezes
+2. User refreshes page mid-form
+3. User closes tab after entering contact info
+
+For each scenario:
+→ Is ANY user data saved? YES or NO
+
+---
+
+SECTION 5 — DATABASE VERIFICATION
+
+List ALL tables related to:
+- quotes
+- leads
+- events
+
+Confirm:
+- Is there ANY table storing partial/incomplete leads?
+
+---
+
+SECTION 6 — FINAL VERDICT (NO FLUFF)
+
+Answer clearly:
+
+1. Are we currently losing users who type contact info but don’t submit?
+   → YES or NO
+
+2. Do we have ANY recovery mechanism for those users?
+   → YES or NO
+
+3. Estimated % of users lost before submit (based on flow structure)
+
+---
+
+STRICT RULES:
+- No assumptions
+- No “should”
+- No suggestions
+- Only what EXISTS in the codebase right now
+- Include file names and line references where applicable
