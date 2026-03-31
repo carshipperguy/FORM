@@ -1,0 +1,66 @@
+You are performing a STRICT READ-ONLY FORENSIC AUDIT of the existing codebase. DO NOT MODIFY CODE. DO NOT SUGGEST IMPROVEMENTS. DO NOT SUMMARIZE. DO NOT INFER. ONLY REPORT WHAT EXISTS WITH FILE + LINE REFERENCES.
+
+OBJECTIVE: Prove, with line-by-line evidence, the exact behavior when MapQuest API fails during `/api/submit-lead`. You must verify: (1) lead is still saved, (2) Zapier/webhook still fires, (3) server still returns 200, (4) frontend still shows success state, (5) user sees NO error.
+
+SECTION 1 — MAPQUEST CALL (SERVER): Locate the exact MapQuest call. Provide file path, function name, and line numbers. Show the request to MapQuest, timeout logic, and error handling block. Confirm what defines failure (statuscode 402, timeout, etc.). Output format:
+File: server/____.ts lines ___–___
+[PASTE EXACT CODE]
+Explanation (1–2 lines max, factual only)
+
+SECTION 2 — FAILURE HANDLING PATH: Trace the exact code path when MapQuest fails. Show try/catch or conditional handling, where failure is detected, and where `mapquestSuccess` is set. Confirm if execution stops or continues. Output:
+File: server/____.ts lines ___–___
+[CODE]
+Result: Execution continues: YES / NO
+
+SECTION 3 — DATABASE WRITE (CRITICAL): Find the exact location where the lead is saved. Confirm if DB write occurs even if MapQuest fails. Show insert/create logic and data being saved. Output:
+File: server/____.ts lines ___–___
+[CODE]
+Condition: Runs when mapquestSuccess = false: YES / NO
+
+SECTION 4 — ZAPIER / WEBHOOK EXECUTION: Locate the webhook trigger. Confirm if webhook fires even if MapQuest fails. Show fetch/axios call and placement relative to MapQuest logic. Output:
+File: server/____.ts lines ___–___
+[CODE]
+Condition: Runs when mapquestSuccess = false: YES / NO
+
+SECTION 5 — FINAL SERVER RESPONSE: Locate the response block. Confirm HTTP status code and JSON body. Verify exact values of `success` and `mapquestSuccess`. Output:
+File: server/____.ts lines ___–___
+[CODE]
+Response Example: { success: ?, mapquestSuccess: ? }
+HTTP Status: 200 / other
+
+SECTION 6 — FRONTEND SUBMIT FLOW: Locate handleSubmit in `client/src/components/SimpleQuoteForm.jsx`. Show entire submit function, fetch call, and response parsing. Output:
+File: client/src/components/SimpleQuoteForm.jsx lines ___–___
+[CODE]
+
+SECTION 7 — SUCCESS CONDITION (FRONTEND LOGIC): Find the exact condition that determines success UI. Confirm whether frontend checks ONLY `response.success` or also `mapquestSuccess`. Output:
+File: client/src/components/SimpleQuoteForm.jsx lines ___–___
+[CODE]
+Condition used: if ( ______ )
+
+SECTION 8 — UI STATE TRANSITIONS (PIXEL LEVEL): Trace exact UI changes after submit. Show where `setIsSubmitting(true)` is called, what disables the button, and what triggers success UI. Output:
+File: client/src/components/SimpleQuoteForm.jsx lines ___–___
+[CODE BLOCKS ONLY]
+List:
+- Button disabled at line ___
+- Success triggered at line ___
+- Redirect / message at line ___
+
+SECTION 9 — FAILURE VISIBILITY CHECK: Search entire frontend for `mapquestSuccess`. Confirm if it is EVER used in UI. Output:
+Found in frontend: YES / NO
+If YES: file + lines + code
+If NO: state clearly: NOT USED IN UI
+
+SECTION 10 — FINAL EXECUTION TRACE: Reconstruct exact runtime path from user click to UI success with MapQuest failure. Output STRICTLY:
+1. User clicks submit → line ___
+2. setIsSubmitting(true) → line ___
+3. fetch('/api/submit-lead') → line ___
+4. Server: MapQuest fails → line ___
+5. Server continues execution → line ___
+6. DB write occurs → line ___
+7. Webhook fires → line ___
+8. Server returns { success: true, mapquestSuccess: false } → line ___
+9. Frontend receives response → line ___
+10. Success condition triggered → line ___
+11. UI updates (describe exact change) → line ___
+
+HARD RULES: NO ASSUMPTIONS. NO SUMMARIES. NO “LIKELY”. NO “SHOULD”. ONLY WHAT EXISTS IN CODE. If any step cannot be proven with code, state: NOT FOUND IN CODEBASE.
