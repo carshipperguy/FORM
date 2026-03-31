@@ -1,0 +1,144 @@
+🔒 REPLIT MASTER AUDIT PROMPT (FEASIBILITY ONLY — NO CODE PUSHES)
+
+Send this exactly:
+
+OBJECTIVE (READ CAREFULLY)
+
+We are conducting a read-only feasibility + risk audit of our quote form.
+
+DO NOT implement anything. DO NOT push code. DO NOT modify behavior.
+
+We need a forensic breakdown of current behavior and safe options only.
+
+This is revenue-critical and UX-sensitive — one wrong move could cost thousands.
+
+CONTEXT
+
+Our quote form depends on MapQuest for location lookup.
+
+Observed issue:
+
+When MapQuest hangs or fails, the UI enters a spinner or blocked state
+Users may already have entered:
+name
+phone
+email
+If they abandon → we lose the lead entirely
+We currently have zero visibility into drop-off at this stage
+SECTION 1 — MAPQUEST FAILURE BEHAVIOR (CODE-LEVEL)
+
+Identify EXACTLY:
+
+Where MapQuest is called in the frontend
+file paths
+functions/components
+What happens when:
+request resolves successfully
+request errors
+request NEVER resolves (hang)
+Does the UI:
+block interaction?
+show spinner indefinitely?
+disable submit?
+Is there:
+any timeout logic?
+any fallback UI?
+any error boundary?
+
+We need real behavior, not assumptions.
+
+SECTION 2 — DATA LOSS ANALYSIS
+
+Trace the lifecycle of these fields:
+
+name
+phone
+email
+
+Answer:
+
+When are these values first stored anywhere?
+local state?
+global state?
+backend?
+Are they EVER persisted before final form submission?
+If user refreshes or leaves:
+is anything saved?
+or is everything lost?
+Is there any localStorage/sessionStorage usage?
+SECTION 3 — DROP-OFF BLIND SPOT
+
+Confirm:
+
+Do we track ANY of the following events?
+form started
+contact fields touched
+MapQuest request initiated
+MapQuest failure/timeout
+form abandonment
+If not:
+confirm we currently have zero visibility into this failure point
+SECTION 4 — SAFE FEASIBILITY OPTIONS (NO IMPLEMENTATION)
+
+We need YOU to evaluate feasibility of the following — based on OUR codebase:
+
+A. Passive Analytics (No Data Capture)
+Can we safely track events without affecting UI?
+Where would this hook in?
+B. MapQuest Timeout Detection
+Can we safely wrap MapQuest calls with a timeout?
+What would break if we do?
+Are there race conditions?
+C. UI Fallback (No Data Capture)
+Can we unlock the UI if MapQuest hangs?
+Can we allow manual city/state entry?
+What dependencies would this impact?
+D. Partial Lead Capture (STRICTLY ANALYSIS)
+Where would we hook capture of:
+name
+phone
+email
+What are the risks in OUR system:
+duplicate leads?
+broken session linking?
+CRM pollution?
+Would this conflict with:
+validation logic?
+submission flow?
+SECTION 5 — RISK ANALYSIS (CRITICAL)
+
+For EACH option above, provide:
+
+UX risk (low / medium / high)
+Engineering risk (low / medium / high)
+Data integrity risk
+Any edge cases specific to OUR codebase
+SECTION 6 — RECOMMENDED SAFE PATH
+
+Based on our actual system, recommend:
+
+The safest FIRST step (no risk)
+The next step after validation
+What we should absolutely NOT do
+HARD RULES
+NO code changes
+NO assumptions
+NO generic answers
+Must reference:
+actual files
+actual logic
+actual behavior
+OUTPUT FORMAT
+
+We want a structured, technical audit — not a summary.
+
+🧠 WHY THIS IS THE RIGHT APPROACH
+
+This forces Replit to:
+
+read your actual implementation
+identify real failure points
+quantify risk BEFORE touching anything
+
+Instead of:
+“yeah let’s just capture leads” → 💀
