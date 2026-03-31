@@ -1,0 +1,234 @@
+READ-ONLY AUDIT REQUEST — ZERO CODE CHANGES ALLOWED
+
+You are auditing a live production lead capture system.
+This is a **STRICT READ-ONLY ANALYSIS**.
+
+DO NOT:
+
+* Write code
+* Suggest refactors
+* Change logic
+* Propose UI redesigns
+* Modify timeouts
+* Touch MapQuest logic
+* Touch submission flow
+
+You are ONLY mapping behavior and identifying safe instrumentation points.
+
+---
+
+OBJECTIVE
+
+We need to understand **lead drop-off, failure points, and observability gaps** in the quote form system WITHOUT introducing any risk to production.
+
+The system currently:
+
+* Uses `/api/submit-lead` as the single backend entry point
+* Calls MapQuest server-side with an 8s AbortController
+* Uses a 12s client timeout
+* Always saves leads to DB + fires Zapier even if MapQuest fails
+
+We have confirmed:
+
+* No infinite spinner
+* No post-submit data loss
+* BUT zero visibility into drop-off and failures
+
+---
+
+SECTION 1 — FULL SUBMISSION FLOW TRACE
+
+Trace the COMPLETE lifecycle of a lead from:
+
+1. Page load
+2. First user interaction
+3. Location selection
+4. Vehicle selection
+5. Shipment date selection
+6. Contact fields appearing
+7. User typing name/phone/email
+8. Submit button click
+9. `/api/submit-lead` request
+10. MapQuest execution
+11. DB insert
+12. Zapier webhook
+13. Response returned to client
+14. Final UI rendered (price vs fallback)
+
+For EACH step, provide:
+
+* File name
+* Function name
+* Line numbers
+* Whether the step is:
+  (a) synchronous
+  (b) async but awaited
+  (c) fire-and-forget
+* Whether failure at this step:
+  → blocks submission
+  → degrades gracefully
+  → is invisible
+
+---
+
+SECTION 2 — DATA PERSISTENCE MAP
+
+Map EXACTLY where each field exists at every stage:
+
+Fields:
+
+* pickupLocation
+* dropoffLocation
+* vehicle (year/make/model/type)
+* shipmentDate
+* name
+* phone
+* email
+
+For each field, define:
+
+Before submit:
+
+* React state?
+* localStorage?
+* sessionStorage?
+* nowhere?
+
+During submit:
+
+* included in payload?
+* transformed?
+
+After submit:
+
+* stored in DB?
+* stored in sessionStorage?
+
+Explicitly confirm:
+👉 At what exact line does the FIRST durable persistence occur?
+
+---
+
+SECTION 3 — DROP-OFF BLIND SPOTS
+
+Identify ALL points where a user can exit and we lose visibility:
+
+Examples:
+
+* Page load bounce
+* Before contact fields appear
+* After entering contact info but before submit
+* During spinner
+* During API call
+* After timeout but before UI render
+
+For EACH point:
+
+* Is anything logged? (yes/no)
+* Where? (console / DB / nowhere)
+* Is it queryable? (yes/no)
+
+---
+
+SECTION 4 — SAFE INSTRUMENTATION POINTS (CRITICAL)
+
+Identify EXACT hook points where we can add **PASSIVE EVENT LOGGING ONLY**.
+
+STRICT RULES:
+
+* Must NOT block execution
+* Must NOT await anything
+* Must NOT modify existing logic
+* Must NOT introduce race conditions
+
+For EACH safe hook, provide:
+
+* File + line number
+* Event name suggestion
+* What data is safely available at that moment
+* Why it is safe (non-blocking, post-state-set, etc.)
+
+Required events to map:
+
+* form_loaded
+* contact_fields_shown
+* submit_clicked
+* submit_success
+* mapquest_failed
+* client_timeout_triggered
+
+---
+
+SECTION 5 — TIMEOUT + RACE CONDITION ANALYSIS
+
+Validate:
+
+* Server MapQuest timeout (8s)
+* Client fetch timeout (12s)
+* Zapier timeout (~15s)
+
+Answer:
+
+1. Can client timeout BEFORE server completes?
+2. If yes, what EXACT user experience occurs?
+3. Does DB insert still happen?
+4. Does Zapier still fire?
+5. Does user see error vs success UI?
+
+No guessing — reference exact code paths.
+
+---
+
+SECTION 6 — PARTIAL LEAD CAPTURE FEASIBILITY (NO IMPLEMENTATION)
+
+Analyze ONLY — do NOT suggest implementation.
+
+Answer:
+
+1. Where could name/phone/email theoretically be captured pre-submit?
+2. What validation would fail if sent to `/api/submit-lead`?
+3. Would Zapier fire incorrectly?
+4. Would duplicates occur?
+5. Is there ANY existing deduplication logic tied to sessionId?
+
+---
+
+SECTION 7 — CURRENT GUARANTEES (VERIFY)
+
+Confirm with code references:
+
+* No infinite spinner exists
+* MapQuest failure does NOT block lead save
+* DB insert always occurs on valid submit
+* Zapier always fires after DB insert
+* UI always resolves to either:
+  → price page
+  → fallback "we'll call you" page
+
+---
+
+OUTPUT FORMAT (MANDATORY)
+
+* No summaries
+* No opinions
+* No recommendations unless explicitly asked
+* No code blocks
+* No pseudocode
+
+Use STRICT STRUCTURE:
+
+SECTION X — TITLE
+→ Bulletproof, line-referenced findings only
+
+---
+
+FINAL WARNING
+
+This is a HIGH-RISK production system.
+
+Any incorrect assumption or hallucinated logic could cost thousands in lost leads.
+
+If something is uncertain:
+→ say "NOT VERIFIED IN CODE"
+
+DO NOT GUESS.
