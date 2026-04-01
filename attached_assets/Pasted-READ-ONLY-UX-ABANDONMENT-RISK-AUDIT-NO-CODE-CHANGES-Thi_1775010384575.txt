@@ -1,0 +1,207 @@
+READ-ONLY UX + ABANDONMENT RISK AUDIT — NO CODE CHANGES
+
+This is a STRICT READ-ONLY audit of the quote form.
+
+DO NOT:
+
+* write code
+* refactor anything
+* change validation
+* change UI
+* change submission logic
+
+We are identifying ALL points of potential user confusion, friction, or abandonment.
+
+---
+
+OBJECTIVE
+
+Find anything in the form flow that could cause a user to:
+
+* abandon the form
+* get confused
+* think something failed
+* hesitate to submit
+* enter incorrect data
+* get blocked or frustrated
+
+We are looking for SMALL UX issues that have BIG impact.
+
+---
+
+SECTION 1 — REQUIRED FIELD VALIDATION
+
+Audit validateForm() and all required inputs.
+
+For each required field:
+
+* Where is validation triggered?
+* What message is shown?
+* Is the message specific or vague?
+* Is the message visible immediately or only on submit?
+
+Identify:
+
+* Any vague errors (e.g. “Invalid input”)
+* Any missing field highlighting
+* Any fields that fail silently
+* Any fields where user may not understand what’s wrong
+
+---
+
+SECTION 2 — FIELD ORDER + FLOW LOGIC
+
+Audit the order of inputs:
+
+* location → vehicle → date → contact
+
+Check:
+
+* Does anything appear “out of order”?
+* Does anything feel like a sudden jump?
+* Are contact fields gated behind shipmentDate?
+
+Specifically confirm:
+
+* Contact fields ONLY appear after shipmentDate
+* Is that behavior obvious to user?
+
+Identify:
+
+* Any point where a user might think the form is broken
+* Any point where fields “suddenly appear” with no explanation
+
+---
+
+SECTION 3 — LOCATION INPUT (HIGH RISK)
+
+Audit LocationMenuSelector:
+
+* Does user HAVE to pick from dropdown?
+* What happens if they type but don’t select?
+* Is there any error if zipCode is missing?
+* Is behavior obvious?
+
+Identify:
+
+* Cases where user thinks they entered location but didn’t actually select
+* Any silent failures
+* Any confusion between typed text vs selected value
+
+---
+
+SECTION 4 — SUBMIT BUTTON BEHAVIOR
+
+Audit:
+
+* Button disabled state
+* Spinner behavior
+* Text: “Calculating Quote...”
+
+Check:
+
+* Is it obvious something is happening?
+* Is there ANY feedback delay?
+* Could user click multiple times?
+
+Identify:
+
+* Any delay between click and spinner
+* Any chance user thinks click didn’t register
+
+---
+
+SECTION 5 — TIMEOUT / ERROR EXPERIENCE
+
+Audit catch(error) block:
+
+* alert("There was an error processing your request")
+
+Identify:
+
+* Is this message misleading?
+* Could this appear even if lead was saved?
+* Would user think submission failed?
+
+Confirm exact conditions where this alert fires.
+
+---
+
+SECTION 6 — FINAL TRANSITION TO /final-quote
+
+Audit:
+
+* sessionStorage write
+* navigate('/final-quote')
+
+Check:
+
+* Is there any delay before redirect?
+* Any chance sessionStorage fails?
+* Any flicker or hesitation?
+
+---
+
+SECTION 7 — MOBILE UX RISKS
+
+Audit mobile-specific behavior:
+
+* input focus
+* dropdown usability
+* keyboard overlap
+* date picker usability
+
+Identify:
+
+* anything harder on mobile vs desktop
+* any hidden fields or clipped UI
+
+---
+
+SECTION 8 — MICRO-FRICTION / TRUST ISSUES
+
+Identify:
+
+* anything that could make user hesitate:
+
+  * phone/email entry timing
+  * lack of reassurance
+  * unclear next step
+
+* anything that feels “off” or unclear
+
+---
+
+SECTION 9 — QUICK WINS (NO CODE CHANGES YET)
+
+List:
+
+* top 5 highest-impact friction points
+* each with:
+
+  * exact file + line reference
+  * why it causes abandonment
+  * how often it likely occurs (high / medium / low)
+
+---
+
+OUTPUT RULES
+
+* No solutions yet
+* No code suggestions
+* No redesign proposals
+
+ONLY:
+
+* findings
+* file paths
+* line numbers
+* behavior analysis
+
+---
+
+FINAL NOTE
+
+Assume every small confusion point can cost real leads.
+
+Be extremely critical.
