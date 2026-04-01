@@ -60,6 +60,41 @@ export function initLocationService(): void {
 /**
  * Search for locations by query string
  */
+const US_STATE_ABBREVS = new Set([
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+  'VA','WA','WV','WI','WY','DC','PR','GU','VI','AS','MP'
+]);
+
+/**
+ * Normalizes a user-typed query to handle "City STATE" without comma.
+ * "Chicago IL" → "Chicago, IL"
+ * "chicago il" → "chicago, il"
+ * "Los Angeles CA" → "Los Angeles, CA"
+ * Returns both the original and normalized form so both are tried.
+ */
+function buildQueryVariants(raw: string): string[] {
+  const trimmed = raw.trim();
+  const variants: string[] = [trimmed.toLowerCase()];
+
+  // Match "City STATE" pattern: one or more words, optional whitespace, 2-letter state
+  // Handles: "Chicago IL", "Chicago  IL", "Los Angeles CA"
+  const cityStatePattern = /^(.+?)\s+([A-Za-z]{2})$/;
+  const match = trimmed.match(cityStatePattern);
+  if (match) {
+    const possibleState = match[2].toUpperCase();
+    if (US_STATE_ABBREVS.has(possibleState)) {
+      const normalized = `${match[1].trim()}, ${possibleState}`.toLowerCase();
+      if (!variants.includes(normalized)) {
+        variants.push(normalized);
+      }
+    }
+  }
+
+  return variants;
+}
+
 export function searchLocations(query: string, limit: number = 200): LocationOption[] {
   if (!initialized) {
     console.warn('⚠️ Location service not initialized yet');
@@ -68,49 +103,45 @@ export function searchLocations(query: string, limit: number = 200): LocationOpt
   
   if (!query) return [];
   
-  const queryLower = query.trim().toLowerCase();
+  const trimmed = query.trim();
+  if (trimmed.length === 0) return [];
+
+  const queryVariants = buildQueryVariants(trimmed);
   
-  if (queryLower.length === 0) return [];
-  
-  // Search by city, state, or zip code
-  const matches = locationOptions.filter(option => {
-    // Match by city (starts with has priority, then contains)
-    if (option.city.toLowerCase().startsWith(queryLower)) {
-      return true;
+  // Search by city, state, zip, or value — try all query variants
+  const seen = new Set<string>();
+  const matches: LocationOption[] = [];
+
+  for (const queryLower of queryVariants) {
+    for (const option of locationOptions) {
+      if (seen.has(option.value)) continue;
+
+      const cityLower = option.city.toLowerCase();
+      const stateLower = option.state.toLowerCase();
+      const valueLower = option.value.toLowerCase();
+
+      if (
+        cityLower.startsWith(queryLower) ||
+        cityLower.includes(queryLower) ||
+        stateLower.startsWith(queryLower) ||
+        valueLower.includes(queryLower) ||
+        (option.zips && option.zips.some(zip => zip.startsWith(queryLower))) ||
+        (option.zips && option.zips.some(zip => zip.includes(queryLower)))
+      ) {
+        seen.add(option.value);
+        matches.push(option);
+        if (matches.length >= limit) break;
+      }
     }
-    if (option.city.toLowerCase().includes(queryLower)) {
-      return true;
-    }
-    
-    // Match by state
-    if (option.state.toLowerCase().startsWith(queryLower)) {
-      return true;
-    }
-    
-    // Match by full location value
-    if (option.value.toLowerCase().includes(queryLower)) {
-      return true;
-    }
-    
-    // Match by ZIP - prioritize ZIPs that START with query for better UX
-    if (option.zips && option.zips.some(zip => zip.startsWith(queryLower))) {
-      return true;
-    }
-    
-    // Fallback: match ZIPs that contain query
-    if (option.zips && option.zips.some(zip => zip.includes(queryLower))) {
-      return true;
-    }
-    
-    return false;
-  });
+    if (matches.length >= limit) break;
+  }
 
   // Return lightweight objects with just the needed fields
   return matches.slice(0, limit).map(option => ({
     value: option.value,
     city: option.city, 
     state: option.state,
-    zips: option.zips.slice(0, 5) // Limit ZIP list for reduced payload size
+    zips: option.zips.slice(0, 5)
   }));
 }
 

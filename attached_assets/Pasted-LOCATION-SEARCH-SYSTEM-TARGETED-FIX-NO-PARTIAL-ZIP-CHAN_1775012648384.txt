@@ -1,0 +1,126 @@
+LOCATION SEARCH SYSTEM — TARGETED FIX (NO PARTIAL ZIP CHANGES)
+
+We are fixing ONLY two issues in the location selector:
+
+1. Missing ZIP codes (~2,500–3,000 gap)
+2. City input formatting ("Chicago IL" vs "Chicago, IL")
+
+DO NOT modify partial ZIP behavior in any way.
+
+---
+
+STRICT RULES
+
+* DO NOT change partial ZIP search logic
+* DO NOT change dropdown UI structure
+* DO NOT change selection mechanism
+* DO NOT change validation rules
+* DO NOT impact MapQuest input formatting
+* DO NOT introduce regressions in pricing or submission flow
+
+This must be a safe, isolated improvement.
+
+---
+
+SECTION 1 — ZIP COVERAGE (CRITICAL)
+
+Problem:
+Thousands of real ZIP codes are missing → users cannot find themselves
+
+Requirements:
+
+* Expand ZIP dataset toward full US coverage (~41,000 ZIPs)
+* Ensure major metro areas are fully covered:
+
+  * Boston (02101)
+  * San Francisco (94101)
+  * NYC, LA, Chicago, Houston, etc.
+
+Validation:
+
+* Typing a valid ZIP MUST return results
+* No empty dropdown for valid US ZIPs
+
+Rules:
+
+* Maintain correct mapping:
+  ZIP ↔ City ↔ State
+* No duplicate/conflicting entries
+* Preserve existing schema
+
+---
+
+SECTION 2 — FLEXIBLE CITY INPUT (HIGH PRIORITY)
+
+Problem:
+Users type:
+"Chicago IL"
+
+System expects:
+"Chicago, IL"
+
+Requirements:
+
+Normalize user input BEFORE search:
+
+* Accept:
+  "Chicago IL"
+  "ChicagoIL"
+  "Chicago  IL"
+  "chicago il"
+
+* Convert internally to:
+  "Chicago, IL"
+
+Rules:
+
+* Ignore comma requirement
+* Trim whitespace
+* Case-insensitive matching
+* DO NOT require strict formatting
+
+---
+
+SECTION 3 — SEARCH MATCHING IMPROVEMENT
+
+Ensure:
+
+* City + State matches return correctly even without comma
+* ZIP matches still work as before
+* No degradation of existing search performance
+
+---
+
+SECTION 4 — DO NOT TOUCH (IMPORTANT)
+
+* Partial ZIP behavior (leave exactly as-is)
+* Dropdown rendering logic
+* onChange / selection logic
+* validation logic in SimpleQuoteForm
+* MapQuest integration
+* backend pricing logic
+
+---
+
+SECTION 5 — VALIDATION CHECK
+
+After implementation confirm:
+
+* Valid ZIP always returns results
+* "Chicago IL" returns Chicago, IL
+* No empty dropdown for real locations
+* No regression in form submission
+* No change to how users select locations
+
+---
+
+FINAL NOTE
+
+This is a precision fix.
+
+We are improving:
+
+* data completeness
+* input tolerance
+
+WITHOUT altering behavior or UX structure.
