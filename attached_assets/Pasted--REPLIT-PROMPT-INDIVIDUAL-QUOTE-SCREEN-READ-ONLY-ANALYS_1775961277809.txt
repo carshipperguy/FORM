@@ -1,0 +1,116 @@
+🔍 REPLIT PROMPT — INDIVIDUAL QUOTE SCREEN (READ-ONLY ANALYSIS)
+
+NO CODE CHANGES — ANALYSIS ONLY
+
+🎯 CONTEXT (IMPORTANT)
+
+This is specifically about the Individual Quote Screen UI in ShipDesk.
+
+On this screen, we have:
+
+Top header section (where Current Status is shown)
+Quote Activity Log (right side panel)
+Sales actions like sending emails, setting follow-ups, etc.
+
+Everything below refers ONLY to behavior on this screen.
+
+🔴 ISSUE 1 — DUPLICATE EMAIL ENTRIES (QUOTE ACTIVITY LOG)
+What’s Happening
+
+On the Individual Quote Screen → Quote Activity Log:
+
+Example:
+
+Sales rep sends an email
+Activity log correctly shows: “Email Sent” at a specific timestamp (ex: April 11, 7:13 PM)
+
+However:
+
+That same email event is being logged multiple times
+It appears more than once in the Quote Activity Log
+Why This Is a Problem
+Activity log becomes bloated
+Timeline becomes hard to read
+Same action appears duplicated
+Reduces clarity for sales + ops
+What I Need You To Do
+Trace exactly:
+Where “Email Sent” logs are created
+Which functions/endpoints fire when email is sent from the quote screen
+Identify:
+Why the same event is being inserted more than once
+Whether:
+frontend is triggering multiple calls
+backend is logging multiple times
+or multiple listeners are attached
+Confirm feasibility:
+Can we enforce 1 activity log entry per email action
+Without breaking anything else
+🔴 ISSUE 2 — FOLLOW-UP DATE NOT VISIBLE IN HEADER (INDIVIDUAL QUOTE SCREEN)
+Current Behavior
+
+On the Individual Quote Screen:
+
+At the top, we show:
+
+Current Status: Follow Up
+
+Inside the Activity Log UI, the follow-up date is already being set and stored
+
+BUT:
+
+👉 That follow-up date is NOT visible in the top header section
+
+What I Want
+
+If a follow-up date exists, it should ALSO appear next to the status at the top.
+
+Example:
+
+Current Status: Follow Up (Apr 14)
+OR
+Current Status: Follow Up — Next: Apr 14
+Important Clarification
+We are NOT creating a new field
+We are NOT changing how follow-ups are set
+
+👉 The data already exists
+👉 It is already used in the Activity Log UI
+
+This is purely:
+
+making that same data visible in the header
+
+What I Need You To Do
+Identify:
+Where the follow-up date is stored (DB field / state)
+How it is currently rendered in the activity log
+Locate:
+The component responsible for Current Status display on the Individual Quote Screen
+Determine:
+If the follow-up date can be safely accessed and displayed there
+Whether this is:
+a simple UI addition
+or requires refactoring
+⚠️ CONSTRAINTS
+NO code changes yet
+NO assumptions
+DO NOT implement anything
+This is analysis only
+✅ EXPECTED OUTPUT
+
+Provide:
+
+Confirmation you understand BOTH issues in the context of the Individual Quote Screen
+Root cause analysis for duplicate email logs
+Exact files / functions / components involved
+Feasibility assessment (easy / moderate / complex)
+Any risks or edge cases
+💬 FINAL NOTE
+
+This is about:
+
+cleaning up the Quote Activity Log
+improving visibility of follow-ups at the top of the screen
+
+Both directly impact how sales and ops use the Individual Quote Screen daily
