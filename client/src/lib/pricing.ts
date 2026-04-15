@@ -234,6 +234,11 @@ export function calculatePrice(
     openTransportPrice = basePrice * vehicleMultiplier;
   }
 
+  // ACROSS THE BOARD +20% — applied after all existing logic so every vehicle type is truly 20% higher
+  const priceBeforeGlobal20 = openTransportPrice;
+  openTransportPrice = openTransportPrice * 1.20;
+  console.log(`🔄 GLOBAL +20%: $${priceBeforeGlobal20.toFixed(2)} → $${openTransportPrice.toFixed(2)}`);
+
   if (ENABLE_NEW_SPECIAL_PRICING && isSpecialVehicleType(vehicleType)) {
     console.log('🔍🔍🔍 RV PRICING FINAL:', {
       vehicleType,
