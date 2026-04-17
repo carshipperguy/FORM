@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Gjl7J39lmwhE5YadUDZQ1"
+uri = "file://drop_offs.csv"
+type = "table"
+title = "466 Drop-offs — Name, Phone, Email, Vehicle, Date"
