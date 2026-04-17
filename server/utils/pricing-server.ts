@@ -116,6 +116,9 @@ export function calculatePriceServer(
     openTransportPrice = basePrice * vehicleMultiplier;
   }
 
+  // ACROSS THE BOARD +20% — mirrors pricing.ts exactly
+  openTransportPrice = openTransportPrice * 1.20;
+
   let enclosedTransportPrice = openTransportPrice * ENCLOSED_MULTIPLIER;
 
   openTransportPrice = Math.max(openTransportPrice, 695);
