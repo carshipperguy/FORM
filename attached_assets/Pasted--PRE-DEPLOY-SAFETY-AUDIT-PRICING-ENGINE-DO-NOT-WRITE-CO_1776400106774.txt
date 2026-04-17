@@ -1,0 +1,132 @@
+🔴 PRE-DEPLOY SAFETY AUDIT — PRICING ENGINE
+
+DO NOT WRITE CODE
+DO NOT DEPLOY
+AUDIT ONLY
+
+🎯 OBJECTIVE
+
+We are adding a ×1.20 multiplier inside:
+
+client/src/lib/pricing.ts
+
+You must verify this change has ZERO unintended consequences anywhere in the app.
+
+🔍 FULL SYSTEM AUDIT
+1. SOURCE OF TRUTH (CRITICAL)
+
+Confirm:
+
+Pricing is calculated only in:
+client/src/lib/pricing.ts
+No other files:
+recompute pricing
+override pricing
+apply additional multipliers
+2. MULTIPLIER SAFETY
+
+Confirm:
+
+×1.20 is applied exactly once
+Not applied:
+earlier in the flow
+later in the flow
+inside helper functions
+3. ORDER OF OPERATIONS
+
+List exact execution order:
+
+base calculation
+distance adjustments
+vehicle multipliers
+route minimums
+existing multipliers
+new ×1.20
+enclosed calculation
+final rounding
+
+👉 Must match actual code order
+
+4. MINIMUM RULES BEHAVIOR
+
+Confirm:
+
+Whether minimums:
+are applied before multiplier
+are applied after multiplier
+
+List final effective minimums after change.
+
+5. DATA FLOW
+
+Trace where pricing values go:
+
+where openTransport / enclosedTransport are:
+stored
+passed
+displayed
+
+Confirm:
+
+No transformation happens after pricing.ts
+Values remain consistent everywhere
+6. UI CONSISTENCY
+
+Confirm:
+
+displayed price = stored price (if stored)
+no stale values after recalculation
+no flicker between old/new values
+7. EDGE CASE TESTING
+
+Simulate:
+
+very short routes
+routes hitting minimums
+mid-range quotes
+long routes
+enclosed transport
+all vehicle types
+
+Confirm:
+
+no zero values
+no negative values
+no extreme spikes outside expected logic
+8. DEPENDENCY CHECK
+
+Search entire codebase for:
+
+any logic depending on price ranges
+any conditions like:
+if (price < X) or if (price > X)
+
+Confirm:
+
+nothing breaks due to higher pricing
+9. FAILURE SAFETY
+
+If pricing.ts fails:
+
+does app crash?
+or return safe fallback values?
+📤 REQUIRED OUTPUT
+YES / NO — Safe to Deploy
+Exact confirmation of:
+single multiplier application
+correct order of operations
+Any hidden dependencies found
+Any edge cases that behave differently
+Final go / no-go
+🔥 STANDARD
+
+Do NOT assume safety because “it’s a small change”
+
+You must:
+
+trace the full lifecycle of pricing
+confirm no duplicate logic
+confirm no hidden dependencies
+💥 GOAL
+
+Zero surprises after deploy
