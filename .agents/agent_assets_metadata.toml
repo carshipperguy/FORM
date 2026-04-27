@@ -12,3 +12,9 @@ id = "iAPwQOr7o4gxB10NBRhAz"
 uri = "file://true_dropoffs.csv"
 type = "table"
 title = "187 True Drop-offs — Not in CRM"
+
+[[outputs]]
+id = "4-b-UnWjUhiFl7RVI1k-U"
+uri = "file://dropoffs.csv"
+type = "table"
+title = "325 Drop-off Leads — Never Reached Zapier"
