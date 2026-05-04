@@ -1,0 +1,138 @@
+We need to identify a critical production issue:
+
+Users are successfully filling out the quote form and hitting submit, but some leads are not appearing in the system.
+
+This is NOT about dropdown selection or ZIP validation. The form allows correction and users can submit successfully.
+
+We need a full end-to-end audit of what happens AFTER the user clicks submit.
+
+---
+
+## CORE QUESTION
+
+For a submitted form, identify EVERY point where the lead could fail to be captured or lost.
+
+Trace the full pipeline:
+
+Frontend → /api/submit-lead → database → Zapier webhook → CRM
+
+---
+
+1. FRONTEND SUBMISSION
+
+---
+
+* Does the form always send a request on submit?
+* Are there any conditions where fetch() fails silently?
+* Are there any uncaught errors that would prevent the request from firing?
+
+Log:
+
+* how many submit attempts vs how many requests actually sent
+
+---
+
+2. BACKEND ENDPOINT (/api/submit-lead)
+
+---
+
+* Under what conditions does this endpoint:
+
+  * throw an error
+  * return non-200
+  * fail to insert into DB
+
+* Is there any scenario where:
+
+  * the request succeeds but DB insert fails silently?
+  * Promise.allSettled hides failures?
+
+Show all failure paths.
+
+---
+
+3. DATABASE INSERT
+
+---
+
+* Can db.insert(fallbackLeads) ever fail?
+* If it fails, is it logged or silently ignored?
+* Are there any rate limits, connection issues, or race conditions?
+
+---
+
+4. WEBHOOK / ZAPIER
+
+---
+
+* Does sendToWebhook ever fail?
+
+* If it fails:
+
+  * is it logged?
+  * is it retried?
+  * is it swallowed?
+
+* Are there cases where:
+
+  * DB insert succeeds but webhook fails?
+  * webhook succeeds but Zapier does not run?
+
+---
+
+5. ZAPIER FAILURE VISIBILITY
+
+---
+
+* Are we logging webhook responses?
+* Do we know if Zapier returns errors?
+* Are failed webhook attempts visible anywhere?
+
+---
+
+6. DROP-OFF POINT IDENTIFICATION
+
+---
+
+Give exact scenarios where a lead is LOST:
+
+Example:
+
+* user submits → frontend ok → backend ok → DB fails → no retry → lead lost
+* user submits → backend ok → webhook fails → no retry → lead never reaches CRM
+
+List ALL such paths.
+
+---
+
+7. REQUIRED FIXES
+
+---
+
+Provide specific fixes to guarantee:
+
+* 100% of successful form submissions result in:
+  → DB insert
+  → webhook send
+  → visible log of success/failure
+
+Include:
+
+* retry logic if needed
+* logging improvements
+* error handling fixes
+
+---
+
+8. OUTPUT REQUIRED
+
+---
+
+I need:
+
+* exact failure points
+* exact code locations
+* confirmation whether leads can currently be lost after submit
+* exact fix plan to guarantee no lead loss
+
+This is a production-critical issue.
