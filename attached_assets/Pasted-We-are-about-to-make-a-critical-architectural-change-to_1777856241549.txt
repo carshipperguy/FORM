@@ -1,0 +1,168 @@
+We are about to make a critical architectural change to the quote form: removing strict location validation so we NEVER lose a lead.
+
+Before we do anything, I need a full feasibility and safety audit based on the ACTUAL codebase.
+
+This is NOT theoretical. You have full access to the code — I need precise answers.
+
+---
+
+## CORE QUESTION (NON-NEGOTIABLE)
+
+If we allow the form to submit with:
+
+* pickupZip = null
+* dropoffZip = null
+* no dropdown selection
+* MapQuest distance possibly failing
+* price possibly null
+
+WILL the backend still:
+
+1. Accept the request without throwing
+2. Persist the lead in the database
+3. Successfully fire the Zapier webhook
+4. Send a valid payload (even if fields are null)
+
+I need definitive answers based on code, not assumptions.
+
+---
+
+1. CURRENT WEBHOOK DEPENDENCIES
+
+---
+
+Audit the Zapier webhook flow:
+
+* Where exactly is the webhook triggered? (file + function)
+* What conditions must be met BEFORE it fires?
+
+Specifically check:
+
+* Does webhook firing depend on:
+
+  * valid ZIP?
+  * successful location resolution?
+  * successful MapQuest distance?
+  * successful price calculation?
+
+If ANY of those are required → show exact code that enforces it.
+
+---
+
+2. PAYLOAD STRUCTURE VALIDATION
+
+---
+
+Show the exact payload being sent to Zapier today.
+
+Then answer:
+
+* Which fields are REQUIRED vs OPTIONAL?
+* Will null values cause:
+
+  * runtime errors?
+  * type errors?
+  * rejected requests?
+
+Check for things like:
+
+* .toString() on null
+* number parsing on undefined
+* required schema validation
+
+---
+
+3. BACKEND REQUEST HANDLING
+
+---
+
+Audit the API endpoint that receives the form submission:
+
+* Does it validate:
+
+  * pickupZip
+  * dropoffZip
+  * distance
+  * price
+
+* Does it reject requests if any of those are missing?
+
+Show exact validation logic and failure paths.
+
+---
+
+4. DATABASE CONSTRAINTS
+
+---
+
+Check the database schema:
+
+* Are pickup_zip / dropoff_zip nullable?
+* Are there NOT NULL constraints that would reject the insert?
+* Are there triggers or computed fields that depend on ZIP?
+
+---
+
+5. FAILURE MODES (CRITICAL)
+
+---
+
+Identify ALL scenarios where this change would break:
+
+Example cases to test:
+
+A)
+pickupLocation = "Chicago"
+pickupZip = null
+
+B)
+pickupLocation = "asdfasdf"
+MapQuest fails
+distance = null
+price = null
+
+C)
+User types but does not select dropdown
+
+For each case:
+
+* Will submission succeed?
+* Will DB insert succeed?
+* Will webhook fire?
+
+---
+
+6. SAFE IMPLEMENTATION PLAN
+
+---
+
+If this is feasible, provide EXACT changes:
+
+* What validation must be removed or changed
+* What guards must be added for null-safe payloads
+* Whether webhook logic needs to be decoupled from pricing/location success
+
+---
+
+7. FINAL ANSWER REQUIRED
+
+---
+
+I need a clear answer:
+
+Is it SAFE to:
+
+* remove ZIP requirement
+* allow free-text location submission
+* allow price/distance to be null
+* still guarantee webhook delivery 100% of the time
+
+Answer must include:
+
+* YES or NO
+* why
+* exact code references supporting the conclusion
+
+No assumptions. No general statements.
+
+This is a production-critical decision.
