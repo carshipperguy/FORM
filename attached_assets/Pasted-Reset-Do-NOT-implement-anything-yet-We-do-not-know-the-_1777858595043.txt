@@ -1,0 +1,90 @@
+Reset.
+
+Do NOT implement anything yet.
+
+We do not know the root cause yet.
+
+The user-facing symptom is:
+
+* User clicks submit
+* Form spins / does not load correctly
+* Lead may not go through
+* We need to find exactly where the request is getting stuck, aborted, rejected, or failing
+
+Stay in READ-ONLY ROOT-CAUSE AUDIT mode.
+
+Do NOT write code.
+Do NOT modify files.
+Do NOT propose architecture changes yet.
+
+Known findings:
+
+* Frontend has AbortSignal.timeout(12000) on /api/submit-lead
+* Backend may take longer than 12 seconds
+* Zapier call exists in server/utils/webhook.ts
+* Current response may not expose Zapier success/failure
+
+Your task is to trace the submit flow end-to-end and identify the actual failure point.
+
+Check:
+
+1. Frontend submit handler
+
+   * Where submit starts
+   * Where loading/spinner state is set
+   * Where loading/spinner state is cleared
+   * Whether errors clear loading state
+   * Whether AbortError is caught correctly
+   * Whether the UI can get stuck spinning
+
+2. Frontend fetch request
+
+   * Exact endpoint
+   * Exact timeout behavior
+   * Exact error handling
+   * Exact success handling
+   * Whether response parsing can throw
+
+3. Backend /api/submit-lead route
+
+   * Whether request reaches backend
+   * Whether route logs receipt
+   * Whether any validation rejects the payload
+   * Whether any code path never returns a response
+   * Whether MapQuest can block response
+   * Whether Zapier can block response
+   * Whether Promise.allSettled always resolves
+   * Whether res.json is always called
+
+4. Zapier webhook function
+
+   * Whether webhook URL is configured
+   * Whether fetch can hang
+   * Whether timeout works
+   * Whether errors are swallowed
+   * Whether failures are returned to route
+
+5. Logs and observability
+
+   * Identify exact logs that prove:
+     a. frontend submitted
+     b. backend received
+     c. Zapier attempted
+     d. Zapier succeeded/failed
+     e. response returned to frontend
+
+Deliver ONLY a root-cause audit.
+
+Output:
+
+* Exact likely failure point(s)
+* Exact files and line numbers
+* Exact evidence for each
+* Whether the spinner issue is frontend state, backend delay, network abort, Zapier failure, or response handling
+* What minimal fix should be considered AFTER confirmation
+
+Do NOT write code.
+
+End with:
+
+ROOT CAUSE AUDIT COMPLETE — READY FOR FIX PLAN
