@@ -1,0 +1,258 @@
+ABSOLUTE MODE — PRE-DEPLOY SAFETY AUDIT
+
+Do NOT write code.
+Do NOT modify files.
+Do NOT deploy.
+Do NOT approve deployment automatically.
+
+We need a world-class pre-deploy audit of the last-hour quote form changes.
+
+Your job is to aggressively try to prove this release is unsafe.
+
+Assume there may be hidden regressions, race conditions, mobile edge cases, tracking issues, or lead-loss paths.
+
+---
+
+## CONTEXT
+
+Recent changes include:
+
+1. Frontend timeout changed:
+
+   * from AbortSignal.timeout(12000)
+   * to compatibility-safe 45000ms / undefined fallback
+
+2. Backend submit flow changed:
+
+   * response now returns before Zapier completes
+   * DB insert and Zapier run post-response / fire-and-forget
+   * diagnostic logs added
+
+3. Mobile dropdown fix changed:
+
+   * onBlur timeout increased from 200ms to 350ms
+   * onTouchStart added
+   * onTouchEnd added
+   * desktop onClick and onMouseDown preserved
+
+4. CAPI / attribution was audited and believed safe
+
+---
+
+## PRIMARY QUESTION
+
+Before deployment, determine whether these changes could cause unintended consequences or make the funnel worse.
+
+You must actively look for reasons this deployment should NOT go live.
+
+---
+
+## AUDIT REQUIREMENTS
+
+1. DIFF AUDIT
+
+Review the exact git diff for all files changed in the last hour.
+
+For every changed file, list:
+
+* file path
+* changed lines
+* intended behavior
+* possible unintended behavior
+* rollback method
+
+Confirm no unrelated files changed.
+
+---
+
+2. SUBMIT PIPELINE SAFETY
+
+Audit /api/submit-lead after the backend change.
+
+Confirm:
+
+* pricing response is still correct
+* MapQuest logic unchanged
+* webhookPayload unchanged
+* Zapier still fires for every valid submission
+* DB insert still fires for every valid submission
+* no unhandled promise rejections
+* no early return prevents Zapier
+* no code path skips DB or Zapier unexpectedly
+* response body remains compatible with frontend
+
+Aggressively search for failure cases:
+
+* MapQuest fails
+* Zapier fails
+* DB insert fails
+* client disconnects
+* request errors after res.json()
+* concurrent submissions
+* slow network
+* server restart during post-response work
+
+---
+
+3. FRONTEND SUBMIT SAFETY
+
+Audit SimpleQuoteForm.jsx.
+
+Confirm:
+
+* timeout change cannot break older Android WebViews
+* longer timeout does not create stuck spinner behavior
+* catch block still clears isSubmitting
+* success path still navigates correctly
+* CAPI / Pixel / analytics events still fire correctly
+* no duplicate submit behavior was introduced
+* no payload fields changed
+
+---
+
+4. MOBILE DROPDOWN SAFETY
+
+Audit LocationMenuSelector.jsx.
+
+Confirm:
+
+* Android tap selects location
+* iOS tap selects location
+* desktop click still selects location
+* no double selection occurs
+* ZIP is still set correctly
+* onChange contract unchanged
+* dropdown still closes correctly
+* blur behavior still works when user taps outside
+* no accidental selection during scroll or drag
+* no accessibility regression worse than before
+
+Test or reason through:
+
+* Android Chrome
+* Samsung Internet
+* Facebook in-app browser
+* Instagram in-app browser
+* iOS Safari
+* desktop Chrome/Safari
+
+---
+
+5. CAPI / ATTRIBUTION SAFETY
+
+Re-audit all tracking after the final code state.
+
+Confirm:
+
+* Meta Pixel still fires
+* Meta CAPI still fires
+* sendAttributionToCRM still fires
+* event IDs unchanged
+* payloads unchanged
+* events are not duplicated
+* events are not delayed worse than before
+* tracking does not depend on Zapier completion
+
+Verdict must be:
+
+CAPI SAFE
+or
+CAPI AT RISK
+
+---
+
+6. REGRESSION TEST MATRIX
+
+Provide a concrete pre-deploy test matrix.
+
+Include:
+
+* desktop successful quote
+* Android successful quote
+* iOS successful quote
+* missing/invalid city
+* MapQuest failure
+* Zapier failure
+* slow Zapier
+* DB insert failure if safely simulatable
+* old Android WebView compatibility
+* Facebook/Instagram in-app browser
+
+For each test, define:
+
+* expected result
+* logs to confirm
+* rollback trigger
+
+---
+
+7. BUSINESS IMPACT PROJECTION
+
+Estimate expected improvement after deployment.
+
+Use available evidence only.
+
+Do NOT fabricate precision.
+
+Provide:
+
+* conservative expected lift
+* realistic expected lift
+* aggressive expected lift
+
+Base projections on:
+
+* documented timeout retry evidence
+* documented duplicate/retry behavior
+* mobile dropdown bug severity
+* Android / mobile traffic assumptions
+* current form completion evidence if available
+
+Clearly separate:
+
+* known hard numbers
+* inferred numbers
+* unknowable historical losses
+
+Answer:
+
+* Can we expect more submissions? yes/no
+* Why?
+* Which fix likely contributes most?
+* What metric should be watched after deploy?
+
+---
+
+8. FINAL DEPLOY VERDICT
+
+At the end, provide one of these:
+
+GREEN — Safe to deploy with monitoring
+YELLOW — Deploy only after listed fixes
+RED — Do not deploy
+
+You must justify the verdict.
+
+Also provide:
+
+* top 5 remaining risks
+* exact rollback plan
+* first 30-minute monitoring checklist
+* what would prove the deployment is working
+* what would prove it is failing
+
+---
+
+IMPORTANT
+
+Do not be optimistic.
+
+Do not rubber-stamp this.
+
+Try to prove the deployment is unsafe.
+
+If you cannot find a blocker, say so clearly and explain why.
+
+End with:
+
+PRE-DEPLOY AUDIT COMPLETE — VERDICT: GREEN/YELLOW/RED
