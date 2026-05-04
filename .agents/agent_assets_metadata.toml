@@ -24,3 +24,9 @@ id = "ntM97kE3DvRymlgLtFegd"
 uri = "file://dropped-leads-last-7-days.csv"
 type = "table"
 title = "Dropped Leads — 198 Phone Numbers (Last 7 Days)"
+
+[[outputs]]
+id = "xm4wX0Ime9M3F1AVkyIJZ"
+uri = "file://dropped-lead-phones.csv"
+type = "table"
+title = "Dropped Lead Phone Numbers — 198 numbers (Last 7 Days)"
