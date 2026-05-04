@@ -18,3 +18,9 @@ id = "4-b-UnWjUhiFl7RVI1k-U"
 uri = "file://dropoffs.csv"
 type = "table"
 title = "325 Drop-off Leads — Click to Download"
+
+[[outputs]]
+id = "ntM97kE3DvRymlgLtFegd"
+uri = "file://dropped-leads-last-7-days.csv"
+type = "table"
+title = "Dropped Leads — Last 7 Days (198 unique numbers)"
