@@ -1,0 +1,85 @@
+ENTER READ-ONLY AUDIT MODE.
+
+Do NOT write code.
+Do NOT modify files.
+
+---
+
+## OBJECTIVE
+
+A test lead has just been submitted after Step 3 implementation.
+
+We need a precise audit of how the system behaves NOW versus BEFORE Step 3.
+
+This is a behavioral audit, not a code rewrite.
+
+---
+
+## AUDIT REQUIREMENTS
+
+Using the most recent test submission logs:
+
+1. Reconstruct the exact execution timeline NOW:
+
+   * Request received timestamp
+   * MapQuest start + end
+   * Response sent timestamp
+   * Zapier start timestamp
+   * Zapier completion timestamp
+   * DB insert timing
+
+2. Reconstruct the same timeline for BEFORE Step 3 (based on previous structure):
+
+   * Where Promise.allSettled blocked
+   * When response was sent relative to Zapier
+
+3. Provide a side-by-side comparison:
+
+   BEFORE vs AFTER
+
+   * Total user wait time
+   * Time to response
+   * Time Zapier completed
+   * Whether Zapier blocked response
+   * Whether DB blocked response
+
+4. Confirm execution guarantees:
+
+   * Does sendToWebhook() ALWAYS execute after res.json()?
+   * Are there ANY code paths where Zapier would not fire?
+   * Are there ANY unhandled exceptions possible post-response?
+
+5. Confirm data integrity:
+
+   * Payload sent to Zapier is identical before vs after
+   * DB insert behavior unchanged
+   * No race condition between DB and Zapier
+
+6. Identify any NEW risks introduced:
+
+   * Server crash window between response and Zapier
+   * Logging gaps
+   * Any concurrency issues
+
+7. Confirm observability:
+
+   * Can we trace a single lead end-to-end via diagnosticId?
+   * Can we detect Zapier failures reliably?
+
+---
+
+## OUTPUT FORMAT
+
+Provide:
+
+1. Exact timeline (with real timestamps from logs)
+2. Before vs After comparison table
+3. Confirmation of safety (YES/NO with explanation)
+4. Any residual risks (ranked)
+5. Recommendation: Is system safer now than before?
+
+DO NOT suggest new changes.
+
+End with:
+
+AUDIT COMPLETE — SYSTEM STATE VERIFIED
