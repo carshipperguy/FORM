@@ -1291,6 +1291,7 @@ export function registerRoutes(app: Express): Server {
   // ─────────────────────────────────────────────────────────────
   app.post("/api/submit-lead", async (req, res) => {
     const formData = req.body;
+    const _reqStart = Date.now();
 
     // Guard: ignore health-check pings
     if (!formData || (!formData.phone && !formData.name)) {
@@ -1401,6 +1402,7 @@ export function registerRoutes(app: Express): Server {
     }
 
     // ── Step 5: Respond to client ──────────────────────────────
+    console.log(`⏱️ [${diagnosticId}] Total backend time: ${Date.now() - _reqStart}ms`);
     if (mapquestSuccess) {
       return res.json({
         success: true,

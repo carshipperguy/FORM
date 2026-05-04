@@ -619,6 +619,9 @@ const SimpleQuoteForm = () => {
       logEvent("client_timeout_triggered", {
         error_name: error?.name || "UnknownError",
         error_message: error?.message || String(error),
+        is_abort: error?.name === "AbortError",
+        is_type_error: error?.name === "TypeError",
+        is_compat_error: error?.name === "TypeError" && typeof AbortSignal?.timeout !== "function",
         vehicleType: formData.vehicleType,
       });
       console.error("Error in form submission:", error);
