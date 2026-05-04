@@ -1,0 +1,187 @@
+ABSOLUTE MODE — READ-ONLY SAFETY AUDIT ONLY
+
+Do NOT write code.
+Do NOT modify files.
+Do NOT implement validation changes.
+Do NOT suggest final code yet.
+
+We are considering relaxing location validation so users can submit typed pickup/dropoff text even if no ZIP was selected from the dropdown.
+
+This is production-sensitive. Before any change, perform a full read-only audit.
+
+---
+
+## FILES TO READ IN FULL
+
+Read these files completely before responding:
+
+1. client/src/components/SimpleQuoteForm.jsx
+2. client/src/components/LocationMenuSelector.jsx
+3. server/routes.ts
+4. server/utils/webhook.ts
+5. server/utils/attribution-webhook.ts
+6. client/src/lib/meta-capi-form.ts
+7. any file that defines:
+
+   * trackEvent
+   * logEvent
+   * submit_success
+   * form validation
+   * quoteData creation
+   * final quote navigation
+   * fallback / priceUnavailable behavior
+
+Do not rely on memory. Re-read them.
+
+---
+
+## QUESTION TO ANSWER
+
+Can we safely allow form submission when:
+
+pickupLocation = typed text
+pickupZip = null
+
+dropoffLocation = typed text
+dropoffZip = null
+
+without breaking:
+
+* quote flow
+* Zapier payload
+* DB save
+* MapQuest
+* final quote page
+* CAPI / attribution
+* analytics
+* mobile dropdown behavior
+
+---
+
+## AUDIT REQUIREMENTS
+
+1. Validation audit
+
+Identify every validation gate that requires:
+
+* pickupLocation
+* dropoffLocation
+* pickupZip
+* dropoffZip
+
+List exact file and line numbers.
+
+2. State flow audit
+
+Trace how pickupLocation, dropoffLocation, pickupZip, and dropoffZip are set.
+
+Answer:
+
+* Does typing alone update formData?
+* Or does only dropdown selection update formData?
+* If typing alone does NOT update formData, relaxing validation alone is NOT sufficient.
+
+3. Payload audit
+
+Trace the lead payload from frontend to backend to Zapier.
+
+Confirm:
+
+* whether null ZIPs are safe
+* whether typed location text reaches backend
+* whether Zapier receives useful fields
+* whether DB stores the lead
+
+4. Quote flow audit
+
+If MapQuest succeeds with typed text:
+
+* does user get normal price?
+
+If MapQuest fails:
+
+* does user get fallback / priceUnavailable flow?
+* does final quote page handle that correctly?
+
+5. CAPI / attribution audit
+
+Confirm whether typed-location/null-ZIP submissions affect:
+
+* Meta Pixel
+* Meta CAPI
+* attribution webhook
+* event IDs
+* conversion tracking
+
+6. UI / UX audit
+
+If no dropdown match exists:
+
+* what does user see?
+* can they continue?
+* does typed text persist?
+* would validation errors be visible?
+* would the user understand what happened?
+
+7. Failure mode audit
+
+Aggressively try to prove this change is unsafe.
+
+Check for:
+
+* null crashes
+* undefined field access
+* skipped Zapier
+* skipped DB insert
+* broken final quote page
+* broken CAPI
+* double submits
+* invalid payload
+* silent lead loss
+
+8. Minimal safe change options
+
+Do NOT implement. Provide options only.
+
+For each option, list:
+
+* exact files affected
+* exact behavior changed
+* risk level
+* verification tests required
+* rollback method
+
+Options should include:
+
+A. validation-only change
+B. validation + typing state update
+C. explicit manual-location fallback path
+D. no-code data-only option
+
+9. Recommendation
+
+Give a final recommendation:
+
+* SAFE as-is
+* SAFE only with additional state update
+* NOT SAFE without larger change
+
+Do not be optimistic. Try to prove this wrong.
+
+---
+
+## OUTPUT FORMAT
+
+Respond with:
+
+1. Files read
+2. Findings by file
+3. Exact blockers
+4. Whether validation-only change is sufficient: YES / NO
+5. Safest implementation path
+6. Questions requiring owner approval before code
+7. Final verdict: GREEN / YELLOW / RED
+
+End with:
+
+READ-ONLY SAFETY AUDIT COMPLETE — AWAITING OWNER DECISION
