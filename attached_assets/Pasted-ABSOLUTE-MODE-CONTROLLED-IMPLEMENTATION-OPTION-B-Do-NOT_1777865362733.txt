@@ -1,0 +1,221 @@
+ABSOLUTE MODE — CONTROLLED IMPLEMENTATION (OPTION B)
+
+Do NOT improvise.
+Do NOT modify unrelated logic.
+Follow instructions exactly.
+
+---
+
+## OBJECTIVE
+
+Fix lead loss caused by typed locations not being saved and ZIP-only validation blocking submission.
+
+Users must be able to:
+
+1. Type a location (without selecting dropdown)
+2. Have that text saved into formData
+3. Submit successfully without ZIP
+4. Ensure payload reaches DB and Zapier with usable location text
+
+---
+
+## FILES IN SCOPE (ONLY THESE)
+
+1. client/src/components/LocationMenuSelector.jsx
+2. client/src/components/SimpleQuoteForm.jsx
+
+NO OTHER FILES MAY BE MODIFIED.
+
+---
+
+## CHANGE #1 — STATE FIX (CRITICAL)
+
+File:
+LocationMenuSelector.jsx
+
+Problem:
+Typing updates ONLY internal state (searchInput).
+Parent formData is NEVER updated unless dropdown is selected.
+
+Required Fix:
+
+When the user leaves the input field (onBlur):
+
+IF:
+
+* no dropdown option was selected
+
+THEN:
+
+* call onChange(searchInput, null)
+
+This must:
+
+* pass the typed text to the parent
+* set location value
+* leave ZIP as null
+
+---
+
+## IMPLEMENTATION RULES (STATE FIX)
+
+* Do NOT break existing dropdown selection behavior
+
+* Do NOT override selection if user clicked a dropdown option
+
+* Only trigger fallback when:
+
+  * user typed
+  * and did NOT select from dropdown
+
+* Ensure:
+
+  * selected option still uses ZIP (existing behavior unchanged)
+  * typed fallback uses null ZIP
+
+---
+
+## CHANGE #2 — VALIDATION FIX
+
+File:
+SimpleQuoteForm.jsx
+
+Current (blocking behavior):
+
+if (!formData.pickupLocation || !pickupZip)
+if (!formData.dropoffLocation || !dropoffZip)
+
+Required Change:
+
+Remove ZIP dependency.
+
+New logic:
+
+* Require ONLY:
+
+  * formData.pickupLocation (non-empty)
+  * formData.dropoffLocation (non-empty)
+
+ZIP must NOT be required.
+
+---
+
+## CONSTRAINTS (NON-NEGOTIABLE)
+
+Do NOT modify:
+
+* backend (server/routes.ts)
+* webhook logic
+* payload structure
+* MapQuest logic
+* pricing logic
+* CAPI / analytics
+* dropdown filtering logic
+* city dataset
+
+This is a CLIENT-ONLY fix.
+
+---
+
+## EXPECTED BEHAVIOR AFTER CHANGE
+
+CASE 1 — Dropdown selection:
+
+* unchanged
+* ZIP present
+* pricing works normally
+
+CASE 2 — Typed input (no selection):
+
+* location text saved
+* ZIP = null
+* submission succeeds
+* backend processes request
+* Zapier receives lead
+* DB stores lead
+
+---
+
+## MANDATORY VERIFICATION (REQUIRED)
+
+Provide proof for ALL:
+
+1. Dropdown selection (regression test)
+
+   * select city from dropdown
+   * confirm ZIP still set
+   * confirm pricing works
+
+2. Typed city (no dropdown)
+
+   * type "Chicago"
+   * blur input
+   * submit
+   * confirm:
+
+     * pickupLocation = "Chicago"
+     * pickupZip = null
+     * DB record exists
+     * Zapier returns 200
+
+3. Missing city
+
+   * type "East Amherst"
+   * blur input
+   * submit
+   * confirm:
+
+     * location saved correctly
+     * lead captured
+     * no crash
+
+4. Garbage input
+
+   * type "asdfasdfasdf"
+   * blur input
+   * submit
+   * confirm:
+
+     * submission succeeds
+     * mapquestSuccess = false
+     * priceUnavailable flow works
+     * lead still saved
+
+---
+
+## LOGGING REQUIRED
+
+Provide:
+
+* server logs (full flow)
+* DB confirmation
+* Zapier response (status + timing)
+* payload sent to Zapier
+
+---
+
+## ROLLBACK PLAN
+
+Must confirm:
+
+* reverting is limited to:
+
+  * removing onBlur handler
+  * restoring validation lines
+
+Rollback time < 60 seconds
+
+---
+
+## FINAL OUTPUT
+
+Respond ONLY with:
+
+1. Files modified
+2. Exact changes made (line references)
+3. Verification results (all 4 tests)
+4. Confirmation no regressions
+
+End with:
+
+IMPLEMENTATION COMPLETE — VERIFIED SAFE

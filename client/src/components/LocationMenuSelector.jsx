@@ -17,6 +17,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   
   const searchTimeoutRef = useRef(null);
   const abortControllerRef = useRef(null);
+  const selectedFromDropdownRef = useRef(false);
   
   // Load popular cities on initial render
   useEffect(() => {
@@ -88,14 +89,11 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
   const handleInputChange = (e) => {
     const input = e.target.value;
     setSearchInput(input);
-    
-    // Track the input but don't save it as a valid selection
-    // User must select from dropdown to get a valid city/zip pair
+    selectedFromDropdownRef.current = false;
     setShowDropdown(true);
   };
   
   const handleOptionSelect = (option) => {
-    // Pass both the location string and the first ZIP code
     const primaryZip = option.zips && option.zips.length > 0 ? option.zips[0] : null;
     
     console.log('Selected location with ZIP:', {
@@ -103,12 +101,9 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
       primaryZip
     });
     
-    // Update the visible input field
+    selectedFromDropdownRef.current = true;
     setSearchInput(option.value);
-    
-    // Pass both the location value and ZIP to the parent component
     onChange(option.value, primaryZip);
-    
     setShowDropdown(false);
   };
   
@@ -136,7 +131,12 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
               }
             }
           }}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 350)}
+          onBlur={() => {
+            setTimeout(() => setShowDropdown(false), 350);
+            if (!selectedFromDropdownRef.current && searchInput.trim().length > 0) {
+              onChange(searchInput.trim(), null);
+            }
+          }}
           placeholder={placeholder || "Search and select from dropdown (required)"}
           required={required}
           className={styles['location-input']}

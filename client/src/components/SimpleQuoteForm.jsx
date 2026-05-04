@@ -277,19 +277,19 @@ const SimpleQuoteForm = () => {
     // Simplified validation of only required fields
     const errors = [];
 
-    // Validate pickup location (must come from dropdown to have ZIP)
-    if (!formData.pickupLocation || !pickupZip) {
+    // Validate pickup location (text required; ZIP not required)
+    if (!formData.pickupLocation) {
       errors.push({
         field: "pickupLocation",
-        message: "Please select a pickup location from the dropdown menu",
+        message: "Please enter a pickup location",
       });
     }
 
-    // Validate dropoff location (must come from dropdown to have ZIP)
-    if (!formData.dropoffLocation || !dropoffZip) {
+    // Validate dropoff location (text required; ZIP not required)
+    if (!formData.dropoffLocation) {
       errors.push({
         field: "dropoffLocation",
-        message: "Please select a delivery location from the dropdown menu",
+        message: "Please enter a delivery location",
       });
     }
 
