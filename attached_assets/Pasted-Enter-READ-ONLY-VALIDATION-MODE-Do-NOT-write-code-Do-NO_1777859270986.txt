@@ -1,0 +1,97 @@
+Enter READ-ONLY VALIDATION MODE.
+
+Do NOT write code.
+Do NOT modify files.
+
+---
+
+## OBJECTIVE
+
+We are losing leads because users abandon the form while waiting for the submit request to finish.
+
+We need to reduce wait time and eliminate abandonment BEFORE we collect name, phone, email.
+
+---
+
+## CURRENT BEHAVIOR
+
+* User clicks submit
+* Frontend waits for backend response
+* Backend waits for:
+
+  * MapQuest (for pricing)
+  * Zapier webhook
+* Total time can exceed 12 seconds
+* Frontend may abort OR user leaves
+
+---
+
+## PROPOSED CHANGE (TO VALIDATE ONLY)
+
+We want to change ONLY this:
+
+1. Keep MapQuest in the request (needed for price)
+2. Send the response to the frontend IMMEDIATELY after price is calculated
+3. Move Zapier webhook execution to AFTER the response is sent
+
+New flow:
+
+* Calculate price (MapQuest)
+* Return response to user (fast)
+* THEN send payload to Zapier
+
+---
+
+## CRITICAL QUESTIONS YOU MUST ANSWER
+
+1. Will code after res.json(...) reliably continue executing in our current Node/Express setup?
+
+2. Identify ANY cases where sendToWebhook() would NOT run after response is sent:
+
+   * early return
+   * thrown errors
+   * process termination
+   * unhandled promise issues
+
+3. Confirm whether our current route structure allows this safely without breaking existing logic
+
+4. Identify EXACT location in server/routes.ts where:
+
+   * response is sent
+   * Zapier is currently called
+   * and how execution order would change
+
+5. Confirm whether this change:
+
+   * improves response time
+   * reduces user abandonment
+   * does NOT break payload delivery to Zapier
+
+6. Identify any safeguards required:
+
+   * try/catch
+   * logging
+   * ensuring Zapier always fires
+
+---
+
+## IMPORTANT CONSTRAINTS
+
+* Do NOT redesign the system
+* Do NOT introduce queues or new infrastructure
+* Do NOT change database schema
+* Do NOT change pricing logic
+* Only validate this execution order change
+
+---
+
+## OUTPUT FORMAT
+
+* Clear yes/no on feasibility
+* Exact risks (if any)
+* Exact safe implementation approach
+* Exact lines/files impacted
+
+End with:
+
+VALIDATION COMPLETE — SAFE TO IMPLEMENT OR REQUIRES ADJUSTMENT
