@@ -482,7 +482,7 @@ const SimpleQuoteForm = () => {
         },
         credentials: "include",
         body: JSON.stringify(leadPayload),
-        signal: AbortSignal.timeout(12000),
+        signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(45000) : undefined,
         keepalive: true,
       });
 
