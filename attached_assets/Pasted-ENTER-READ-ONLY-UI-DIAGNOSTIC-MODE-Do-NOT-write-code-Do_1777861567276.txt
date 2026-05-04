@@ -1,0 +1,134 @@
+ENTER READ-ONLY UI DIAGNOSTIC MODE.
+
+Do NOT write code.
+Do NOT modify files.
+Do NOT suggest implementation yet.
+
+---
+
+## OBJECTIVE
+
+We need to diagnose a suspected mobile dropdown selection bug in the location input.
+
+Users (especially Android) may be unable to select a city from the dropdown.
+
+This must be confirmed BEFORE any fix is attempted.
+
+---
+
+## AREAS TO ANALYZE
+
+File:
+client/src/components/LocationMenuSelector.jsx
+
+---
+
+## DIAGNOSTIC REQUIREMENTS
+
+1. EVENT FLOW ANALYSIS
+
+Trace the exact sequence when a mobile user taps a dropdown option:
+
+* input focus
+* dropdown open
+* touchstart / touchend
+* mousedown / click (if any)
+* onBlur firing
+* onClick firing
+* handleOptionSelect execution
+
+Provide exact order of events on:
+
+* desktop
+* mobile (Android Chrome specifically)
+
+---
+
+2. BLUR RACE CONDITION CHECK
+
+Analyze this line:
+
+onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+
+Answer:
+
+* Can onBlur fire BEFORE onClick on mobile?
+* Does this cause dropdown to close before selection registers?
+* Is 200ms sufficient or unsafe?
+
+---
+
+3. TOUCH VS MOUSE EVENT COVERAGE
+
+Check dropdown option element:
+
+* Is only onMouseDown used?
+* Is onTouchStart missing?
+* Does this create a gap on mobile?
+
+Explain:
+
+* What happens on Android tap
+* Whether preventDefault is actually triggered
+
+---
+
+4. FAILURE MODE CONFIRMATION
+
+Confirm if the following failure is real:
+
+User taps option
+→ blur fires
+→ dropdown closes
+→ click never registers
+→ selection lost
+
+Provide YES / NO with reasoning.
+
+---
+
+5. REPRODUCTION CONDITIONS
+
+List exact conditions where bug occurs:
+
+* device type (Android / iOS / desktop)
+* browser (Chrome, WebView, etc.)
+* interaction speed (fast tap vs slow tap)
+* network conditions (if relevant)
+
+---
+
+6. IMPACT ASSESSMENT
+
+Estimate:
+
+* % of users affected (rough estimate based on known behavior)
+* whether this blocks form completion entirely
+* whether users can recover or are forced to abandon
+
+---
+
+7. SAFE FIX STRATEGY (NO CODE)
+
+Describe the safest fix approach WITHOUT writing code:
+
+* what needs to change conceptually
+* what events must be handled
+* what timing must be adjusted
+* what must NOT be broken (desktop behavior, accessibility)
+
+---
+
+## OUTPUT FORMAT
+
+Provide:
+
+1. Confirmed root cause (YES/NO)
+2. Exact event sequence (desktop vs mobile)
+3. Explanation of failure
+4. Risk level (LOW / MEDIUM / HIGH)
+5. Recommended fix strategy (no code)
+
+End with:
+
+UI DIAGNOSTIC COMPLETE — READY FOR SAFE FIX PLAN
