@@ -1,0 +1,90 @@
+Enter READ-ONLY DIAGNOSTIC MODE.
+
+Do NOT write code.
+Do NOT modify files.
+
+---
+
+## OBJECTIVE
+
+We are experiencing lead loss and user abandonment on the quote form.
+
+We need a full diagnostic before making any changes.
+
+---
+
+## KNOWN SYMPTOMS
+
+* Form sometimes completes in ~1 second during testing
+
+* In production, users report:
+
+  * long spinning
+  * errors after submit
+  * possible dropped leads
+
+* Android devices may have higher failure rate
+
+---
+
+## AREAS TO INVESTIGATE
+
+1. FRONTEND BEHAVIOR
+
+* Confirm exact behavior of AbortSignal.timeout(12000)
+* Identify all code paths where fetch() can fail:
+
+  * AbortError
+  * network failure
+  * JSON parse failure
+* Confirm spinner state transitions
+* Confirm whether UI shows error even if backend succeeded
+
+2. MOBILE / ANDROID ISSUES
+
+* Identify known issues with fetch + AbortSignal on Android browsers
+* Identify whether background tab throttling could affect requests
+* Identify whether network interruptions could terminate requests early
+
+3. BACKEND TIMING
+
+* Confirm real-world latency distribution for:
+
+  * MapQuest
+  * Zapier
+* Identify how often total execution exceeds 12 seconds
+* Identify slow-path scenarios (new routes, bad inputs, etc.)
+
+4. ZAPIER RELIABILITY
+
+* Identify all failure modes of sendToWebhook()
+* Confirm whether failures are retried
+* Confirm whether failures are visible anywhere
+* Identify if payload can be lost silently
+
+5. LOGGING GAPS
+
+* Identify what we CANNOT currently see:
+
+  * client aborts
+  * incomplete requests
+  * Zapier failures
+* Identify missing logs needed to trace a single lead end-to-end
+
+---
+
+## OUTPUT REQUIREMENTS
+
+Provide:
+
+1. Exact root causes of lead loss (ranked by likelihood)
+2. Confirmation of Android-specific risks (if any)
+3. Evidence of where requests fail or terminate
+4. % likelihood of each failure mode if possible
+5. What must be instrumented BEFORE any fix is deployed
+
+DO NOT propose fixes yet.
+
+End with:
+
+DIAGNOSTIC COMPLETE — READY FOR STABILIZATION PLAN
