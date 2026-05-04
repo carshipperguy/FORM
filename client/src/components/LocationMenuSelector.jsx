@@ -136,7 +136,7 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
               }
             }
           }}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 350)}
           placeholder={placeholder || "Search and select from dropdown (required)"}
           required={required}
           className={styles['location-input']}
@@ -154,6 +154,8 @@ const LocationMenuSelector = ({ value, onChange, placeholder, required, label })
                   className={styles['location-option']}
                   onClick={() => handleOptionSelect(option)}
                   onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onTouchEnd={(e) => { e.preventDefault(); handleOptionSelect(option); }}
                 >
                   <div className={styles['location-option-city']}>{option.city}, {option.state}</div>
                   {option.zips && option.zips.length > 0 && (
