@@ -1,0 +1,180 @@
+We have a critical production issue on our quote form that is actively causing lost leads.
+
+Users are attempting to enter valid cities, and in many cases they are typing:
+
+* full city + state
+* city only (no state)
+* or selecting from dropdown inconsistently
+
+The form is failing or blocking submission in some of these scenarios.
+
+We have already confirmed:
+
+* ALL ZIP codes exist in the database
+* This is NOT a missing data problem
+* This is a workflow / validation / matching failure
+
+I need a full root cause analysis of how this is dropping leads.
+
+Break down the entire flow end-to-end:
+
+---
+
+1. USER INPUT MODES (CRITICAL)
+
+---
+
+Explain ALL ways users can input location:
+
+* typing city only
+* typing city + state
+* selecting from autocomplete dropdown
+* pasting values
+
+For each mode:
+
+* what does the frontend expect?
+* what is considered a “valid” input?
+* does the user HAVE to select from dropdown for it to work?
+
+Specifically:
+What happens if a user types:
+→ “Amherst”
+→ “Amherst, MA”
+→ “amherst” (lowercase)
+→ “Hamburg NY” (no comma)
+
+Do these pass or fail? Why?
+
+---
+
+2. FRONTEND VALIDATION LOGIC
+
+---
+
+* What component handles city input?
+* Is submission blocked unless a dropdown option is selected?
+* Is there a hidden “selected value” vs “typed value” mismatch?
+
+This is critical:
+If a user types a valid city but DOES NOT click a dropdown option,
+→ does the form treat it as invalid?
+
+---
+
+3. API + MATCHING LOGIC
+
+---
+
+* What API endpoint resolves city/state → ZIP?
+* Show the exact query used
+
+Confirm:
+
+* Is matching exact string only?
+* Is it case-sensitive?
+* Does it trim whitespace?
+* Does it support partial matches (ILIKE)?
+
+What happens when:
+→ no match is found?
+→ multiple matches are possible?
+→ state is missing?
+
+---
+
+4. FAILURE POINT (WHERE LEADS ARE LOST)
+
+---
+
+Identify EXACTLY where the lead is dropped:
+
+* frontend blocks submission?
+* API returns empty and no fallback exists?
+* validation fails silently?
+* dropdown never populates so user cannot proceed?
+
+Explain the exact condition that causes:
+→ user cannot continue
+→ user abandons form
+→ lead is never created
+
+---
+
+5. REAL USER FAILURES (MANDATORY)
+
+---
+
+Pull 5–10 real failed sessions/logs and show:
+
+* what the user typed (raw input)
+* whether they selected from dropdown or not
+* API request + response
+* validation result
+* why submission failed
+
+---
+
+6. DATA STRUCTURE LIMITATION
+
+---
+
+Confirm:
+
+* Do we only store ONE city per ZIP (USPS primary city)?
+* Are alternative city names supported at all?
+
+If not:
+Explain how this causes valid cities to fail matching.
+
+---
+
+7. WHY THIS IS CAUSING LEAD LOSS
+
+---
+
+Spell this out clearly:
+
+Example flow:
+User types “Amherst”
+→ system expects exact stored name
+→ no match
+→ form blocks or fails silently
+→ user leaves
+→ lead is lost
+
+I want this clearly explained.
+
+---
+
+8. REQUIRED FIX (NO WORKAROUNDS)
+
+---
+
+Provide a concrete fix plan.
+
+We need ONE of the following (or combination):
+
+A) Allow free-text input and resolve in backend (never block submission)
+B) Implement fuzzy matching (ILIKE / similarity search)
+C) Add city alias support mapped to ZIPs
+D) Handle city-only input safely (infer state or prompt user properly)
+
+CRITICAL:
+
+* The form must NEVER block a valid user from submitting
+* Do NOT suggest adding thousands of duplicate city rows
+
+---
+
+9. OUTPUT REQUIRED
+
+---
+
+Return:
+
+* exact root cause
+* exact failing logic (frontend + backend)
+* exact fix with code-level detail
+
+This is a revenue-impacting production bug and must be treated as urgent.
