@@ -1367,30 +1367,14 @@ export function registerRoutes(app: Express): Server {
       eventDate: formData.eventDate || new Date().toISOString(),
     };
 
-    // ── Step 4: Save to DB + fire Zapier in parallel (ALWAYS) ──
+    // ── Step 4: Save to DB (fire-and-forget) ───────────────────
     const diagnosticId = `sl_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-    console.log(`📊 [${diagnosticId}] Saving lead and firing Zapier (mapquestSuccess=${mapquestSuccess})...`);
+    console.log(`📊 [${diagnosticId}] Saving lead to DB (mapquestSuccess=${mapquestSuccess})...`);
 
-    const [dbResult, webhookResult] = await Promise.allSettled([
-      db.insert(fallbackLeads).values({ data: webhookPayload }),
-      sendToWebhook(webhookPayload, req.headers),
-    ]);
-
-    if (dbResult.status === "fulfilled") {
-      console.log(`✅ [${diagnosticId}] Lead saved to DB`);
-    } else {
-      console.error(`❌ [${diagnosticId}] DB save failed:`, dbResult.reason);
-    }
-
-    if (webhookResult.status === "fulfilled" && webhookResult.value?.success) {
-      console.log(`✅ [${diagnosticId}] Zapier webhook delivered`);
-    } else {
-      const zapierErr = webhookResult.status === "rejected" ? webhookResult.reason : webhookResult.value?.message;
-      console.error(`⚠️ [${diagnosticId}] Zapier send failed:`, zapierErr);
-    }
-
-    // Fire attribution webhook independently (non-blocking, best-effort)
-    sendAttributionToCRM(webhookPayload);
+    db.insert(fallbackLeads)
+      .values({ data: webhookPayload })
+      .then(() => console.log(`✅ [${diagnosticId}] Lead saved to DB`))
+      .catch((err) => console.error(`❌ [${diagnosticId}] DB save failed:`, err));
 
     // Mark any partial lead for this session as converted (non-blocking, best-effort)
     const sessionIdForConversion = formData.session_id || formData.sessionId || null;
@@ -1401,10 +1385,13 @@ export function registerRoutes(app: Express): Server {
         .catch(() => {});
     }
 
-    // ── Step 5: Respond to client ──────────────────────────────
-    console.log(`⏱️ [${diagnosticId}] Total backend time: ${Date.now() - _reqStart}ms`);
+    // Fire attribution webhook independently (non-blocking, best-effort)
+    sendAttributionToCRM(webhookPayload);
+
+    // ── Step 5: Respond to client immediately ──────────────────
+    console.log(`⏱️ [${diagnosticId}] Total backend time before response: ${Date.now() - _reqStart}ms`);
     if (mapquestSuccess) {
-      return res.json({
+      res.json({
         success: true,
         mapquestSuccess: true,
         distance,
@@ -1413,11 +1400,23 @@ export function registerRoutes(app: Express): Server {
         transitTime,
       });
     } else {
-      return res.json({
+      res.json({
         success: true,
         mapquestSuccess: false,
       });
     }
+
+    // ── Step 6: Fire Zapier AFTER response is sent ─────────────
+    console.log(`📤 [${diagnosticId}] Firing Zapier post-response...`);
+    sendToWebhook(webhookPayload, req.headers)
+      .then((result) => {
+        if (result?.success) {
+          console.log(`✅ [${diagnosticId}] Zapier webhook delivered (post-response)`);
+        } else {
+          console.error(`⚠️ [${diagnosticId}] Zapier returned failure (post-response):`, result?.message);
+        }
+      })
+      .catch((err) => console.error(`❌ [${diagnosticId}] Zapier threw (post-response):`, err));
   });
 
   // Dedicated webhook endpoint for CRM integration
