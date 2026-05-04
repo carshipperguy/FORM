@@ -1,0 +1,122 @@
+ENTER READ-ONLY DATA + UX AUDIT MODE.
+
+Do NOT write code.
+Do NOT modify files.
+
+---
+
+## OBJECTIVE
+
+We need to fully audit the "missing cities" issue in the location dropdown.
+
+This is a potential silent funnel blocker.
+
+---
+
+## AREAS TO ANALYZE
+
+File(s):
+
+* LocationMenuSelector.jsx
+* Any city dataset / list used for dropdown
+* Any filtering / search logic
+* Validation logic tied to ZIP / location selection
+
+---
+
+## AUDIT REQUIREMENTS
+
+1. DATA COVERAGE
+
+* Where does the city list come from?
+* How many cities are included?
+* What regions/states are underrepresented?
+* Confirm if ~4,000 cities are missing (validate this number)
+
+---
+
+2. SEARCH / FILTER BEHAVIOR
+
+* What happens when a user types a city that is NOT in the dataset?
+
+Confirm:
+
+* Does dropdown show empty?
+* Does it show "no results"?
+* Does it fallback to anything?
+
+---
+
+3. SUBMISSION DEPENDENCY
+
+* Can a user submit WITHOUT selecting a dropdown option?
+
+Specifically:
+
+* If user types a city manually (not selecting dropdown)
+* Is ZIP required?
+* Does validation fail?
+
+Provide exact validation path.
+
+---
+
+4. FAILURE MODE CONFIRMATION
+
+Confirm if this scenario is real:
+
+User types city not in dataset
+→ no dropdown result
+→ cannot select
+→ ZIP not set
+→ form cannot submit
+
+YES / NO with explanation.
+
+---
+
+5. USER EXPERIENCE GAP
+
+* What does the user see when no cities match?
+* Is there any message?
+* Any fallback like:
+
+  * "Enter ZIP instead"
+  * "Use closest city"
+
+---
+
+6. IMPACT ASSESSMENT
+
+Estimate:
+
+* % of users likely affected
+* which user segments (rural, suburbs, typos, etc.)
+* whether this blocks submission completely or partially
+
+---
+
+7. SAFE FIX STRATEGY (NO CODE)
+
+Provide safest possible improvement plan:
+
+* how to handle "no results"
+* how to allow manual entry or fallback
+* how to preserve existing validation
+* how to avoid breaking pricing / ZIP logic
+
+---
+
+## OUTPUT FORMAT
+
+Provide:
+
+1. Confirmed failure mode (YES/NO)
+2. Root cause
+3. Severity (LOW / MEDIUM / HIGH)
+4. % impact estimate
+5. Recommended fix strategy (no code)
+
+End with:
+
+MISSING CITIES AUDIT COMPLETE
