@@ -1,0 +1,80 @@
+# Diagnostic Brief: Qualcalculator Form Drop-Off Investigation
+
+## Your mission
+Investigate why users are abandoning the Qualcalculator form. Today's abandonment count is 39. I need the *specific* failure points causing these drop-offs — not generic "improve UX" suggestions. **Investigate and report first. Do not modify any code until I approve a fix plan.**
+
+## System context
+- The calculator is this Replit-hosted web app.
+- It is embedded as an `<iframe>` on a WordPress + Elementor landing page (different origin from the Replit app).
+- It uses the MapQuest API for [FILL IN: geocoding / autocomplete / distance].
+- It has AI-assisted steps for [FILL IN: e.g., qualification scoring, recommendation, summary generation].
+- Known suspects I want pressure-tested: (1) iframe ↔ Elementor interaction, (2) MapQuest API edge cases, (3) AI step latency/failures, (4) form mechanics on mobile.
+- Goal: identify smoking-gun causes so I can fix them at the form, the iframe boundary, or the host page.
+
+## Phase 1 — Telemetry audit (do this before anything else)
+1. List every event/log captured per user session today: page load, field focus, field blur with sanitized value, validation errors, every API request (URL, status, latency), submit attempts, completion. If something isn't measured, say so explicitly — gaps are findings.
+2. Pull today's 39 abandoned sessions. For each, output:
+   - Last successful event before drop-off
+   - Time on form before leaving
+   - Last field interacted with
+   - Any client-console, server, or API errors in the same session
+   - User-agent, device class, viewport size
+   - Iframe referrer (confirm they came from the Elementor page vs. direct)
+3. Cluster the 39 into drop-off buckets. I want patterns like "N users left at field X right after a MapQuest 4xx," not a generic funnel chart.
+
+## Phase 2 — Root-cause hunt across suspect categories
+
+### A. Iframe + Elementor interaction
+- Inspect `sandbox` and `allow` attributes on the iframe — are any blocking autofill, clipboard, geolocation, or payment APIs the form needs?
+- Is the iframe receiving the `postMessage` traffic it expects from the parent (resize, scroll, focus)? Any rejected origins?
+- Third-party cookie / storage partitioning: are we relying on anything that breaks under Safari ITP or Chrome with 3PC blocked? Test session continuity in those modes.
+- Mobile: is the iframe content height being clipped, or are touch / scroll events being trapped by the Elementor container?
+- Is Elementor lazy-loading the iframe in a way that delays our JS bootstrap past the user's first interaction?
+- Any CSS or font variables from the parent leaking in or being blocked?
+
+### B. MapQuest API failure modes
+- Last 7 days of MapQuest calls: error rate, latency p50/p95/p99, timeout count, rate-limit hits.
+- Address patterns that fail disproportionately (rural, PO boxes, apartment units, non-US, typo'd input).
+- Autocomplete: are requests being dropped when the user types fast? Debounce working as intended?
+- Are API errors surfaced as recoverable UI states, or does the form silently freeze?
+- CORS / referrer issues specifically from inside the iframe context (not just from the Replit preview).
+
+### C. AI step failure modes
+- Latency p50/p95/p99 per AI call. Anything over ~5s while the user is waiting visibly?
+- Failure rate, timeout policy, retry behavior. What does the user see during a retry?
+- Malformed / hallucinated responses: does parsing ever fail silently and leave the user on a "loading" state forever?
+- Are AI outputs ever feeding into downstream validation in a way that legitimate users get rejected?
+
+### D. Form mechanics
+- Per-field validation rules — any regex too strict (phone, zip, email-with-plus-sign, international addresses)?
+- Mobile keyboard correctness: `inputmode`, `type`, `autocomplete` attributes per field. iOS focus-jump issues inside iframes?
+- Browser autofill: does it actually work in this iframe? Any JS handlers killing autofilled values?
+- Tab order, "Next" button accessibility, focus management between steps.
+- Error message visibility on submit — are errors rendered where the user can see them, with auto-scroll? Or does clicking submit appear to do nothing?
+
+### E. Performance
+- Time-to-interactive on a simulated 4G mobile profile.
+- LCP and any render-blocking resources.
+- Bundle size — anything deferrable?
+- Memory / state leaks for users who tab away and return.
+
+### F. Browser/device matrix
+- iOS Safari 17+ (new privacy defaults are aggressive).
+- Chrome Android.
+- Desktop Safari, Chrome, Firefox, Edge.
+- Flag any platform with disproportionate abandonment in today's 39.
+
+## Phase 3 — Required output
+A single prioritized report with these sections:
+
+1. **Smoking guns** — top 1–5 most likely causes of today's 39, ranked by estimated impact. Each with: evidence (specific log entries, file:line, session IDs), hypothesis, proposed fix, effort estimate, regression risk.
+2. **Strong suspects** — real issues that are harder to attribute to specific drop-offs but worth fixing.
+3. **Instrumentation gaps** — exactly what I need to add to measure cause more precisely going forward.
+4. **Host-page asks** — anything I need to change on the Elementor landing page (iframe attributes, container CSS, script load order, CSP). Be specific enough that I can hand it to whoever owns the WordPress site.
+5. **Quick wins vs. structural fixes** — separated, with my recommended order of operations.
+
+## Rules of engagement
+- Cite specific files, line numbers, log timestamps, or session IDs as evidence. No vague "the form may have issues."
+- If a hypothesis isn't testable with the data we have, say so and propose what to add.
+- Do not modify code in this pass. After I approve fixes, propose a diff and wait for go-ahead before applying.
+- Label guesses as guesses. I'd rather have an honest "unknown — need data X" than a confident wrong answer.
