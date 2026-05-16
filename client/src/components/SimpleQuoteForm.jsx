@@ -725,7 +725,7 @@ const SimpleQuoteForm = () => {
                       name="model"
                       value={formData.model}
                       onChange={handleChange}
-                      placeholder="Model"
+                      placeholder="Type in your model"
                       required
                     />
                   ) : (
@@ -776,7 +776,7 @@ const SimpleQuoteForm = () => {
                     name="model"
                     value={formData.model}
                     onChange={handleChange}
-                    placeholder="Model"
+                    placeholder="Type in your model"
                     required
                   />
                 </div>
@@ -787,7 +787,7 @@ const SimpleQuoteForm = () => {
 
         <div className="form-section">
           <div className="form-header">
-            <h2>Shipment Details</h2>
+            <h2>Available Ship Date</h2>
           </div>
           <div className="form-fields">
             <div
@@ -811,6 +811,7 @@ const SimpleQuoteForm = () => {
             </div>
             {formData.shipmentDate && (
               <>
+                <p style={{ fontSize: "13px", color: "#6B7280", margin: "8px 0", textAlign: "center" }}>↓ Almost done — scroll down to finish</p>
                 <div className="form-field">
                   <input
                     type="text"
