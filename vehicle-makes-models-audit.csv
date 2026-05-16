@@ -1,617 +1,870 @@
-make,model,status,notes
-Toyota,4Runner,CURRENT,Has dropdown
-Toyota,Avalon,CURRENT,Has dropdown
-Toyota,Camry,CURRENT,Has dropdown
-Toyota,Camry Hybrid,CURRENT,Has dropdown
-Toyota,Celica,CURRENT,Has dropdown
-Toyota,Corolla,CURRENT,Has dropdown
-Toyota,Corolla Cross,CURRENT,Has dropdown
-Toyota,Corolla Cross Hybrid,CURRENT,Has dropdown
-Toyota,Corolla Hatchback,CURRENT,Has dropdown
-Toyota,Crown,CURRENT,Has dropdown
-Toyota,FJ Cruiser,CURRENT,Has dropdown
-Toyota,GR Corolla,CURRENT,Has dropdown
-Toyota,GR Supra,CURRENT,Has dropdown
-Toyota,GR86,CURRENT,Has dropdown
-Toyota,Grand Highlander,CURRENT,Has dropdown
-Toyota,Grand Highlander Hybrid,CURRENT,Has dropdown
-Toyota,Highlander,CURRENT,Has dropdown
-Toyota,Highlander Hybrid,CURRENT,Has dropdown
-Toyota,Land Cruiser,CURRENT,Has dropdown
-Toyota,MR2,CURRENT,Has dropdown
-Toyota,Matrix,CURRENT,Has dropdown
-Toyota,Mirai,CURRENT,Has dropdown
-Toyota,Prius,CURRENT,Has dropdown
-Toyota,Prius Prime,CURRENT,Has dropdown
-Toyota,RAV4,CURRENT,Has dropdown
-Toyota,RAV4 Hybrid,CURRENT,Has dropdown
-Toyota,RAV4 Prime,CURRENT,Has dropdown
-Toyota,Sequoia,CURRENT,Has dropdown
-Toyota,Sienna,CURRENT,Has dropdown
-Toyota,Supra,CURRENT,Has dropdown
-Toyota,Tacoma,CURRENT,Has dropdown
-Toyota,Tundra,CURRENT,Has dropdown
-Toyota,Venza,CURRENT,Has dropdown
-Toyota,Yaris,CURRENT,Has dropdown
-Toyota,bZ4X,CURRENT,Has dropdown
-Toyota,C-HR,MISSING,Popular model not in dropdown
-Toyota,Crown Hybrid,MISSING,Popular model not in dropdown
-Toyota,Tundra Hybrid,MISSING,Popular model not in dropdown
-Toyota,Sequoia Hybrid,MISSING,Popular model not in dropdown
-Toyota,bZ3X,MISSING,Popular model not in dropdown
-Honda,Accord,CURRENT,Has dropdown
-Honda,Accord Hybrid,CURRENT,Has dropdown
-Honda,CR-V,CURRENT,Has dropdown
-Honda,CR-Z,CURRENT,Has dropdown
-Honda,Civic,CURRENT,Has dropdown
-Honda,Civic Hybrid,CURRENT,Has dropdown
-Honda,Clarity,CURRENT,Has dropdown
-Honda,Clarity EV,CURRENT,Has dropdown
-Honda,Crosstour,CURRENT,Has dropdown
-Honda,Element,CURRENT,Has dropdown
-Honda,Fit,CURRENT,Has dropdown
-Honda,HR-V,CURRENT,Has dropdown
-Honda,Insight,CURRENT,Has dropdown
-Honda,Insight Hybrid,CURRENT,Has dropdown
-Honda,Legend,CURRENT,Has dropdown
-Honda,NSX,CURRENT,Has dropdown
-Honda,Odyssey,CURRENT,Has dropdown
-Honda,Passport,CURRENT,Has dropdown
-Honda,Pilot,CURRENT,Has dropdown
-Honda,Prelude,CURRENT,Has dropdown
-Honda,Prologue,CURRENT,Has dropdown
-Honda,Ridgeline,CURRENT,Has dropdown
-Honda,S2000,CURRENT,Has dropdown
-Honda,ZR-V,CURRENT,Has dropdown
-Honda,Integra,MISSING,Popular model not in dropdown
-Honda,Del Sol,MISSING,Popular model not in dropdown
-Honda,Jazz,MISSING,Popular model not in dropdown
-Ford,Aerostar,CURRENT,Has dropdown
-Ford,Aspire,CURRENT,Has dropdown
-Ford,Bronco,CURRENT,Has dropdown
-Ford,Bronco Sport,CURRENT,Has dropdown
-Ford,C-Max,CURRENT,Has dropdown
-Ford,Chateau,CURRENT,Has dropdown
-Ford,Club Wagon,CURRENT,Has dropdown
-Ford,Contour,CURRENT,Has dropdown
-Ford,Courier,CURRENT,Has dropdown
-Ford,Crown Victoria,CURRENT,Has dropdown
-Ford,Custom Van,CURRENT,Has dropdown
-Ford,E-350 Cutaway,CURRENT,Has dropdown
-Ford,E-450 Cutaway,CURRENT,Has dropdown
-Ford,E-Series,CURRENT,Has dropdown
-Ford,EcoSport,CURRENT,Has dropdown
-Ford,Edge,CURRENT,Has dropdown
-Ford,Escape,CURRENT,Has dropdown
-Ford,Escort,CURRENT,Has dropdown
-Ford,Expedition,CURRENT,Has dropdown
-Ford,Explorer,CURRENT,Has dropdown
-Ford,Explorer Sport Trac,CURRENT,Has dropdown
-Ford,F-150,CURRENT,Has dropdown
-Ford,F-150 Lightning,CURRENT,Has dropdown
-Ford,F-250,CURRENT,Has dropdown
-Ford,F-350,CURRENT,Has dropdown
-Ford,F-450 Cutaway,CURRENT,Has dropdown
-Ford,F-450 F-550,CURRENT,Has dropdown
-Ford,F-550 Cutaway,CURRENT,Has dropdown
-Ford,Fairmont,CURRENT,Has dropdown
-Ford,Falcon,CURRENT,Has dropdown
-Ford,Fiesta,CURRENT,Has dropdown
-Ford,Five Hundred,CURRENT,Has dropdown
-Ford,Flex,CURRENT,Has dropdown
-Ford,Focus,CURRENT,Has dropdown
-Ford,Freestyle,CURRENT,Has dropdown
-Ford,Fusion,CURRENT,Has dropdown
-Ford,Galaxie,CURRENT,Has dropdown
-Ford,Granada,CURRENT,Has dropdown
-Ford,LTD,CURRENT,Has dropdown
-Ford,Maverick 1970s,CURRENT,Has dropdown
-Ford,Maverick 2022,CURRENT,Has dropdown
-Ford,Mustang,CURRENT,Has dropdown
-Ford,Mustang Mach-E,CURRENT,Has dropdown
-Ford,Pinto,CURRENT,Has dropdown
-Ford,Probe,CURRENT,Has dropdown
-Ford,Ranger,CURRENT,Has dropdown
-Ford,Super Duty Series,CURRENT,Has dropdown
-Ford,Taurus,CURRENT,Has dropdown
-Ford,Tempo,CURRENT,Has dropdown
-Ford,Thunderbird,CURRENT,Has dropdown
-Ford,Transit,CURRENT,Has dropdown
-Ford,Transit Cargo Van,CURRENT,Has dropdown
-Ford,Transit Connect,CURRENT,Has dropdown
-Ford,Transit Cutaway,CURRENT,Has dropdown
-Ford,Windstar,CURRENT,Has dropdown
-Ford,Mustang Dark Horse,MISSING,Popular model not in dropdown
-Ford,F-150 Tremor,MISSING,Popular model not in dropdown
-Ford,Bronco Raptor,MISSING,Popular model not in dropdown
-Ford,Ranger Raptor,MISSING,Popular model not in dropdown
-Chevrolet,Astro,CURRENT,Has dropdown
-Chevrolet,Avalanche,CURRENT,Has dropdown
-Chevrolet,Aveo,CURRENT,Has dropdown
-Chevrolet,Bel Air,CURRENT,Has dropdown
-Chevrolet,Biscayne,CURRENT,Has dropdown
-Chevrolet,Blazer,CURRENT,Has dropdown
-Chevrolet,Bolt EV EUV,CURRENT,Has dropdown
-Chevrolet,C K Series,CURRENT,Has dropdown
-Chevrolet,Camaro,CURRENT,Has dropdown
-Chevrolet,Caprice,CURRENT,Has dropdown
-Chevrolet,Captiva Sport,CURRENT,Has dropdown
-Chevrolet,Cavalier,CURRENT,Has dropdown
-Chevrolet,Celebrity,CURRENT,Has dropdown
-Chevrolet,Chevelle,CURRENT,Has dropdown
-Chevrolet,Citation,CURRENT,Has dropdown
-Chevrolet,City Express,CURRENT,Has dropdown
-Chevrolet,Cobalt,CURRENT,Has dropdown
-Chevrolet,Colorado,CURRENT,Has dropdown
-Chevrolet,Corsica,CURRENT,Has dropdown
-Chevrolet,Corvette,CURRENT,Has dropdown
-Chevrolet,Cruze,CURRENT,Has dropdown
-Chevrolet,El Camino,CURRENT,Has dropdown
-Chevrolet,Equinox,CURRENT,Has dropdown
-Chevrolet,Express,CURRENT,Has dropdown
-Chevrolet,Express 3500 Cutaway,CURRENT,Has dropdown
-Chevrolet,Express 4500 Cutaway,CURRENT,Has dropdown
-Chevrolet,Express Cargo Van,CURRENT,Has dropdown
-Chevrolet,G-Series Van,CURRENT,Has dropdown
-Chevrolet,HHR,CURRENT,Has dropdown
-Chevrolet,Impala,CURRENT,Has dropdown
-Chevrolet,LUV,CURRENT,Has dropdown
-Chevrolet,Lumina,CURRENT,Has dropdown
-Chevrolet,Lumina APV,CURRENT,Has dropdown
-Chevrolet,Malibu,CURRENT,Has dropdown
-Chevrolet,Metro,CURRENT,Has dropdown
-Chevrolet,Monza,CURRENT,Has dropdown
-Chevrolet,Nova,CURRENT,Has dropdown
-Chevrolet,S-10,CURRENT,Has dropdown
-Chevrolet,SS,CURRENT,Has dropdown
-Chevrolet,SSR,CURRENT,Has dropdown
-Chevrolet,Silverado,CURRENT,Has dropdown
-Chevrolet,Silverado 1500,CURRENT,Has dropdown
-Chevrolet,Silverado 2500HD,CURRENT,Has dropdown
-Chevrolet,Silverado 3500HD,CURRENT,Has dropdown
-Chevrolet,Sonic,CURRENT,Has dropdown
-Chevrolet,Suburban,CURRENT,Has dropdown
-Chevrolet,Tahoe,CURRENT,Has dropdown
-Chevrolet,Tracker,CURRENT,Has dropdown
-Chevrolet,Trailblazer,CURRENT,Has dropdown
-Chevrolet,Traverse,CURRENT,Has dropdown
-Chevrolet,Uplander,CURRENT,Has dropdown
-Chevrolet,Vega,CURRENT,Has dropdown
-Chevrolet,Venture,CURRENT,Has dropdown
-Chevrolet,Volt,CURRENT,Has dropdown
-Chevrolet,Spark,MISSING,Popular model not in dropdown
-Chevrolet,Trax,MISSING,Popular model not in dropdown
-Chevrolet,Equinox EV,MISSING,Popular model not in dropdown
-Chevrolet,Blazer EV,MISSING,Popular model not in dropdown
-BMW,1 Series,CURRENT,Has dropdown
-BMW,2 Series,CURRENT,Has dropdown
-BMW,3 Series,CURRENT,Has dropdown
-BMW,4 Series,CURRENT,Has dropdown
-BMW,5 Series,CURRENT,Has dropdown
-BMW,6 Series,CURRENT,Has dropdown
-BMW,7 Series,CURRENT,Has dropdown
-BMW,8 Series,CURRENT,Has dropdown
-BMW,M1,CURRENT,Has dropdown
-BMW,M2,CURRENT,Has dropdown
-BMW,M3,CURRENT,Has dropdown
-BMW,M4,CURRENT,Has dropdown
-BMW,M5,CURRENT,Has dropdown
-BMW,M6,CURRENT,Has dropdown
-BMW,M8,CURRENT,Has dropdown
-BMW,X1,CURRENT,Has dropdown
-BMW,X2,CURRENT,Has dropdown
-BMW,X3,CURRENT,Has dropdown
-BMW,X3M,CURRENT,Has dropdown
-BMW,X4,CURRENT,Has dropdown
-BMW,X4M,CURRENT,Has dropdown
-BMW,X5,CURRENT,Has dropdown
-BMW,X5M,CURRENT,Has dropdown
-BMW,X6,CURRENT,Has dropdown
-BMW,X6M,CURRENT,Has dropdown
-BMW,X7,CURRENT,Has dropdown
-BMW,XM,CURRENT,Has dropdown
-BMW,Z3,CURRENT,Has dropdown
-BMW,Z4,CURRENT,Has dropdown
-BMW,Z8,CURRENT,Has dropdown
-BMW,i3,CURRENT,Has dropdown
-BMW,i4,CURRENT,Has dropdown
-BMW,i5,CURRENT,Has dropdown
-BMW,i7,CURRENT,Has dropdown
-BMW,i8,CURRENT,Has dropdown
-BMW,iX,CURRENT,Has dropdown
-BMW,iX1,CURRENT,Has dropdown
-BMW,iX3,CURRENT,Has dropdown
-BMW,iX2,MISSING,Popular model not in dropdown
-BMW,X1 M35i,MISSING,Popular model not in dropdown
-BMW,M240i,MISSING,Popular model not in dropdown
-Audi,A3,CURRENT,Has dropdown
-Audi,A4,CURRENT,Has dropdown
-Audi,A4 allroad,CURRENT,Has dropdown
-Audi,A5,CURRENT,Has dropdown
-Audi,A5 Cabriolet,CURRENT,Has dropdown
-Audi,A6,CURRENT,Has dropdown
-Audi,A7,CURRENT,Has dropdown
-Audi,A8,CURRENT,Has dropdown
-Audi,Q3,CURRENT,Has dropdown
-Audi,Q4 e-tron,CURRENT,Has dropdown
-Audi,Q5,CURRENT,Has dropdown
-Audi,Q5 Sportback,CURRENT,Has dropdown
-Audi,Q7,CURRENT,Has dropdown
-Audi,Q8,CURRENT,Has dropdown
-Audi,Q8 e-tron,CURRENT,Has dropdown
-Audi,R8,CURRENT,Has dropdown
-Audi,RS Q3,CURRENT,Has dropdown
-Audi,RS Q8,CURRENT,Has dropdown
-Audi,RS e-tron GT,CURRENT,Has dropdown
-Audi,RS3,CURRENT,Has dropdown
-Audi,RS4,CURRENT,Has dropdown
-Audi,RS5,CURRENT,Has dropdown
-Audi,RS6 Avant,CURRENT,Has dropdown
-Audi,RS7,CURRENT,Has dropdown
-Audi,S3,CURRENT,Has dropdown
-Audi,S4,CURRENT,Has dropdown
-Audi,S5,CURRENT,Has dropdown
-Audi,S5 Cabriolet,CURRENT,Has dropdown
-Audi,S6,CURRENT,Has dropdown
-Audi,S7,CURRENT,Has dropdown
-Audi,S8,CURRENT,Has dropdown
-Audi,SQ5,CURRENT,Has dropdown
-Audi,SQ7,CURRENT,Has dropdown
-Audi,SQ8,CURRENT,Has dropdown
-Audi,TT,CURRENT,Has dropdown
-Audi,TT RS,CURRENT,Has dropdown
-Audi,TTS,CURRENT,Has dropdown
-Audi,e-tron,CURRENT,Has dropdown
-Audi,e-tron GT,CURRENT,Has dropdown
-Audi,A1,MISSING,Popular model not in dropdown
-Audi,Q2,MISSING,Popular model not in dropdown
-Audi,Q6 e-tron,MISSING,Popular model not in dropdown
-Audi,S e-tron GT,MISSING,Popular model not in dropdown
-Tesla,Cybertruck,CURRENT,Has dropdown
-Tesla,Model 3,CURRENT,Has dropdown
-Tesla,Model S,CURRENT,Has dropdown
-Tesla,Model X,CURRENT,Has dropdown
-Tesla,Model Y,CURRENT,Has dropdown
-Tesla,Roadster,MISSING,Popular model not in dropdown
-Tesla,Semi,MISSING,Popular model not in dropdown
-RAM,1500,CURRENT,Has dropdown
-RAM,2500,CURRENT,Has dropdown
-RAM,3500,CURRENT,Has dropdown
-RAM,ProMaster,CURRENT,Has dropdown
-RAM,1500 Classic,MISSING,Popular model not in dropdown
-RAM,TRX,MISSING,Popular model not in dropdown
-Ram,4500 Cutaway,CURRENT,Has dropdown
-Ram,5500 Cutaway,CURRENT,Has dropdown
-Ram,ProMaster 1500 Cargo Van,CURRENT,Has dropdown
-Ram,ProMaster 2500 Cargo Van,CURRENT,Has dropdown
-Ram,ProMaster 3500 Cargo Van,CURRENT,Has dropdown
-Ram,ProMaster Cutaway,CURRENT,Has dropdown
-GMC,Acadia,CURRENT,Has dropdown
-GMC,Canyon,CURRENT,Has dropdown
-GMC,Envoy,CURRENT,Has dropdown
-GMC,Hummer EV,CURRENT,Has dropdown
-GMC,Hummer EV SUV,CURRENT,Has dropdown
-GMC,Jimmy,CURRENT,Has dropdown
-GMC,Safari,CURRENT,Has dropdown
-GMC,Savana 3500 Cutaway,CURRENT,Has dropdown
-GMC,Savana 4500 Cutaway,CURRENT,Has dropdown
-GMC,Savana Cargo Van,CURRENT,Has dropdown
-GMC,Savana Passenger Van,CURRENT,Has dropdown
-GMC,Sierra,CURRENT,Has dropdown
-GMC,Sierra 1500,CURRENT,Has dropdown
-GMC,Sierra 2500 HD,CURRENT,Has dropdown
-GMC,Sierra 3500 HD,CURRENT,Has dropdown
-GMC,Sierra EV,CURRENT,Has dropdown
-GMC,Sonoma,CURRENT,Has dropdown
-GMC,Syclone,CURRENT,Has dropdown
-GMC,Terrain,CURRENT,Has dropdown
-GMC,Typhoon,CURRENT,Has dropdown
-GMC,Yukon,CURRENT,Has dropdown
-GMC,Yukon XL,CURRENT,Has dropdown
-GMC,Canyon EV,MISSING,Popular model not in dropdown
-GMC,Yukon AT4,MISSING,Popular model not in dropdown
-Nissan,240SX,CURRENT,Has dropdown
-Nissan,300ZX,CURRENT,Has dropdown
-Nissan,Altima,CURRENT,Has dropdown
-Nissan,Altima Coupe,CURRENT,Has dropdown
-Nissan,Armada,CURRENT,Has dropdown
-Nissan,Cube,CURRENT,Has dropdown
-Nissan,Frontier,CURRENT,Has dropdown
-Nissan,GT-R,CURRENT,Has dropdown
-Nissan,Juke,CURRENT,Has dropdown
-Nissan,Kicks,CURRENT,Has dropdown
-Nissan,Leaf,CURRENT,Has dropdown
-Nissan,Maxima,CURRENT,Has dropdown
-Nissan,Murano,CURRENT,Has dropdown
-Nissan,Murano CrossCabriolet,CURRENT,Has dropdown
-Nissan,NV1500 Cargo Van,CURRENT,Has dropdown
-Nissan,NV200,CURRENT,Has dropdown
-Nissan,NV2500 HD Cargo Van,CURRENT,Has dropdown
-Nissan,NV3500 HD Cargo Van,CURRENT,Has dropdown
-Nissan,Pathfinder,CURRENT,Has dropdown
-Nissan,Quest,CURRENT,Has dropdown
-Nissan,Rogue,CURRENT,Has dropdown
-Nissan,Rogue Sport,CURRENT,Has dropdown
-Nissan,Sentra,CURRENT,Has dropdown
-Nissan,Titan,CURRENT,Has dropdown
-Nissan,Titan XD,CURRENT,Has dropdown
-Nissan,Versa,CURRENT,Has dropdown
-Nissan,Xterra,CURRENT,Has dropdown
-Nissan,Z (350Z, 370Z, 400Z),CURRENT,Has dropdown
-Nissan,Ariya,MISSING,Popular model not in dropdown
-Nissan,400Z,MISSING,Popular model not in dropdown
-Nissan,Z Proto,MISSING,Popular model not in dropdown
-Jeep,CJ-5,CURRENT,Has dropdown
-Jeep,CJ-7,CURRENT,Has dropdown
-Jeep,Cherokee,CURRENT,Has dropdown
-Jeep,Comanche,CURRENT,Has dropdown
-Jeep,Commander,CURRENT,Has dropdown
-Jeep,Compass,CURRENT,Has dropdown
-Jeep,Gladiator,CURRENT,Has dropdown
-Jeep,Grand Cherokee,CURRENT,Has dropdown
-Jeep,Grand Cherokee 4xe,CURRENT,Has dropdown
-Jeep,Grand Cherokee L,CURRENT,Has dropdown
-Jeep,Grand Cherokee SRT,CURRENT,Has dropdown
-Jeep,Grand Wagoneer,CURRENT,Has dropdown
-Jeep,Grand Wagoneer L,CURRENT,Has dropdown
-Jeep,Liberty,CURRENT,Has dropdown
-Jeep,Patriot,CURRENT,Has dropdown
-Jeep,Renegade,CURRENT,Has dropdown
-Jeep,Scrambler,CURRENT,Has dropdown
-Jeep,Trackhawk,CURRENT,Has dropdown
-Jeep,Wagoneer,CURRENT,Has dropdown
-Jeep,Wagoneer L,CURRENT,Has dropdown
-Jeep,Wrangler,CURRENT,Has dropdown
-Jeep,Wrangler 4xe,CURRENT,Has dropdown
-Jeep,Wrangler Unlimited,CURRENT,Has dropdown
-Jeep,Hornet,MISSING,Popular model not in dropdown
-Jeep,Recon,MISSING,Popular model not in dropdown
-Jeep,Avenger,MISSING,Popular model not in dropdown
-Hyundai,Accent,CURRENT,Has dropdown
-Hyundai,Azera,CURRENT,Has dropdown
-Hyundai,Elantra,CURRENT,Has dropdown
-Hyundai,Entourage,CURRENT,Has dropdown
-Hyundai,Genesis,CURRENT,Has dropdown
-Hyundai,Genesis Coupe,CURRENT,Has dropdown
-Hyundai,Ioniq,CURRENT,Has dropdown
-Hyundai,Ioniq 5,CURRENT,Has dropdown
-Hyundai,Ioniq 6,CURRENT,Has dropdown
-Hyundai,Kona,CURRENT,Has dropdown
-Hyundai,Kona Electric,CURRENT,Has dropdown
-Hyundai,Kona N,CURRENT,Has dropdown
-Hyundai,Nexo,CURRENT,Has dropdown
-Hyundai,Palisade,CURRENT,Has dropdown
-Hyundai,Santa Fe,CURRENT,Has dropdown
-Hyundai,Santa Fe Hybrid,CURRENT,Has dropdown
-Hyundai,Santa Fe Plug-In Hybrid,CURRENT,Has dropdown
-Hyundai,Sonata,CURRENT,Has dropdown
-Hyundai,Tiburon,CURRENT,Has dropdown
-Hyundai,Tucson,CURRENT,Has dropdown
-Hyundai,Tucson Hybrid,CURRENT,Has dropdown
-Hyundai,Tucson Plug-In Hybrid,CURRENT,Has dropdown
-Hyundai,Veloster,CURRENT,Has dropdown
-Hyundai,Veloster N,CURRENT,Has dropdown
-Hyundai,Venue,CURRENT,Has dropdown
-Hyundai,Ioniq 7,MISSING,Popular model not in dropdown
-Hyundai,Santa Cruz,MISSING,Popular model not in dropdown
-Hyundai,Casper,MISSING,Popular model not in dropdown
-Kia,Amanti,CURRENT,Has dropdown
-Kia,Bongo,CURRENT,Has dropdown
-Kia,Borrego,CURRENT,Has dropdown
-Kia,Cadenza,CURRENT,Has dropdown
-Kia,Carnival,CURRENT,Has dropdown
-Kia,EV5,CURRENT,Has dropdown
-Kia,EV6,CURRENT,Has dropdown
-Kia,EV9,CURRENT,Has dropdown
-Kia,Forte,CURRENT,Has dropdown
-Kia,K5,CURRENT,Has dropdown
-Kia,K900,CURRENT,Has dropdown
-Kia,Mohave,CURRENT,Has dropdown
-Kia,Niro,CURRENT,Has dropdown
-Kia,Niro EV,CURRENT,Has dropdown
-Kia,Niro Hybrid,CURRENT,Has dropdown
-Kia,Niro PHEV,CURRENT,Has dropdown
-Kia,Optima,CURRENT,Has dropdown
-Kia,Optima Hybrid,CURRENT,Has dropdown
-Kia,Optima PHEV,CURRENT,Has dropdown
-Kia,Rio,CURRENT,Has dropdown
-Kia,Rondo,CURRENT,Has dropdown
-Kia,Sedona,CURRENT,Has dropdown
-Kia,Seltos,CURRENT,Has dropdown
-Kia,Sorento,CURRENT,Has dropdown
-Kia,Sorento Hybrid,CURRENT,Has dropdown
-Kia,Sorento PHEV,CURRENT,Has dropdown
-Kia,Soul,CURRENT,Has dropdown
-Kia,Soul EV,CURRENT,Has dropdown
-Kia,Spectra,CURRENT,Has dropdown
-Kia,Sportage,CURRENT,Has dropdown
-Kia,Sportage Hybrid,CURRENT,Has dropdown
-Kia,Stinger,CURRENT,Has dropdown
-Kia,Telluride,CURRENT,Has dropdown
-Kia,K4,MISSING,Popular model not in dropdown
-Kia,K8,MISSING,Popular model not in dropdown
-Kia,EV3,MISSING,Popular model not in dropdown
-Kia,EV4,MISSING,Popular model not in dropdown
-Kia,Syros,MISSING,Popular model not in dropdown
-Volkswagen,Arteon,CURRENT,Has dropdown
-Volkswagen,Atlas,CURRENT,Has dropdown
-Volkswagen,Atlas Cross Sport,CURRENT,Has dropdown
-Volkswagen,Beetle,CURRENT,Has dropdown
-Volkswagen,CC,CURRENT,Has dropdown
-Volkswagen,Corrado,CURRENT,Has dropdown
-Volkswagen,Eos,CURRENT,Has dropdown
-Volkswagen,Golf,CURRENT,Has dropdown
-Volkswagen,Golf GTI,CURRENT,Has dropdown
-Volkswagen,Golf R,CURRENT,Has dropdown
-Volkswagen,ID.4,CURRENT,Has dropdown
-Volkswagen,ID.Buzz,CURRENT,Has dropdown
-Volkswagen,Jetta,CURRENT,Has dropdown
-Volkswagen,Jetta GLI,CURRENT,Has dropdown
-Volkswagen,Karmann Ghia,CURRENT,Has dropdown
-Volkswagen,Passat,CURRENT,Has dropdown
-Volkswagen,Phaeton,CURRENT,Has dropdown
-Volkswagen,Rabbit,CURRENT,Has dropdown
-Volkswagen,Routan,CURRENT,Has dropdown
-Volkswagen,Taos,CURRENT,Has dropdown
-Volkswagen,Tiguan,CURRENT,Has dropdown
-Volkswagen,Touareg,CURRENT,Has dropdown
-Volkswagen,ID.3,MISSING,Popular model not in dropdown
-Volkswagen,Tiguan Allspace,MISSING,Popular model not in dropdown
-Volkswagen,T-Roc,MISSING,Popular model not in dropdown
-Subaru,Ascent,CURRENT,Has dropdown
-Subaru,BRZ,CURRENT,Has dropdown
-Subaru,Baja,CURRENT,Has dropdown
-Subaru,Crosstrek,CURRENT,Has dropdown
-Subaru,Forester,CURRENT,Has dropdown
-Subaru,Impreza,CURRENT,Has dropdown
-Subaru,Legacy,CURRENT,Has dropdown
-Subaru,Outback,CURRENT,Has dropdown
-Subaru,SVX,CURRENT,Has dropdown
-Subaru,Solterra,CURRENT,Has dropdown
-Subaru,Tribeca,CURRENT,Has dropdown
-Subaru,WRX,CURRENT,Has dropdown
-Subaru,WRX STI,CURRENT,Has dropdown
-Subaru,XT,CURRENT,Has dropdown
-Subaru,Crosstrek Hybrid,MISSING,Popular model not in dropdown
-Subaru,Wilderness (Outback),MISSING,Popular model not in dropdown
-Subaru,Wilderness (Forester),MISSING,Popular model not in dropdown
-Lexus,CT,CURRENT,Has dropdown
-Lexus,ES,CURRENT,Has dropdown
-Lexus,GS,CURRENT,Has dropdown
-Lexus,GX,CURRENT,Has dropdown
-Lexus,HS,CURRENT,Has dropdown
-Lexus,IS,CURRENT,Has dropdown
-Lexus,IS F,CURRENT,Has dropdown
-Lexus,LC,CURRENT,Has dropdown
-Lexus,LFA,CURRENT,Has dropdown
-Lexus,LS,CURRENT,Has dropdown
-Lexus,LX,CURRENT,Has dropdown
-Lexus,NX,CURRENT,Has dropdown
-Lexus,RC,CURRENT,Has dropdown
-Lexus,RC F,CURRENT,Has dropdown
-Lexus,RX,CURRENT,Has dropdown
-Lexus,RZ,CURRENT,Has dropdown
-Lexus,SC,CURRENT,Has dropdown
-Lexus,TX,CURRENT,Has dropdown
-Lexus,UX,CURRENT,Has dropdown
-Lexus,RX Hybrid,MISSING,Popular model not in dropdown
-Lexus,NX Hybrid,MISSING,Popular model not in dropdown
-Lexus,NX Plug-In Hybrid,MISSING,Popular model not in dropdown
-Lexus,GX Hybrid,MISSING,Popular model not in dropdown
-Lexus,LM,MISSING,Popular model not in dropdown
-Dodge,400,CURRENT,Has dropdown
-Dodge,600,CURRENT,Has dropdown
-Dodge,Aries K-car,CURRENT,Has dropdown
-Dodge,Aspen,CURRENT,Has dropdown
-Dodge,Avenger,CURRENT,Has dropdown
-Dodge,B-Series Van,CURRENT,Has dropdown
-Dodge,Caravan,CURRENT,Has dropdown
-Dodge,Challenger,CURRENT,Has dropdown
-Dodge,Charger,CURRENT,Has dropdown
-Dodge,Coronet,CURRENT,Has dropdown
-Dodge,D100 D150,CURRENT,Has dropdown
-Dodge,D200 D250,CURRENT,Has dropdown
-Dodge,D300 D350,CURRENT,Has dropdown
-Dodge,Dakota,CURRENT,Has dropdown
-Dodge,Dart,CURRENT,Has dropdown
-Dodge,Daytona,CURRENT,Has dropdown
-Dodge,Demon,CURRENT,Has dropdown
-Dodge,Diplomat,CURRENT,Has dropdown
-Dodge,Durango,CURRENT,Has dropdown
-Dodge,Dynasty,CURRENT,Has dropdown
-Dodge,Grand Caravan,CURRENT,Has dropdown
-Dodge,Intrepid,CURRENT,Has dropdown
-Dodge,Journey,CURRENT,Has dropdown
-Dodge,Lancer 1980s,CURRENT,Has dropdown
-Dodge,Lil Red Express Truck,CURRENT,Has dropdown
-Dodge,Mini Ram Van,CURRENT,Has dropdown
-Dodge,Mirada,CURRENT,Has dropdown
-Dodge,Monaco,CURRENT,Has dropdown
-Dodge,Neon,CURRENT,Has dropdown
-Dodge,Nitro,CURRENT,Has dropdown
-Dodge,Omni,CURRENT,Has dropdown
-Dodge,Polara,CURRENT,Has dropdown
-Dodge,Power Wagon,CURRENT,Has dropdown
-Dodge,Raider,CURRENT,Has dropdown
-Dodge,Ram,CURRENT,Has dropdown
-Dodge,Ram 1500,CURRENT,Has dropdown
-Dodge,Ram 2500,CURRENT,Has dropdown
-Dodge,Ram 3500,CURRENT,Has dropdown
-Dodge,Ram Van,CURRENT,Has dropdown
-Dodge,Ramcharger,CURRENT,Has dropdown
-Dodge,Rampage,CURRENT,Has dropdown
-Dodge,Spirit,CURRENT,Has dropdown
-Dodge,Sportsman,CURRENT,Has dropdown
-Dodge,Sprinter,CURRENT,Has dropdown
-Dodge,Stealth,CURRENT,Has dropdown
-Dodge,Stratus,CURRENT,Has dropdown
-Dodge,Super Bee,CURRENT,Has dropdown
-Dodge,Tradesman,CURRENT,Has dropdown
-Dodge,Viper,CURRENT,Has dropdown
-Dodge,Wagoneer,CURRENT,Has dropdown
-Dodge,Warlock,CURRENT,Has dropdown
-Dodge,Hornet,MISSING,Popular model not in dropdown
-Dodge,Charger Daytona EV,MISSING,Popular model not in dropdown
-Acura,(free text input),FREE_TEXT,No dropdown — user types model
-Alfa Romeo,(free text input),FREE_TEXT,No dropdown — user types model
-Aston Martin,(free text input),FREE_TEXT,No dropdown — user types model
-Bentley,(free text input),FREE_TEXT,No dropdown — user types model
-Bugatti,(free text input),FREE_TEXT,No dropdown — user types model
-Buick,(free text input),FREE_TEXT,No dropdown — user types model
-Cadillac,(free text input),FREE_TEXT,No dropdown — user types model
-Chrysler,(free text input),FREE_TEXT,No dropdown — user types model
-Citroën,(free text input),FREE_TEXT,No dropdown — user types model
-Dacia,(free text input),FREE_TEXT,No dropdown — user types model
-Daewoo,(free text input),FREE_TEXT,No dropdown — user types model
-Daihatsu,(free text input),FREE_TEXT,No dropdown — user types model
-Eagle,(free text input),FREE_TEXT,No dropdown — user types model
-Ferrari,(free text input),FREE_TEXT,No dropdown — user types model
-Fiat,(free text input),FREE_TEXT,No dropdown — user types model
-Fisker,(free text input),FREE_TEXT,No dropdown — user types model
-Genesis,(free text input),FREE_TEXT,No dropdown — user types model
-Geo,(free text input),FREE_TEXT,No dropdown — user types model
-Hummer,(free text input),FREE_TEXT,No dropdown — user types model
-Infiniti,(free text input),FREE_TEXT,No dropdown — user types model
-International,(free text input),FREE_TEXT,No dropdown — user types model
-Isuzu,(free text input),FREE_TEXT,No dropdown — user types model
-Jaguar,(free text input),FREE_TEXT,No dropdown — user types model
-Karma,(free text input),FREE_TEXT,No dropdown — user types model
-Koenigsegg,(free text input),FREE_TEXT,No dropdown — user types model
-Lamborghini,(free text input),FREE_TEXT,No dropdown — user types model
-Lancia,(free text input),FREE_TEXT,No dropdown — user types model
-Land Rover,(free text input),FREE_TEXT,No dropdown — user types model
-Lincoln,(free text input),FREE_TEXT,No dropdown — user types model
-Lotus,(free text input),FREE_TEXT,No dropdown — user types model
-Lucid,(free text input),FREE_TEXT,No dropdown — user types model
-Maserati,(free text input),FREE_TEXT,No dropdown — user types model
-Maybach,(free text input),FREE_TEXT,No dropdown — user types model
-Mazda,(free text input),FREE_TEXT,No dropdown — user types model
-McLaren,(free text input),FREE_TEXT,No dropdown — user types model
-Mercedes,(free text input),FREE_TEXT,No dropdown — user types model
-Mercedes-Benz,(free text input),FREE_TEXT,No dropdown — user types model
-Mercury,(free text input),FREE_TEXT,No dropdown — user types model
-Mini,(free text input),FREE_TEXT,No dropdown — user types model
-Mitsubishi,(free text input),FREE_TEXT,No dropdown — user types model
-Oldsmobile,(free text input),FREE_TEXT,No dropdown — user types model
-Opel,(free text input),FREE_TEXT,No dropdown — user types model
-Peugeot,(free text input),FREE_TEXT,No dropdown — user types model
-Plymouth,(free text input),FREE_TEXT,No dropdown — user types model
-Polestar,(free text input),FREE_TEXT,No dropdown — user types model
-Pontiac,(free text input),FREE_TEXT,No dropdown — user types model
-Porsche,(free text input),FREE_TEXT,No dropdown — user types model
-Renault,(free text input),FREE_TEXT,No dropdown — user types model
-Rivian,(free text input),FREE_TEXT,No dropdown — user types model
-Rolls-Royce,(free text input),FREE_TEXT,No dropdown — user types model
-Saab,(free text input),FREE_TEXT,No dropdown — user types model
-Saleen,(free text input),FREE_TEXT,No dropdown — user types model
-Saturn,(free text input),FREE_TEXT,No dropdown — user types model
-Scion,(free text input),FREE_TEXT,No dropdown — user types model
-Seat,(free text input),FREE_TEXT,No dropdown — user types model
-Skoda,(free text input),FREE_TEXT,No dropdown — user types model
-Smart,(free text input),FREE_TEXT,No dropdown — user types model
-Spyker,(free text input),FREE_TEXT,No dropdown — user types model
-Suzuki,(free text input),FREE_TEXT,No dropdown — user types model
-Tata,(free text input),FREE_TEXT,No dropdown — user types model
-VinFast,(free text input),FREE_TEXT,No dropdown — user types model
-Volvo,(free text input),FREE_TEXT,No dropdown — user types model
-Yugo,(free text input),FREE_TEXT,No dropdown — user types model
+make,model,app_status,priority_to_add,notes
+Toyota,4Runner,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Avalon,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Camry,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Camry Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Celica,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Corolla,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Corolla Cross,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Corolla Cross Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Corolla Hatchback,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Crown,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,FJ Cruiser,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,GR Corolla,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,GR Supra,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,GR86,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Grand Highlander,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Grand Highlander Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Highlander,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Highlander Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Land Cruiser,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,MR2,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Matrix,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Mirai,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Prius,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Prius Prime,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,RAV4,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,RAV4 Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,RAV4 Prime,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Sequoia,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Sienna,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Supra,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Tacoma,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Tundra,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Venza,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,Yaris,in_app_dropdown,N/A,Currently in app with dropdown
+Toyota,bZ4X,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Accord,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Accord Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,CR-V,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,CR-Z,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Civic,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Civic Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Clarity,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Clarity EV,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Crosstour,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Element,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Fit,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,HR-V,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Insight,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Insight Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Legend,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,NSX,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Odyssey,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Passport,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Pilot,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Prelude,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Prologue,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,Ridgeline,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,S2000,in_app_dropdown,N/A,Currently in app with dropdown
+Honda,ZR-V,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Aerostar,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Aspire,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Bronco,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Bronco Sport,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,C-Max,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Chateau,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Club Wagon,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Contour,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Courier,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Crown Victoria,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Custom Van,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,E-350 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,E-450 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,E-Series,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,EcoSport,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Edge,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Escape,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Escort,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Expedition,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Explorer,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Explorer Sport Trac,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-150,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-150 Lightning,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-250,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-350,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-450 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-450 F-550,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,F-550 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Fairmont,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Falcon,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Fiesta,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Five Hundred,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Flex,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Focus,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Freestyle,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Fusion,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Galaxie,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Granada,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,LTD,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Maverick 1970s,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Maverick 2022,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Mustang,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Mustang Mach-E,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Pinto,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Probe,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Ranger,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Super Duty Series,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Taurus,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Tempo,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Thunderbird,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Transit,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Transit Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Transit Connect,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Transit Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ford,Windstar,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Astro,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Avalanche,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Aveo,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Bel Air,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Biscayne,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Blazer,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Bolt EV EUV,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,C K Series,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Camaro,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Caprice,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Captiva Sport,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Cavalier,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Celebrity,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Chevelle,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Citation,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,City Express,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Cobalt,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Colorado,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Corsica,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Corvette,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Cruze,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,El Camino,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Equinox,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Express,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Express 3500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Express 4500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Express Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,G-Series Van,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,HHR,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Impala,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,LUV,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Lumina,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Lumina APV,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Malibu,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Metro,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Monza,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Nova,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,S-10,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,SS,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,SSR,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Silverado,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Silverado 1500,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Silverado 2500HD,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Silverado 3500HD,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Sonic,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Suburban,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Tahoe,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Tracker,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Trailblazer,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Traverse,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Uplander,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Vega,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Venture,in_app_dropdown,N/A,Currently in app with dropdown
+Chevrolet,Volt,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,1 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,2 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,3 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,4 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,5 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,6 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,7 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,8 Series,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M1,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M2,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M3,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M4,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M5,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M6,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,M8,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X1,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X2,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X3,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X3M,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X4,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X4M,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X5,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X5M,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X6,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X6M,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,X7,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,XM,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,Z3,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,Z4,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,Z8,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,i3,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,i4,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,i5,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,i7,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,i8,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,iX,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,iX1,in_app_dropdown,N/A,Currently in app with dropdown
+BMW,iX3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A4,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A4 allroad,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A5,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A5 Cabriolet,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A6,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A7,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,A8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q4 e-tron,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q5,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q5 Sportback,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q7,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,Q8 e-tron,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,R8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS Q3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS Q8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS e-tron GT,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS4,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS5,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS6 Avant,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,RS7,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S3,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S4,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S5,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S5 Cabriolet,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S6,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S7,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,S8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,SQ5,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,SQ7,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,SQ8,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,TT,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,TT RS,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,TTS,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,e-tron,in_app_dropdown,N/A,Currently in app with dropdown
+Audi,e-tron GT,in_app_dropdown,N/A,Currently in app with dropdown
+Tesla,Cybertruck,in_app_dropdown,N/A,Currently in app with dropdown
+Tesla,Model 3,in_app_dropdown,N/A,Currently in app with dropdown
+Tesla,Model S,in_app_dropdown,N/A,Currently in app with dropdown
+Tesla,Model X,in_app_dropdown,N/A,Currently in app with dropdown
+Tesla,Model Y,in_app_dropdown,N/A,Currently in app with dropdown
+RAM,1500,in_app_dropdown,N/A,Currently in app with dropdown
+RAM,2500,in_app_dropdown,N/A,Currently in app with dropdown
+RAM,3500,in_app_dropdown,N/A,Currently in app with dropdown
+RAM,ProMaster,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,4500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,5500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,ProMaster 1500 Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,ProMaster 2500 Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,ProMaster 3500 Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Ram,ProMaster Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Acadia,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Canyon,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Envoy,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Hummer EV,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Hummer EV SUV,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Jimmy,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Safari,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Savana 3500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Savana 4500 Cutaway,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Savana Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Savana Passenger Van,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sierra,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sierra 1500,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sierra 2500 HD,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sierra 3500 HD,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sierra EV,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Sonoma,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Syclone,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Terrain,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Typhoon,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Yukon,in_app_dropdown,N/A,Currently in app with dropdown
+GMC,Yukon XL,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,240SX,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,300ZX,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Altima,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Altima Coupe,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Armada,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Cube,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Frontier,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,GT-R,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Juke,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Kicks,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Leaf,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Maxima,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Murano,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Murano CrossCabriolet,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,NV1500 Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,NV200,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,NV2500 HD Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,NV3500 HD Cargo Van,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Pathfinder,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Quest,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Rogue,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Rogue Sport,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Sentra,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Titan,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Titan XD,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Versa,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,Xterra,in_app_dropdown,N/A,Currently in app with dropdown
+Nissan,"Z (350Z, 370Z, 400Z)",in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,CJ-5,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,CJ-7,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Cherokee,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Comanche,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Commander,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Compass,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Gladiator,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Cherokee,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Cherokee 4xe,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Cherokee L,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Cherokee SRT,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Wagoneer,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Grand Wagoneer L,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Liberty,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Patriot,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Renegade,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Scrambler,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Trackhawk,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Wagoneer,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Wagoneer L,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Wrangler,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Wrangler 4xe,in_app_dropdown,N/A,Currently in app with dropdown
+Jeep,Wrangler Unlimited,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Accent,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Azera,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Elantra,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Entourage,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Genesis,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Genesis Coupe,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Ioniq,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Ioniq 5,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Ioniq 6,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Kona,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Kona Electric,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Kona N,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Nexo,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Palisade,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Santa Fe,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Santa Fe Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Santa Fe Plug-In Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Sonata,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Tiburon,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Tucson,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Tucson Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Tucson Plug-In Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Veloster,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Veloster N,in_app_dropdown,N/A,Currently in app with dropdown
+Hyundai,Venue,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Amanti,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Bongo,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Borrego,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Cadenza,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Carnival,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,EV5,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,EV6,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,EV9,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Forte,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,K5,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,K900,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Mohave,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Niro,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Niro EV,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Niro Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Niro PHEV,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Optima,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Optima Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Optima PHEV,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Rio,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Rondo,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sedona,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Seltos,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sorento,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sorento Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sorento PHEV,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Soul,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Soul EV,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Spectra,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sportage,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Sportage Hybrid,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Stinger,in_app_dropdown,N/A,Currently in app with dropdown
+Kia,Telluride,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Arteon,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Atlas,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Atlas Cross Sport,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Beetle,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,CC,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Corrado,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Eos,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Golf,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Golf GTI,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Golf R,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,ID.4,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,ID.Buzz,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Jetta,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Jetta GLI,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Karmann Ghia,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Passat,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Phaeton,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Rabbit,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Routan,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Taos,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Tiguan,in_app_dropdown,N/A,Currently in app with dropdown
+Volkswagen,Touareg,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Ascent,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,BRZ,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Baja,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Crosstrek,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Forester,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Impreza,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Legacy,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Outback,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,SVX,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Solterra,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,Tribeca,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,WRX,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,WRX STI,in_app_dropdown,N/A,Currently in app with dropdown
+Subaru,XT,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,CT,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,ES,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,GS,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,GX,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,HS,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,IS,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,IS F,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,LC,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,LFA,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,LS,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,LX,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,NX,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,RC,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,RC F,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,RX,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,RZ,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,SC,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,TX,in_app_dropdown,N/A,Currently in app with dropdown
+Lexus,UX,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,400,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,600,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Aries K-car,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Aspen,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Avenger,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,B-Series Van,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Caravan,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Challenger,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Charger,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Coronet,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,D100 D150,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,D200 D250,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,D300 D350,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Dakota,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Dart,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Daytona,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Demon,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Diplomat,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Durango,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Dynasty,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Grand Caravan,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Intrepid,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Journey,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Lancer 1980s,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Lil Red Express Truck,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Mini Ram Van,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Mirada,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Monaco,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Neon,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Nitro,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Omni,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Polara,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Power Wagon,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Raider,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ram,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ram 1500,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ram 2500,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ram 3500,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ram Van,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Ramcharger,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Rampage,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Spirit,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Sportsman,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Sprinter,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Stealth,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Stratus,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Super Bee,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Tradesman,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Viper,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Wagoneer,in_app_dropdown,N/A,Currently in app with dropdown
+Dodge,Warlock,in_app_dropdown,N/A,Currently in app with dropdown
+Acura,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Alfa Romeo,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Aston Martin,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Bentley,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Bugatti,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Buick,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Cadillac,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Chrysler,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Citroën,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Dacia,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Daewoo,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Daihatsu,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Eagle,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Ferrari,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Fiat,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Fisker,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Genesis,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Geo,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Hummer,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Infiniti,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+International,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Isuzu,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Jaguar,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Karma,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Koenigsegg,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Lamborghini,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Lancia,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Land Rover,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Lincoln,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Lotus,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Lucid,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Maserati,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Maybach,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mazda,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+McLaren,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mercedes,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mercedes-Benz,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mercury,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mini,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Mitsubishi,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Oldsmobile,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Opel,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Peugeot,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Plymouth,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Polestar,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Pontiac,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Porsche,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Renault,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Rivian,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Rolls-Royce,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Saab,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Saleen,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Saturn,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Scion,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Seat,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Skoda,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Smart,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Spyker,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Suzuki,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Tata,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+VinFast,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Volvo,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Yugo,(free text — no dropdown),in_app_free_text,N/A,Make is selectable; customer must type model manually
+Acura,ILX,suggested_addition,High,Popular compact sedan 2013–2022
+Acura,Integra,suggested_addition,High,Revived 2023+; popular with younger buyers
+Acura,MDX,suggested_addition,High,Best-selling Acura SUV
+Acura,NSX,suggested_addition,Medium,Supercar; niche but frequently shipped
+Acura,RDX,suggested_addition,High,Top-selling Acura crossover
+Acura,RLX,suggested_addition,Medium,Flagship sedan
+Acura,TL,suggested_addition,High,Very popular 2004–2014
+Acura,TLX,suggested_addition,High,Current mid-size sedan
+Acura,TSX,suggested_addition,Medium,Popular 2004–2014
+Acura,ZDX,suggested_addition,Medium,Older SUV + new 2024 EV
+Alfa Romeo,4C,suggested_addition,Medium,Sports coupe; frequently shipped
+Alfa Romeo,Giulia,suggested_addition,High,Most common Alfa in US
+Alfa Romeo,Stelvio,suggested_addition,High,Most common Alfa SUV
+Alfa Romeo,Tonale,suggested_addition,Medium,New crossover 2023+
+Aston Martin,DB9,suggested_addition,Medium,Classic GT
+Aston Martin,DB11,suggested_addition,Medium,Current GT
+Aston Martin,DBX,suggested_addition,High,Only Aston SUV; most shipped
+Aston Martin,DBS,suggested_addition,Medium,Supercar
+Aston Martin,Vantage,suggested_addition,Medium,Sports car
+Bentley,Bentayga,suggested_addition,High,Most-shipped Bentley (SUV)
+Bentley,Continental GT,suggested_addition,High,Most-recognized Bentley
+Bentley,Flying Spur,suggested_addition,Medium,Luxury sedan
+Bentley,Mulsanne,suggested_addition,Medium,Flagship; discontinued 2020
+Buick,Enclave,suggested_addition,High,Popular 3-row SUV
+Buick,Encore,suggested_addition,High,Compact SUV best-seller
+Buick,Encore GX,suggested_addition,High,Current compact crossover
+Buick,Envision,suggested_addition,High,Mid-size crossover
+Buick,LaCrosse,suggested_addition,High,Full-size sedan discontinued 2019
+Buick,LeSabre,suggested_addition,Medium,Older full-size; many still shipping
+Buick,Park Avenue,suggested_addition,Medium,Classic large sedan
+Buick,Regal,suggested_addition,Medium,Mid-size sedan discontinued 2020
+Buick,Verano,suggested_addition,Medium,Compact sedan 2012–2017
+Buick,Riviera,suggested_addition,Low,Classic; collector shipments
+Cadillac,ATS,suggested_addition,High,Compact sedan/coupe 2013–2019
+Cadillac,CT4,suggested_addition,High,Current compact sedan
+Cadillac,CT5,suggested_addition,High,Current mid-size sedan
+Cadillac,CTS,suggested_addition,High,Very popular 2003–2019
+Cadillac,DeVille,suggested_addition,Medium,Classic full-size
+Cadillac,DTS,suggested_addition,Medium,Full-size sedan 2006–2011
+Cadillac,Escalade,suggested_addition,High,Flagship SUV; very frequently shipped
+Cadillac,Escalade ESV,suggested_addition,High,Extended version; common
+Cadillac,Escalade EXT,suggested_addition,Medium,Truck bed variant; discontinued
+Cadillac,Lyriq,suggested_addition,High,Current EV crossover
+Cadillac,SRX,suggested_addition,High,Popular SUV 2004–2016
+Cadillac,STS,suggested_addition,Medium,Sedan 2005–2011
+Cadillac,XT4,suggested_addition,High,Current compact SUV
+Cadillac,XT5,suggested_addition,High,Current mid-size SUV; top seller
+Cadillac,XT6,suggested_addition,High,Current 3-row SUV
+Cadillac,XTS,suggested_addition,Medium,Large sedan 2013–2019
+Chrysler,200,suggested_addition,High,Very popular 2011–2017
+Chrysler,300,suggested_addition,High,Most-shipped current Chrysler
+Chrysler,Aspen,suggested_addition,Medium,SUV 2007–2009
+Chrysler,Concorde,suggested_addition,Medium,Sedan 1993–2004
+Chrysler,Crossfire,suggested_addition,Medium,Sports coupe 2004–2008
+Chrysler,New Yorker,suggested_addition,Medium,Classic; older collectors
+Chrysler,Pacifica,suggested_addition,High,Current minivan; very common
+Chrysler,PT Cruiser,suggested_addition,High,Very common older vehicle
+Chrysler,Sebring,suggested_addition,High,Popular sedan/convertible
+Chrysler,Town & Country,suggested_addition,High,Popular minivan pre-Pacifica
+Chrysler,Voyager,suggested_addition,Medium,Budget minivan 2020+
+Ferrari,296,suggested_addition,Low,Rare; high-value specialty
+Ferrari,488,suggested_addition,Low,Sports car
+Ferrari,812 Superfast,suggested_addition,Low,Grand tourer
+Ferrari,California,suggested_addition,Low,Convertible
+Ferrari,F8 Tributo,suggested_addition,Low,Sports car
+Ferrari,Portofino,suggested_addition,Low,Convertible GT
+Ferrari,Roma,suggested_addition,Low,Grand tourer
+Ferrari,SF90 Stradale,suggested_addition,Low,Hybrid hypercar
+Genesis,Electrified G80,suggested_addition,Medium,EV flagship sedan
+Genesis,Electrified GV70,suggested_addition,Medium,EV crossover
+Genesis,G70,suggested_addition,High,Entry sedan; very popular
+Genesis,G80,suggested_addition,High,Mid-size flagship sedan
+Genesis,G90,suggested_addition,Medium,Full-size flagship
+Genesis,GV60,suggested_addition,Medium,EV crossover
+Genesis,GV70,suggested_addition,High,Most popular Genesis SUV
+Genesis,GV80,suggested_addition,High,Full-size luxury SUV
+Hummer,H1,suggested_addition,Medium,Classic military-style; collector
+Hummer,H2,suggested_addition,High,Very common older vehicle
+Hummer,H3,suggested_addition,High,Compact; very common
+Infiniti,G35,suggested_addition,High,Very popular 2003–2007; many shipped
+Infiniti,G37,suggested_addition,High,Popular 2008–2013
+Infiniti,M35/M45,suggested_addition,Medium,Sedan 2006–2010
+Infiniti,Q30,suggested_addition,Low,Compact sold in limited US markets
+Infiniti,Q45,suggested_addition,Medium,Older luxury sedan
+Infiniti,Q50,suggested_addition,High,Current top-selling Infiniti sedan
+Infiniti,Q60,suggested_addition,High,Sports coupe; popular
+Infiniti,Q70,suggested_addition,Medium,Sedan 2014–2019
+Infiniti,QX50,suggested_addition,High,Popular compact SUV
+Infiniti,QX55,suggested_addition,Medium,Coupe-crossover 2021+
+Infiniti,QX60,suggested_addition,High,3-row SUV; very popular
+Infiniti,QX70,suggested_addition,Medium,Sport SUV; discontinued 2017
+Infiniti,QX80,suggested_addition,High,Full-size flagship SUV
+Infiniti,FX35/FX45,suggested_addition,Medium,Sport utility 2003–2008
+Isuzu,Amigo,suggested_addition,Low,Small SUV discontinued
+Isuzu,Axiom,suggested_addition,Low,SUV 2002–2004
+Isuzu,I-Series (I-280/I-370),suggested_addition,Medium,Pickup truck
+Isuzu,Rodeo,suggested_addition,Medium,SUV; common older vehicle
+Isuzu,Trooper,suggested_addition,Medium,Classic SUV
+Isuzu,VehiCROSS,suggested_addition,Low,Rare SUV; collector
+Jaguar,E-Pace,suggested_addition,High,Compact crossover; popular
+Jaguar,E-Type,suggested_addition,Medium,Classic; collector shipments
+Jaguar,F-Pace,suggested_addition,High,Most popular Jaguar SUV
+Jaguar,F-Type,suggested_addition,High,Sports car; frequently shipped
+Jaguar,I-Pace,suggested_addition,Medium,EV crossover
+Jaguar,S-Type,suggested_addition,Medium,Sedan discontinued 2008
+Jaguar,X-Type,suggested_addition,Medium,Sedan discontinued 2009
+Jaguar,XE,suggested_addition,High,Current compact sedan
+Jaguar,XF,suggested_addition,High,Current mid-size sedan
+Jaguar,XJ,suggested_addition,High,Flagship sedan; discontinued 2019
+Jaguar,XK,suggested_addition,Medium,Grand tourer discontinued 2015
+Lamborghini,Aventador,suggested_addition,Low,Flagship supercar
+Lamborghini,Gallardo,suggested_addition,Low,Popular entry model
+Lamborghini,Huracán,suggested_addition,Low,Current entry supercar
+Lamborghini,Urus,suggested_addition,Medium,SUV; most shipped Lamborghini
+Land Rover,Defender,suggested_addition,High,Iconic SUV; very popular
+Land Rover,Discovery,suggested_addition,High,Classic 3-row SUV
+Land Rover,Discovery Sport,suggested_addition,High,Compact crossover
+Land Rover,Freelander,suggested_addition,Low,Older; discontinued in US
+Land Rover,LR2,suggested_addition,Medium,2006–2015; common older vehicle
+Land Rover,LR3,suggested_addition,Medium,2005–2009
+Land Rover,LR4,suggested_addition,Medium,2010–2016
+Land Rover,Range Rover,suggested_addition,High,Flagship; very frequently shipped
+Land Rover,Range Rover Evoque,suggested_addition,High,Compact luxury; popular
+Land Rover,Range Rover Sport,suggested_addition,High,Sport version; very popular
+Land Rover,Range Rover Velar,suggested_addition,High,Mid-size coupe-SUV
+Lincoln,Aviator,suggested_addition,High,Mid-size luxury SUV; popular
+Lincoln,Blackwood,suggested_addition,Low,Pickup 2002; rare
+Lincoln,Continental,suggested_addition,Medium,Revived sedan 2017–2020
+Lincoln,Corsair,suggested_addition,High,Compact luxury SUV
+Lincoln,Mark LT,suggested_addition,Low,Pickup 2006–2008
+Lincoln,MKC,suggested_addition,High,Compact SUV 2015–2019
+Lincoln,MKS,suggested_addition,Medium,Sedan 2009–2016
+Lincoln,MKT,suggested_addition,Medium,Crossover 2010–2019
+Lincoln,MKX,suggested_addition,High,Mid-size SUV 2007–2018
+Lincoln,MKZ,suggested_addition,High,Luxury sedan 2006–2020
+Lincoln,Nautilus,suggested_addition,High,Current mid-size SUV (was MKX)
+Lincoln,Navigator,suggested_addition,High,Full-size flagship SUV
+Lincoln,Town Car,suggested_addition,High,Classic flagship; still shipped frequently
+Lincoln,Zephyr,suggested_addition,Medium,Compact luxury 2006 / revived 2022
+Lucid,Air,suggested_addition,High,Only current model; all shipments
+Lucid,Gravity,suggested_addition,Medium,New SUV 2024+
+Maserati,Ghibli,suggested_addition,High,Entry sedan; most-shipped Maserati
+Maserati,GranCabrio,suggested_addition,Medium,Convertible grand tourer
+Maserati,GranTurismo,suggested_addition,High,Sports GT; revived 2023
+Maserati,Grecale,suggested_addition,High,New crossover 2023+
+Maserati,Levante,suggested_addition,High,SUV; most popular Maserati model
+Maserati,MC20,suggested_addition,Medium,Mid-engine supercar
+Maserati,Quattroporte,suggested_addition,Medium,Flagship sedan
+Mazda,CX-3,suggested_addition,High,Subcompact crossover
+Mazda,CX-30,suggested_addition,High,Popular small crossover
+Mazda,CX-5,suggested_addition,High,Best-selling Mazda; very common
+Mazda,CX-50,suggested_addition,High,New for 2023
+Mazda,CX-7,suggested_addition,High,2007–2012; still many on roads
+Mazda,CX-70,suggested_addition,Medium,New 2-row SUV 2024+
+Mazda,CX-9,suggested_addition,High,3-row SUV; popular
+Mazda,CX-90,suggested_addition,High,New 3-row 2024+
+Mazda,Mazda2,suggested_addition,Medium,Subcompact; discontinued in US
+Mazda,Mazda3,suggested_addition,High,Compact sedan/hatchback; very popular
+Mazda,Mazda5,suggested_addition,Medium,Compact MPV; discontinued
+Mazda,Mazda6,suggested_addition,High,Mid-size sedan; discontinued 2021
+Mazda,Miata (MX-5),suggested_addition,High,Iconic roadster; frequently shipped
+Mazda,MX-30,suggested_addition,Medium,EV/plug-in hybrid crossover
+Mazda,MX-6,suggested_addition,Low,Coupe; older/classic
+Mazda,Protegé,suggested_addition,Medium,Older compact; still shipped
+Mazda,RX-7,suggested_addition,Medium,Classic sports car; collector
+Mazda,RX-8,suggested_addition,Medium,Sports car 2003–2011
+Mazda,Tribute,suggested_addition,Medium,SUV 2001–2011
+McLaren,570S,suggested_addition,Low,Sports Series
+McLaren,600LT,suggested_addition,Low,Longtail variant
+McLaren,720S,suggested_addition,Low,Super Series
+McLaren,Artura,suggested_addition,Low,New hybrid supercar
+McLaren,GT,suggested_addition,Low,Grand tourer
+Mercury,Capri,suggested_addition,Low,Classic/collector
+Mercury,Cougar,suggested_addition,Medium,Classic coupe; many still shipped
+Mercury,Grand Marquis,suggested_addition,High,Very common older full-size
+Mercury,Marauder,suggested_addition,Low,Performance sedan
+Mercury,Mariner,suggested_addition,High,SUV 2005–2011; very common
+Mercury,Milan,suggested_addition,High,Sedan 2006–2011; common
+Mercury,Montego,suggested_addition,Medium,Sedan 2005–2007
+Mercury,Monterey,suggested_addition,Medium,Minivan 2004–2007
+Mercury,Mountaineer,suggested_addition,High,SUV 1997–2010; very common
+Mercury,Mystique,suggested_addition,Medium,Sedan 1995–2000
+Mercury,Sable,suggested_addition,High,Sedan 1986–2005; many still around
+Mercury,Topaz,suggested_addition,Low,Older sedan
+Mercury,Tracer,suggested_addition,Low,Older compact
+Mercury,Villager,suggested_addition,Medium,Minivan 1993–2002
+Mini,Clubman,suggested_addition,High,Wagon; popular
+Mini,Convertible,suggested_addition,High,Roadster version
+Mini,Cooper,suggested_addition,High,Base hatchback; most common
+Mini,Cooper S,suggested_addition,High,Sport variant; very common
+Mini,Countryman,suggested_addition,High,Largest Mini; best seller
+Mini,JCW (John Cooper Works),suggested_addition,Medium,Performance variant
+Mini,Paceman,suggested_addition,Medium,Coupe-crossover 2013–2016
+Mini,Roadster,suggested_addition,Low,2-seat convertible; discontinued
+Mitsubishi,3000GT,suggested_addition,Medium,Sports car; classic/collector
+Mitsubishi,Eclipse,suggested_addition,High,Very common older sports car
+Mitsubishi,Eclipse Cross,suggested_addition,High,Current crossover
+Mitsubishi,Galant,suggested_addition,High,Very common older sedan
+Mitsubishi,i-MiEV,suggested_addition,Low,EV; rare
+Mitsubishi,Lancer,suggested_addition,High,Very popular sedan/sport
+Mitsubishi,Lancer Evolution,suggested_addition,High,Performance; frequently shipped
+Mitsubishi,Mirage,suggested_addition,High,Current budget hatchback/sedan
+Mitsubishi,Montero,suggested_addition,High,Classic SUV; many still shipped
+Mitsubishi,Montero Sport,suggested_addition,High,Compact SUV
+Mitsubishi,Outlander,suggested_addition,High,Current top-seller for Mitsubishi
+Mitsubishi,Outlander PHEV,suggested_addition,High,Plug-in hybrid; popular
+Mitsubishi,Outlander Sport,suggested_addition,High,Compact crossover
+Mitsubishi,Raider,suggested_addition,Low,Pickup 2006–2009
+Oldsmobile,Alero,suggested_addition,High,Compact 1999–2004; very common
+Oldsmobile,Aurora,suggested_addition,Medium,Luxury sedan
+Oldsmobile,Bravada,suggested_addition,Medium,SUV
+Oldsmobile,Cutlass,suggested_addition,High,Classic; many still shipped
+Oldsmobile,Cutlass Supreme,suggested_addition,High,Very common older vehicle
+Oldsmobile,Intrigue,suggested_addition,Medium,Sedan 1998–2002
+Oldsmobile,Silhouette,suggested_addition,Medium,Minivan
+Oldsmobile,Toronado,suggested_addition,Low,Classic front-wheel drive coupe
+Polestar,1,suggested_addition,Medium,Hybrid grand tourer; limited production
+Polestar,2,suggested_addition,High,EV sedan; most common Polestar
+Polestar,3,suggested_addition,High,EV SUV 2024+
+Polestar,4,suggested_addition,Medium,EV coupe-SUV 2024+
+Pontiac,Aztek,suggested_addition,High,Crossover; very commonly shipped
+Pontiac,Bonneville,suggested_addition,Medium,Full-size sedan
+Pontiac,Firebird,suggested_addition,High,Classic sports car; collector
+Pontiac,G3,suggested_addition,Low,Subcompact
+Pontiac,G5,suggested_addition,Medium,Compact 2007–2010
+Pontiac,G6,suggested_addition,High,Mid-size 2005–2010; very common
+Pontiac,G8,suggested_addition,Medium,Sedan 2008–2009; frequently shipped
+Pontiac,Grand Am,suggested_addition,High,Very popular 1973–2005
+Pontiac,Grand Prix,suggested_addition,High,Very popular coupe/sedan
+Pontiac,GTO,suggested_addition,Medium,Muscle car; 2004–2006 + classic
+Pontiac,Montana,suggested_addition,High,Minivan; very common
+Pontiac,Solstice,suggested_addition,Medium,Roadster 2006–2010
+Pontiac,Sunfire,suggested_addition,High,Compact coupe/sedan; very common
+Pontiac,Torrent,suggested_addition,High,Crossover; very common
+Pontiac,Trans Am,suggested_addition,High,Classic muscle; collector shipments
+Pontiac,Vibe,suggested_addition,High,Compact hatchback; very common
+Porsche,718 Boxster,suggested_addition,High,Roadster; frequently shipped
+Porsche,718 Cayman,suggested_addition,High,Coupe; frequently shipped
+Porsche,911,suggested_addition,High,Iconic sports car; very frequently shipped
+Porsche,928,suggested_addition,Medium,Classic GT; collector
+Porsche,944,suggested_addition,Medium,Classic sports car; collector
+Porsche,968,suggested_addition,Low,Classic sports car
+Porsche,Cayenne,suggested_addition,High,SUV; most-shipped Porsche
+Porsche,Cayenne Coupe,suggested_addition,High,Coupe variant
+Porsche,Macan,suggested_addition,High,Compact SUV; very popular
+Porsche,Panamera,suggested_addition,High,Luxury sedan/sport turismo
+Porsche,Taycan,suggested_addition,High,EV flagship; growing rapidly
+Porsche,Taycan Cross Turismo,suggested_addition,Medium,EV wagon variant
+Rivian,R1S,suggested_addition,High,Electric SUV; growing shipping demand
+Rivian,R1T,suggested_addition,High,Electric pickup; frequently shipped
+Rivian,R2,suggested_addition,Medium,New smaller EV 2025+
+Rolls-Royce,Cullinan,suggested_addition,High,SUV; most shipped RR model now
+Rolls-Royce,Dawn,suggested_addition,Medium,Convertible
+Rolls-Royce,Ghost,suggested_addition,High,Luxury sedan
+Rolls-Royce,Phantom,suggested_addition,Medium,Flagship
+Rolls-Royce,Silver Shadow,suggested_addition,Low,Classic; collector
+Rolls-Royce,Spectre,suggested_addition,Medium,EV coupe 2024+
+Rolls-Royce,Wraith,suggested_addition,Medium,Coupe
+Saab,9-2X,suggested_addition,Low,Wagon 2005–2006
+Saab,9-3,suggested_addition,High,Most common Saab; sedan/convertible
+Saab,9-5,suggested_addition,High,Flagship sedan; very common
+Saab,9-7X,suggested_addition,Medium,SUV 2005–2009
+Saturn,Aura,suggested_addition,High,Sedan 2007–2010; very common
+Saturn,Ion,suggested_addition,High,Compact 2003–2007; very common
+Saturn,L Series,suggested_addition,Medium,Sedan/wagon
+Saturn,Outlook,suggested_addition,High,3-row SUV; common
+Saturn,Relay,suggested_addition,Medium,Minivan 2005–2007
+Saturn,SC,suggested_addition,Medium,Sports coupe
+Saturn,SL,suggested_addition,High,Compact sedan; very common
+Saturn,Vue,suggested_addition,High,Compact SUV; very commonly shipped
+Scion,FR-S,suggested_addition,High,Sports coupe; frequently shipped
+Scion,iA,suggested_addition,Medium,Sedan 2016
+Scion,iM,suggested_addition,Medium,Hatchback 2016
+Scion,iQ,suggested_addition,Low,Micro city car
+Scion,tC,suggested_addition,High,Sports coupe; very common
+Scion,xA,suggested_addition,Medium,Subcompact
+Scion,xB,suggested_addition,High,Boxy hatchback; very popular
+Scion,xD,suggested_addition,Medium,Subcompact 2008–2014
+Suzuki,Aerio,suggested_addition,Low,Compact 2003–2007
+Suzuki,Equator,suggested_addition,Low,Pickup 2009–2012
+Suzuki,Forenza,suggested_addition,Low,Compact 2004–2008
+Suzuki,Grand Vitara,suggested_addition,Medium,SUV; common
+Suzuki,Kizashi,suggested_addition,Medium,Sedan 2010–2013
+Suzuki,Reno,suggested_addition,Low,Compact 2005–2008
+Suzuki,Samurai,suggested_addition,Low,Classic; collector
+Suzuki,Sidekick,suggested_addition,Medium,Classic small SUV
+Suzuki,Swift,suggested_addition,Low,Classic subcompact
+Suzuki,Vitara,suggested_addition,Medium,Small SUV
+Suzuki,XL7,suggested_addition,Medium,SUV 2001–2009
+VinFast,VF 8,suggested_addition,High,Current best-known model in US
+VinFast,VF 9,suggested_addition,Medium,Larger SUV variant
+Volvo,C30,suggested_addition,Medium,Hatchback 2007–2013
+Volvo,C40 Recharge,suggested_addition,High,EV coupe-crossover; popular
+Volvo,C70,suggested_addition,Medium,Convertible/coupe discontinued 2013
+Volvo,S40,suggested_addition,High,Compact sedan; very common
+Volvo,S60,suggested_addition,High,Current popular sedan
+Volvo,S70,suggested_addition,Medium,Older sedan
+Volvo,S80,suggested_addition,High,Flagship sedan; common
+Volvo,S90,suggested_addition,High,Current flagship sedan
+Volvo,V40,suggested_addition,Low,Hatchback not sold in US
+Volvo,V50,suggested_addition,Low,Wagon; limited US sales
+Volvo,V60,suggested_addition,High,Wagon; very popular
+Volvo,V70,suggested_addition,Medium,Older wagon; common
+Volvo,V90,suggested_addition,High,Current large wagon
+Volvo,XC40,suggested_addition,High,Popular compact crossover
+Volvo,XC40 Recharge,suggested_addition,High,EV version; very popular
+Volvo,XC60,suggested_addition,High,Most popular Volvo; very commonly shipped
+Volvo,XC70,suggested_addition,Medium,Older cross-country wagon
+Volvo,XC90,suggested_addition,High,Flagship SUV; very commonly shipped

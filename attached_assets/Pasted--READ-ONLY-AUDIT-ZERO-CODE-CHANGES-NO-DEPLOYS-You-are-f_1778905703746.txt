@@ -1,0 +1,31 @@
+🛑🛑🛑 READ-ONLY AUDIT. ZERO CODE CHANGES. NO DEPLOYS. 🛑🛑🛑You are forbidden from modifying any code in this session until I send the literal phrase "DEPLOY APPROVED." This is an investigation only.Specifically forbidden until that phrase appears:
+❌ No git commit, git push, merge, deploy, restart.
+❌ No edits to any file. Read-only mode.
+❌ No package installs.
+❌ No config or environment changes.
+❌ No "test a change to see if it works."
+❌ No assuming permission from any prior session.
+If you feel any urge to act, STOP and write it in chat starting with "I'm tempted to..." and wait.ContextI'm auditing how this form sends data to downstream systems. I am running a parallel audit on a different Replit app (amerigoautotransport.replit.app, my CRM) in another chat session. Your job is the outbound side only — what does this form send, where does it send it, and what does the payload look like.The goal: I'm considering replacing the Zapier middleman with a direct webhook from this form to my CRM. Before any work happens I need a full, honest inventory of what's flowing out of this app today.Required audit — every item must produce verbatim evidence1. Lead submission flowa. Locate the /api/submit-lead endpoint handler. Paste the full handler code with file:line.
+b. List every outbound HTTP request that fires during a successful submission. For each: the destination URL (or env variable name if hidden), the method, the headers, the payload shape.
+c. List every outbound HTTP request that fires during a FAILED submission (validation errors, MapQuest failures, etc.).
+d. List every database write that happens during submission. Table names, fields written.2. Zapier webhook specificallya. Find every reference to Zapier in the codebase. File:line, surrounding context.
+b. What is the exact Zapier webhook URL (or env variable name)?
+c. What is the exact payload structure sent to Zapier? Paste a sample of what one real submission looks like — pull from logs if possible, or reconstruct from the code.
+d. Is the Zapier call fire-and-forget, or does it block the response to the user?
+e. Does the form retry if Zapier fails? Does it log the failure?
+f. How long has Zapier been in this flow? Look at git history or comments if available.3. Other outbound integrationsa. Meta CAPI — what endpoint, what payload, what triggers it? Paste sample.
+b. Google Tag Manager / GA — what fires from the server side vs client side?
+c. Any other webhooks, third-party APIs, or external services called during submission?
+d. Any SMS or email sent from this app directly?4. Partial-lead flowa. Same audit for /api/partial-lead — what fires, where does it go, what's the payload?
+b. Does Zapier receive partial-leads, or only completed submissions?5. The shape of the data this form producesa. List every field that ends up in the outbound payload, with their types and example values.
+b. Are there any computed/derived fields (distance, price estimate, etc.) added to the payload by this app, or does it forward exactly what the user typed?6. Authentication and securitya. Are outbound webhooks signed, authenticated, or use shared secrets?
+b. If the Zapier URL leaked, could a bad actor inject fake leads?
+c. Are there any rate limits or abuse protections on the outbound side?7. The bigger question — what would change if Zapier were removeda. List every Zapier action that, to your knowledge from the code, currently happens AFTER Zapier receives the lead (notifications, sheet writes, CRM forwarding, etc.). You may not know all of this — flag what you can see in the code vs. what's invisible to you.
+b. If this form bypassed Zapier and sent directly to the CRM, what's the minimum payload structure the CRM would need to receive?
+c. Are there any environment variables, secrets, or config that exist solely because of Zapier?Deliverables in this exact order
+The full audit above with verbatim code/log evidence.
+A "what I can see" vs. "what I can't see" summary. You can see the form's code. You cannot see the Zapier zap configuration or the CRM's receiving endpoint. Be honest about the boundary.
+A list of specific questions whose answers live in Zapier itself (not in this code) — what I'd need to log into Zapier to find out.
+A list of specific questions whose answers live in the CRM Replit app (not in this code) — what the parallel audit needs to surface.
+A preliminary sketch of what a direct webhook payload could look like, designed for backward compatibility with what Zapier currently provides.
+No code modifications. No deploys. No git operations. Stop after the audit and wait for further instruction.
