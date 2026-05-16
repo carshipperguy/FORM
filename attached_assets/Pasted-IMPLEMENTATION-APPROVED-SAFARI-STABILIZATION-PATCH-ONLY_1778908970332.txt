@@ -1,0 +1,170 @@
+IMPLEMENTATION APPROVED — SAFARI STABILIZATION PATCH ONLY
+
+Apply ONLY the exact fixes below to:
+`client/src/components/SimpleQuoteForm.jsx`
+
+No redesigns.
+No refactors.
+No unrelated cleanup.
+No formatting-only changes.
+No package updates.
+No server changes.
+No pricing logic changes.
+No CRM payload changes.
+No analytics schema changes.
+No CSS file changes.
+
+GOAL:
+Prevent iPhone Safari / cross-origin iframe storage crashes from breaking the quote form while preserving all existing business logic and workflows.
+
+---
+
+## FIX 1-A — Protect localStorage read on initial render
+
+REPLACE:
+
+```js
+vehicleType: localStorage.getItem('selectedVehicleType') || "",
+```
+
+WITH:
+
+```js
+vehicleType: (() => {
+  try {
+    return localStorage.getItem('selectedVehicleType') || "";
+  } catch (_) {
+    return "";
+  }
+})(),
+```
+
+PURPOSE:
+If Safari blocks localStorage access inside the iframe, the form must continue rendering instead of crashing.
+
+---
+
+## FIX 1-B — Protect sessionStorage write
+
+REPLACE:
+
+```js
+sessionStorage.setItem(
+  'parent_attribution_data',
+  JSON.stringify(parentParams)
+);
+```
+
+WITH:
+
+```js
+try {
+  sessionStorage.setItem(
+    'parent_attribution_data',
+    JSON.stringify(parentParams)
+  );
+} catch (_) {}
+```
+
+PURPOSE:
+Blocked sessionStorage must not break the event/message handler.
+
+---
+
+## FIX 1-C — Protect localStorage write
+
+REPLACE:
+
+```js
+localStorage.setItem('selectedVehicleType', value);
+```
+
+WITH:
+
+```js
+try {
+  localStorage.setItem('selectedVehicleType', value);
+} catch (_) {}
+```
+
+PURPOSE:
+Vehicle selection should not crash on Safari storage restriction errors.
+
+---
+
+## FIX 2 — Replace iframe alert() with inline validation error
+
+REPLACE:
+
+```js
+alert("There was an error processing your request. Please try again.");
+```
+
+WITH:
+
+```js
+setValidationErrors([
+  {
+    field: 'submit',
+    message:
+      'There was an error processing your request. Please try again.'
+  }
+]);
+```
+
+PURPOSE:
+Safari suppresses alert() inside cross-origin iframe contexts.
+Use the already-existing inline validation UI instead.
+
+---
+
+## FIX 3 — Add autocomplete hints
+
+ADD:
+
+```jsx
+autocomplete="name"
+```
+
+to the name field.
+
+ADD:
+
+```jsx
+autocomplete="tel"
+```
+
+to the phone field.
+
+ADD:
+
+```jsx
+autocomplete="email"
+```
+
+to the email field.
+
+PURPOSE:
+Improve iPhone autofill behavior inside iframe environments.
+
+---
+
+## POST-DEPLOY VERIFICATION
+
+Immediately verify:
+
+1. Form renders normally
+2. Vehicle type selector works
+3. Year/make/model still work
+4. Date picker still reveals contact fields
+5. Name/phone/email update state correctly
+6. Submit button still submits successfully
+7. Leads still hit CRM normally
+8. No console crashes from storage APIs
+9. No blank iframe behavior
+10. No unrelated file modifications
+
+If any regression appears:
+ROLL BACK IMMEDIATELY.
+
+This is a surgical stabilization patch only.

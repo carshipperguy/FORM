@@ -26,7 +26,13 @@ const SimpleQuoteForm = () => {
   const [formData, setFormData] = useState({
     pickupLocation: "",
     dropoffLocation: "",
-    vehicleType: localStorage.getItem('selectedVehicleType') || "",
+    vehicleType: (() => {
+      try {
+        return localStorage.getItem('selectedVehicleType') || "";
+      } catch (_) {
+        return "";
+      }
+    })(),
     year: "",
     make: "",
     model: "",
@@ -171,7 +177,12 @@ const SimpleQuoteForm = () => {
         setAttributionData(parentUtmData);
         
         // Store in sessionStorage for other components
-        sessionStorage.setItem('parent_attribution_data', JSON.stringify(parentParams));
+        try {
+          sessionStorage.setItem(
+            'parent_attribution_data',
+            JSON.stringify(parentParams)
+          );
+        } catch (_) {}
       }
     };
     
@@ -193,7 +204,9 @@ const SimpleQuoteForm = () => {
     if (name === "vehicleType") {
       // Persist vehicle type to localStorage to prevent loss on page refresh
       if (value) {
-        localStorage.setItem('selectedVehicleType', value);
+        try {
+          localStorage.setItem('selectedVehicleType', value);
+        } catch (_) {}
       }
       
       setFormData((prev) => ({
@@ -626,7 +639,13 @@ const SimpleQuoteForm = () => {
       });
       console.error("Error in form submission:", error);
       setIsSubmitting(false);
-      alert("There was an error processing your request. Please try again.");
+      setValidationErrors([
+        {
+          field: 'submit',
+          message:
+            'There was an error processing your request. Please try again.'
+        }
+      ]);
     }
   };
 
@@ -819,6 +838,7 @@ const SimpleQuoteForm = () => {
                     value={formData.name || ""}
                     onChange={handleChange}
                     placeholder="Your Name"
+                    autocomplete="name"
                     required
                   />
                 </div>
@@ -830,6 +850,7 @@ const SimpleQuoteForm = () => {
                     onChange={handleChange}
                     onBlur={handlePhoneBlur}
                     placeholder="Phone Number"
+                    autocomplete="tel"
                     required
                   />
                 </div>
@@ -840,6 +861,7 @@ const SimpleQuoteForm = () => {
                     value={formData.email || ""}
                     onChange={handleChange}
                     placeholder="Email Address"
+                    autocomplete="email"
                     required
                   />
                 </div>
