@@ -1,0 +1,109 @@
+🛑 STOP. READ THIS ENTIRE BLOCK BEFORE TOUCHING ANYTHING. 🛑
+YOU ARE IN INVESTIGATION MODE. YOU ARE NOT IN FIX MODE.
+Non-negotiable rules. Violating any one means you have failed this task regardless of what else you find:
+
+❌ DO NOT modify any code. Not one line. Not a "tiny fix." Not "while I was in there." Read-only.
+❌ DO NOT push, commit, deploy, redeploy, or restart anything. No git commit. No git push. No deploy triggers. No installs. No config changes. No env var edits.
+❌ DO NOT create new files, new branches, or PRs.
+❌ DO NOT run migrations, seeds, or any command that writes state.
+❌ DO NOT "test a hypothesis" by changing code to see what happens. If you need a code change to test, write it as a diff in chat for me to approve.
+❌ DO NOT guess, infer, or pattern-match from memory. No "I'd expect this is fine" verdicts. If you don't have direct evidence, the answer is ❓ unknown with a note on what evidence would resolve it.
+❌ DO NOT shortcut the checklist. Every item gets a verdict. Skipping items is failing.
+❌ DO NOT "everything looks normal" me. That answer is never acceptable on a production bug actively losing money.
+✅ DO read code, read logs, read headers, read deployment settings, and report findings.
+✅ DO cite file:line for every code claim and paste the actual code.
+✅ DO paste raw evidence — log lines verbatim, header dumps verbatim, response bodies verbatim. Summaries don't count.
+
+If you feel the urge to "just quickly fix" something, STOP. Write the proposed change as a diff in chat. I will approve every single change before any code is touched. No exceptions.
+The last time an agent touched this codebase without permission, something else broke. We are not repeating that. Your entire job this session is to gather evidence and report. Nothing else.
+
+Context
+
+App: form-carshipperguy.replit.app — quote form for auto transport
+Embedded as a cross-origin iframe on a WordPress page at amerigoautotransport.net
+Real customers report they fill out info and cannot continue / advance / submit
+This is P0 — actively losing the business money every hour
+CRITICAL: This bug only manifests in the cross-origin iframe context. Testing on the bare .replit.app URL will not reveal it. Any verdict based on direct-URL testing alone is invalid and will be rejected.
+Two previously identified suspects (Safari localStorage SecurityError at SimpleQuoteForm.jsx:29, and iOS native date picker freezing in cross-origin iframes) have been documented. Confirm or rule out those AND go beyond them. The point of this session is exhaustive coverage — find every smoking gun, not just the obvious ones.
+
+Your task: every item below gets a verdict — ✅ ruled out / ⚠️ likely contributing / 🔴 root cause / ❓ unknown — with verbatim evidence. Do not collapse items. Do not skip items because "they're probably fine." Items left as ❓ unknown must include "to resolve this I need:" with a specific data source.
+
+LAYER 1 — Form never finishes loading
+1.1. localStorage / sessionStorage / document.cookie / IndexedDB calls executed at module load, render, or useState initialization that can throw SecurityError in Safari ITP cross-origin iframes. List every call with file:line, whether it's wrapped in try/catch, and what happens if it throws.
+1.2. Replit deployment type — Reserved VM / Always-On vs Autoscale / Hobby. Cold-start behavior and current sleep status. Time-to-first-byte from a cold request.
+1.3. Memory and CPU usage over the last 24h. Any near-limit spikes that could silently drop asset requests.
+1.4. CDN / proxy / edge layer between Replit and the browser. Any geographic routing involved.
+1.5. WordPress page asset race conditions — WP Rocket lazy-load, GTM, Elementor — that could load-block the iframe.
+1.6. The Replit domain *.replit.app's presence on common blocklists (EasyList, EasyPrivacy, uBlock Origin's defaults, Brave Shields). Confirm whether the bare domain is blocked.
+1.7. Corporate / school / public-wifi firewalls that block *.replit.app. Unfixable on our side but must be acknowledged as part of the failure population.
+1.8. Service worker registration on either the parent domain or iframe domain. Stale cached bundles after a recent deploy = customers on broken old code with no way to refresh.
+LAYER 2 — Form loads but a specific field is broken
+2.1. Native <input type="date"> inside cross-origin iframes on iOS Safari. Confirm the form uses native date input, identify any gating logic where downstream fields depend on the date being filled, explain the failure surface.
+2.2. Android Chrome date picker behavior in this iframe context.
+2.3. ZIP / location autocomplete endpoint (/api/location-search): file:line of every call, timeout config, error handling, what happens when it returns empty or times out.
+2.4. ZIP validation: PO boxes, brand-new ZIPs, APO/FPO military addresses, Puerto Rico, US territories. Paste the validation logic.
+2.5. Phone validation regex: paste the regex. Test it against: international numbers, extensions (555-1234 x99), parentheses ((954) 642-2118), spaces, plus-prefix.
+2.6. Email validation regex: paste it. Test against: plus-addressing, new TLDs (.car, .auto, .xyz), apostrophes in local part, single-character locals.
+2.7. Name field validation: apostrophes (O'Brien), hyphens (Smith-Jones), accents (José, Müller), single names, very long names.
+2.8. Year/Make/Model dropdown loading. What data source, what error path, what happens if it fails to load.
+2.9. Make/Model coverage. Does the dropdown include current-year models a real customer would actually try to pick? Spot-check 2024–2026 EVs: Ioniq 6, Ioniq 9, Lyriq, Vistiq, Rivian R1S, Cybertruck, EV9, Mustang Mach-E, Equinox EV, F-150 Lightning.
+2.10. Mobile keyboard occlusion of the submit button at common viewport sizes (375px iPhone SE, 390px iPhone 15, 412px Pixel 8).
+2.11. Auto-scroll / auto-focus behavior between fields. Any jarring scroll jumps that could disorient mobile users.
+2.12. Required-field markers — are they visually present? Does the customer know which fields are required before clicking submit?
+2.13. Browser autofill behavior. Cross-origin iframe autofill is unreliable in iOS Safari. Check autocomplete attributes on every field.
+LAYER 3 — Customer fills everything, clicks Continue, nothing happens
+3.1. Validation failure feedback. Is there scroll-to-error, focus-to-error, toast, inline message, or anything else visible to the user? Paste the failure handler.
+3.2. Hidden required fields — honeypots, captcha tokens, hCaptcha/reCAPTCHA, terms checkboxes, opt-in toggles. Any field the customer can't see but must satisfy.
+3.3. Submit button disabled state. List every condition that disables it. Are any of those conditions reachable but unreached states (e.g. waiting on an async result that silently failed)?
+3.4. Double-submit protection. After first click, is there a code path that locks the button and never unlocks it?
+3.5. onSubmit error swallowing. Any try/catch in the submit flow that catches errors silently without re-enabling the button or showing the user?
+3.6. Network online/offline handling. Does the form handle navigator.onLine === false?
+3.7. Date-in-the-past validation. If a customer enters a past date or today's date, does submit get silently blocked?
+LAYER 4 — Continue button works, but submission fails
+4.1. Every outbound fetch from the form: file:line, endpoint, method, timeout, error handler, user-facing failure state. ZIP lookup, geocoding, distance calc, submit-lead, partial-lead, Meta CAPI, Google Analytics, Twilio, SendGrid, CRM webhook, any other.
+4.2. /api/submit-lead backend flow. Does it acknowledge to the frontend before or after CRM/email/SMS side-effects? If the CRM webhook fails, does the frontend know?
+4.3. alert() usage in error handlers. iOS Safari suppresses alert() inside cross-origin iframes. Identify every alert() call in submission error paths.
+4.4. MapQuest distance API. Timeout, rate-limit handling, what happens to the customer if it errors.
+4.5. Synchronous third-party calls in the submit path (waiting on Twilio/SendGrid before responding). Latency budget.
+4.6. Last 7 days of deployment logs. Paste verbatim every 4xx, 5xx, timeout, and unhandled rejection. No summaries. Paste the actual log lines.
+4.7. Network failure mid-submission — is there retry logic? Any optimistic UI that could trick the customer?
+4.8. Bot/abuse protection (Cloudflare, Replit's edge protection, any rate limiter). Any 403 / challenge responses to real users in recent logs?
+4.9. UTF-8 / encoding bugs. Check recent request bodies in logs for ? or \uFFFD replacement characters in customer-submitted fields.
+4.10. Race condition between partial-lead and submit-lead. Could a stale partial-lead update overwrite or interfere with a successful submit?
+4.11. Timezone / date parsing. If shipment date is sent as a string and parsed server-side in a different timezone, "today" might serialize as "yesterday" and fail server-side validation. Check the parsing path.
+LAYER 5 — Submission succeeds but customer thinks it didn't
+5.1. Success screen rendering. Where on the page does the success state render? Is it above or below the iframe's natural fold at 700/800/900px iframe heights?
+5.2. Success message clarity. Is there a clear "what happens next" message, expected timeline, contact number? Or just "thanks"?
+5.3. Post-submit redirect / navigation. Does the form try window.top.location or any cross-origin navigation that would be blocked by the iframe?
+5.4. Confirmation email deliverability. Spot-check whether confirmation emails land in spam for Gmail / Outlook / Yahoo / iCloud. Check SPF, DKIM, DMARC records for the sending domain.
+LAYER 6 — Cross-cutting environment
+6.1. WordPress iframe embed code. Pull the actual <iframe> tag from amerigoautotransport.net's page source. Report: src, height, width, sandbox, allow, loading, referrerpolicy. Paste the tag verbatim.
+6.2. WordPress parent-page CSP headers that could block iframe outbound calls.
+6.3. WordPress GTM container scripts that could interfere with the iframe.
+6.4. Elementor popup wrapping — is the iframe inside an Elementor popup with its own scroll/overflow behavior?
+6.5. WordPress WP Rocket lazy-loading interaction with the iframe.
+6.6. Parent page's Permissions-Policy header — does it block geolocation, autoplay, clipboard, or anything the form might need?
+6.7. A/B tests or feature flags — is there any path that could render a broken variant to a subset of users?
+LAYER 7 — Cross-correlate the actual production data
+7.1. Count of /api/partial-lead events vs /api/submit-lead events in the last 7 days. Paste the raw numbers. The delta is the population of stuck customers.
+7.2. For the most recent 20 partial-lead events with no matching submit-lead, paste the field-completion state of each. Which fields were filled in, which weren't, where in the form did each customer stop?
+7.3. User-agent breakdown of stuck users. Is the failure concentrated in iOS Safari, Android Chrome, desktop Safari, or distributed evenly?
+7.4. Geographic distribution of stuck users (from IP). Concentrated or distributed?
+7.5. Time-of-day distribution. Spikes that correlate with cold-start patterns or deployment events?
+
+Required deliverables, in this exact order, in this exact format:
+
+The full checklist above with verdicts and verbatim evidence for every item. ❓ unknown items must include "to resolve this I need:".
+Suspect ranking. Top 5 most likely root causes with confidence levels (high / medium / low) and the specific evidence that would promote each to confirmed.
+Data we need that we don't have. A list of things only the business owner can pull — CRM lead counts, support tickets, customer complaints with browser/device details, WordPress page HTML — to triangulate.
+Proposed-fix diffs, written in this chat, NOT applied. Every proposed change as a diff. No file edits. No deploys. I will explicitly say "apply fix #N" before you touch anything. If I don't say it, you don't do it.
+A reproduction plan I can run on my iPhone in 2 minutes that confirms which suspect is the real cause.
+
+Final reminder: Nothing in this task requires writing code. If you open a file in edit mode, you have misunderstood the assignment. Report findings. Wait for approval. That is the entire job.
+
+A note for you outside the prompt: the previous agent report covered roughly 6 of these items thoroughly. When this one comes back, scan for any item it skipped or summarized vaguely instead of pasting evidence — especially Layer 7 (the production data correlation), which is the highest-leverage section and the one most likely to get glossed over. If anything in Layer 7 comes back vague, re-prompt with: "Layer 7.X was not addressed with verbatim numbers/data. Paste the actual values now."
+Once you have the report, the decision tree is:
+
+If the smoking gun is in Layer 5, it's a fast UX fix and you'll be unblocked today.
+If it's in Layers 1–4, install Clarity and pull the partial-vs-submit numbers before approving any code changes beyond Fix #1 and Fix #2. We've been guessing too long.
+If it's in Layer 6, the fix is on the WordPress side and doesn't need Replit at all.
