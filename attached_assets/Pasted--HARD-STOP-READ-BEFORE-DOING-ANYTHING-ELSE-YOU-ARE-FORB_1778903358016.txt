@@ -1,0 +1,134 @@
+🛑🛑🛑 HARD STOP — READ BEFORE DOING ANYTHING ELSE. 🛑🛑🛑
+YOU ARE FORBIDDEN FROM PUSHING, DEPLOYING, COMMITTING, RESTARTING, OR MODIFYING ANY CODE IN THIS SESSION UNTIL THE BUSINESS OWNER REPLIES WITH THE LITERAL PHRASE "DEPLOY APPROVED."
+No exceptions. Not for "small fixes." Not for "low-risk." Not for "I'm confident." Not for "just to test." If you push code without the literal phrase "DEPLOY APPROVED" appearing in a message from the business owner, you have failed this session and broken trust.
+Specifically forbidden until the literal phrase "DEPLOY APPROVED" appears:
+
+❌ No git commit, no git push, no merge, no deploy.
+❌ No edits to any file. Not one character. Read-only mode until approval.
+❌ No package installs, no npm install, no pip install.
+❌ No config changes, no environment variable edits, no schema migrations.
+❌ No restart of the deployment, no killing of processes.
+❌ No "test a small change to see if it works." If you need to test, describe the test in chat and wait.
+❌ No assuming permission from any prior session. This is a new session. Approval resets.
+❌ No interpreting approval-adjacent phrases ("looks good," "sure," "go ahead," "do it," "ok") as approval. Only the literal phrase "DEPLOY APPROVED" counts.
+
+If you feel the urge to "just go ahead" with anything, STOP. Write the urge in chat starting with "I'm tempted to..." and let the business owner decide. Every prior time an agent has touched this codebase without explicit permission, something has broken downstream. We are not doing that again.
+
+Context
+The business owner has approved three specific UX changes to the auto transport quote form at form-carshipperguy.replit.app. This session implements exactly those three changes and nothing else. The Phase 1 disclosure from the previous session has already been completed and reviewed. The business owner has answered the open questions. Proceed with the diffs.
+The business owner is non-technical. Explain everything in plain language. Surface every risk. They make the final call.
+
+The three approved changes — locked in
+Change #1 — Rename the section heading "Shipment Details" → "Available Ship Date"
+
+File: client/src/components/SimpleQuoteForm.jsx around line 790
+Replace the text Shipment Details inside the existing <h2> with Available Ship Date
+Keep the same wrapper element, same className, same styling, same position. Only the inner text changes.
+DO NOT change the styling, structure, or position of this header
+DO NOT change any other section header
+DO NOT add a subtitle, tooltip, or helper text to this header
+
+Change #2 — Update both free-text model input placeholders to "Type in your model"
+The business owner has confirmed: apply this change to BOTH Path A AND Path B.
+
+Path A (SimpleQuoteForm.jsx around line 723-730): The free-text model input that renders for standard vehicles when the make is in newMakesWithFreeTextModels OR the year is pre-1990. Change placeholder="Model" to placeholder="Type in your model".
+Path B (SimpleQuoteForm.jsx around line 773-781): The free-text model input that renders for non-standard vehicle types (boat, motorcycle, rv, travel trailer, atv, heavy equipment, other). Change placeholder="Model" to placeholder="Type in your model".
+DO NOT change the dropdown model field path (where models DO populate from data)
+DO NOT change the list of makes in newMakesWithFreeTextModels
+DO NOT change validation behavior
+DO NOT remove the required attribute
+DO NOT change the styling of the model field
+DO NOT change any other field's placeholder
+
+Change #3 — Add a small scroll hint below the date field that appears only after the date is picked
+The business owner has confirmed: use color #6B7280.
+
+Location: Inside the existing condition block at SimpleQuoteForm.jsx around line 812, as the very first element inside the <> fragment — before the name field, after the date input.
+The hint must appear ONLY when formData.shipmentDate is truthy. Reuse the existing condition. Do not introduce a new state variable.
+Render the hint as a plain <p> or <div> with inline style.
+The text must read exactly: ↓ Almost done — scroll down to finish
+Styling:
+
+Font size: 13px
+Color: #6B7280
+Margin: 8px top and 8px bottom
+Text alignment: center
+No font weight changes, no italics, no underlines
+
+
+DO NOT add any JavaScript-driven scroll behavior
+DO NOT add an IntersectionObserver or any visibility tracking
+DO NOT add a dismiss button or any interaction
+DO NOT use any animation, transition, or flash effect
+DO NOT use bold, all-caps, or any emoji other than the single down-arrow ↓ shown above
+DO NOT render the hint at any other time or location
+
+
+Required workflow — follow this exactly
+Step 1 — Read each affected code location and confirm it matches what was disclosed previously.
+Before writing any diffs, paste the current verbatim state of each affected block with file:line. If anything has changed since the Phase 1 disclosure (e.g., line numbers shifted, code structure differs), flag it before proceeding.
+Step 2 — Write all three diffs in chat. Three separate diffs, not one big one.
+Each diff must include:
+
+File path and line numbers
+Exact before/after with surrounding context (3 lines before, 3 lines after)
+A one-sentence plain-English description of what the diff does
+A one-sentence description of what the diff does NOT do
+A confirmation that the diff matches the exact specifications above
+
+Step 3 — Final pre-deploy summary.
+After all three diffs, write a final summary that includes:
+
+Files that will be modified
+Total lines added, removed, changed
+Confirmation that no other files will be touched
+Confirmation that no packages, configs, environment variables, or deployment settings will be changed
+
+Then write the literal sentence: "Three diffs proposed. No code has been modified. Awaiting 'DEPLOY APPROVED' before any changes."
+Then stop. Do not write anything else. Do not deploy. Do not even prepare to deploy. Wait.
+Step 4 — ONLY after the business owner replies with the literal phrase "DEPLOY APPROVED":
+
+Apply the three diffs exactly as written. Character-for-character. No additions. No "small improvements." Nothing else.
+Redeploy.
+Re-read the modified line ranges in the live files and paste them back in chat. Show the business owner that the deployed code matches the approved diffs.
+Provide a 60-second mobile test plan the business owner can run on their phone to verify each change is live:
+
+How to verify Change #1 (the new heading)
+How to verify Change #2 (the new model placeholder)
+How to verify Change #3 (the scroll hint appearing after a date is picked)
+
+
+
+If the business owner replies with anything OTHER than "DEPLOY APPROVED" — including approval-adjacent phrases — DO NOT deploy. Ask explicitly: "Do I have DEPLOY APPROVED?" and wait for the literal phrase.
+
+Scope check — what this session does NOT touch
+To be absolutely clear, none of the following will be modified in this session:
+
+The iframe height (lives in WordPress, outside scope)
+The localStorage / sessionStorage calls (separate ticket)
+The alert() in the error handler (separate ticket)
+The native <input type="date"> element (separate ticket)
+The validation logic (separate ticket)
+The vehicle data file or list of makes (separate ticket)
+The submit button styling or behavior
+The success screen
+Any backend code, API endpoint, or database schema
+Any analytics, logging, or telemetry
+Any other field's label, placeholder, or styling
+Any CSS file outside the styles needed for Change #3
+Any test file
+Any package, dependency, or config
+
+If you notice something else that seems broken or improvable, note it in chat as "Observed but not in scope" and move on. We will address other issues in separate sessions.
+
+Honesty requirements
+
+If any of the three changes cannot be implemented exactly as written for a real technical reason, surface the reason in chat and propose the minimum alternative. Do not silently substitute.
+If a line number has shifted since the Phase 1 disclosure, flag it before writing the diff.
+If you discover a side effect that wasn't covered in the Phase 1 disclosure, surface it in chat before writing the diff.
+If you've made any mistake in any prior session that could affect this work, flag it now.
+
+
+Final reminder
+Three changes. Heading rename. Model placeholder. Scroll hint. Three diffs in chat. Wait for "DEPLOY APPROVED." Apply. Verify. Done.
+If you find yourself opening a file in edit mode before "DEPLOY APPROVED" appears, you have misunderstood the assignment and must stop immediately.
