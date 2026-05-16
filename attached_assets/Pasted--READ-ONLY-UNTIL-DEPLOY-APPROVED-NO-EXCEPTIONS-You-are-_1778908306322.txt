@@ -1,0 +1,204 @@
+🛑🛑🛑 READ-ONLY UNTIL "DEPLOY APPROVED." NO EXCEPTIONS. 🛑🛑🛑
+You are forbidden from modifying any code in this session until I send the literal phrase "DEPLOY APPROVED" — uppercase or lowercase, both accepted, but the exact two words must appear.
+Forbidden until approval:
+
+❌ No git commit, git push, merge, deploy, restart, install.
+❌ No edits to any file. Not one character.
+❌ No package installs, no npm install, no pip install.
+❌ No environment variable changes, config changes, schema changes.
+❌ No "test a change to see if it works."
+❌ No interpreting "looks good" or "go ahead" or "do it" as approval — only "DEPLOY APPROVED" counts.
+❌ No assuming permission from any prior session.
+❌ No "while I'm in here, I noticed X" — that's drift, and drift breaks production.
+❌ No reformatting, no cleanup, no comments-only edits, no whitespace changes.
+
+If you feel any urge to act outside the three explicit changes below, STOP. Write the urge in chat starting with "I'm tempted to..." and wait.
+Every prior time an agent in this codebase has touched something not explicitly approved, something has broken. We are not repeating that. The scope here is locked.
+
+Context
+This is a focused three-fix session for iPhone Safari compatibility. All three fixes are in one file: client/src/components/SimpleQuoteForm.jsx. Total expected change: approximately 15 lines, all defensive additions, zero refactoring.
+The three fixes target iPhone Safari users who are currently invisible failures in our funnel — they either see a blank form, see invisible error messages, or get blocked by missing autofill behavior. Each fix is a known web-development pattern with no novel logic.
+The business owner is non-technical and burned by prior unintended consequences. Surface every risk. Make no assumptions. The fixes below are tightly scoped — execute exactly what's specified, nothing more, nothing less.
+
+PHASE 1 — DISCLOSURE (read-only, do this FIRST)
+Before writing any diffs, complete this disclosure phase in chat. You may read code but must not modify anything.
+1.1 Locate each target and report current state
+For each of the three changes, paste:
+
+The current file path and line numbers
+The current code verbatim (5 lines of context before and after the target)
+Confirmation that the code matches what's described in this prompt
+If anything has shifted (line numbers, structure, names), flag it before writing any diff
+
+1.2 Side effects to disclose for each change
+For each change, list:
+
+Every other place in the codebase that references the same variable, function, attribute, or pattern. Use grep/search to be thorough.
+Whether any other component, test, or service depends on the current behavior
+Whether any logging, analytics, or telemetry watches for these specific code paths
+Whether the change could affect any existing form submission, validation, or display behavior
+
+1.3 Explicit risks to call out
+For each change, answer:
+
+What is the worst case if this change is wrong?
+What is the rollback path? (Specifically: can you revert with a single git revert, or does anything depend on this change downstream?)
+What would a customer notice if this change broke?
+Are there any browsers, devices, or scenarios where this change could behave differently than expected?
+
+1.4 What you cannot verify
+Be explicit about anything you cannot test from your Replit environment:
+
+You cannot test on a real iPhone Safari device
+You cannot test on a real Android device
+You cannot test the form rendered inside the actual WordPress iframe at 585px
+You can only verify the code change is syntactically correct and matches the diff
+
+State these limitations directly so the business owner knows what verification is and isn't possible before deploy.
+
+THE THREE FIXES (locked scope)
+Fix #1 — Wrap three storage calls in try/catch
+The form currently has three places where localStorage or sessionStorage is accessed without try/catch protection. These calls throw SecurityError in iPhone Safari cross-origin iframe contexts, which causes the form to crash on initial render.
+Location 1: client/src/components/SimpleQuoteForm.jsx line 29
+Current:
+vehicleType: localStorage.getItem('selectedVehicleType') || "",
+Change to:
+vehicleType: (() => { try { return localStorage.getItem('selectedVehicleType') || ""; } catch (_) { return ""; } })(),
+Location 2: client/src/components/SimpleQuoteForm.jsx around line 194-197
+Current:
+if (value) {
+  localStorage.setItem('selectedVehicleType', value);
+}
+Change to:
+if (value) {
+  try { localStorage.setItem('selectedVehicleType', value); } catch (_) {}
+}
+Location 3: client/src/components/SimpleQuoteForm.jsx around line 173-174
+Current:
+sessionStorage.setItem('parent_attribution_data', JSON.stringify(parentParams));
+Change to:
+try { sessionStorage.setItem('parent_attribution_data', JSON.stringify(parentParams)); } catch (_) {}
+What this fix does NOT do:
+
+Does not change any function name, variable name, or component structure
+Does not change what value is stored
+Does not change what value is read
+Does not change when storage is accessed
+Does not affect any browser other than Safari (in non-Safari browsers, the try blocks succeed and behavior is identical to today)
+
+Fix #2 — Replace the alert() submission error with an inline error message
+The form currently shows submission errors via alert(), which is silently suppressed in iPhone Safari cross-origin iframes.
+Location: client/src/components/SimpleQuoteForm.jsx around line 629
+Current:
+alert("There was an error processing your request. Please try again.");
+Change to:
+setValidationErrors([{ field: 'submit', message: 'There was an error processing your request. Please try again.' }]);
+This reuses the existing validationErrors state and the existing <div className="validation-errors"> display block. The error renders in the same place validation errors already render. No new state variables, no new components, no new CSS.
+Verification required before approval:
+
+Confirm that setValidationErrors is in scope at this line
+Confirm that the existing error display block correctly renders errors with field: 'submit'
+Confirm that the error block's CSS does not depend on specific field values
+Confirm that no other code path expects an alert() to fire here (e.g., a downstream test or a behavior dependency)
+
+What this fix does NOT do:
+
+Does not change any other error handling in the form
+Does not change the alert behavior anywhere else in the codebase
+Does not modify the validation error display CSS or component structure
+Does not change when errors are shown
+
+Fix #3 — Add autocomplete attributes to name, phone, email
+The form's contact fields lack autocomplete attributes, which suppresses iOS Safari autofill suggestions inside cross-origin iframes.
+Location: client/src/components/SimpleQuoteForm.jsx around lines 814-844
+For the three contact field inputs (name, phone, email), add one attribute to each:
+
+Name input: add autocomplete="name"
+Phone input: add autocomplete="tel"
+Email input: add autocomplete="email"
+
+Each is one new attribute on an existing element. No other attribute changes. No element structure changes. No styling changes.
+What this fix does NOT do:
+
+Does not change the placeholder text
+Does not change the input types
+Does not change validation
+Does not change the name HTML attribute (which browsers use for form submission, separate from autocomplete)
+Does not affect autofill on the location, vehicle, or date fields
+
+
+REQUIRED WORKFLOW
+Step 1: Phase 1 disclosure in chat (NO CODE CHANGES)
+Complete every item in section 1.1, 1.2, 1.3, 1.4 above. Paste verbatim evidence. Flag anything that doesn't match the prompt's assumptions.
+Step 2: Three diffs in chat (NO CODE CHANGES)
+Write three separate diffs. Each diff must include:
+
+File path and line numbers
+Before code (with 3 lines of context)
+After code (with 3 lines of context)
+One-sentence plain-English description of what the diff does
+One-sentence description of what the diff does NOT do
+A confirmation that the diff matches the spec character-for-character
+
+Step 3: Pre-deploy summary
+After all diffs, write:
+
+Files that will be modified (should be exactly one: client/src/components/SimpleQuoteForm.jsx)
+Total lines added, removed, changed
+Confirmation that no other files will be touched
+Confirmation that no packages, configs, environment variables, or deployment settings will change
+Confirmation that the existing three UX changes from the last deploy are still in place and unaffected
+
+Then write the literal sentence: "Three Safari fix diffs proposed. No code has been modified. Awaiting 'DEPLOY APPROVED' before any changes."
+Then stop. Do not write anything else. Wait.
+Step 4: After "DEPLOY APPROVED" (and only after)
+
+Apply the three diffs exactly as written. Character-for-character. No additions. No "improvements." No reformatting. No comments. Nothing else.
+Redeploy.
+Re-read the modified line ranges and paste them in chat. Show that deployed code matches approved diffs.
+Provide a 90-second mobile test plan the business owner can run on their phone to verify:
+
+How to verify Fix #1: Open the form on iPhone Safari. Form should load and display fields (not a blank white box).
+How to verify Fix #2: Submit the form with intentionally wrong data (e.g., missing field after submission). An error message should appear inline on the form (not silently).
+How to verify Fix #3: On iPhone Safari, tap the Name field. iOS should suggest saved names. Same for phone, same for email.
+
+
+Confirm the previous three UX changes (heading rename, model placeholder, scroll hint) are still present and unaffected.
+
+If approval comes in anything OTHER than "DEPLOY APPROVED," ask: "Do I have DEPLOY APPROVED?" Wait for the literal phrase.
+
+EXPLICIT SCOPE BOUNDARIES
+Things you will NOT touch in this session, even if you notice they could be improved:
+
+The native <input type="date"> element (separate ticket)
+The iframe height or WordPress page (outside scope, business owner's decision)
+The validation logic for any field
+The submit button styling or behavior
+The success screen or post-submission routing
+The vehicle data file
+The vehicle dropdown logic
+The location autocomplete behavior
+Any backend code, API endpoint, or database schema
+Any analytics, logging, telemetry, or tracking code
+Any other component file
+The CSS files
+The test files
+The package.json or dependencies
+The build config
+The deployment settings
+
+If you notice anything else broken or improvable, write "Observed but not in scope: [thing]" in chat and continue. We will handle other issues in separate sessions with their own approval.
+
+HONESTY REQUIREMENTS
+
+If any line number has shifted since the prompt was written, flag it before writing the diff.
+If you find a structural difference from what the prompt describes (e.g., the alert is wrapped in a function, the storage call is conditional), surface it before proposing the diff.
+If implementing exactly as specified would cause a syntax error or break another part of the file, surface it before proposing.
+If you've made any mistake in any prior session that could affect this work, flag it now.
+If you cannot do any part of this exactly as written for a real technical reason, say so. Do not silently substitute.
+
+
+FINAL REMINDER
+Three fixes. Storage wrap. Inline error. Autocomplete attributes. All in one file. About 15 lines total. Nothing else. Read-only until "DEPLOY APPROVED."
+Disclose first. Write diffs. Wait. Apply only on the magic phrase. Verify. Done.
+If you find yourself opening a file in edit mode before "DEPLOY APPROVED" appears, you have misunderstood the assignment.
