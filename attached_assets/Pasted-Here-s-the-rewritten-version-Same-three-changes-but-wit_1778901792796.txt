@@ -1,0 +1,120 @@
+Here's the rewritten version. Same three changes, but with the hard stop on code pushes moved to the top, and a required pre-flight review where Replit must disclose what it can and can't do, plus any UI/UX side effects, before you decide whether to approve.
+Copy everything between the lines:
+
+🛑🛑🛑 HARD STOP — READ BEFORE DOING ANYTHING ELSE. 🛑🛑🛑
+YOU ARE FORBIDDEN FROM PUSHING, DEPLOYING, COMMITTING, RESTARTING, OR MODIFYING ANY CODE IN THIS SESSION UNTIL THE BUSINESS OWNER GIVES YOU AN EXPLICIT, WRITTEN "DEPLOY APPROVED" MESSAGE.
+This rule has no exceptions. Not for "small fixes." Not for "low-risk" changes. Not for "I'm confident." Not for "just to test." If you push code without the literal phrase "DEPLOY APPROVED" appearing in a message from the business owner, you have failed this session and broken trust.
+Specifically forbidden until explicit approval:
+
+❌ No git commit, no git push, no merge, no deploy.
+❌ No edits to any file. Not one character. Read-only mode.
+❌ No package installs, no npm install, no pip install.
+❌ No config changes, no environment variable edits, no schema migrations.
+❌ No restart of the deployment, no killing of processes.
+❌ No "test a small change to see if it works." If you need to test, describe the test in chat and wait.
+❌ No assuming permission from prior sessions. This is a new session. Approval resets.
+
+Required workflow:
+
+Read everything below.
+Tell the business owner in chat what you CAN do, what you CAN'T do, and what you're UNSURE about.
+Tell the business owner every UI/UX side effect each proposed change could cause — including subtle ones.
+Write out the proposed diffs in chat for review.
+STOP. Wait for the business owner to read everything and reply.
+Only after the business owner replies with the literal phrase "DEPLOY APPROVED" may you write any code or deploy anything.
+After deploy, re-read the changed lines in the live files and paste them back so the business owner can verify what landed.
+
+If at any point you feel the urge to "just go ahead" with anything, STOP. Write the urge in chat as a sentence beginning with "I'm tempted to..." and let the business owner decide. Every time you've touched this codebase without explicit permission, something has broken downstream. We are not doing that again.
+
+Context
+A prior investigation identified UX friction as a major driver of form abandonment on the auto transport quote form at form-carshipperguy.replit.app. The business owner has decided NOT to restructure the form or change the underlying data. The scope of this session is three small, targeted UX adjustments. Nothing else.
+The business owner is non-technical. Your job is to explain everything in plain language, surface every risk, and let them make the call.
+
+Phase 1 — Disclosure (do this BEFORE writing any diffs)
+Before proposing any code changes, answer the following questions in chat. Be honest. If the answer is "I don't know" or "I can't do this," say that. Do not fake confidence.
+1.1 — What you can do
+For each of the three proposed changes below, confirm:
+a. Can you locate the exact code location for this change? Paste the file:line.
+b. Can you implement this change with the libraries, components, and styles already in the project? (Yes/No — if No, explain.)
+c. Do you have full visibility into how this change will render at mobile width (308px), desktop width, and on iOS Safari specifically?
+d. Are there any technical constraints in the existing codebase that would prevent implementing this change as described? (e.g., a styling system, a state management pattern, a conditional render structure that doesn't allow this.)
+1.2 — What you can't do
+Be explicit about anything you cannot verify or guarantee from the Replit environment. For example:
+
+Can you actually preview the form rendered inside an iframe at 585px height, the way customers see it?
+Can you run any real-device test (iPhone Safari, Android Chrome) before deploy?
+Can you observe what happens after the date is picked on a real iOS device, or are you relying on the code logic alone?
+If something looks fine on your end but breaks on a customer's phone after deploy, how would we find out?
+
+1.3 — Unintended side effects to disclose
+For each of the three changes, list every plausible UI/UX side effect, including ones that might seem minor. Examples of what to surface:
+
+Does this change shift the position of any other element on the page (push something up or down)?
+Does this change affect how the form looks at any screen width you don't normally test?
+Does this change interact with any animation, transition, or existing conditional render?
+Could this change affect screen readers, keyboard navigation, or autofill behavior?
+Could this change visually conflict with anything else on the form (color clash, spacing weird, alignment off)?
+Could this change change how the form looks for desktop users who DON'T have the problem we're trying to solve?
+Is there any existing CSS rule or override that might fight with this change?
+If a customer has already started filling out the form and the change deploys mid-session, does anything weird happen for them?
+
+If you cannot think of any side effects, say so explicitly: "I considered side effects X, Y, Z and found none." Do not skip this section.
+
+The three proposed changes
+After Phase 1 disclosure, write the proposed diffs for these three changes — in chat, not in files. Then stop and wait for approval.
+Change #1 — Rename the "Shipment Details" section heading to "Available Ship Date"
+The third section heading currently reads "Shipment Details." Replace that text with "Available Ship Date." Keep the same wrapper element, same className, same styling, same position. Only the inner text changes.
+Do NOT change the styling of this header. Do NOT change any other section header. Do NOT add a subtitle, tooltip, or helper text to this header beyond what Change #3 covers.
+Change #2 — Add a "Type in model type" placeholder for the model field when it renders as a free-text input
+For certain makes, the model field renders as a free-text <input> instead of a dropdown. Currently that free-text input has no placeholder or an inadequate one (likely just "Model"). Customers see an empty box, don't realize they're supposed to type, and bounce.
+Locate the model field's free-text render path. Set its placeholder attribute to exactly: Type in model type
+Do NOT change the dropdown path. Do NOT change the list of makes that trigger free-text mode. Do NOT change validation. Do NOT remove the required attribute.
+Before writing the diff, paste:
+
+The file:line of the model field render block.
+The exact current JSX for both the dropdown and free-text paths.
+The list of makes that currently trigger the free-text path, so the business owner can verify the scope of impact.
+
+Change #3 — Add a small scroll hint that appears only after the date is picked
+Immediately below the date input, render a small piece of helper text that:
+
+Appears only when formData.shipmentDate is truthy. Reuse the existing condition that gates the contact fields — do not invent a new state variable.
+Reads exactly: ↓ Almost done — scroll down to finish
+Styled: small text (around 13px), muted color matching the existing palette for secondary text, with about 8px of vertical margin separating it from the date input above and the contact fields below.
+Static. No flashing, blinking, animation, pulsing, popup, or modal. Just a quiet line of text.
+
+Do NOT add a JavaScript-driven scroll. Do NOT add an IntersectionObserver or any visibility tracking. Do NOT add a dismiss button. Do NOT use bold, all-caps, or emoji other than the down-arrow ↓.
+If the existing CSS palette doesn't have a suitable muted gray, list the colors that DO exist in the palette and let the business owner pick. Do not invent a new color.
+
+Phase 2 — Diffs in chat, then stop
+After completing Phase 1 disclosure, write each of the three diffs as a code block in chat. Three small diffs, not one big one. Each diff must include:
+
+The file path and approximate line numbers.
+The exact before/after.
+A one-sentence plain-English description of what the diff does.
+A one-sentence description of what the diff does NOT do.
+
+After all three diffs are in chat, write: "Three diffs proposed. No code has been modified. Awaiting 'DEPLOY APPROVED' before any changes."
+Then stop. Do not write any more text until the business owner replies.
+
+Phase 3 — Only after explicit "DEPLOY APPROVED"
+If and only if the business owner replies with the literal phrase "DEPLOY APPROVED":
+
+Apply the three diffs exactly as written. No additions. No "small improvements." Nothing else.
+Redeploy.
+Re-read the modified line ranges in the live files and paste them back in chat so the business owner can verify the deployed code matches the approved diffs character-for-character.
+Provide a 60-second mobile test plan the business owner can run on their phone to verify each change is live and working.
+
+If the business owner replies with anything OTHER than "DEPLOY APPROVED" — including approval-adjacent phrases like "looks good," "go ahead," "ok," "sure," or "do it" — DO NOT deploy. Ask explicitly: "Do I have DEPLOY APPROVED?" and wait for the literal phrase.
+This is not bureaucracy. The business owner has been burned by agents acting on implicit approval. The literal phrase is the safety check.
+
+Honesty requirements
+
+If you cannot do something exactly as described, say so. Don't fake it.
+If you think one of the three changes is a bad idea, say so — but make the case, don't refuse silently.
+If a side effect is real but minor, say it's real but minor. Don't hide it because it's small.
+If you've made a mistake in a prior session, this is the time to flag it, not bury it.
+
+Final reminder
+You are in read-only investigation mode until "DEPLOY APPROVED." Three changes. Heading rename. Model placeholder. Scroll hint. Nothing else gets touched ever. Not the iframe, not the vehicle data, not the storage code, not validation, not the success screen, not the styling system.
+Disclosure first. Diffs second. Wait third. Deploy only on the magic phrase.
