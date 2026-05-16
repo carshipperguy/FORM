@@ -1,0 +1,142 @@
+That's a sharp observation and honestly — given your data — it might be the most important theory anyone has put on the table in this whole investigation.
+Here's the prompt. Same strict no-touch rules. This one focuses the agent entirely on the user experience and friction angle, which is a real blind spot in every report so far.
+
+🛑 STOP. READ THIS ENTIRE BLOCK BEFORE TOUCHING ANYTHING. 🛑
+INVESTIGATION ONLY. NO CODE CHANGES. NO DEPLOYS. NO EXCEPTIONS.
+Same rules as the previous three investigation rounds:
+
+❌ No code edits. Read-only.
+❌ No commits, pushes, deploys, restarts, installs, config changes.
+❌ No "test a hypothesis by changing code."
+❌ No guessing. Every conclusion needs verbatim evidence (code with file:line, DB query results, paste it raw).
+❌ No collapsing items. No skipping items.
+❌ Do not begin proposing fixes until every audit item below has a verdict.
+
+If you find yourself opening a file in edit mode, you have misunderstood the task.
+
+Context — new hypothesis from the business owner
+Previous investigation rounds focused on browser-specific bugs (Safari ITP, iOS date picker, iframe height, scroll behavior). Those are real findings. But they may not be the main cause of customer drop-off.
+The business owner — who actually talks to customers — believes the bigger problem may be plain user experience friction, not technical browser bugs. Specifically:
+
+After picking year/make/model, the user scrolls down expecting the form to end. They don't realize a shipment date field is still required below.
+They fill in name/phone/email, hit submit, and get blocked by a missing date field they never saw — with no clear feedback about what went wrong (we already know validation-errors block renders below the fold and alert() is suppressed on iOS).
+Older / less tech-savvy customers in particular may not understand why the form "won't submit" when from their perspective everything is filled in.
+
+This is a UX hypothesis, not a technical bug hypothesis. The form may be technically working as designed, but designed badly for real humans. The previous investigation rounds did not examine this angle.
+Your job in this round: audit the form purely from a user-experience and clarity standpoint. Pretend you are a 55-year-old shipping their car for the first time. Walk through the form. Where would a real person get confused, frustrated, or lost?
+Provide verbatim evidence from the code (JSX, CSS, microcopy) for every observation. Not opinions — quote what's literally on the screen.
+
+Required UX audit — every item must reference specific code with file:line
+9.1 Form structure and visual hierarchy. Paste the rendered order of sections and fields verbatim from the JSX (SimpleQuoteForm.jsx render block). For each section, note: section heading text, fields contained, whether section headings are visually distinct (font size, color, weight, divider). Identify any place where the visual flow could mislead a user into thinking a section is the last section when it isn't.
+9.2 Required field indicators. Pull every form input and report whether it has any of: an asterisk, "(required)" text, a colored label, a different border, helper text, or any visual signal that it is mandatory. Quote the JSX/CSS verbatim. If there are NO visible "required" markers, say so directly — that is itself a major UX failure.
+9.3 The shipment date field specifically. This is the most-suspected friction point. Paste verbatim:
+
+The section heading it lives under and the heading's styling.
+The field's label text and placeholder text.
+Any helper text, tooltip, or "When do you want this picked up?" instruction.
+Its visual position relative to vehicle make/model (does it look like part of vehicle details or its own thing?).
+Whether a desktop user would visually understand this field is required before name/phone/email appear.
+Whether the form scrolls or auto-advances when the date is set.
+Whether the appearance of name/phone/email fields after date selection is obvious (animation, scroll-to, highlight) or silent (they just appear).
+
+9.4 The "contact fields are hidden until date is set" gate. This is unusual UX. Paste:
+
+The exact condition (SimpleQuoteForm.jsx:812 or wherever the conditional render is).
+Whether the user has any indication that more fields exist below the date.
+Whether a customer who fills out everything visible up to and including vehicle make/model would have any reason to expect more fields.
+What it would feel like for a user who scrolls down past the vehicle section, doesn't see the date field clearly, doesn't see name/phone/email at all, and assumes the form is broken.
+
+9.5 The submit button when fields are missing.
+
+Is the button visually disabled / grayed out when required fields are empty? Paste the JSX and CSS.
+Or is the button always blue/active and the user only learns something's wrong after tapping it?
+If a user taps submit with an empty shipmentDate, what visual feedback do they get? Paste the entire failure path verbatim.
+
+9.6 Error messaging.
+
+Paste the validation error block markup verbatim and its CSS.
+Quote the actual error message strings. Are they written for humans ("Please pick a shipment date") or for developers ("shipmentDate is required")?
+Are errors shown inline next to each broken field, or only in one block at the bottom?
+If they're at the bottom only, is the bottom of the form even visible on most screens?
+Does the form scroll to or highlight the first broken field when validation fails? (Answer this from the code, we already suspect no.)
+
+9.7 Placeholder text vs labels.
+
+Does every input have a real <label> element, or does it rely on placeholder text only?
+Paste the JSX for each input field.
+Note: placeholder-only fields are a known accessibility and usability problem — older users especially lose track of what a field is for once they start typing because the placeholder disappears.
+
+9.8 Microcopy quality across the entire form.
+
+The intro/header — does it explain what's about to happen and how long it'll take?
+Section headings — are they action-oriented ("Tell us about your vehicle") or generic ("Vehicle Details")?
+Submit button text — does it say "Submit" or something clearer like "Get My Free Quote"?
+Quote-strip every user-facing string in the form. Paste the list verbatim.
+
+9.9 Tab order and keyboard navigation.
+
+If a user pressed Tab through the form, what order would they hit fields in?
+Are there any focus traps, skipped fields, or non-keyboard-accessible elements?
+
+9.10 The progressive disclosure pattern.
+
+Currently: vehicle fields visible immediately, date visible immediately, contact fields hidden until date is set.
+Walk through what a real user experiences step by step. Where could they get lost or stop?
+Is there any "Step 1 of 2" / progress indicator anywhere? Paste verbatim if yes.
+
+9.11 Length perception.
+
+How long does the form look on first paint at mobile width, before any fields are filled?
+Does it look "short and easy" (encouraging completion) or "long and complicated" (encouraging abandonment)?
+Is there anything that would communicate to the user "this is going to take 60 seconds and then you'll have a quote"?
+
+9.12 The cumulative friction count.
+List every single decision/input the user has to make before they can submit:
+
+Pickup ZIP
+Drop-off ZIP
+Vehicle type (with subtype options?)
+Year
+Make
+Model
+Date
+Name
+Phone
+Email
+
+Count them. For each, note whether it's a dropdown, free text, button selector, date picker, etc. Quantify the cognitive load.
+9.13 The "I think I'm done" moment.
+This is the business owner's specific hypothesis. After vehicle year/make/model, what does the user see next? Is the date field visually grouped with the vehicle section or set apart? If a user thought they were done after entering the model, what would convince them otherwise?
+Quote the section heading above the date field (verbatim) and describe its visual prominence.
+9.14 Mobile-specific UX problems.
+At 308px form width (which is what the form forces on mobile):
+
+Do labels wrap to multiple lines awkwardly?
+Do dropdowns/inputs get cramped?
+Is tap-target size adequate (minimum 44×44 pixels per Apple HIG / 48×48 per Material Design)?
+Does the form feel like a desktop form crammed into a phone, or one designed for mobile?
+
+9.15 Drop-off correlation with UX hypothesis.
+Re-examine the partial-leads data with this lens:
+
+Of the 244 unconverted partials, how many have name+email+vehicle_type filled but never submitted? (We saw 36 earlier.)
+These 36 users completed everything visible to them but never reached submit. The business owner's theory predicts these are users who didn't notice the date field, filled the contact fields they saw, hit a hidden submit button, and gave up.
+Cross-reference: do these 36 users have session_id populated? (If yes, they're not the Safari-blocked population — they're a separate group that the UX theory specifically explains.)
+
+
+Required deliverables, in this order:
+
+The full audit above with verbatim evidence. Every item answered. No collapsing.
+A user-experience-only ranking of the friction points, ranked by how many real users would likely be confused or blocked by each. Numeric estimates if possible, honest "speculative" markers if not.
+A list of specific UX improvements — written as proposed changes only, not applied. For each: the current code with file:line, what the change would be, and what user behavior it would improve. No diffs yet — describe the change in plain English.
+An assessment of the business owner's specific hypothesis: is "users don't realize they need to enter a date" supported, partially supported, or not supported by what you find in the code and data? Cite evidence either way.
+
+
+Honesty requirements
+
+If the form has clear, well-labeled, well-structured UX, say so. Don't invent problems to look thorough.
+If the form has serious UX problems, name them clearly and specifically. Don't soft-pedal.
+If the business owner's hypothesis is wrong, say so directly. If it's right, say so directly.
+This is the fourth investigation round. The business owner has been patient. Give them the truth, with evidence.
+
+Nothing in this task requires writing code. Report findings. Wait for approval.
