@@ -1,0 +1,129 @@
+🛑🛑🛑 READ-ONLY DEEP FEASIBILITY INVESTIGATION. NO CODE CHANGES. NO INSTALLS. NO COMMITS. NO DEPLOYS. 🛑🛑🛑
+You are forbidden from modifying any code, installing any packages, committing, deploying, or restarting until the literal phrase "DEPLOY APPROVED" appears. This entire investigation is read-only.
+If you feel any urge to act, write "I'm tempted to..." and stop.
+
+Goal of this investigation
+I am considering replacing the current <input type="date"> with a custom JavaScript calendar component that I would build inline in the existing form file (no library install). The custom calendar would render a clickable grid of days, work on iPhone Safari inside cross-origin iframes (because it doesn't depend on native iOS UI), and write to the existing formData.shipmentDate field.
+Before any code is proposed or written, I need you to investigate every single thing that could go wrong, every dependency, every assumption, and every constraint in my specific codebase. This is not a generic feasibility study — it's a deep dive into MY code, MY form, MY file structure.
+You will produce a granular report. Then I decide whether to proceed.
+
+The investigation — twelve sections, each granular
+Section 1 — File and component inventory
+1.1 Confirm the exact file path of the form component. Paste file:line.
+1.2 Confirm the React version in package.json. Paste verbatim.
+1.3 List every other component file in the project. File paths only.
+1.4 Confirm whether the project uses TypeScript or plain JavaScript. Confirm the build system (Vite, Webpack, Create React App, etc.) by looking at package.json and config files.
+1.5 List every component imported by SimpleQuoteForm.jsx. For each, state whether it's local, from node_modules, or a CSS file.
+1.6 Confirm whether the form is rendered standalone (single component) or wrapped in any provider, context, or layout. Paste the entry point that renders it.
+Section 2 — Current date input — exhaustive analysis
+2.1 Paste the verbatim JSX of the current date input block, including 10 lines of context before and after.
+2.2 List every reference to shipmentDate in the entire codebase. File:line for each. Include reads, writes, validation, formatting, and Zapier payload construction.
+2.3 What is the exact format of formData.shipmentDate when the native picker sets it? Paste evidence from the code (likely YYYY-MM-DD).
+2.4 Paste the verbatim validateForm function with full context. Identify every line that depends on shipmentDate.
+2.5 Paste the verbatim handleChange function. Confirm whether it handles all input types generically or has type-specific logic.
+2.6 Paste the verbatim Zapier payload construction code that uses shipmentDate. Confirm what format Zapier ultimately receives.
+2.7 Paste any other formatting, conversion, or transformation that touches shipmentDate between input and final submission.
+Section 3 — The conditional gate that depends on shipmentDate
+3.1 Paste the verbatim JSX of the {formData.shipmentDate && (...)} block.
+3.2 Confirm that ANY truthy value for shipmentDate triggers the contact fields to render — including potentially malformed date strings.
+3.3 Identify whether the gate condition would behave differently if shipmentDate becomes an empty string, a Date object, a number, or an ISO string.
+Section 4 — Styling system
+4.1 Where do the form's styles live? Inline styles, CSS module, styled-components, vanilla CSS file? Paste evidence.
+4.2 Paste the verbatim CSS for the existing .form-field, .date-field, .form-fields, and .form-section classes.
+4.3 Identify the color palette used in the form. List every distinct hex color, where it appears, and what it represents (primary, text, border, hover, etc.).
+4.4 Identify the font stack and sizes used in the form.
+4.5 Identify any animation, transition, or hover effects on form fields.
+4.6 Confirm the form's container width behavior. At what breakpoints does it render at what width? Paste the verbatim CSS.
+Section 5 — Cross-origin iframe rendering constraints
+5.1 Confirm the form is intended to be embedded in an iframe (the WordPress site). Find any code that detects iframe context, postMessage handling, or parent-page communication. Paste it.
+5.2 List every CSS property or JavaScript behavior in the codebase that assumes iframe-only or non-iframe context.
+5.3 What is the iframe's known height constraint? Confirm by searching for any height-related comments or logic in the form file.
+5.4 Identify whether the form has any z-index management. Paste every z-index value used. If a popup or overlay component were added, which z-index value would it need to render above everything else? What is the highest z-index currently in use?
+Section 6 — React state and event handling patterns used
+6.1 Paste the form's full state declaration (useState calls at the top of the component).
+6.2 How does the form handle controlled vs uncontrolled inputs? Find evidence in the existing date input or other input fields.
+6.3 Identify whether the form uses refs (useRef) anywhere. List every ref and its purpose.
+6.4 Identify whether the form uses any portal pattern (createPortal from react-dom) anywhere.
+6.5 Identify how popups, modals, or overlays are handled today (if at all). If they're not handled today, that means a calendar overlay would be a new pattern in this codebase — flag that.
+Section 7 — What a custom calendar component would need to do
+7.1 List the inputs and outputs of a minimum-viable calendar:
+
+Inputs: current selected date (string or null), minimum date (today)
+Outputs: when user taps a day, call a callback with the new date string in the same format formData.shipmentDate currently uses
+7.2 List the visual elements required:
+A "month and year" header
+Left and right arrows to change month
+A 7-column grid of day numbers
+Visual indication of: today, selected day, days in the past (greyed out), other-month days (faded)
+7.3 List the behavioral requirements:
+Tapping a day in the past does nothing (or shows a disabled state)
+Tapping a future day fills shipmentDate with the corresponding date string
+The calendar opens when the date field is tapped
+The calendar closes when a date is selected, or when the customer taps outside it
+The keyboard does not appear (this is not a text input)
+7.4 List what the calendar must NOT do:
+Must not change the field name shipmentDate
+Must not change the data type written to formData.shipmentDate
+Must not change the format of the value written
+Must not interact with any other form field
+
+Section 8 — Every risk specific to this codebase
+For each of the following, give a specific answer based on what's actually in the code, not a generic answer:
+8.1 The form is inside a cross-origin iframe. Will a custom popup overlay (positioned absolute over the rest of the form) render correctly within the iframe? Are there any known iframe rendering quirks visible in the existing code?
+8.2 The iframe is height-constrained (585px in production). A calendar overlay would be approximately 280px tall and 280px wide. Would it fit within the iframe's visible area, or could it be clipped at the bottom? Paste the calculation.
+8.3 If the calendar uses position: fixed, will it render relative to the iframe's viewport or the parent page's viewport? Confirm by examining how iframe contexts handle fixed positioning in the existing codebase or in general web standards.
+8.4 If the calendar uses position: absolute, what container would it be positioned relative to? Confirm the parent positioning context of the date input.
+8.5 Would the calendar overlay interact with the existing scroll hint added in the previous deploy? Paste the relevant code.
+8.6 Would the calendar interact with the contact-fields gate? If a customer opens the calendar without selecting a date, what happens to the form layout below?
+8.7 Are there any existing event listeners (window resize, scroll, click-outside detection) that a calendar overlay would conflict with? List them.
+8.8 If the calendar component re-renders frequently (state updates on each interaction), would it cause the entire form to re-render? Identify the parent-child relationships and where state lives.
+8.9 The form currently has the LocationMenuSelector component which is a combobox. Does it have similar popup/overlay behavior that might offer a working pattern for the calendar? Paste its relevant code.
+8.10 What happens on iPad in landscape mode, where the iframe might render at a wider width? Would the calendar's fixed-width assumption break?
+8.11 What happens when the customer rotates their phone mid-interaction? Would the calendar reposition correctly?
+8.12 What happens if the customer's iPhone is in dark mode? Would the calendar's colors clash with iOS rendering?
+8.13 Does iOS Safari have any specific touch event quirks that affect tappable grid elements? Identify any from the existing codebase.
+8.14 If the customer triple-taps rapidly, would the calendar handle it correctly or could it select multiple dates? Identify the state management implications.
+8.15 What happens if the calendar is opened, the customer scrolls the form, and then taps a day? Does the day still register correctly?
+Section 9 — Build system, bundle size, and runtime impact
+9.1 What is the current bundle size of the form's JavaScript output? Find evidence in the build artifacts or estimate from the source.
+9.2 How many lines of code would a minimum-viable calendar add? Give a realistic estimate.
+9.3 Would adding the calendar inline in SimpleQuoteForm.jsx make the file too large to maintain? Currently the file is approximately how many lines?
+9.4 Should the calendar be in a separate file? If yes, what file structure would match the project's existing pattern?
+9.5 Would the calendar have any runtime performance implications — slow re-renders, memory leaks, infinite loops if state is mishandled?
+Section 10 — Accessibility
+10.1 Does the current form follow any accessibility patterns? Are there aria-label attributes, focus management, keyboard navigation? List evidence.
+10.2 Would a custom calendar need ARIA attributes to be screen-reader accessible? Which ones?
+10.3 Can a custom calendar be operated by keyboard alone (arrow keys to navigate days, Enter to select, Escape to close)? What event listeners would be required?
+10.4 Would the customer's iOS VoiceOver users be able to use the custom calendar? What's required?
+Section 11 — Testing what's possible vs not possible
+11.1 Can you, the Replit agent, render the form in your preview environment and visually confirm the current behavior?
+11.2 Can you simulate an iPhone Safari user-agent or screen size?
+11.3 Can you test inside an actual cross-origin iframe?
+11.4 Can you take a screenshot of the rendered form at 308px width to verify the visual layout?
+11.5 What can you NOT test from your environment that would only be testable on a real device or in the actual WordPress embed?
+Section 12 — Conclusions
+After completing Sections 1-11, answer the following directly:
+12.1 Is building a custom inline calendar component feasible in this codebase? Yes or no, with specific evidence.
+12.2 What is the realistic line-count of the change? Give a range (e.g., 80-120 lines).
+12.3 What are the top three risks you cannot eliminate? Name them specifically.
+12.4 What is the minimum viable version that fixes the iPhone Safari problem without unnecessary complexity? Describe it in one paragraph.
+12.5 What would you need from me (the business owner) to proceed safely if I approved this work? List specifics.
+12.6 If I asked you to do it in the smallest possible scope, what would you build, what would you skip, and why?
+12.7 What are the things you literally cannot promise about the outcome? Be explicit.
+
+Deliverables
+Write the full report in chat. Use clear section headers matching the numbering above. Paste verbatim code wherever requested. Do not summarize where evidence is required. Do not skip sections.
+When the report is complete, write: "Feasibility investigation complete. No code modified. No packages installed. Awaiting direction before any further action."
+Then stop.
+
+Honesty requirements
+If any section cannot be answered from code alone, say so explicitly. Do not invent answers. If something would require testing on a real device, label it as such. If a risk is genuinely unknowable until deployment, label it as such.
+If you find evidence that contradicts an assumption in this prompt (e.g., the file isn't where I expect, the format isn't what I expect, the iframe behavior is different than I described), flag it before proceeding.
+If you can't access something needed to answer a section (a config file, a build artifact, the actual deployed bundle), note what's missing.
+
+Scope boundaries
+You are not designing the calendar in this session. You are not writing code. You are not proposing a diff. You are inventorying what's true in the codebase and what risks are real before any design happens.
+The next step after this report — if I decide to proceed — is a separate session where the actual design and diff are written. This investigation just tells me whether to take that next step.
+
+Send this prompt to the form app's Replit (the one containing SimpleQuoteForm.jsx). When the report comes back, paste it here and we'll work through what it says together. The report will be long. That's the point.
+One reminder: this is read-only investigation only. Do not approve anything from this prompt. Do not say "DEPLOY APPROVED." The next step after this report is a decision about whether to proceed, not a deployment.
