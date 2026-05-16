@@ -48,3 +48,9 @@ id = "rt5BvV5RPrjsU3LRVHQkD"
 uri = "file://exports/vehicle_makes_in_database.csv"
 type = "table"
 title = "All Vehicle Makes in Database"
+
+[[outputs]]
+id = "xVcU-4XTrsi-8f_sQ5bOL"
+uri = "file://exports/car_truck_suv_make_model.csv"
+type = "table"
+title = "All Car/Truck/SUV Makes & Models in Database"
