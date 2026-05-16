@@ -1,0 +1,105 @@
+Here's the prompt. Same strict no-touch rules. This one pushes the agent to stop summarizing and prove its conclusions with real numbers tied to real customers.
+
+🛑 STOP. READ THIS ENTIRE BLOCK BEFORE TOUCHING ANYTHING. 🛑
+YOU ARE STILL IN INVESTIGATION MODE. NO CODE CHANGES. NO DEPLOYS. NO EXCEPTIONS.
+The non-negotiable rules from the previous sessions still apply:
+
+❌ No code modifications. Read-only.
+❌ No commits, no pushes, no deploys, no restarts, no installs, no config changes.
+❌ No "test a hypothesis by changing code."
+❌ No guessing. Every conclusion needs verbatim evidence.
+❌ No collapsing items. No skipping items.
+✅ Paste raw evidence — log lines verbatim, query results verbatim, code verbatim with file:line.
+
+If you feel the urge to fix anything, STOP. Write the diff in chat. Do not touch the repo.
+
+Context
+Your previous report identified four bugs (Safari localStorage crash, iOS date picker, alert() suppression, iframe height 585px) and ranked the iframe height as the top suspect. The business owner has a fair objection: the form is producing 459 successful submissions in the last 7 days, which means it is clearly working for some non-trivial percentage of customers. Your previous report does not explain who is succeeding, who is failing, or why. The ranking is therefore not yet evidence-based — it's plausible but unproven.
+This investigation is to figure out exactly which customers are getting stuck, on which devices, at which step, in what proportions. Not which bug is "most likely." Which bug is actually responsible for which slice of the drop-off, with numbers attached.
+Hypothetical correctness is not acceptable. "Form natural height is 625px > 585px so button is clipped" is a theoretical claim. The real-world version is "X% of mobile Safari users can reach the submit button, Y% cannot, and here's the query that proves it."
+
+Required investigation — every item must produce numbers or paste evidence
+8.1 Successful submission patterns. From the 459 submit-lead events in the last 7 days, pull and paste:
+
+Distribution by hour of day. Is the success rate flat or does it dip at specific hours?
+Average time-on-form for successful submissions (if you have any timestamp data — partial-lead first-fire to submit-lead).
+Whether successful submissions cluster around specific traffic sources / referrers (if attribution data is captured).
+Whether the 459 submissions include any client_timeout_triggered events (from logEvent() calls) and how many.
+
+8.2 Drop-off step localization. The partial_leads table fires when phone is typed. We need to know what comes BEFORE that and what comes AFTER. Examine the form code and identify:
+
+Every place a logEvent() or analytics call fires (file:line, event name).
+Every place a state transition could be observed server-side (any /api call besides partial-lead and submit-lead).
+Whether the current logging would let us distinguish "stuck at date picker" from "stuck at submit button" from "stuck at validation error." Be honest — if the current logging cannot distinguish these, say so, and tell us what logging would need to exist to answer the question.
+
+8.3 Cross-reference unconverted partials with available signals. For the 244 unconverted partial leads (or the subset with usable data), paste:
+
+How many have vehicle_type filled in (meaning they got past vehicle selection).
+How many have email filled in.
+How many have name filled in.
+Distribution: how many filled in 1, 2, 3, 4 fields before dropping off.
+Any timestamp patterns — were they on the form for 30 seconds or 5 minutes before abandoning?
+
+8.4 Submit-lead success patterns vs partial-lead drop-off patterns. Of the 459 successful submits:
+
+Do their partial_lead precursors have session_id populated (meaning storage worked for them)?
+Of the 244 unconverted, what percentage had session_id populated vs null?
+If unconverted partials have null session_id at a much higher rate than converted ones, that's direct evidence the Safari storage issue is killing them specifically.
+
+8.5 The iframe height theory — actually prove or disprove it.
+
+What is the form's exact rendered height at 308px width with NO contact fields visible (i.e., before the date is selected)? Inspect the DOM tree from the JSX and report the sum of field heights + margins + padding.
+What is the form's exact rendered height at 308px width WITH contact fields visible?
+What is the form's exact rendered height at 308px width with contact fields visible AND a validation error displayed?
+Compare each to 585px. State precisely: in which of these three states is the submit button reachable, and in which is it clipped?
+If the answer is "submit button is reachable when there are no validation errors and no contact fields gating," then the iframe height theory is incomplete — it only explains stuck users in specific states.
+
+8.6 The Safari storage theory — actually prove or disprove it.
+
+The 11/20 unconverted partials with null session_id was flagged as evidence. What percentage of the 323 converted partials have null session_id? If converted partials have null session_id at a similar rate, then null session_id is not a Safari-only signature and the evidence is weaker than presented.
+What share of total traffic to the form domain is iOS Safari? Pull from server access logs (User-Agent string) over the last 7 days. If iOS Safari is 10% of traffic, the Safari crash can only explain a 10% ceiling on stuck users, not a 30% drop-off.
+
+8.7 The date picker theory — actually prove or disprove it.
+
+Of the 244 unconverted partials, how many have vehicle_type populated? Because vehicle_type is selected BEFORE the date field in the form's visual order. If most stuck users have vehicle_type filled in, they made it to the date field. If most don't, they got stuck earlier and the date picker isn't the issue for them.
+Cross-reference: of partials where vehicle_type IS populated, how many converted vs didn't convert? That ratio tells us if the post-vehicle-pre-submit journey is where the loss happens.
+
+8.8 The validation error theory — actually prove or disprove it.
+
+Does any logging exist that records when validateForm() returns false? If yes, how many failed validations occurred in the last 7 days, and how many of those users eventually submitted successfully vs gave up?
+If no such logging exists, say so explicitly.
+
+8.9 Desktop vs mobile breakdown.
+
+Pull User-Agent strings from any server log that captures them (access logs, request logs, error logs).
+Break down the 459 successful submissions by desktop / mobile / tablet.
+Break down the 244 unconverted partials by the same.
+If desktop conversion rate is 70%+ and mobile is 40%-, the mobile-iframe theory is supported. If both are 55%, the iframe theory is weaker and something universal is going on.
+
+8.10 If certain data is uncapturable from current logging, list every piece of data we'd need to add to answer these questions definitively. Include:
+
+Which exact field/value would need to be added.
+Which exact code location (file:line) the logging would need to be inserted at.
+What it would cost in performance / privacy / complexity.
+Do NOT add this logging. List it as a proposed change.
+
+
+Honesty requirements
+
+If the previous report's conclusions cannot be verified by the data, say so explicitly. "The iframe height theory was presented as a top suspect but the data available does not let me confirm or deny it" is an acceptable answer.
+If the question is unanswerable with current data, say "to answer this I need: X" — do not guess.
+If you find that the actual top suspect is different from what you reported last time, say so directly. We will not be upset that you changed your mind. We will be upset if you refuse to.
+Rank suspects again at the end, but this time each rank must be backed by a numeric ratio, not an architectural argument. If you cannot back a rank with numbers, mark it "speculative" and put it at the bottom.
+
+
+Required deliverables, in this order
+
+Every item above filled out with numbers or pasted evidence. Vague answers fail.
+A revised suspect ranking where each entry is "Suspect X — explains Y% of the drop-off based on data point Z." If you cannot phrase it that way, mark it speculative.
+A list of logging additions (file:line of where to insert, what to log) that would let us answer the questions we currently can't. Diffs only — do not apply.
+A list of customer questions the business owner should ask the next 5 people who call complaining the form didn't work — exact phrasing, designed to localize the bug to a specific step / device / browser.
+
+
+Final reminder
+The business owner has been patient through three rounds of this. They are right to push back when conclusions don't match their reality. Your job is to either prove your previous ranking with data, or honestly revise it. "I was overconfident, here's what the numbers actually say" is the most valuable answer you can give.
+Nothing in this task requires writing code. If you open a file in edit mode, you have misunderstood the assignment.
