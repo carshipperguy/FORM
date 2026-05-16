@@ -1,0 +1,44 @@
+Here's the prompt with strict no-code-push warnings front-loaded. Copy everything between the lines:
+
+🛑 STOP. READ THIS ENTIRE BLOCK BEFORE TOUCHING ANYTHING. 🛑
+YOU ARE IN DIAGNOSIS MODE. YOU ARE NOT IN FIX MODE.
+The following rules are non-negotiable. Violating any of them means you have failed this task regardless of what else you accomplish:
+
+❌ DO NOT modify any code. Not one line. Not a "tiny fix." Not "while I was in there." Read-only.
+❌ DO NOT push, commit, deploy, redeploy, or restart anything. No git commit. No git push. No deployment triggers. No package installs. No config changes. No environment variable edits.
+❌ DO NOT create new files, branches, or PRs.
+❌ DO NOT run migrations, seeds, scripts, or any command that writes state.
+❌ DO NOT "test a hypothesis" by changing code to see what happens. If you need to test something, tell me and I will decide.
+❌ DO NOT guess, infer, or pattern-match from memory. If you don't have direct evidence, the answer is "unknown — here's how to find out," not a confident verdict.
+✅ DO read code, read logs, read headers, read deployment settings, and report findings.
+✅ DO tell me exactly which file and line number every claim comes from.
+
+If at any point you feel the urge to "just quickly fix" something — STOP and write the proposed change in this chat as a diff for me to review. I will approve every single change before any code is touched. No exceptions, even for "obvious" one-liners.
+Every previous time an agent has touched this codebase without permission, something else has broken. We are not doing that again. Your job for this entire session is to gather evidence and report. That is it.
+
+Context
+
+App: form-carshipperguy.replit.app — multi-step auto-transport quote form
+Embedded as a cross-origin iframe on a WordPress page at amerigoautotransport.net
+Real customers fill out their info and cannot continue / advance / submit
+Actively losing the business money — treat as P0
+This bug only manifests in the cross-origin iframe context. Testing on the .replit.app URL directly will not reveal it. Any verdict based only on direct-URL testing is invalid.
+
+Your task: work through the diagnostic checklist below in order. For each item return one of ✅ ruled out / ⚠️ likely contributing / 🔴 root cause / ❓ unknown, with evidence (file:line code snippet, log line, network response, header dump, or test result). Vague answers are failures. "Looks fine" is a failure. "Probably not the issue" is a failure.
+
+Cross-origin storage (most likely cause in 2026). Find every read/write of localStorage, sessionStorage, document.cookie, and IndexedDB. When this app runs inside a cross-origin iframe (Safari ITP and Chrome's storage partitioning), those reads return empty and writes silently fail — so multi-step state is lost between steps and the "Continue" button effectively resets the user. List every storage call with file:line. Do not refactor. Do not "fix it real quick." Just list them and explain what each one does.
+iframe framing headers. Fetch the response headers from form-carshipperguy.replit.app and report them verbatim. Confirm X-Frame-Options is not DENY or SAMEORIGIN. Confirm Content-Security-Policy: frame-ancestors allows amerigoautotransport.net. Confirm any auth/session cookies are set with SameSite=None; Secure — Lax or Strict will be dropped in this iframe context and any cookie-dependent step will fail. Paste the raw header dump.
+The Continue / Next / Submit button. Locate every handler with file:line. Walk through the click flow in text. Is there a validation rule that's silently failing (a required hidden field, an async ZIP/Google Places lookup that never resolves, a phone format regex that rejects valid inputs)? Is the button disabled by a state that's never satisfied? Is there an error toast being rendered but pushed outside the iframe's visible viewport so the user sees nothing happen? Quote the actual code.
+All backend / third-party API calls. Enumerate every fetch the form makes: ZIP lookup, geocoding, distance/quote calculation, form submission, email/SMS notification, CRM webhook. For each, paste file:line and the endpoint URL. Note whether it has a timeout, error handling, and a user-facing failure state. Pull the last 24h of Replit deployment logs and surface any 4xx, 5xx, timeouts, or unhandled rejections — paste the actual log lines. Do not summarize, paste them.
+Deployment health. Report: is this on Reserved VM / Always-On, or sleeping Autoscale/Hobby? Last restart timestamp. Current memory/CPU. If it sleeps, cold-start latency on the first user interaction can blow past API timeouts and look like a frozen form.
+Mobile viewport. Inspect the form rendered at 375px width. Is the Continue button reachable without scrolling inside the iframe? iframes on iOS Safari frequently don't scroll independently, so a button below the parent page's iframe height is unreachable. Report the form's total height at mobile widths.
+Console + network diagnostics for reproduction. Write me a step-by-step script of exactly what to open in DevTools (Console tab, Network tab filters, Application > Storage panel) when I reproduce the bug on the live amerigoautotransport.net page — what to click, what to look for, what would prove which hypothesis. I will run it and report back.
+
+Required deliverables (in this order, in this format):
+
+The checklist above filled out, every item, with verdict + evidence.
+A ranked list of suspected root causes with confidence levels (high / medium / low) and what evidence would promote each to confirmed.
+A proposed-fixes section, written as diffs in this chat, NOT applied. I will read every diff and explicitly say "apply fix #N" before you touch the repo. If I don't say it, you don't do it.
+A reproduction plan I can run on my phone in 60 seconds to verify the bug still exists or has been fixed.
+
+Final reminder: nothing in this task requires you to write code. If you find yourself opening a file in edit mode, you have misunderstood the assignment. Report findings. Wait for approval. That is the entire job.
