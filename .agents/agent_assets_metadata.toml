@@ -36,3 +36,9 @@ id = "ILPJ2iF1cs7AeGqo94Qr4"
 uri = "file://exports/abandoned_leads_today_may9.csv"
 type = "table"
 title = "Abandoned Leads — Today (May 9, 2026)"
+
+[[outputs]]
+id = "BZbrrS9KygYiqNQSQ5GRi"
+uri = "file://exports/lost_leads_7days_may16.csv"
+type = "table"
+title = "Lost Leads — Last 7 Days (May 9–16, 2026)"
