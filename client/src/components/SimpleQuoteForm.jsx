@@ -645,7 +645,7 @@ const SimpleQuoteForm = () => {
                 onChange={(value, zipCode) =>
                   handleLocationChange("pickupLocation", value, zipCode)
                 }
-                placeholder="Ship From"
+                placeholder="Pickup city or ZIP"
                 required
               />
             </div>
@@ -655,7 +655,7 @@ const SimpleQuoteForm = () => {
                 onChange={(value, zipCode) =>
                   handleLocationChange("dropoffLocation", value, zipCode)
                 }
-                placeholder="Ship To"
+                placeholder="Drop-off city or ZIP"
                 required
               />
             </div>
