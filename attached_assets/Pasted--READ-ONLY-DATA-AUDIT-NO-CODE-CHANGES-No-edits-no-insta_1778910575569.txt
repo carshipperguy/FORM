@@ -1,0 +1,15 @@
+🛑 READ-ONLY DATA AUDIT. NO CODE CHANGES. 🛑No edits, no installs, no commits, no deploys. Pure analysis of existing data.GoalI want to measure how many iPhone Safari customers are getting stuck somewhere in my quote form before they leave any trace. Specifically I want to know if there's evidence that the date picker (or any other step) is blocking customers from progressing.What to check
+Browser data in partial leads. Look at the partial_leads table. Is browser/user-agent data stored on each row? If yes, run a breakdown: of the last 30 days of partial leads, how many came from iPhone Safari, iPhone Chrome, Android, desktop Chrome, desktop Safari, etc. List the counts.
+
+Browser data in visitor_attribution. Same question for the visitor_attribution table. Does it store user-agent or browser info? If yes, run a breakdown: in the last 30 days, how many sessions were created from each browser type, and what percentage of those sessions resulted in any lead (partial or completed) being recorded?
+
+Conversion rate by browser. For each browser, compute: sessions / partial leads / completed quotes. Show the funnel. The expectation is iPhone Safari should have a dramatically lower conversion rate than other browsers if there's an early blocker.
+
+Form view tracking. Is there any tracking that records when the form is viewed (not just submitted)? Check for any event in any table that fires before the partial_lead step. If yes, run the same browser breakdown on views.
+
+iPhone Safari specific. Of all sessions that arrived from an iPhone (any browser), what percentage produced a partial lead? Of those that produced a partial lead, what percentage submitted a completed quote? Show the funnel.
+
+Time-on-form proxy. If session timestamps exist, look at iPhone Safari sessions specifically. How long did they last? Sessions that lasted longer than 30 seconds but produced no partial lead are strong candidates for "got stuck mid-form."
+
+What you cannot determine. Be explicit about which signals you can measure with the current data, and which would require new instrumentation in the form to capture.
+OutputWrite the findings as a plain English report with actual numbers. No code changes. No assumptions about what the data should look like. Just report what's there.
