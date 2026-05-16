@@ -42,3 +42,9 @@ id = "BZbrrS9KygYiqNQSQ5GRi"
 uri = "file://exports/lost_leads_7days_may16.csv"
 type = "table"
 title = "Lost Leads — Last 7 Days (May 9–16, 2026)"
+
+[[outputs]]
+id = "rt5BvV5RPrjsU3LRVHQkD"
+uri = "file://exports/vehicle_makes_in_database.csv"
+type = "table"
+title = "All Vehicle Makes in Database"
