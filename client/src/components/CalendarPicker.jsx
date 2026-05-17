@@ -103,8 +103,15 @@ const CalendarPicker = ({ value, onChange }) => {
           if (!isOpen && wrapperRef.current) {
             const rect = wrapperRef.current.getBoundingClientRect();
             const spaceAbove = rect.top;
+            const spaceBelow = window.innerHeight - rect.bottom;
             const calendarHeight = 230;
-            setOpenDirection(spaceAbove >= calendarHeight ? "up" : "down");
+            if (spaceAbove >= calendarHeight) {
+              setOpenDirection("up");
+            } else if (spaceBelow >= calendarHeight) {
+              setOpenDirection("down");
+            } else {
+              setOpenDirection(spaceAbove >= spaceBelow ? "up" : "down");
+            }
           }
           setIsOpen((o) => !o);
         }}

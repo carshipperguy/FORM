@@ -392,7 +392,7 @@ async function sendPageViewEvent(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(eventData),
-    signal: AbortSignal.timeout(10000),
+    signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
   });
 
   if (!response.ok) {

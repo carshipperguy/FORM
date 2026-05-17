@@ -34,7 +34,7 @@ export function trackEvent(eventName: string, data: Record<string, unknown> = {}
         "x-api-key": "amerigo_secret_123",
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3000),
+      signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(3000) : undefined,
       keepalive: true,
     }).catch(() => {});
   } catch {

@@ -1,0 +1,80 @@
+Will this mess up capi?
+
+4:12 AM
+Good catch to ask — yes, this is exactly the right question and it could absolutely mess up CAPI. Let me walk through why.
+
+How CAPI works and why this matters
+Facebook's Conversions API (CAPI) needs to match server-side events back to ad clicks. To do that, it uses:
+
+fbclid — the click ID Facebook adds to URLs when someone clicks an ad
+fbp — the browser cookie (_fbp)
+fbc — the click cookie (_fbc, derived from fbclid)
+Hashed PII — email, phone, first/last name, ZIP, etc.
+The more of these you send, the better Facebook can match the conversion back to the ad click. Match quality directly affects ad performance — low match quality means Facebook can't attribute conversions, can't optimize the campaign, and your CPL goes up.
+
+Where the risk lives in your fix
+Two failure modes, depending on architecture:
+
+Risk 1: CAPI fires from the /final-quote page
+If your CAPI event (the "Lead" or "InitiateCheckout" event) fires from the final quote page — not from the form submission — then your fix just stripped the inputs CAPI needs.
+
+The final quote page now receives only prices, vehicle, locations, date. It does not receive:
+
+fbclid (you removed attribution fields)
+email, phone, name (you removed PII)
+If the final quote page tries to construct a CAPI payload, it'll send a low-quality event with no user data, no click ID, and Facebook's match rate craters for every Safari Private Mode user.
+
+Risk 2: CAPI fires server-side from Zapier (or similar)
+If CAPI fires from your server / Zapier webhook that runs before navigate(), you're fine — that payload was sent before the URL stripping happens, so it still has everything.
+
+But: only if Zapier actually received the full payload before navigate fires. This is the same concern I raised last message. If the Zapier send is async and not awaited, Safari can kill the in-flight request during navigation, and now neither the URL nor Zapier has the data. Lead + CAPI event both lost.
+
+How to know which one applies to you
+Three questions to answer with grep:
+
+Where does fbq('track', 'Lead' or fbq('track', 'Submit' fire in your codebase? Form submit handler? Quote page mount? Both?
+Where is your server-side CAPI call made? Is it Zapier → Facebook directly, or your own server → Facebook? When in the flow does it fire?
+Does your final quote page read fbclid/fbp/fbc from anywhere — URL params, cookies, or sessionStorage?
+If CAPI fires only server-side via Zapier before navigation completes, and you've verified that send is awaited or uses sendBeacon, you're fine.
+
+If CAPI fires from the final quote page or the booking page, you have a problem.
+
+If CAPI fires from both (client fbq pixel + server CAPI for deduplication, which is the recommended Meta setup), then the client-side pixel on the final quote page is now firing without fbclid for Private Mode users. Meta dedupes by event_id, but match quality on the client event drops, which can pull down overall match quality scores.
+
+The other thing CAPI cares about that you may have just lost
+The event_source_url field in CAPI events should be the URL the user was on when the event fired. If your CAPI payload reads window.location.href on the final quote page and sends that as event_source_url, that URL now looks like:
+
+/final-quote?data=%7B%22openTransportPrice%22%3A1425...
+That's fine for CAPI — it doesn't care about query string contents. But if any downstream system (Facebook's URL-based attribution, Google Analytics, your own reporting) was parsing the old long URL for attribution fields, it now gets nothing.
+
+What to do
+Before deploy, run this audit:
+
+Grep for fbq(, fbclid, _fbp, _fbc, event_source_url, and any CAPI-related fetch calls.
+For each hit, trace whether it executes before the navigate() call or after (i.e., on the next page).
+For anything that fires after, confirm it gets fbclid/PII from somewhere other than the now-stripped URL — cookies (_fbp, _fbc), or a separate sessionStorage write that doesn't fail in Private Mode (unlikely — Private Mode breaks sessionStorage too, which is why this whole fix exists).
+The likely correct fix if you find CAPI fires on the final quote page:
+
+Add fbclid, fbp, fbc back into the URL payload. They're short — fbclid is ~50 chars, fbp/fbc are ~30 each. Adding all three keeps you under 600 chars total, still safely within proxy limits.
+Don't add email/phone/name back. Hashed PII for CAPI should be sent server-side from Zapier where it lives, not from the browser via URL.
+Concretely, the safeForUrl object becomes:
+
+js
+const safeForUrl = {
+  // ...existing fields...
+  fbclid: quoteDataWithAttribution.fbclid,
+  fbp: quoteDataWithAttribution.fbp,
+  fbc: quoteDataWithAttribution.fbc,
+  utm_source: quoteDataWithAttribution.utm_source,
+  utm_campaign: quoteDataWithAttribution.utm_campaign,
+};
+UTMs are optional but useful for non-Facebook attribution (GA4, your own dashboards) and they're also short.
+
+TL;DR
+If CAPI fires from your server before navigation, this fix is safe.
+
+If CAPI fires from the final quote page or any later page, this fix degrades CAPI match quality for every Safari Private Mode lead because you stripped out exactly the fields CAPI needs.
+
+The conservative move is to put the small attribution fields (fbclid, fbp, fbc, UTMs) back in the URL — they're tiny, they fix CAPI, and they don't push you anywhere near the length limits that were causing the original bug.
+
+Want to share which one your setup uses and I can give you a more definitive answer?

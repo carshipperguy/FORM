@@ -253,6 +253,7 @@ const SimpleQuoteForm = () => {
   const contactFieldsShownFired = useRef(false);
   const partialLeadSentRef = useRef(false);
   const phoneDebounceRef = useRef(null);
+  const submitInProgressRef = useRef(false);
 
   const sendPartialLead = () => {
     try {
@@ -411,6 +412,9 @@ const SimpleQuoteForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (submitInProgressRef.current) return;
+    submitInProgressRef.current = true;
+
     // Set submitting state to prevent multiple submissions
     setIsSubmitting(true);
 
@@ -420,6 +424,7 @@ const SimpleQuoteForm = () => {
 
       if (!isValid) {
         console.error("Form validation failed:", validationErrors);
+        submitInProgressRef.current = false;
         setIsSubmitting(false);
         setTimeout(() => {
           const errEl = document.querySelector(".validation-errors");
@@ -623,6 +628,7 @@ const SimpleQuoteForm = () => {
       }
 
       // Reset submission state before navigating
+      submitInProgressRef.current = false;
       setIsSubmitting(false);
 
       // Navigate to the final quote page (with URL fallback if storage blocked)
@@ -657,6 +663,7 @@ const SimpleQuoteForm = () => {
         vehicleType: formData.vehicleType,
       });
       console.error("Error in form submission:", error);
+      submitInProgressRef.current = false;
       setIsSubmitting(false);
       setValidationErrors([
         {
@@ -1226,7 +1233,7 @@ async function sendGetQuoteEvent(quoteData, formData, eventId) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(eventData),
-      signal: AbortSignal.timeout(10000),
+      signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
     });
 
     if (!response.ok) {

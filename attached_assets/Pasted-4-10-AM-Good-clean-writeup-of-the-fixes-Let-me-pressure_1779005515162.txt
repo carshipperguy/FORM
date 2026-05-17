@@ -1,0 +1,60 @@
+4:10 AM
+Good, clean writeup of the fixes. Let me pressure-test each one before you deploy — I see a few things worth catching:
+
+Change 1: Calendar direction — one real gap
+The measurement is right, but it's frozen at open time. You compute spaceAbove on click, then never recheck. Two scenarios that break:
+
+iOS Safari address bar collapses/expands during scroll. A customer scrolls down between page load and tapping the date field — the viewport height changes by ~60px. Your rect.top reflects current state, so this is actually fine if the tap happens after the scroll settles. But if the calendar is already open and the address bar collapses, the calendar can clip. Minor; probably ignorable.
+iframe-relative vs viewport-relative. getBoundingClientRect().top returns coordinates relative to the iframe's own viewport, not the parent page's viewport. That's actually what you want here, so this is correct — but worth confirming window.innerHeight inside the iframe matches what you expect. On iOS Safari, an iframe's innerHeight is the iframe's height, not the device screen. Good news: your check uses rect.top against a hardcoded 230, not against window.innerHeight, so you're insulated from that confusion.
+The real gap: you check space above (rect.top >= 230) but never check space below when you fall back to "down." If the date field is in the middle of a 400px iframe with 200px above and 170px below, your code opens downward and the calendar clips off the bottom. Customer's stuck again.
+
+Suggested tweak:
+
+js
+const rect = wrapperRef.current.getBoundingClientRect();
+const spaceAbove = rect.top;
+const spaceBelow = window.innerHeight - rect.bottom;
+const calendarHeight = 230;
+
+if (spaceAbove >= calendarHeight) {
+  setOpenDirection("up");
+} else if (spaceBelow >= calendarHeight) {
+  setOpenDirection("down");
+} else {
+  // Neither direction fits — pick the larger one, calendar will scroll
+  setOpenDirection(spaceAbove >= spaceBelow ? "up" : "down");
+}
+Probably 5% of cases, but those are the ones where the iframe is short — which is exactly the embedded-on-a-marketing-page scenario you're shipping into.
+
+Change 2: URL stripping — verify one thing
+Confirm for me: quoteDataWithAttribution is written to Zapier BEFORE the navigate() call, and you've actually tested that the Zapier send completes before the page transition kills any in-flight requests?
+
+If the Zapier POST is async and you don't await it before navigate(), Safari can cancel the in-flight request when the page navigates. Result: URL is clean and short (good), but the lead never reaches Zapier (catastrophic). Your writeup says "leads still reached Zapier (that happens before navigation)" — please verify this is actually awaited, not just called before navigate.
+
+If it's not awaited, the safer pattern is navigator.sendBeacon('/zapier-relay', payload) for the attribution send, since sendBeacon is explicitly designed to survive navigation. Works fine in Safari Private Mode too.
+
+Also worth noting: customers who refresh the /final-quote page now see only prices, no contact info. If your quote page has any "Edit your info" or "Resend quote" affordance that relies on the email/phone, that'll break for Private Mode users. Probably fine, but check it.
+
+Change 3: AbortSignal guard — one extension
+The fix is correct. But: grep for every other use of AbortSignal.timeout in the codebase. If it exists in one place it usually exists in three. Same for AbortSignal.any, structuredClone, Array.prototype.at, and a few other ~2022-era APIs that all dropped on iOS 15.4+. If you patched one and missed the others, you've fixed one crash and left two.
+
+Quick grep:
+
+AbortSignal.timeout
+AbortSignal.any
+structuredClone
+\.at\(-
+The optional chaining pattern you used (AbortSignal?.timeout) is good but it's checking the wrong thing — AbortSignal itself definitely exists on iOS 15.3, it's the .timeout static method that doesn't. So AbortSignal?.timeout evaluates to undefined on 15.3 and your typeof === "function" check catches it. Works, just be aware the ?. is doing nothing here; the typeof is doing the real work.
+
+What's still missing before deploy
+Three things your fixes don't cover that are in the same risk category:
+
+Submit-time beacon. None of these fixes handle the case where the customer hits Submit and the network drops mid-request. Add navigator.sendBeacon to a /api/quote-attempt endpoint before the real fetch fires. Five lines of code, covers an entire class of lead loss none of your three fixes touch.
+Double-submit protection. Is the Submit button disabled the moment it's clicked, or only when isPending flips true? There's a ~50ms window where a fast double-tap on iOS creates two leads. Disable on click, not on state.
+Verify the iframe's CSP frame-ancestors on the production host. None of your three fixes matter if the iframe doesn't render in the first place because of a CSP mismatch on a customer's corporate network.
+Ship recommendation
+Change 1: Add the spaceBelow fallback before shipping. 2-minute edit. Change 2: Verify Zapier send completes before navigate. If it doesn't, swap to sendBeacon. Otherwise ship as-is. Change 3: Grep for sibling APIs first. Ship after.
+
+Then deploy. The three fixes are real and they're correct — they just have small adjacent gaps worth closing in the same push.
+
+Want me to write the spaceBelow fix and the sendBeacon submit guard as a single 
