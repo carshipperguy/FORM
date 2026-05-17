@@ -1,0 +1,23 @@
+Here's a message you can paste to Replit. I kept it plain and direct, and I made it clear they should flag anything risky before touching it.
+
+Hey — I'm wrapping up the form deploy. Two last things I need done. Before you change anything, please tell me if either of these could break something else in the form, the submit flow, the Zapier webhook, or CAPI. If there's any risk, stop and tell me first. I don't want any surprises.
+Task 1 — Add partial lead capture on phone blur
+When a customer types their phone number and tabs/clicks out of the phone field, I want the form to silently send a partial lead to the existing /api/submit-lead endpoint. Same endpoint, same payload shape, same Zapier flow — no new endpoints, no new fields. Just whatever data the customer has filled in so far, with blank or placeholder values for anything missing.
+The point: if a customer enters their phone and bounces, or fills out most of the form and the final submit fails, we still get their info into the CRM via Zapier.
+Use navigator.sendBeacon so it fires even if they close the tab. Add a guard so it only fires once per session (a ref is fine). Only fire if the phone has at least 10 digits.
+Task 2 — Send a test payload through the full pipeline using phone number 3056765682
+After Task 1 is in, trigger one test partial submission with phone 3056765682 and the rest of the fields blank/default. I want to confirm:
+
+The server accepts the payload (no Zod validation error)
+It saves to the database
+Zapier receives it and forwards it to the CRM
+
+Tell me the response status, what shows up in the server logs, and whether it lands in Zapier.
+Before you start:
+
+Does the existing Zod schema (insertQuoteSchema) accept blank strings for things like vehicleYear, vehicleMake, originZip, email? If not, flag it before making changes — I'd rather know than have you guess.
+Will the MapQuest call choke on blank/"Pending" addresses? If yes, will it fail gracefully or crash the route?
+Will server-side CAPI fire on this partial and send garbage to Meta? If yes, flag it so I can decide whether to skip CAPI for partials.
+
+Don't change pricing logic, Zapier webhook URLs, CAPI logic, calendar code, or the Safari fixes that just shipped. Only the phone-blur handler and whatever minimal server-side accommodation is needed to accept blank fields.
+Confirm before you start. Thanks.

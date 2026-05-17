@@ -259,21 +259,48 @@ const SimpleQuoteForm = () => {
     try {
       if (partialLeadSentRef.current) return;
       const digits = (formData.phone || "").replace(/\D/g, "");
-      if (digits.length < 7) return;
+      if (digits.length < 10) return;
       partialLeadSentRef.current = true;
       const sessionId = typeof getCurrentSessionId === "function" ? getCurrentSessionId() : null;
-      fetch("/api/partial-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name || null,
-          phone: digits,
-          email: formData.email || null,
-          vehicleType: formData.vehicleType || null,
-          session_id: sessionId,
-        }),
-        keepalive: true,
-      }).catch(() => {});
+
+      const payload = {
+        // Contact info — use whatever the customer has filled in so far
+        name: formData.name || "Partial Lead",
+        phone: digits,
+        email: formData.email || null,
+        // Vehicle — blank if not yet filled
+        vehicleType: formData.vehicleType || "car/truck/suv",
+        year: formData.year || null,
+        make: formData.make || null,
+        model: formData.model || null,
+        // Location — blank if not yet filled
+        pickupLocation: formData.pickupLocation || null,
+        dropoffLocation: formData.dropoffLocation || null,
+        pickupZip: pickupZip || null,
+        dropoffZip: dropoffZip || null,
+        shipmentDate: formData.shipmentDate || null,
+        // Identifies this in Zapier/CRM as a partial capture, not a full quote
+        eventType: "partial_submission",
+        eventDate: new Date().toISOString(),
+        session_id: sessionId,
+        sessionId: sessionId,
+        // Intentionally omitting meta_capi_data — no CAPI events for partials
+      };
+
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+
+      if (typeof navigator.sendBeacon === "function") {
+        // sendBeacon fires even if the tab is closed — preferred for blur events
+        navigator.sendBeacon("/api/submit-lead", blob);
+      } else {
+        // Fallback for browsers without sendBeacon
+        fetch("/api/submit-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => {});
+      }
     } catch {
       // swallow all errors — never affects form
     }

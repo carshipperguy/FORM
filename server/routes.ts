@@ -1323,7 +1323,7 @@ export function registerRoutes(app: Express): Server {
       clearTimeout(timeoutId);
 
       const mqData = await mqResponse.json();
-      if (mqData.route && typeof mqData.route.distance === "number") {
+      if (mqData.route && typeof mqData.route.distance === "number" && mqData.route.distance > 0) {
         distance = Math.round(mqData.route.distance);
         mapquestTime = mqData.route.formattedTime;
         mapquestSuccess = true;
