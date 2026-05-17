@@ -8,6 +8,7 @@ import {
   newMakesWithFreeTextModels,
 } from "@/lib/vehicle-data";
 import LocationMenuSelector from "./LocationMenuSelector";
+import CalendarPicker from "./CalendarPicker";
 import { getCurrentSessionId } from "@/lib/attribution-tracker";
 import { trackEvent as logEvent } from "@/lib/track-event";
 // CSS module import removed - reverting to inline styles
@@ -420,6 +421,10 @@ const SimpleQuoteForm = () => {
       if (!isValid) {
         console.error("Form validation failed:", validationErrors);
         setIsSubmitting(false);
+        setTimeout(() => {
+          const errEl = document.querySelector(".validation-errors");
+          if (errEl) errEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 100);
         return;
       }
 
@@ -809,23 +814,12 @@ const SimpleQuoteForm = () => {
             <h2>Available Ship Date</h2>
           </div>
           <div className="form-fields">
-            <div
-              className="form-field date-field"
-              onClick={() => {
-                const dateInput = document.getElementById("shipmentDateInput");
-                if (dateInput) dateInput.focus();
-              }}
-            >
-              <input
-                id="shipmentDateInput"
-                type="date"
-                name="shipmentDate"
+            <div className="form-field">
+              <CalendarPicker
                 value={formData.shipmentDate}
-                onChange={handleChange}
-                required
-                min={new Date().toISOString().split("T")[0]}
-                placeholder="MM-DD-YY"
-                style={{ width: "100%", cursor: "pointer" }}
+                onChange={(dateStr) =>
+                  setFormData((prev) => ({ ...prev, shipmentDate: dateStr }))
+                }
               />
             </div>
             {formData.shipmentDate && (
