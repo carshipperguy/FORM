@@ -1,0 +1,39 @@
+The findings that explain why you're losing leads right now
+AL-2 (partial leads stuck in Postgres) is the headline. This is what you've been suspecting. The form does fire partial leads when someone types 7+ digits and pauses or tabs away — but the server just writes them to a database table that nothing reads from. No Zapier. No CRM. No agent visibility. Every abandoned form with a phone number is sitting in a database table you've never looked at.
+The fix is one block of code added to server/routes.ts after the database insert at line 1277. Roughly 30 minutes of work. This alone is probably the highest-ROI thing you can do this week.
+AL-1 (double order webhook) is the second one. Every completed booking fires the order webhook twice — once from the booking page, once from the thank-you page — within 2 seconds. Either your CRM is silently deduplicating (one of the two is being dropped at random), or your agents are seeing duplicate orders. Either way, it's wrong. Delete the duplicate call from thank-you.tsx. 10 minutes.
+AL-4 (ZIP validation rejecting bookings) is the third. If a customer types a city instead of selecting from the dropdown, they can get a quote, proceed to booking, submit — and the server silently rejects it with a 400, but the user sees "Booking Confirmed." That's a lead that thinks they're booked and isn't. Two-part fix: validate ZIP on the form, and stop requiring ZIP on the server submission. 30 minutes.
+AL-3 (no keepalive: true on bookings) — if a customer hits submit and closes the tab quickly, the order request gets cancelled by the browser. Two lines of code. 5 minutes.
+AL-5 (no email/phone format check) — you already knew this one. Junk contact data lands in CRM. 10 minutes.
+The conditional ones worth doing
+CL-1 (calendar clipped by iframe) — this is the one that genuinely scares me. In a fixed-height iframe, the calendar opens upward and gets clipped by the iframe boundary. Customer clicks the date field, sees nothing or a partial calendar, can't select a date, can't reach the contact fields, can't submit. This is a 100% block for affected users. Whether it's happening depends on your WordPress page's iframe height and positioning — but if it is, you have customers who literally cannot complete the form. Worth testing right now: load your actual WordPress page on a phone, try to pick a date.
+CL-3 (URL too long in private mode) — Safari Private / Firefox Strict users get bounced to the homepage with no explanation after submitting. The lead does reach Zapier in this case, but the customer sees what looks like a broken form. 20 minutes.
+CL-4 (contact fields hidden until date selected) — this is a real UX problem the first audit didn't catch. Name/phone/email fields don't render until a date is picked. Users fill everything, hit submit, get a date error, pick a date, then suddenly three new fields appear they didn't know existed. On mobile, easy to miss entirely. Worth fixing the field order so contact info comes before the date.
+The operational stuff
+OB-1 (no alerting on Zapier failures) and OB-2 (lead history wipes on restart) are the long-term problems. If Zapier breaks for two hours, or if someone accidentally turns off a Zap, or if Replit restarts your server — you have no way to know how many leads you lost. The fallback database has them, but nothing tells you "hey, these 12 leads didn't make it to Zapier."
+This won't lose leads today, but it means you can't see lead loss when it happens. Worth doing soon, not urgent this week.
+OB-4 (failed bookings show success screen) — same pattern as AL-4. The booking page navigates to thank-you regardless of whether the submission succeeded. Customer sees "Booking Confirmed" on a failed booking.
+My honest recommended order
+This week, in this order:
+
+AL-2 — Wire partial leads to Zapier. This is the biggest lead recovery you'll get from any single change.
+AL-1 — Remove the duplicate order fire.
+AL-4 — Fix the ZIP validation gap so bookings stop silently failing.
+AL-3 — Add keepalive: true to the booking fetches.
+AL-5 — Email/phone format validation.
+CL-1 — Test the calendar in your actual WordPress iframe. If it's clipped, fix it. If it's not, skip.
+
+That's the conversion-affecting list. Maybe 3-4 hours of total dev time.
+Next week:
+
+CL-3 — URL length fallback fix.
+CL-4 — Reorder fields so contact info isn't hidden.
+OB-4 — Stop showing "Confirmed" on failed bookings.
+
+When you have a slower week:
+
+OB-1, OB-2 — Build the lead delivery monitoring so you can actually see when leads fail to reach Zapier.
+
+One thing to push back on
+The audit is excellent but it got cut off at the end — "the booking details (street addresses, contact names, transport type selection, ..." trails off. Ask Replit for the rest of OB-4 and anything after it. There might be more in sections you haven't seen.
+Also, ask Replit to actually run the AL-2 fix today. That's the one. That's the answer to "where are my leads going." They're in your Postgres database, and nothing is telling your agents they exist.
