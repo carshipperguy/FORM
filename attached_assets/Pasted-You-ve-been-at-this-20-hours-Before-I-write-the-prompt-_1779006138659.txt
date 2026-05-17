@@ -1,0 +1,117 @@
+You've been at this 20 hours. Before I write the prompt, I want to flag one thing from your last message — you said the date selector didn't work in Chrome incognito mobile-emulation mode, and you're trusting that "should be resolved now" without retesting. Retest it before you deploy. Same browser, same emulation, same iframe context, walk through the form end-to-end. If the calendar still doesn't open, you ship a form that loses every Chrome incognito mobile lead. Twenty hours of work doesn't matter if the bug you started with is still there.
+Now the prompt:
+
+Final Pre-Deploy Audit — Lead Loss, Webhooks, Render Failures
+You are a senior engineer performing the final audit before a customer-facing lead-capture form ships to production. The form is embedded in an iframe on a marketing site for an auto transport brokerage. Every lost lead is lost revenue. There is no second chance — if a customer's submit fails silently, they do not come back.
+Recent changes in this deploy:
+
+Calendar picker now checks space above AND below before opening, falling back to whichever side has more room.
+URL payload on Safari Private Mode / Firefox Strict Mode fallback was stripped down to ~400 chars (prices, vehicle, locations, date only — no PII, no attribution).
+Five unguarded AbortSignal.timeout calls were patched with feature detection to prevent iOS 15.3 crashes.
+Submit handler now uses a synchronous ref guard to prevent double-submission from rapid taps.
+
+I have 20 hours invested. I cannot afford to ship a form that silently drops leads, fails to fire webhooks, or renders blank on any customer's device. Your job is to find every remaining failure mode in these three categories. Nothing else.
+Code to audit
+[Paste the following files in full:]
+
+SimpleQuoteForm.jsx (the form component)
+CalendarPicker.jsx (date picker)
+QuoteOptions.jsx (post-quote page with InitiateCheckout pixel)
+final-quote.tsx (the page reached via URL fallback)
+attribution-tracker.ts (UTM/fbclid/fbp handling)
+track-event.ts (event tracking)
+phone-call-tracker.tsx (phone tracking)
+The server route handler for /api/submit-lead
+Any middleware that runs before /api/submit-lead (auth, CORS, rate limiting, body parsing)
+The Zapier/CAPI dispatch code on the server
+The webhook handler that fires after lead submission
+Any CSP / frame-ancestors configuration
+The HTML/JSX that embeds the iframe on the marketing site (if available)
+
+Category 1: Lead loss
+A "lost lead" is any scenario where the customer believes they submitted the form and no record reaches the database, Zapier, or CAPI. For each scenario below, tell me whether it's a real risk in this code, what triggers it, and exactly what to change. Do not give me theoretical answers — point at the specific line.
+
+Customer submits on cellular and the request hangs longer than they're willing to wait. Is there a timeout on the submit fetch? What happens if it fires?
+Customer is on iOS Safari Private Mode. sessionStorage writes throw. Does the form still POST to /api/submit-lead successfully? Does Zapier still fire? Does CAPI still fire?
+Customer is on iOS Safari with cross-site tracking blocked (ITP). Are any cookies needed for the submit to succeed? Are any third-party scripts that the form depends on (Google Maps, analytics) blocked in a way that prevents the form from rendering or submitting?
+Customer is on an iPad in landscape inside a corporate WiFi that strips _fbp/_fbc cookies. Does CAPI still receive useful data?
+Customer submits, the /api/submit-lead endpoint returns 500. What happens client-side? Is the lead recoverable? Is there a server-side log of the attempted payload with enough data to reach the customer manually?
+Customer's session/auth expires while the form is open (form sits in a tab for 2 hours). On submit, server returns 401. What does the customer see? Does the lead reach anywhere recoverable?
+Customer hits Submit, the page navigates, but the server's Zapier call hasn't completed yet. Is the Zapier call awaited before the response is sent, or is it fire-and-forget? If fire-and-forget, what happens if the Node process restarts during the call?
+Customer fills the form, tabs away, iOS Safari unloads the tab (memory pressure), customer returns. Is the form state recoverable, or does it reset?
+Customer uses browser autofill on iOS. Do react-hook-form values capture the autofilled data, or does form.getValues() return empty strings while the UI shows filled fields?
+Customer submits with a vehicle make/model combo that fails server-side validation but passed client-side. Is the lead still captured somewhere with the partial data?
+Customer's IP is rate-limited (shares an IP with someone who spammed earlier). What does the rate-limit response look like? Is the lead lost, or queued?
+Customer's submit succeeds but the navigation to the quote page fails (network drops between submit response and asset load for the next route). Is the lead recorded? Does the customer know it was?
+An ad blocker strips the Facebook pixel. Does the form still submit? Does Zapier still fire? Does server-side CAPI still fire?
+Customer is on Brave with shields up. What's blocked? What's the impact?
+Customer is in a country where Zapier's edge servers are slow (>10 sec to respond). Does the form's submit response wait on Zapier, or return first?
+
+Category 2: Webhook firing reliability
+For each:
+
+After /api/submit-lead returns 200 to the browser, when exactly does Zapier fire? Synchronously before the response? After the response in the same request handler? In a separate worker?
+If the Node process is killed (deploy, crash, OOM) between the response and the Zapier fire, is the lead in the database and the webhook lost? Is there a retry mechanism?
+Does the server-side CAPI call have retry logic? What happens on a Facebook API 5xx?
+Is there a deduplication mechanism if the same lead somehow submits twice? (Phone+email match, idempotency key?)
+Are webhook failures logged with the full payload so they can be replayed manually?
+Is there a dead-letter queue or any persistence layer for failed webhook attempts?
+If the CAPI event_id is missing or malformed, what happens? (Meta deduplicates by event_id — collisions cause silent drops.)
+Is the event_source_url field on the CAPI payload the URL of the iframe or the parent page? It should be the parent page URL for accurate attribution.
+
+Category 3: Render / interaction failures
+The customer never gets to Submit if the form doesn't render or buttons don't respond. For each:
+
+iOS Safari 15.x — does every interactive element work? (Date picker, dropdowns, swap button, submit.)
+iOS Safari 16.x and 17.x — any known WebKit regressions affecting react-hook-form, the calendar's getBoundingClientRect, or position: absolute inside an iframe?
+Chrome incognito mobile emulation — does the date picker open? (User reported it did not earlier — verify whether the calendar fix actually resolves this.)
+A 320px-wide iframe (smallest realistic mobile width) — does any element overflow, get cut off, or become untappable?
+A 1200px-wide iframe — does the form layout still make sense, or does it stretch into a single useless column?
+Iframe height set to 600px by the parent — does the form scroll inside it, or does content get clipped?
+Iframe height set to 100vh — does iOS Safari's collapsing address bar cause the form to reflow mid-interaction in a way that breaks the calendar's position calculation?
+The marketing site loads the iframe with a CSP that omits frame-src for the form's origin — does the form render at all?
+The marketing site is HTTPS, the form is HTTP (misconfiguration) — what does the customer see?
+A customer with JavaScript disabled — does the form render any usable fallback, or just a blank iframe?
+A customer on a 2G connection — does the form's initial bundle load in under 10 seconds? If not, the customer leaves.
+A customer whose browser blocks googleapis.com (corporate firewall) — does the location autocomplete fail gracefully, or break the entire form?
+The Submit button — is it disabled the moment it's tapped, via ref, not via React state? (The fix in this deploy added a ref guard — verify it actually fires before any async work.)
+The Calculate button — same question. Can a customer tap Calculate twice and get conflicting calculatedPrice values?
+Touch targets — are all buttons, radio inputs, and dropdowns ≥44px on mobile per iOS HIG?
+The native <input type="date"> for ship date — does it work on iOS Safari inside an iframe? (Native date pickers have a documented history of misbehavior in iframes.)
+Focus management — when a customer taps Submit and validation fails, does focus move to the first invalid field, or stay on the button? (If it stays, the customer doesn't know what's wrong.)
+Error toasts — are they positioned where a customer using the bottom half of their screen will actually see them, or do they appear above the fold and get missed?
+
+Output format
+For every issue found:
+SEVERITY: [Ship Blocker | Ship-OK But Fix This Week | Backlog]
+CATEGORY: [Lead Loss | Webhook | Render]
+LOCATION: [file:line]
+SCENARIO: [exact reproduction]
+WHAT THE CUSTOMER SEES:
+WHAT THE SERVER SEES:
+WHAT IS LOST:
+FIX: [specific code change]
+TIME TO FIX: [Minutes | Hours | Days]
+End with:
+
+Ship-blockers — must fix before deploy. List in priority order.
+Pre-launch test plan — the exact sequence of manual tests on real devices/browsers I should run before pulling the trigger, with the expected result for each.
+Post-launch monitoring — what to watch in logs for the first 24 hours that would indicate a silent failure (e.g., "If /api/submit-lead 2xx count drops below X% of /api/quote-attempt beacon count, something is broken").
+Things you checked and they're fine — explicit list, so I know the audit was thorough.
+
+Ground rules
+
+No theoretical findings. Every issue must reference a specific line of code I gave you.
+No padding. If a category is clean, say so.
+Assume the worst customer: iPhone SE on cellular in a McDonald's parking lot, on iOS 15.3, in Safari Private Mode, with an ad blocker, on Brave, autofill enabled, easily distracted, will not retry.
+Assume the worst attacker: competitor with a script that submits 1,000 garbage leads/hour with valid-looking data to poison the pipeline and burn through CAPI event budget.
+Lead loss > webhook reliability > render failures. Prioritize accordingly.
+I have 20 hours invested and I am close to deploying. Be thorough enough that I do not regret pushing this button.
+
+Begin the audit.
+
+How to use this
+Do not skim the output. When the audit comes back, read every ship-blocker, every test in the test plan, every monitoring suggestion. If you find yourself wanting to skip something because "that's probably fine," that's the exact bug that loses leads in week one.
+Run the test plan on real devices, not just emulators. Borrow an iPhone, borrow an Android, ask a friend on a different ISP to test from their phone. The bug you flagged in this message — Chrome incognito mobile date picker — is exactly the kind of thing emulators miss and real devices catch.
+Set up the post-launch monitoring before you deploy, not after. If the audit recommends watching the ratio of attempted-to-completed submits, set up that dashboard first. The whole point of monitoring is catching the failure within hours, not weeks.
+Twenty hours in, the temptation is to push it and move on. Take one more hour to run this audit and one more hour to test on a real iPhone. That two-hour investment is the cheapest insurance on the twenty you've already spent.
