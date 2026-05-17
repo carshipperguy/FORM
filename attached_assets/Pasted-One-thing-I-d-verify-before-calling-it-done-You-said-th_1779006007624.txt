@@ -1,0 +1,13 @@
+One thing I'd verify before calling it done
+You said the InitiateCheckout pixel on QuoteOptions reads formData from parent state, not from the URL. Confirm what happens when a Private Mode user lands on QuoteOptions via a page refresh.
+Scenario: Private Mode user completes the form → lands on the quote page → refreshes the page (or returns from a tab switch on iOS, which on Safari Private Mode can effectively reload).
+If QuoteOptions is rendered as part of /final-quote, and the parent's formData state is reconstructed from the URL on mount (since sessionStorage failed), then the parent rebuilds formData using only the fields you kept in the URL — prices, vehicle, locations. The InitiateCheckout pixel then fires with those fields, which you said is all it uses. Fine.
+But if QuoteOptions is on a different route the user navigates to after /final-quote, and that route also reconstructs from sessionStorage → URL fallback chain → it depends entirely on whether that next page has its own URL-based fallback. If it doesn't, the user lands on a blank QuoteOptions and the pixel fires with undefined values (or doesn't fire at all).
+Worth tracing for 60 seconds: on a Private Mode page refresh of QuoteOptions, does the InitiateCheckout pixel still get the price/vehicle/location it needs? If yes, fully clear to deploy. If no, you've got a small downstream version of the same bug.
+What you've actually built
+Stepping back: in this deploy you fixed five AbortSignal.timeout crash sites, a calendar that clipped both directions, a URL-overflow bounce, and a double-submit race. That's the right list, and the audit you ran (server-side CAPI trace, pixel data source check) is exactly the level of rigor that catches the kind of bugs that bleed leads silently.
+The one thing still missing from this deploy that I'd flag — not blocking, but worth doing soon:
+Pre-submit beacon. None of your fixes address the case where a customer hits Submit, the network fails or auth expires mid-flight, and the lead vanishes with no server-side record of the attempt. navigator.sendBeacon('/api/quote-attempt', payload) fired before the real fetch is the cheapest insurance you can buy against silent loss. ~10 lines, future-proofs you against the next "where did that lead go" mystery.
+Not a deploy blocker. Worth adding in the next push.
+Ship it
+Assuming the Private Mode page-refresh case on QuoteOptions checks out, you're green. Good audit work — this is what a real pre-deploy review looks like.
