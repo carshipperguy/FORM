@@ -1,0 +1,167 @@
+Here's the prompt. Built to be handed to Replit (or any engineer/agent with repo access) and run end-to-end without you having to babysit it.
+
+Comprehensive Lead-Loss Audit — Amerigo Auto Transport Quote Form
+Context
+You have full access to the Amerigo Auto Transport quote form codebase. This form is embedded as an iframe on the main marketing site and is the primary lead capture mechanism for the business. Every lead lost is direct revenue lost.
+A prior audit identified five technical ship-blockers and several backlog items. That audit is not the scope of this one. This audit is different in kind: it covers every human-facing path through the form where a willing customer could fail to convert, every byproduct of the iframe embedding, every performance characteristic that affects whether the form is usable, and every silent failure mode where a lead is captured but lost before reaching the CRM.
+Your job is to find every reason a human who wants to give us their information might not successfully do so, or might do so without us being able to reach them afterward.
+Do not summarize. Do not editorialize. Read the actual code, test the actual behavior, and report what you find with file paths, line numbers, reproduction steps, and concrete fixes.
+Operating Principles
+
+A lead is only captured if (a) the form fires a payload, (b) the payload reaches the destination, (c) the payload contains reachable contact info, and (d) someone on our team can act on it. A break anywhere in that chain is a lost lead. Audit all four stages.
+The most expensive bugs are the ones that look like success. Form shows confirmation screen, customer leaves happy, but no lead arrived — or arrived with garbage data, or arrived flagged as something it isn't. Prioritize silent failures over visible ones.
+Assume hostile reality. Slow networks, old phones, blocked storage, ad blockers, autofill quirks, intermittent connectivity, users on commuter trains, users with one thumb, users who tab away mid-form and come back, users who refresh, users behind corporate proxies. If a real human could encounter it, it's in scope.
+The iframe is not neutral. Embedding in another page changes form behavior in dozens of ways — viewport, focus, scroll, storage scoping, third-party cookies, postMessage, navigation. Treat iframe behavior as a first-class audit area.
+Cite specifics. Every finding needs file path, line numbers, reproduction steps, observable symptom, customer impact, and a concrete fix. No general advice. No "consider improving X."
+
+Audit Scope
+1. Lead Capture Mechanics
+For every place in the codebase where customer data is collected and transmitted, document:
+
+What event triggers the transmission (field blur, button click, step transition, page unload, timer, etc.)
+What payload is sent (exact fields)
+Where it's sent (URL, with environment-variable resolution traced)
+What happens on failure (retry logic, fallback behavior, user-visible result)
+What happens on partial success (e.g., webhook 200 but CRM never received it)
+Whether the payload is distinguishable from other payload types in the destination (partial vs. complete, lead vs. order, retry vs. original)
+
+Specifically investigate partial lead capture. The owner believes partial leads (where a user enters phone/email but abandons before completing) are not being sent. Confirm or refute by:
+
+Locating any code intended to fire partial payloads
+Identifying the trigger and verifying it actually fires under realistic conditions
+Inspecting recent Zapier task history (if accessible) to confirm whether partial leads arrive
+If partial capture does not exist or is broken, design and propose the fix: phone field blur with valid 10-digit number triggers a fetch with keepalive: true to the lead webhook, tagged lead_type: "partial" or equivalent
+
+2. Validation and Data Integrity
+For every input field, verify what validation runs on the client and on the server, and whether garbage data can reach the CRM. Specifically:
+
+Email format (catch x, test@, a@b, name@domain without TLD)
+Phone format (catch single digits, letters, fewer than 10 digits)
+Name fields (catch empty strings of spaces, single characters, obvious bot patterns)
+City/ZIP coupling (catch free-typed cities with no ZIP attached from the dropdown)
+Vehicle year/make/model (catch nonsense combinations if the dropdowns allow free input)
+Date fields (catch past dates, dates too far in the future, invalid date strings)
+Any field where the client check passes but the server has no equivalent check, or vice versa
+
+For each validation gap, report: what bad input passes, where it ends up, and what the agent experience is when they try to act on it.
+3. Form UX — Every Step, Every Field
+Walk the form end-to-end as a customer. For each step and each field, identify anything that could cause a willing user to drop off:
+
+Initial load: time to interactive, layout shift, fields appearing slowly, autofocus stealing focus from scrolling
+Field interactions: keyboard appearing/disappearing on mobile, viewport jumps, autofill behavior across iOS Safari, Android Chrome, desktop browsers, password manager interference
+Dropdowns and autocompletes: loading speed, behavior on slow networks, what happens if the suggestion API fails, whether users can submit free-typed values that the system can't parse
+Step transitions: loading states, whether the previous step's data is preserved on back, whether validation errors are visible and scrolled into view
+Submit button states: disabled state visibility, spinner clarity, timeout behavior, what the user sees during the 1–15 seconds the webhook is firing, whether a slow webhook makes them think the form broke
+Error messages: placement (above fold vs. below), color contrast, whether they're announced to screen readers, whether they clear when the user corrects the input
+Success screen: does it actually confirm successful submission, or does it appear before the webhook confirms? Can a user close the tab between "thank you" and the webhook completing? If so, does keepalive: true save them?
+
+4. Iframe-Specific Failure Modes
+The form is iframed into the main site. Audit every consequence of that:
+
+Storage scoping: Does sessionStorage and localStorage work inside the iframe in Safari (third-party storage blocking), Firefox Strict Mode, Brave, and on iOS in general? When it doesn't, what's the fallback and does the fallback actually work end-to-end?
+Cookie behavior: SameSite, third-party cookie blocking, attribution data preservation across iframe boundary
+postMessage: Is the iframe communicating with the parent? Are messages being lost, malformed, or arriving out of order? What happens if the parent isn't listening?
+Viewport and scroll: On mobile Safari, does tapping a field scroll the iframe correctly, or does the parent page scroll instead? Does the keyboard cover the submit button? Can the user scroll within the iframe at all?
+Focus management: Does autofocus work inside an iframe on iOS? Does tabbing escape the iframe? Does the parent page steal focus on scroll?
+Navigation: What happens when the form calls navigate() inside an iframe? Does it navigate the iframe or the parent? Is the final-quote page reachable inside the iframe context, or does it break?
+Cross-origin restrictions: Audit every window.parent.* access. The prior audit found a dead block silently catching a cross-origin exception — find all of them.
+Resizing: Does the iframe resize correctly when the form's content grows (e.g., expanding an error list, opening a calendar)? On a fixed-height iframe, do later steps get cut off?
+Loading order: Does the iframe load before or after the parent page's analytics? Are tracking pixels firing in the right context?
+
+5. Network and Transmission
+
+Webhook reliability: Trace every outbound POST. Document timeout values, retry behavior, what the user sees during each phase, and what happens if the network drops mid-request.
+keepalive: true coverage: Every fire-and-forget request that should survive page navigation must use it. Find any that don't.
+MapQuest dependency: What's the user experience when MapQuest is slow (5+ seconds)? When it returns an error? When it returns malformed data? When the quota is exhausted? Does the form degrade gracefully or does it appear broken?
+Zapier dependency: Same questions. What if Zapier returns 429 (rate limited), 500, or a long-running 200 that times out on the client?
+Meta CAPI: Confirmed wrapped in try/catch — but verify it doesn't block, slow, or interfere with the lead webhook firing first.
+DNS/CDN: Are any required resources loaded from third parties that could be slow or blocked (fonts, analytics, the LocationMenuSelector source)?
+
+6. Performance Audit
+Measure, don't guess. Run Lighthouse and report:
+
+Time to first byte
+First contentful paint
+Time to interactive
+Total blocking time
+Largest contentful paint
+Cumulative layout shift
+Total JavaScript shipped (bytes, gzipped)
+Total CSS shipped
+Number of network requests on initial load
+Any render-blocking resources
+
+Then test on a throttled 4G connection on a mid-range Android device (simulate via Chrome DevTools — CPU 4× slowdown, Slow 4G throttling). Report time-to-interactive under those conditions. Auto transport customers are not all on fiber.
+For each performance issue that exceeds reasonable thresholds (TTI > 5s on throttled 4G, layout shift visible to the eye, > 500KB JS), propose a specific fix.
+7. Accessibility — Where It Affects Conversion
+Not full WCAG compliance. Just: who currently can't complete the form, and what's the cheapest fix?
+
+Keyboard-only completion (the prior audit flagged CalendarPicker — verify, then check every other interactive element)
+Screen reader announcement of errors (an error message that's visible but not announced is invisible to a screen reader user)
+Color contrast on error messages and required-field indicators
+Touch target sizes on mobile (44×44px minimum)
+Form field labels properly associated with inputs (autofill depends on this)
+
+8. Mobile-Specific Failure Modes
+The majority of leads are mobile. Audit:
+
+iOS Safari (current and one version back)
+iOS Safari Private Mode
+Android Chrome
+Samsung Internet (significant share on Samsung devices, behaves differently from Chrome)
+Facebook in-app browser (if any ads link to the form, leads land here — this browser is notoriously broken)
+Instagram in-app browser
+Google in-app browser (from Google search results on Android)
+
+For each, complete a full form submission and document any failure, friction, or visual break.
+9. Attribution and Tracking Integrity
+If a lead arrives but you can't tell where it came from, marketing spend is wasted. Audit:
+
+UTM parameter capture across iframe boundary
+Referrer preservation
+Click ID capture (gclid, fbclid, msclkid, ttclid)
+Session continuity if the user clicks away and returns
+Whether attribution data is included in both partial and complete payloads
+The prior audit flagged getAttributionData() is called but result is unused (line 153). Verify whether attribution is actually reaching the CRM at all, or whether this is a silent failure.
+
+10. Operational and Recovery
+
+What happens if a lead is sent but the CRM rejects it? Is there a dead-letter log, a retry queue, or does it just vanish?
+What happens if Zapier is down? Is there a backup destination, or are leads lost during outages?
+Can you currently see, today, the full list of leads that attempted to submit in the last 24 hours, including ones that failed? If not, how would you know if you lost 50 leads yesterday?
+What alerting exists? If the webhook starts returning 500s, how long until someone notices?
+
+Deliverable Format
+Organize findings in this order, most severe first:
+Section 1: Active Lead Loss
+Bugs that are losing leads right now, today. For each:
+
+Severity (Critical / High)
+File path and line numbers
+What happens (specific reproduction)
+Estimated leads affected per day or per week, with reasoning
+Concrete fix with code
+Effort estimate
+
+Section 2: Conditional Lead Loss
+Bugs that lose leads only under specific conditions (specific browsers, specific user behaviors, specific network states). Same format. Include the conditions and your estimate of how often they occur.
+Section 3: Lead Quality Degradation
+Cases where leads arrive but are less actionable (missing fields, bad attribution, miscategorized as partial/complete, wrong price). Same format.
+Section 4: Performance and Friction
+Things that cause drop-off before submission. Same format. Include measured numbers, not adjectives.
+Section 5: Iframe and Embedding Issues
+Everything iframe-specific. Same format.
+Section 6: Operational Blind Spots
+Places where lead loss is happening but you currently have no way to detect it. Same format.
+Section 7: Verified Clean
+Things you checked and confirmed are working correctly. Brief table format. This protects against re-auditing the same items later.
+What Not to Do
+
+Do not produce a report longer than necessary. If something isn't worth fixing, leave it out.
+Do not flag style issues, code smell, or refactoring opportunities unless they directly cause lead loss.
+Do not invent severity. If you can't articulate the customer impact concretely, the severity is too low to include.
+Do not propose fixes you haven't thought through. If a fix has trade-offs (e.g., rate limiting that could block real users), name them.
+Do not assume the prior audit was complete. Re-verify anything it marked as "fine" that falls into your scope.
+
+One Final Instruction
+Before you start, look at the actual Zapier task history for the last 7 days. Count how many partial leads arrived versus complete submissions. If the ratio is way off from what a normal form should show (typical funnels see 2–5× more partial captures than completed submissions), that alone tells you the partial capture is broken before you read a single line of code. Start there.
