@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const MONTHS = [
   "January","February","March","April","May","June",
@@ -26,6 +26,23 @@ const CalendarPicker = ({ value, onChange }) => {
     const d = base || new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
+
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [isOpen]);
 
   const selectedDate = value ? parseYYYYMMDD(value) : null;
   const year = viewDate.getFullYear();
@@ -77,11 +94,12 @@ const CalendarPicker = ({ value, onChange }) => {
     : "Select a date";
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div ref={wrapperRef} style={{ position: "relative", width: "100%" }}>
       <div
         role="button"
         tabIndex={0}
         onClick={() => setIsOpen((o) => !o)}
+        onKeyDown={(e) => e.key === "Enter" && setIsOpen((o) => !o)}
         style={{
           width: "100%",
           height: "40px",
@@ -103,160 +121,144 @@ const CalendarPicker = ({ value, onChange }) => {
       </div>
 
       {isOpen && (
-        <>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute",
+            bottom: "calc(100% + 2px)",
+            left: 0,
+            width: "100%",
+            backgroundColor: "white",
+            border: "1px solid #E5E7EB",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+            zIndex: 1100,
+            padding: "8px",
+            boxSizing: "border-box",
+          }}
+        >
           <div
-            onClick={() => setIsOpen(false)}
             style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1099,
-              backgroundColor: "transparent",
-              touchAction: "manipulation",
-            }}
-          />
-
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: "absolute",
-              bottom: "calc(100% + 2px)",
-              left: 0,
-              width: "100%",
-              backgroundColor: "white",
-              border: "1px solid #E5E7EB",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-              zIndex: 1100,
-              padding: "8px",
-              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "6px",
             }}
           >
-            <div
+            <button
+              type="button"
+              onClick={goToPrevMonth}
+              disabled={isPrevDisabled}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "6px",
+                background: "none",
+                border: "none",
+                padding: "4px 10px",
+                cursor: isPrevDisabled ? "not-allowed" : "pointer",
+                color: isPrevDisabled ? "#d1d5db" : "#002C42",
+                fontSize: "20px",
+                lineHeight: 1,
+                touchAction: "manipulation",
               }}
             >
-              <button
-                type="button"
-                onClick={goToPrevMonth}
-                disabled={isPrevDisabled}
+              ‹
+            </button>
+            <span
+              style={{
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#002C42",
+                fontFamily: "Arial, sans-serif",
+              }}
+            >
+              {MONTHS[month]} {year}
+            </span>
+            <button
+              type="button"
+              onClick={goToNextMonth}
+              style={{
+                background: "none",
+                border: "none",
+                padding: "4px 10px",
+                cursor: "pointer",
+                color: "#002C42",
+                fontSize: "20px",
+                lineHeight: 1,
+                touchAction: "manipulation",
+              }}
+            >
+              ›
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              textAlign: "center",
+              marginBottom: "4px",
+            }}
+          >
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+              <div
+                key={d}
                 style={{
-                  background: "none",
-                  border: "none",
-                  padding: "4px 10px",
-                  cursor: isPrevDisabled ? "not-allowed" : "pointer",
-                  color: isPrevDisabled ? "#d1d5db" : "#002C42",
-                  fontSize: "20px",
-                  lineHeight: 1,
-                  touchAction: "manipulation",
-                }}
-              >
-                ‹
-              </button>
-              <span
-                style={{
+                  fontSize: "11px",
+                  color: "#718096",
                   fontWeight: 600,
-                  fontSize: "14px",
-                  color: "#002C42",
+                  padding: "2px 0",
                   fontFamily: "Arial, sans-serif",
                 }}
               >
-                {MONTHS[month]} {year}
-              </span>
-              <button
-                type="button"
-                onClick={goToNextMonth}
-                style={{
-                  background: "none",
-                  border: "none",
-                  padding: "4px 10px",
-                  cursor: "pointer",
-                  color: "#002C42",
-                  fontSize: "20px",
-                  lineHeight: 1,
-                  touchAction: "manipulation",
-                }}
-              >
-                ›
-              </button>
-            </div>
+                {d}
+              </div>
+            ))}
+          </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                textAlign: "center",
-                marginBottom: "4px",
-              }}
-            >
-              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              gap: "1px",
+            }}
+          >
+            {cells.map((day, i) => {
+              if (!day) return <div key={i} />;
+              const thisDate = new Date(year, month, day);
+              thisDate.setHours(0, 0, 0, 0);
+              const isPast = thisDate < today;
+              const isToday = thisDate.getTime() === today.getTime();
+              const isSelected =
+                selectedDate &&
+                thisDate.getTime() === selectedDate.getTime();
+
+              return (
                 <div
-                  key={d}
+                  key={i}
+                  onClick={() => !isPast && handleSelect(day)}
                   style={{
-                    fontSize: "11px",
-                    color: "#718096",
-                    fontWeight: 600,
-                    padding: "2px 0",
+                    padding: "6px 2px",
+                    fontSize: "13px",
+                    textAlign: "center",
+                    borderRadius: "2px",
+                    cursor: isPast ? "default" : "pointer",
+                    color: isPast
+                      ? "#d1d5db"
+                      : isSelected
+                      ? "white"
+                      : "#262626",
+                    backgroundColor: isSelected ? "#002C42" : "transparent",
+                    fontWeight: isToday ? 700 : 400,
+                    outline:
+                      isToday && !isSelected ? "1px solid #002C42" : "none",
+                    touchAction: "manipulation",
                     fontFamily: "Arial, sans-serif",
                   }}
                 >
-                  {d}
+                  {day}
                 </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                gap: "1px",
-              }}
-            >
-              {cells.map((day, i) => {
-                if (!day) return <div key={i} />;
-                const thisDate = new Date(year, month, day);
-                thisDate.setHours(0, 0, 0, 0);
-                const isPast = thisDate < today;
-                const isToday = thisDate.getTime() === today.getTime();
-                const isSelected =
-                  selectedDate &&
-                  thisDate.getTime() === selectedDate.getTime();
-
-                return (
-                  <div
-                    key={i}
-                    onClick={() => !isPast && handleSelect(day)}
-                    style={{
-                      padding: "6px 2px",
-                      fontSize: "13px",
-                      textAlign: "center",
-                      borderRadius: "2px",
-                      cursor: isPast ? "default" : "pointer",
-                      color: isPast
-                        ? "#d1d5db"
-                        : isSelected
-                        ? "white"
-                        : "#262626",
-                      backgroundColor: isSelected ? "#002C42" : "transparent",
-                      fontWeight: isToday ? 700 : 400,
-                      outline:
-                        isToday && !isSelected ? "1px solid #002C42" : "none",
-                      touchAction: "manipulation",
-                      fontFamily: "Arial, sans-serif",
-                    }}
-                  >
-                    {day}
-                  </div>
-                );
-              })}
-            </div>
+              );
+            })}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
