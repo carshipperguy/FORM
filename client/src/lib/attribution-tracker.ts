@@ -155,7 +155,7 @@ async function sendAttributionData(
         },
         body: JSON.stringify(attribution),
         // Add timeout to prevent hanging requests
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
       });
 
       if (response.ok) {

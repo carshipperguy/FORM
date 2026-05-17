@@ -627,7 +627,21 @@ const SimpleQuoteForm = () => {
 
       // Navigate to the final quote page (with URL fallback if storage blocked)
       if (useUrlFallback) {
-        const encoded = encodeURIComponent(JSON.stringify(quoteDataWithAttribution));
+        const safeForUrl = {
+          openTransportPrice: quoteDataWithAttribution.openTransportPrice,
+          enclosedTransportPrice: quoteDataWithAttribution.enclosedTransportPrice,
+          distance: quoteDataWithAttribution.distance,
+          transitTime: quoteDataWithAttribution.transitTime,
+          year: quoteDataWithAttribution.year,
+          make: quoteDataWithAttribution.make,
+          model: quoteDataWithAttribution.model,
+          vehicleType: quoteDataWithAttribution.vehicleType,
+          pickupLocation: quoteDataWithAttribution.pickupLocation,
+          dropoffLocation: quoteDataWithAttribution.dropoffLocation,
+          shipmentDate: quoteDataWithAttribution.shipmentDate,
+          priceUnavailable: quoteDataWithAttribution.priceUnavailable,
+        };
+        const encoded = encodeURIComponent(JSON.stringify(safeForUrl));
         navigate(`/final-quote?data=${encoded}`);
       } else {
         navigate(`/final-quote`);

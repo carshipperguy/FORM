@@ -21,6 +21,7 @@ const CalendarPicker = ({ value, onChange }) => {
   today.setHours(0, 0, 0, 0);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [openDirection, setOpenDirection] = useState("up");
   const [viewDate, setViewDate] = useState(() => {
     const base = value ? parseYYYYMMDD(value) : new Date();
     const d = base || new Date();
@@ -98,7 +99,15 @@ const CalendarPicker = ({ value, onChange }) => {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={() => {
+          if (!isOpen && wrapperRef.current) {
+            const rect = wrapperRef.current.getBoundingClientRect();
+            const spaceAbove = rect.top;
+            const calendarHeight = 230;
+            setOpenDirection(spaceAbove >= calendarHeight ? "up" : "down");
+          }
+          setIsOpen((o) => !o);
+        }}
         onKeyDown={(e) => e.key === "Enter" && setIsOpen((o) => !o)}
         style={{
           width: "100%",
@@ -125,12 +134,16 @@ const CalendarPicker = ({ value, onChange }) => {
           onClick={(e) => e.stopPropagation()}
           style={{
             position: "absolute",
-            bottom: "calc(100% + 2px)",
+            ...(openDirection === "up"
+              ? { bottom: "calc(100% + 2px)" }
+              : { top: "calc(100% + 2px)" }),
             left: 0,
             width: "100%",
             backgroundColor: "white",
             border: "1px solid #E5E7EB",
-            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+            boxShadow: openDirection === "up"
+              ? "0 -2px 8px rgba(0,0,0,0.12)"
+              : "0 2px 8px rgba(0,0,0,0.12)",
             zIndex: 1100,
             padding: "8px",
             boxSizing: "border-box",
