@@ -1,0 +1,128 @@
+Here's a thorough pre-deploy audit prompt you can hand to Claude (or any capable LLM) along with your form code. I've written it to catch the iframe/lead-loss issues we've been discussing plus the broader bug surface.
+
+Pre-Deploy Audit Prompt
+You are a senior full-stack engineer performing a pre-production audit of a customer-facing lead capture form. This form is embedded in an iframe on a marketing site and is the primary source of new leads for an auto transport brokerage. Every dropped lead is lost revenue. Your job is to find every bug, edge case, and silent failure mode before this ships.
+The code
+[Paste the full NewQuoteForm component, plus the LocationSearch component, the insertQuoteSchema Zod schema, the /api/quotes server route, and any auth middleware that runs before it.]
+Your audit must cover these categories, in order
+1. Silent lead loss (highest priority)
+A "lost lead" is any case where the customer believes they submitted the form but no record reaches the database. Find every path where this can happen:
+
+Validation failures that show a toast the customer might miss or ignore
+Auth/session failures that return 401/403 with no recovery path
+Network failures with no retry logic
+Client-side exceptions that white-screen the iframe
+Form state that doesn't persist across iOS Safari autofill
+Submit handlers that early-return without logging the attempt
+Cookie/CORS issues specific to iframe contexts (third-party cookie blocking, SameSite, CHIPS, ITP)
+Cases where calculatedPrice is null and Submit silently does nothing
+Race conditions between Calculate and Submit clicks
+
+For each one, describe: (a) the exact scenario, (b) what the customer sees, (c) what the server sees, (d) the fix.
+2. iframe-specific bugs
+This form runs inside an iframe on a different origin than the API. Audit specifically for:
+
+Third-party cookie behavior in Safari (ITP), Brave, Firefox strict mode
+credentials: 'include' reaching a cross-origin API without proper CORS headers
+position: fixed and position: sticky failing inside iOS Safari iframes
+Viewport sizing issues (does the dialog overflow the iframe?)
+Touch event handling on iOS (300ms tap delay, double-tap zoom)
+CSP frame-ancestors directives that could block render
+window.parent access attempts that would throw cross-origin errors
+Native date picker behavior on iOS inside an iframe
+
+3. Validation gaps
+
+Which fields are visually marked with * but not actually validated by Zod?
+Which Zod validations would silently coerce bad data (empty strings becoming 0, etc.)?
+What happens when originCity/originState/originZip are bypassed entirely (e.g., user clears the LocationSearch after selecting)?
+Are phone numbers validated for format? Emails for real format, not just includes('@')?
+Can the customer submit with a ship date in the past?
+Can vehicleType: "Other" be submitted with an empty vehicleSubType?
+Can the form be submitted with calculatedPrice from one origin/destination pair after the customer changed the origin/destination?
+
+4. State management bugs
+
+Where does component useState duplicate react-hook-form state, and can they drift?
+Does form.reset() clear ALL state including component state (vehicleType, vehicleSubType, originLocation, destinationLocation, calculatedPrice, calculatedMiles)?
+Are there places using form.getValues() for rendering that should use form.watch()?
+Does swapping origin/destination correctly update the LocationSearch displayed values?
+Does changing the make after selecting a model leave a stale model in state?
+
+5. Security & trust boundaries
+
+Is totalPrice calculated on the client and trusted by the server? (Customer can POST any price.)
+Is the duplicate-check endpoint leaking PII to unauthenticated callers?
+Is the quote-submission endpoint rate-limited? Per-IP and per-phone?
+Are there XSS vectors in the customerName, origin, destination fields when they're later rendered in a CRM dashboard?
+Is the leadSource field client-controlled and trusted? Can a competitor poison your attribution?
+Are server logs leaking customer PII (full payloads) in a way that violates retention policy?
+
+6. Mobile-specific issues
+
+Does grid-cols-2 and grid-cols-3 collapse correctly on a 375px iPhone SE viewport?
+Are tap targets ≥44px per iOS HIG?
+Does the sticky submit bar actually stick inside max-h-[90vh] overflow-y-auto?
+Does the iOS keyboard cover the Submit button when focused on a field near the bottom?
+Does the native date input behave correctly across iOS versions?
+
+7. Pricing & business logic bugs
+
+Does the tiered rate-per-mile create discontinuities where a longer trip costs less than a shorter one?
+What happens with a 0-mile route (same origin and destination)?
+What happens with international addresses that geocode but aren't actually shippable?
+Can the customer manipulate the form into a $0 quote that still submits?
+Is the broker/carrier fee split correctly preserved through the submit flow?
+
+8. Error messaging & observability
+
+For every throw new Error(...) and toast({variant: "destructive"}), ask: does the customer actually see this, do they know what to do next, and does the server log it?
+Are there any swallowed promises (e.g., the catch {} in checkDuplicatesServer)?
+Is there any client-side beacon that fires before the submit attempt, so failed submits can be reconstructed from logs?
+Is console.error going to a real logger in production or just to a browser console no one is reading?
+
+9. Race conditions & async ordering
+
+Can the user click Calculate twice and have the second response overwrite a fresh first response?
+Can the user click Submit before Calculate finishes?
+Can checkDuplicatesServer fire mid-submit and cause a UI flash that confuses the customer?
+Is createQuoteMutation properly debounced to prevent double-submission on a slow network?
+
+10. Accessibility & screen reader paths
+
+Does the form work for keyboard-only navigation?
+Are radio button labels properly associated?
+Does the LocationSearch announce results to screen readers?
+Does the error state on validation announce to assistive tech, or just show a red border?
+
+Output format
+For each issue you find, output:
+SEVERITY: [Critical | High | Medium | Low]
+CATEGORY: [from the list above]
+LOCATION: [file:line or component:section]
+SCENARIO: [exact reproduction steps a customer or attacker would take]
+CUSTOMER IMPACT: [what they see / what's lost]
+SERVER IMPACT: [what's logged, what's stored, what's missed]
+FIX: [concrete code change or architectural change]
+EFFORT: [Minutes | Hours | Days]
+Group findings by severity, critical first. End with:
+
+A "ship-blockers" list — issues that must be fixed before deploy.
+A "fix within 48 hours" list — ship-OK but urgent.
+A "backlog" list — real issues, not urgent.
+A "things I checked and they're fine" list — so I know the audit was thorough, not selective.
+
+Ground rules
+
+Do not be diplomatic. If something is wrong, say so plainly.
+Do not invent issues to pad the list. If the code is fine in a category, say so.
+Assume the worst customer: non-technical, on iOS Safari, on cellular, with autofill enabled, easily distracted, will not retry.
+Assume the worst attacker: a competitor who wants to poison your lead pipeline with junk data and fake high-value quotes.
+Prioritize lead loss above everything else. A bug that loses one lead per week is worse than a bug that's ugly but loses nothing.
+
+Begin the audit.
+
+A few notes on using this:
+Feed it the actual code, not summaries. The audit's only as good as the source it sees. Include the schema, the server route, and the auth middleware — most of the lead-loss bugs live at the seams between those files, not inside any single one.
+Run it twice with different models if you can — Opus and Sonnet will catch different things. Cheap insurance before a deploy.
+The "things I checked and they're fine" list is the most important section. Most audits are theater; that section forces the auditor to commit to coverage, which is what you actually need before pushing to prod.
