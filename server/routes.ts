@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import cors from "cors";
 import { storage } from "./storage";
 import { insertQuoteSchema, fallbackLeads, partialLeads } from "@shared/schema";
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and, gte, sql } from "drizzle-orm";
 import {
   sendConfirmationEmail,
   sendConfirmationSMS,
@@ -1407,16 +1407,60 @@ export function registerRoutes(app: Express): Server {
     }
 
     // ── Step 6: Fire Zapier AFTER response is sent ─────────────
-    console.log(`📤 [${diagnosticId}] Firing Zapier post-response...`);
-    sendToWebhook(webhookPayload, req.headers)
-      .then((result) => {
-        if (result?.success) {
-          console.log(`✅ [${diagnosticId}] Zapier webhook delivered (post-response)`);
-        } else {
-          console.error(`⚠️ [${diagnosticId}] Zapier returned failure (post-response):`, result?.message);
+    const isPartial = webhookPayload.eventType === "partial_submission";
+    const normalizedPhone = (formData.phone || "").replace(/\D/g, "");
+
+    if (isPartial && normalizedPhone) {
+      // Hold 2 minutes. If a full quote arrives from the same phone during that
+      // window, skip Zapier for the partial — the full quote will handle it.
+      console.log(`⏳ [${diagnosticId}] Partial lead — holding Zapier 2 min to check for full submission...`);
+      setTimeout(async () => {
+        try {
+          const cutoff = new Date(Date.now() - 3 * 60 * 1000);
+          const fullQuote = await db
+            .select({ id: fallbackLeads.id })
+            .from(fallbackLeads)
+            .where(
+              and(
+                gte(fallbackLeads.createdAt, cutoff),
+                sql`${fallbackLeads.data}->>'eventType' = 'quote_submission'`,
+                sql`regexp_replace(${fallbackLeads.data}->>'phone', '[^0-9]', '', 'g') = ${normalizedPhone}`
+              )
+            )
+            .limit(1);
+
+          if (fullQuote.length > 0) {
+            console.log(`⏭️  [${diagnosticId}] Skipping partial Zapier — full quote found for same phone`);
+            return;
+          }
+
+          console.log(`📤 [${diagnosticId}] No full quote found — firing Zapier for partial now`);
+          sendToWebhook(webhookPayload, {})
+            .then((result) => {
+              if (result?.success) {
+                console.log(`✅ [${diagnosticId}] Partial Zapier delivered (delayed)`);
+              } else {
+                console.error(`⚠️ [${diagnosticId}] Partial Zapier failed:`, result?.message);
+              }
+            })
+            .catch((err) => console.error(`❌ [${diagnosticId}] Partial Zapier threw:`, err));
+        } catch (err) {
+          console.error(`❌ [${diagnosticId}] Partial delay check failed — firing anyway:`, err);
+          sendToWebhook(webhookPayload, {}).catch(() => {});
         }
-      })
-      .catch((err) => console.error(`❌ [${diagnosticId}] Zapier threw (post-response):`, err));
+      }, 2 * 60 * 1000);
+    } else {
+      console.log(`📤 [${diagnosticId}] Firing Zapier post-response...`);
+      sendToWebhook(webhookPayload, req.headers)
+        .then((result) => {
+          if (result?.success) {
+            console.log(`✅ [${diagnosticId}] Zapier webhook delivered (post-response)`);
+          } else {
+            console.error(`⚠️ [${diagnosticId}] Zapier returned failure (post-response):`, result?.message);
+          }
+        })
+        .catch((err) => console.error(`❌ [${diagnosticId}] Zapier threw (post-response):`, err));
+    }
   });
 
   // Dedicated webhook endpoint for CRM integration
