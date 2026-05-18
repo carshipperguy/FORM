@@ -287,14 +287,14 @@ const SimpleQuoteForm = () => {
         // Intentionally omitting meta_capi_data — no CAPI events for partials
       };
 
+      // Send to partial-lead only (DB capture, no CRM/Zapier entry).
+      // The full quote submission handles Zapier when the customer completes the form.
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
 
       if (typeof navigator.sendBeacon === "function") {
-        // sendBeacon fires even if the tab is closed — preferred for blur events
-        navigator.sendBeacon("/api/submit-lead", blob);
+        navigator.sendBeacon("/api/partial-lead", blob);
       } else {
-        // Fallback for browsers without sendBeacon
-        fetch("/api/submit-lead", {
+        fetch("/api/partial-lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
