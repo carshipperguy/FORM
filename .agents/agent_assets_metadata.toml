@@ -78,3 +78,9 @@ id = "FRxU1df99AuqLk36bCeyh"
 uri = "file://missed_leads_updated.csv"
 type = "table"
 title = "Missed Leads — Updated (196 contacts, May 12 – Jun 3)"
+
+[[outputs]]
+id = "7OwmRrdBs-nEJDC9-3-i7"
+uri = "file://missed_leads_live.csv"
+type = "table"
+title = "Missed Leads — Live Export (165 contacts, last 20 days)"
