@@ -84,3 +84,9 @@ id = "7OwmRrdBs-nEJDC9-3-i7"
 uri = "file://missed_leads_live.csv"
 type = "table"
 title = "Missed Leads — Live Export (165 contacts, last 20 days)"
+
+[[outputs]]
+id = "Iz8QJN5xJMiDGDqISXNbF"
+uri = "file://missed_leads_7days.csv"
+type = "table"
+title = "Lost Leads — Last 7 Days (47 contacts, May 29 – Jun 5)"
