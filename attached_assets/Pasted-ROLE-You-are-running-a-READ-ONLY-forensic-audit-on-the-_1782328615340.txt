@@ -1,0 +1,61 @@
+ROLE: You are running a READ-ONLY forensic audit on the QUOTE CALCULATOR app (NOT ShipDesk). You are diagnosing, not fixing. You will not change a single file, run a migration, write to the DB, or redeploy. Violating this is a failure.
+
+CONTEXT: Amerigo's Facebook ad cost/day jumped from ~$9 (prior 22 days) to ~$60 (last 2 days). This app is the public quote form, connected to the Meta pixel/CAPI (Pixel 953087976815191) and is where leads actually convert. I need to rule out — with proof — whether ANY change in the last ~72 hours could have contributed, in EITHER direction:
+  (A) FLOOD: duplicate or malformed events to Meta, broken event_id dedup, retry/loop, or Lead/SubmitReservation firing more than once per action.
+  (B) BREAKAGE: people can no longer convert, or convert but the event doesn't fire — i.e. broken submit, failed validation blocking submit, the conversion event not firing on success, leads not persisting, leads landing dead/incomplete, or handoff to CRM/ShipDesk failing. Breakage starves Meta's optimization signal and wastes spend just as badly as a flood.
+
+HARD CONSTRAINTS (non-negotiable):
+- READ-ONLY. No file edits, no commits, no restarts that mutate state, no redeploy.
+- NO DB WRITES of any kind. SELECT for counts is allowed; INSERT/UPDATE/DELETE/DDL is forbidden. No drizzle-kit generate, no db:push, no migrations applied.
+- First, report the CURRENT TypeScript error baseline for THIS app (npm run check or equivalent) as a number. Do not change it. Do not run fixes.
+- EVIDENCE = raw terminal output and raw diffs ONLY. No self-graded checklists, no "✅ done," no prose claims without proof. Every assertion must show commit hash + file:line + the actual diff/log line.
+- If you find something you believe should be changed: STOP and report it for my approval. Do not act on it.
+- Never print secret VALUES. Reference env vars by NAME only.
+
+RUN EACH STEP AND PASTE RAW OUTPUT:
+
+1. TIMELINE — every commit in the last 72h:
+   git log --since="72 hours ago" --stat --date=iso --pretty=format:'%h | %ad | %an | %s'
+   Then full diffs: git log --since="72 hours ago" -p --date=iso
+
+2. UNCOMMITTED/RECENT FILES on disk:
+   find . -type f -mtime -3 -not -path "./node_modules/*" -not -path "./.git/*" | sort
+
+3. META/CAPI BLAST RADIUS — search the 72h diffs AND the live tree for:
+   capi, conversions, graph.facebook.com, 953087976815191, pixel, fbp, fbc, fbclid, event_id, Lead, SubmitReservation, PhoneCall, access_token (name only)
+   Use: git log --since="72 hours ago" -p -S"<term>" for each, plus a grep over the current tree. Show file:line for every hit.
+
+4. OUTBOUND META CALLS (flood check) — find every place that POSTs to the Conversions API / graph.facebook.com. For each, confirm with file:line: (a) an event_id is sent for dedup, (b) the SAME event_id is shared between the browser pixel and the server CAPI call for the same action, (c) no retry-without-backoff or loop, (d) a single user action cannot fire the same event more than once. Report any that fail.
+
+5. CONVERSION PATH INTEGRITY (breakage check) — trace the quote-submit flow end to end and show file:line for each link:
+   - The submit handler and the endpoint it POSTs to. Did anything in the 72h diffs change required fields, validation rules, the submit wiring, button/handler, or the success/error branching?
+   - Is there any path where submit can silently fail (validation error swallowed, endpoint 4xx/5xx, network error uncaught) so the user sees nothing convert?
+   - Did the conversion EVENT trigger move behind a new condition that could now be false? Show the exact condition.
+
+6. EVENT-FIRING CORRECTNESS — confirm with file:line: on a SUCCESSFUL quote submit, does the Lead/SubmitReservation event reliably fire to BOTH pixel and CAPI with a shared event_id? Flag any path where (a) submit succeeds but no event fires, or (b) an event fires but the submit/lead did not actually persist.
+
+7. IFRAME / CROSS-ORIGIN TRACKING — this form is served as a cross-origin iframe. Confirm with file:line whether fbp/fbc cookies and fbclid are actually captured in this context, or whether a 72h change (CSP, cookie SameSite, domain, embed config) could have broken cookie/param propagation and thus match quality. Report findings, do not change.
+
+8. LEAD CAPTURE / DEAD-LOST LEADS (READ-ONLY counts) — if leads/submissions are recorded:
+   - COUNT of leads created last 72h vs the prior comparable window. Paste query + raw counts.
+   - COUNT of leads in the last 72h with NULL/missing critical fields (name, phone, email, vehicle/lane) — i.e. dead/incomplete.
+   - Any leads stuck/un-forwarded to CRM/ShipDesk, if a status/handoff column exists. SELECT only.
+
+9. SCHEDULERS/WORKERS — grep for setInterval, cron, schedule, queue, worker, fire-and-forget. Flag any added/modified in 72h that make outbound API calls or fire events.
+
+10. ENV/CONFIG CHANGES — any 72h change to env-var usage (by NAME), build/start command, package.json deps/scripts, CSP/headers, or Replit deploy config. List them.
+
+11. ERROR/ANOMALY SCAN — last 72h: client-side JS errors on the form, server 4xx/5xx on the submit endpoint, Meta 4xx/429 responses, CORS/iframe errors. Paste raw log lines.
+
+OUTPUT FORMAT:
+- Section 0: Current TS error baseline for this app (number).
+- Section 1: Change timeline (commit | time | author | files).
+- Section 2: HIGH — anything touching Meta/CAPI/pixel/events OR the conversion/submit path OR lead persistence, with file:line + diff.
+- Section 3: MEDIUM — env/secrets/config/scheduler/CSP/iframe changes.
+- Section 4: LOW — everything else.
+- Section 5: LEAD SIGNAL — raw 72h-vs-prior counts (total, dead/incomplete, un-forwarded).
+- Section 6: VERDICT — answer BOTH separately, evidence-backed:
+    (A) Any code-side contributor to a Meta EVENT anomaly (flood/dup/malformed)? Name it with proof, or "None found in 72h window."
+    (B) Any conversion-blocking or lead-loss issue (people can't convert / events not firing / leads dead or lost)? Name it with proof, or "None found in 72h window."
+   Do not speculate beyond what the output shows.
+- Final line: "Changed nothing. Nothing redeployed. Awaiting your decision."
