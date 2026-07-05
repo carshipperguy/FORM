@@ -90,3 +90,9 @@ id = "Iz8QJN5xJMiDGDqISXNbF"
 uri = "file://missed_leads_7days.csv"
 type = "table"
 title = "Lost Leads — Last 7 Days (47 contacts, May 29 – Jun 5)"
+
+[[outputs]]
+id = "B6ujI6hH83XIuxpKkuSMq"
+uri = "file://lost_leads_45days.csv"
+type = "table"
+title = "Lost Leads — Last 45 Days (197 contacts)"
