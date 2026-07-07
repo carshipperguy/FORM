@@ -102,3 +102,9 @@ id = "ZmMO15XDi_89B302Vo9Wk"
 uri = "file://abandoned_leads_last30days.csv"
 type = "table"
 title = "Abandoned Leads — Last 30 Days (315 contacts)"
+
+[[outputs]]
+id = "QJlurBRVmAiZONFhvsH3_"
+uri = "file://vehicle_makes_models.csv"
+type = "table"
+title = "Vehicle Makes & Models — Current App List (609 rows)"
