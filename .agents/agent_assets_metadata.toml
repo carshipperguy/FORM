@@ -96,3 +96,9 @@ id = "B6ujI6hH83XIuxpKkuSMq"
 uri = "file://lost_leads_45days.csv"
 type = "table"
 title = "Lost Leads — Last 45 Days (197 contacts)"
+
+[[outputs]]
+id = "ZmMO15XDi_89B302Vo9Wk"
+uri = "file://abandoned_leads_last30days.csv"
+type = "table"
+title = "Abandoned Leads — Last 30 Days (315 contacts)"
