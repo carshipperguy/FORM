@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { registerV2Routes } from "./routes-v2";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -70,6 +71,9 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = registerRoutes(app);
+
+  // New native quote/booking pipeline (additive; does not affect legacy /api/* routes).
+  registerV2Routes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
